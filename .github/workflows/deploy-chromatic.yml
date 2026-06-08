@@ -1,0 +1,60 @@
+name: 'Deploy Chromatic'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+      - develop
+    paths:
+      - '**/*.stories.ts'
+      - '**/*.stories.tsx'
+      - '**/*.mdx'
+      - '.storybook/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic-deployment:
+    runs-on: ubuntu-latest
+    env:
+      WORKDIR: .
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish Chromatic
+        id: chromatic
+        uses: chromaui/action@latest
+        with:
+          workingDir: .
+          buildScriptName: build-storybook
+          autoAcceptChanges: true
+          onlyChanged: true
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment PR with Storybook URL
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          comment_tag: chromatic
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: '🚀storybook: ${{ steps.chromatic.outputs.storybookUrl }}'
