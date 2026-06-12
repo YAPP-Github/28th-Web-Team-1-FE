@@ -1,0 +1,230 @@
+# Feature-Sliced Design 가이드
+
+## FSD란?
+
+Feature-Sliced Design은 프론트엔드 코드를 **레이어 → 슬라이스 → 세그먼트** 3단계로 나누는 아키텍처입니다.
+
+- **레이어**: `app`, `views(pages)`, `widgets`, `features`, `entities`, `shared` (고정된 6개)
+- **슬라이스**: 각 레이어 안의 도메인/기능 단위 폴더 (예: `user`, `update-profile`)
+- **세그먼트**: 슬라이스 안의 역할별 폴더 (예: `ui`, `model`, `api`)
+
+---
+
+## Import 규칙
+
+### 1. 레이어 간 의존성은 단방향
+
+```
+app → views(pages) → widgets → features → entities → shared
+```
+
+위에서 아래 방향으로만 import할 수 있습니다. 역방향이나 같은 레이어 간 import는 금지입니다.
+
+```ts
+// ✅ feature → entity (하위 레이어 참조) — 허용
+import { userQueries } from '@/entities/user'
+
+// ❌ feature → feature (같은 레이어 간 참조) — 금지
+import { useDeleteProfile } from '@/features/delete-profile'
+
+// ❌ entity → feature (역방향) — 금지
+import { useUpdateProfile } from '@/features/update-profile'
+```
+
+### 2. 슬라이스 내부는 자유롭게 참조 가능
+
+FSD 규칙은 슬라이스 **경계**에만 적용됩니다.
+같은 슬라이스 안의 `ui`, `model`, `api` 끼리는 자유롭게 참조해도 됩니다.
+
+```ts
+// ✅ ui → model 참조 — 허용 (같은 슬라이스 내부)
+// features/update-profile/ui/UpdateProfileForm.tsx
+// 같은 슬라이스에서 참조할때는 index.ts를 거치지 않고 바로 참조해도 됨
+import { isEditingAtom } from '../model/update-profile.atoms'
+```
+
+### 3. Public API (index.ts) 를 통해서만 import
+
+슬라이스 외부에서 참조할 때는 반드시 `index.ts`를 통해야 합니다. 내부 경로 직접 참조(딥 import)는 금지입니다.
+shared 레이어는 예외적으로 모든 슬라이스에서 자유롭게 참조할 수 있습니다.
+
+```ts
+// ✅ index.ts를 통한 참조 — 허용
+import { UserAvatar } from '@/entities/user'
+
+// ❌ 내부 경로 직접 참조 — 금지
+import { UserAvatar } from '@/entities/user/ui/UserAvatar'
+```
+
+### 요약
+
+| 참조 방향                                     | 허용 여부          |
+| --------------------------------------------- | ------------------ |
+| 같은 슬라이스 내부 (ui → model)               | ✅                 |
+| 하위 레이어 슬라이스 참조 (feature → entity)  | ✅ index.ts 통해서 |
+| 같은 레이어 다른 슬라이스 (feature → feature) | ❌                 |
+| 상위 레이어 참조 (entity → feature)           | ❌                 |
+| 슬라이스 내부 경로 직접 참조 (딥 import)      | ❌                 |
+
+---
+
+## 코드 배치 규칙
+
+### TanStack Query
+
+| 종류               | 위치               | 예시                |
+| ------------------ | ------------------ | ------------------- |
+| 쿼리키             | `entities/*/model` | `user.keys.ts`      |
+| 조회 (useQuery)    | `entities/*/model` | `user.queries.ts`   |
+| 변경 (useMutation) | `entities/*/model` | `user.mutations.ts` |
+
+```ts
+// ✅ entities/user/model/user.keys.ts
+export const userKeys = {
+  all: () => ['user'] as const,
+  lists: () => [...userKeys.all(), 'list'] as const,
+  detail: (id: string) => [...userKeys.all(), id] as const
+}
+
+export const userQueries = {
+  all: () =>
+    queryOptions({
+      queryKey: userKeys.all(),
+      queryFn: getUserList
+    }),
+  detail: (id: string) =>
+    queryOptions({
+      queryKey: userKeys.detail(id),
+      queryFn: () => getUser(id)
+    })
+}
+
+// ✅ entities/user/model/user.mutations.ts
+export const useUpdateUser = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: updateUser,
+    onSuccess: () => qc.invalidateQueries({ queryKey: userQueries.all() })
+  })
+}
+
+// ✅ features/update-profile/ui/UpdateProfileForm.tsx
+// mutation은 entities에서 가져다 씀
+import { useUpdateUser } from '@/entities/user'
+```
+
+### Jotai
+
+Jotai는 **atom 단위로 상태를 선언**합니다.
+파일명은 `*.atoms.ts`로 작성합니다.
+
+| 상태 종류                           | 위치               | 예시               |
+| ----------------------------------- | ------------------ | ------------------ |
+| 전역 도메인 상태 (여러 곳에서 사용) | `entities/*/model` | `session.atoms.ts` |
+| 특정 기능 UI 상태                   | `features/*/model` | `draft.atoms.ts`   |
+| 특정 위젯 UI 상태                   | `widgets/*/model`  | `sidebar.atoms.ts` |
+
+```ts
+// ❌ 금지 — 서버 데이터를 Jotai atom에 복사
+const userAtom = atom<User | null>(null)
+
+// ❌ 금지 — 서버 데이터를 atom에서 fetch하는 패턴
+const userAtom = atom(async () => {
+  return await getUser()
+})
+
+// ✅ 서버 데이터는 TanStack Query
+const { data: user } = useQuery(userQueries.detail(id))
+
+// ✅ Jotai는 순수 클라이언트 상태만
+// features/update-profile/model/update-profile.atoms.ts
+import { atom } from 'jotai'
+
+export const isEditingAtom = atom(false)
+```
+
+#### derived atom (읽기 전용 파생 상태)
+
+```ts
+// ✅ 다른 atom에서 파생된 상태
+// entities/session/model/session.atoms.ts
+import { atom } from 'jotai'
+
+export const sessionAtom = atom<Session | null>(null)
+
+export const isLoggedInAtom = atom((get) => get(sessionAtom) !== null)
+```
+
+---
+
+## 폴더 구조
+
+```text
+📁 28TH-WEB-TEAM-1-FE/
+├── 📁 app/                         # Next.js App Router (라우팅만, 로직 없음)
+│   ├── 📄 layout.tsx               # src/app의 Layout을 재사용
+│   ├── 📄 page.tsx                 # → views에서 re-export만
+│   ├── 📁 dashboard/
+│   │   └── 📄 page.tsx             # import { DashboardPage } from '@/views/dashboard'
+│   └── 📁 api/                     # Route Handlers
+│
+├── 📁 src/
+│   ├── 📁 app/                     # FSD app 레이어: 전역 설정
+│   │   ├── 📁 providers/
+│   │   │   ├── 📄 QueryProvider.tsx       # QueryClientProvider
+│   │   │   ├── 📄 AnalyticsProvider.tsx   # PostHog/Mixpanel init 등
+│   │   │   └── 📄 index.tsx               # Provider 합성 (Jotai Provider는 필요시만)
+│   │   ├── 📁 styles/
+│   │   │   ├── 📄 globals.css
+│   │   │   └── 📄 fonts.ts               # Next.js 폰트 최적화
+│   │   ├── 📁 layouts/
+│   │   │   ├── 📄 RootLayout.tsx
+│   │   │   └── 📄 DashboardLayout.tsx
+│   │   └── 📁 config/                    # env 검증 등
+│   │
+│   ├── 📁 views/                   # FSD pages 레이어 (이름만 변경)
+│   │   └── 📁 dashboard/
+│   │       ├── 📁 ui
+│   │       │   ├── 📄 DashboardPage.tsx   # page.tsx
+│   │       │   └── 📄 Menu.tsx
+│   │       ├── 📄 model/DashboardPage.atoms.ts  # 페이지 단위 상태 (Jotai atom)
+│   │       └── 📄 index.ts         # Public API
+│   │
+│   ├── 📁 widgets/                 # 페이지를 구성하는 큰 블록
+│   │   └── 📁 header/
+│   │       ├── 📄 ui/Header.tsx
+│   │       ├── 📄 model/header.atoms.ts
+│   │       └── 📄 index.ts
+│   │
+│   ├── 📁 features/                # 사용자 행동 단위 (동사로 네이밍)
+│   │   └── 📁 update_profile/
+│   │       ├── 📄 ui/UpdateProfileForm.tsx # mutation은 entities에서 import
+│   │       ├── 📄 model/update-profile.atoms.ts  # isEditing 등 UI 상태
+│   │       └── 📄 index.ts
+│   │
+│   ├── 📁 entities/                # 비즈니스 도메인 (명사로 네이밍)
+│   │   └── 📁 user/
+│   │       ├── 📄 api/user.api.ts          # fetch 함수
+│   │       ├── 📁 model/
+│   │       │   ├── 📄 user.keys.ts         # 쿼리키 (queryOptions, queryKey)
+│   │       │   ├── 📄 user.queries.ts      # useQuery
+│   │       │   ├── 📄 user.mutations.ts    # useMutation
+│   │       │   ├── 📄 user.atoms.ts        # 전역 도메인 클라이언트 상태 (Jotai atom)
+│   │       │   └── 📄 user.types.ts
+│   │       ├── 📄 ui/UserAvatar.tsx
+│   │       └── 📄 index.ts
+│   │
+│   └── 📁 shared/                  # 도메인 무관 공통 코드
+│       ├── 📁 config/              # 상수
+│       ├── 📁 hooks/               # 공통 훅
+│       ├── 📁 types/               # 공통 타입
+│       │   └── 📄 category.ts
+│       ├── 📁 ui/                  # 디자인시스템 (공통 컴포넌트 및 스토리)
+│       │   └── 📁 button/
+│       │       ├── 📄 Button.tsx
+│       │       ├── 📄 Button.stories.tsx
+│       │       └── 📄 index.ts     # 공통 컴포넌트의 Public API
+│       └── 📁 lib/                 # cn, formatDate, http 등 유틸리티 함수
+│
+└── 📁 .storybook/
+```
