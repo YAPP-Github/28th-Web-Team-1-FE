@@ -40,7 +40,7 @@ FSD 규칙은 슬라이스 **경계**에만 적용됩니다.
 // ✅ ui → model 참조 — 허용 (같은 슬라이스 내부)
 // features/update-profile/ui/UpdateProfileForm.tsx
 // 같은 슬라이스에서 참조할때는 index.ts를 거치지 않고 바로 참조해도 됨
-import { useUpdateProfile } from '../model/use-update-profile'
+import { isEditingAtom } from '../model/update-profile.atoms'
 ```
 
 ### 3. Public API (index.ts) 를 통해서만 import
@@ -113,29 +113,46 @@ export const useUpdateUser = () => {
 import { useUpdateUser } from '@/entities/user'
 ```
 
-### Zustand
+### Jotai
+
+Jotai는 **atom 단위로 상태를 선언**합니다.
+파일명은 `*.atoms.ts`로 작성합니다.
 
 | 상태 종류                           | 위치               | 예시               |
 | ----------------------------------- | ------------------ | ------------------ |
-| 전역 도메인 상태 (여러 곳에서 사용) | `entities/*/model` | `session.store.ts` |
-| 특정 기능 UI 상태                   | `features/*/model` | `draft.store.ts`   |
-| 특정 위젯 UI 상태                   | `widgets/*/model`  | `sidebar.store.ts` |
+| 전역 도메인 상태 (여러 곳에서 사용) | `entities/*/model` | `session.atoms.ts` |
+| 특정 기능 UI 상태                   | `features/*/model` | `draft.atoms.ts`   |
+| 특정 위젯 UI 상태                   | `widgets/*/model`  | `sidebar.atoms.ts` |
 
 ```ts
-// ❌ 금지 — 서버 데이터를 Zustand에 복사
-const useUserStore = create((set) => ({
-  user: null,
-  fetchUser: async () => {
-    const user = await getUser()
-    set({ user })
-  }
-}))
+// ❌ 금지 — 서버 데이터를 Jotai atom에 복사
+const userAtom = atom<User | null>(null)
+
+// ❌ 금지 — 서버 데이터를 atom에서 fetch하는 패턴
+const userAtom = atom(async () => {
+  return await getUser()
+})
 
 // ✅ 서버 데이터는 TanStack Query
 const { data: user } = useQuery(userQueries.detail(id))
 
-// ✅ Zustand는 순수 클라이언트 상태만
-const { isEditing, setIsEditing } = useEditStore()
+// ✅ Jotai는 순수 클라이언트 상태만
+// features/update-profile/model/update-profile.atoms.ts
+import { atom } from 'jotai'
+
+export const isEditingAtom = atom(false)
+```
+
+#### derived atom (읽기 전용 파생 상태)
+
+```ts
+// ✅ 다른 atom에서 파생된 상태
+// entities/session/model/session.atoms.ts
+import { atom } from 'jotai'
+
+export const sessionAtom = atom<Session | null>(null)
+
+export const isLoggedInAtom = atom((get) => get(sessionAtom) !== null)
 ```
 
 ---
@@ -156,7 +173,7 @@ const { isEditing, setIsEditing } = useEditStore()
 │   │   ├── 📁 providers/
 │   │   │   ├── 📄 QueryProvider.tsx       # QueryClientProvider
 │   │   │   ├── 📄 AnalyticsProvider.tsx   # PostHog/Mixpanel init 등
-│   │   │   └── 📄 index.tsx               # Provider 합성
+│   │   │   └── 📄 index.tsx               # Provider 합성 (Jotai Provider는 필요시만)
 │   │   ├── 📁 styles/
 │   │   │   ├── 📄 globals.css
 │   │   │   └── 📄 fonts.ts               # Next.js 폰트 최적화
@@ -170,18 +187,19 @@ const { isEditing, setIsEditing } = useEditStore()
 │   │       ├── 📁 ui
 │   │       │   ├── 📄 DashboardPage.tsx   # page.tsx
 │   │       │   └── 📄 Menu.tsx
-│   │       ├── 📄 model/DashboardPage.store.ts # 페이지 단위 상태 (Zustand)
+│   │       ├── 📄 model/DashboardPage.atoms.ts  # 페이지 단위 상태 (Jotai atom)
 │   │       └── 📄 index.ts         # Public API
 │   │
 │   ├── 📁 widgets/                 # 페이지를 구성하는 큰 블록
 │   │   └── 📁 header/
 │   │       ├── 📄 ui/Header.tsx
-│   │       ├── 📄 model/header.store.ts
+│   │       ├── 📄 model/header.atoms.ts
 │   │       └── 📄 index.ts
 │   │
 │   ├── 📁 features/                # 사용자 행동 단위 (동사로 네이밍)
 │   │   └── 📁 update_profile/
 │   │       ├── 📄 ui/UpdateProfileForm.tsx # mutation은 entities에서 import
+│   │       ├── 📄 model/update-profile.atoms.ts  # isEditing 등 UI 상태
 │   │       └── 📄 index.ts
 │   │
 │   ├── 📁 entities/                # 비즈니스 도메인 (명사로 네이밍)
@@ -191,6 +209,7 @@ const { isEditing, setIsEditing } = useEditStore()
 │   │       │   ├── 📄 user.keys.ts         # 쿼리키 (queryOptions, queryKey)
 │   │       │   ├── 📄 user.queries.ts      # useQuery
 │   │       │   ├── 📄 user.mutations.ts    # useMutation
+│   │       │   ├── 📄 user.atoms.ts        # 전역 도메인 클라이언트 상태 (Jotai atom)
 │   │       │   └── 📄 user.types.ts
 │   │       ├── 📄 ui/UserAvatar.tsx
 │   │       └── 📄 index.ts
