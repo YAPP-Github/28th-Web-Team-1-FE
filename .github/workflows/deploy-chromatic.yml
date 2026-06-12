@@ -1,0 +1,76 @@
+name: 'Deploy Chromatic'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+      - develop
+    paths:
+      - '**/*.stories.ts'
+      - '**/*.stories.tsx'
+      - '**/*.mdx'
+      - '.storybook/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic-deployment:
+    runs-on: ubuntu-latest
+    env:
+      WORKDIR: .
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish Chromatic
+        id: chromatic
+        uses: chromaui/action@latest
+        with:
+          workingDir: .
+          buildScriptName: build-storybook
+          autoAcceptChanges: true
+          onlyChanged: true
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment PR with Storybook URL
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          comment_tag: chromatic
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: '🚀storybook: ${{ steps.chromatic.outputs.storybookUrl }}'
+
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          STORYBOOK_URL: ${{ steps.chromatic.outputs.storybookUrl }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          PAYLOAD=$(jq -n \
+                --arg content "🚀 **Storybook 배포 완료**\nPR: [#${PR_NUMBER} - ${PR_TITLE}](${PR_URL}) by **${PR_AUTHOR}**\n📖 [Storybook 열기](${STORYBOOK_URL})" \
+                '{content: $content}')
+              curl -H "Content-Type: application/json" \
+                -d "$PAYLOAD" \
+                "$DISCORD_WEBHOOK_URL"
