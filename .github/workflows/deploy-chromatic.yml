@@ -9,7 +9,7 @@ on:
     types: [opened, synchronize]
     branches:
       - main
-      - develop
+      - dev
     paths:
       - '**/*.stories.ts'
       - '**/*.stories.tsx'
