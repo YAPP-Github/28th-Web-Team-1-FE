@@ -25,12 +25,13 @@ pre-commit:
 #  현재 git add {staged_files}가 주석 처리되어 있어서, 수정된 내용이 staging에 반영되지 않습니다.
 #  즉 커밋에는 원본(수정 전) 파일이 올라가게 됩니다.
 
-# pre-push: push 전에 전체 타입체크 + 빌드를 수행
+# pre-push: push 전에 전체 타입체크 수행
+# build: CI에서 자동 검증되므로 생략
 pre-push:
   parallel: true
   commands:
     typecheck:
       run: npx tsc --noEmit
-    build:
-      run: npm run build
+    # build:
+    #   run: npm run build
 
