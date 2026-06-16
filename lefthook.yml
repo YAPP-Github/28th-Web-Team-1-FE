@@ -1,0 +1,37 @@
+colors: true
+
+# prepare-commit-msg: 커밋 메시지 에디터가 열리기 전에 실행됨
+# 브랜치명(feat/#12)에서 이슈 번호를 추출해 커밋 메시지에 자동 추가
+prepare-commit-msg:
+  commands:
+    add-issue:
+      run: ./scripts/prepare-commit-msg.sh "{1}" "{2}"
+
+# commit-msg: 커밋 메시지가 작성된 후 포맷을 검증함
+# 형식: {icon}[{type}] {message} (#{issue_num})
+commit-msg:
+  commands:
+    validate:
+      run: ./scripts/validate-commit-msg.sh "{1}"
+
+# pre-commit: git add 된 파일(staged)에 대해 lint 실행
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "*.{js,jsx,ts,tsx,mjs}"
+      run: npx eslint --fix {staged_files}
+#      && git add {staged_files}
+#  현재 git add {staged_files}가 주석 처리되어 있어서, 수정된 내용이 staging에 반영되지 않습니다.
+#  즉 커밋에는 원본(수정 전) 파일이 올라가게 됩니다.
+
+# pre-push: push 전에 전체 타입체크 수행
+# build: CI에서 자동 검증되므로 생략
+pre-push:
+  parallel: true
+  commands:
+    typecheck:
+      run: npx tsc --noEmit
+    # build:
+    #   run: npm run build
+
