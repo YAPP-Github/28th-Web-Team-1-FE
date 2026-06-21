@@ -12,7 +12,7 @@ import globals from 'globals'
 import { fixupPluginRules } from '@eslint/compat'
 
 export default tseslint.config({
-  ignores: ['node_modules', 'dist', 'build', '.next', 'out']
+  ignores: ['node_modules', 'dist', 'build', '.next', 'out', 'public/mockServiceWorker.js']
 }, js.configs.recommended, ...tseslint.configs.recommended, {
   files: ['**/*.{js,jsx,ts,tsx}'],
   languageOptions: {
