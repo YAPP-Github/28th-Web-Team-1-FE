@@ -45,6 +45,7 @@
     "eslint-plugin-storybook": "^10.4.2",
     "globals": "^17.0.0",
     "lefthook": "^2.1.9",
+    "msw": "^2.14.6",
     "playwright": "^1.60.0",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
