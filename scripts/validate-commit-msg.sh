@@ -2,6 +2,10 @@
 
 commit_msg=$(grep -v '^#' "$1" | head -1)
 
+if [[ "$commit_msg" =~ ^Merge ]]; then
+  exit 0
+fi
+
 pattern='^.+\[(Feat|Fix|Docs|Style|Refactor|Test|Chore)\] .+( \(#[0-9]+\))?$'
 
 if [[ -n "$commit_msg" ]] && ! [[ "$commit_msg" =~ $pattern ]]; then
