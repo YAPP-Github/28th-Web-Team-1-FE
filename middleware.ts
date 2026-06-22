@@ -9,6 +9,8 @@ export const middleware = async (request: NextRequest) => {
   const accessToken = request.cookies.get('access_token')?.value
   const refreshToken = request.cookies.get('refresh_token')?.value
 
+  // TODO : 와이어프레임 기반 디자인 확정 후 접근 제어 보강 필요
+  //  - 인증이 필요한 페이지 진입 전 middleware에서 accessToken 유무 확인 후 없으면 로그인 페이지로 리다이렉트
   if (accessToken || !refreshToken) return NextResponse.next()
 
   const tokens = await refreshTokens(refreshToken)
