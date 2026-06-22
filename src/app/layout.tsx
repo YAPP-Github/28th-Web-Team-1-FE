@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './style/globals.css'
+import '@radix-ui/themes/styles.css'
 import { Providers } from './provider'
 
 const geistSans = Geist({

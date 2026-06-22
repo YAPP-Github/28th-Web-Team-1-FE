@@ -1,8 +1,14 @@
+import { Flex, Heading, Text } from '@radix-ui/themes'
+
 export const HomePage = () => {
   return (
-    <div className="flex h-screen flex-col items-center justify-center">
-      <h1 className="mb-4 text-4xl font-bold">Welcome to the Home Page</h1>
-      <p className="mb-8 text-lg text-gray-600">This is the main landing page of our application.</p>
-    </div>
+    <Flex direction={'column'} align={'center'} justify={'center'} className="h-screen">
+      <Heading weight={'bold'} size={'8'} className="mb-4">
+        Welcome to the Home Page
+      </Heading>
+      <Text as={'p'} size={'6'} color={'gray'} className="mb-8">
+        This is the main landing page of our application.
+      </Text>
+    </Flex>
   )
 }
