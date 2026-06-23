@@ -52,9 +52,6 @@ export const AllVariants: Story = {
 export const Playground: Story = {
   args: {
     variant: 'title1',
-    size: '6',
-    weight: 'regular',
-    color: 'gray-90',
     children: 'YAPP'
   }
 }

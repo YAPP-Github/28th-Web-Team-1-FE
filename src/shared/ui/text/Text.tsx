@@ -65,6 +65,9 @@ export const typographyVariants: Record<TypographyVariant, string> = {
  *   size="8" → 35px
  *   size="9" → 60px
  *
+ * ## Prop 우선순위
+ * `variant` > `weight`, `size` — weight, size와 함께 설정 시 variant가 적용
+ *
  * @example
  * ```
  * <Text variant="body1">본문 텍스트</Text>
