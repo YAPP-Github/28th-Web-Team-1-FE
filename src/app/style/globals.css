@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@radix-ui/themes/styles.css";
+@import "@radix-ui/themes/styles.css" layer(components);
 
 /* ── Color Palette ── */
 @theme inline {
