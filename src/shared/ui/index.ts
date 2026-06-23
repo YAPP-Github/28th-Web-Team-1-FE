@@ -1,2 +1,2 @@
-export { Text } from './text'
-export { Heading } from './heading'
+export { Text } from './typography/text'
+export { Heading } from './typography/heading'

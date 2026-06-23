@@ -1,6 +1,7 @@
 import { Flex } from '@radix-ui/themes'
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import { Text, typographyVariants } from './Text'
+import { Text } from './Text'
+import { typographyVariants } from '../shared'
 import { CUSTOM_COLORS } from '@shared/config'
 
 const meta = {
@@ -40,7 +41,7 @@ type Story = StoryObj<typeof meta>
 export const AllVariants: Story = {
   render: () => (
     <Flex direction={'column'} align={'start'} justify={'start'} className="space-y-2">
-      {(Object.keys(typographyVariants) as Array<keyof typeof typographyVariants>).map((variant) => (
+      {(Object.keys(typographyVariants) as Array<keyof typeof typographyVariants>).map((variant: keyof typeof typographyVariants) => (
         <Text key={variant} variant={variant}>
           {variant}
         </Text>
@@ -52,6 +53,6 @@ export const AllVariants: Story = {
 export const Playground: Story = {
   args: {
     variant: 'title1',
-    children: 'YAPP'
+    children: 'YAPP-TEXT'
   }
 }

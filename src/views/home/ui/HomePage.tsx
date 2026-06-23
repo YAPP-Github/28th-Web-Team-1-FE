@@ -1,4 +1,5 @@
-import { Flex, Heading, Text } from '@radix-ui/themes'
+import { Flex } from '@radix-ui/themes'
+import { Heading, Text } from '@shared/ui'
 
 export const HomePage = () => {
   return (
@@ -6,7 +7,7 @@ export const HomePage = () => {
       <Heading weight={'bold'} size={'8'} className="mb-4">
         Welcome to the Home Page
       </Heading>
-      <Text as={'p'} size={'6'} color={'gray'} className="mb-8">
+      <Text as={'p'} size={'6'} color={'gray-10'} className="mb-8">
         This is the main landing page of our application.
       </Text>
     </Flex>
