@@ -1,0 +1,433 @@
+# Color Palette
+
+커스텀 팔레트는 `src/app/style/globals.css`의 `@theme inline` 블록에 정의되어 있습니다.
+
+## 사용법
+
+```tsx
+import { Text } from '@shared/ui'
+
+<Text color="red-40">빨간색 텍스트</Text>
+<Text color="gray-60">회색 텍스트</Text>
+<Text color="green-40" weight="semibold">초록 semibold</Text>
+```
+
+혹은 Tailwind 유틸리티 클래스를 직접 사용:
+
+```tsx
+<div className="text-red-40 bg-gray-5 border-green-40">...</div>
+```
+
+CSS 변수 참조:
+
+```css
+color: var(--color-red-40);
+background-color: var(--color-gray-5);
+border-color: var(--color-green-40);
+```
+
+---
+
+## Red
+
+<table>
+  <thead>
+    <tr>
+      <th style={{ textAlign: 'left' }}>Swatch</th>
+      <th style={{ textAlign: 'left' }}>Name</th>
+      <th style={{ textAlign: 'left' }}>Variable</th>
+      <th style={{ textAlign: 'left' }}>Hex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FFFFFF', border: '1px solid #CDD1D5' }} /></td>
+      <td><code>red-0</code></td>
+      <td><code>--color-red-0</code></td>
+      <td><code>#FFFFFF</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FDEFEC' }} /></td>
+      <td><code>red-5</code></td>
+      <td><code>--color-red-5</code></td>
+      <td><code>#FDEFEC</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FCDFD9' }} /></td>
+      <td><code>red-10</code></td>
+      <td><code>--color-red-10</code></td>
+      <td><code>#FCDFD9</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#F7AFA1' }} /></td>
+      <td><code>red-20</code></td>
+      <td><code>--color-red-20</code></td>
+      <td><code>#F7AFA1</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#F48771' }} /></td>
+      <td><code>red-30</code></td>
+      <td><code>--color-red-30</code></td>
+      <td><code>#F48771</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#F05F42' }} /></td>
+      <td><code>red-40</code></td>
+      <td><code>--color-red-40</code></td>
+      <td><code>#F05F42</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#DE3412' }} /></td>
+      <td><code>red-50</code></td>
+      <td><code>--color-red-50</code></td>
+      <td><code>#DE3412</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#BD2C0F' }} /></td>
+      <td><code>red-60</code></td>
+      <td><code>--color-red-60</code></td>
+      <td><code>#BD2C0F</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#8A240F' }} /></td>
+      <td><code>red-70</code></td>
+      <td><code>--color-red-70</code></td>
+      <td><code>#8A240F</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#5C180A' }} /></td>
+      <td><code>red-80</code></td>
+      <td><code>--color-red-80</code></td>
+      <td><code>#5C180A</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#390D05' }} /></td>
+      <td><code>red-90</code></td>
+      <td><code>--color-red-90</code></td>
+      <td><code>#390D05</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#260903' }} /></td>
+      <td><code>red-95</code></td>
+      <td><code>--color-red-95</code></td>
+      <td><code>#260903</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#000000' }} /></td>
+      <td><code>red-100</code></td>
+      <td><code>--color-red-100</code></td>
+      <td><code>#000000</code></td>
+    </tr>
+  </tbody>
+</table>
+
+## Yellow
+
+<table>
+  <thead>
+    <tr>
+      <th style={{ textAlign: 'left' }}>Swatch</th>
+      <th style={{ textAlign: 'left' }}>Name</th>
+      <th style={{ textAlign: 'left' }}>Variable</th>
+      <th style={{ textAlign: 'left' }}>Hex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FFFFFF', border: '1px solid #CDD1D5' }} /></td>
+      <td><code>yellow-0</code></td>
+      <td><code>--color-yellow-0</code></td>
+      <td><code>#FFFFFF</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FFF3DB' }} /></td>
+      <td><code>yellow-5</code></td>
+      <td><code>--color-yellow-5</code></td>
+      <td><code>#FFF3DB</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FFE0A3' }} /></td>
+      <td><code>yellow-10</code></td>
+      <td><code>--color-yellow-10</code></td>
+      <td><code>#FFE0A3</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FFC95C' }} /></td>
+      <td><code>yellow-20</code></td>
+      <td><code>--color-yellow-20</code></td>
+      <td><code>#FFC95C</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FFB114' }} /></td>
+      <td><code>yellow-30</code></td>
+      <td><code>--color-yellow-30</code></td>
+      <td><code>#FFB114</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#C78500' }} /></td>
+      <td><code>yellow-40</code></td>
+      <td><code>--color-yellow-40</code></td>
+      <td><code>#C78500</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#9E6A00' }} /></td>
+      <td><code>yellow-50</code></td>
+      <td><code>--color-yellow-50</code></td>
+      <td><code>#9E6A00</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#8A5C00' }} /></td>
+      <td><code>yellow-60</code></td>
+      <td><code>--color-yellow-60</code></td>
+      <td><code>#8A5C00</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#614100' }} /></td>
+      <td><code>yellow-70</code></td>
+      <td><code>--color-yellow-70</code></td>
+      <td><code>#614100</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#422C00' }} /></td>
+      <td><code>yellow-80</code></td>
+      <td><code>--color-yellow-80</code></td>
+      <td><code>#422C00</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#2E1F00' }} /></td>
+      <td><code>yellow-90</code></td>
+      <td><code>--color-yellow-90</code></td>
+      <td><code>#2E1F00</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#241800' }} /></td>
+      <td><code>yellow-95</code></td>
+      <td><code>--color-yellow-95</code></td>
+      <td><code>#241800</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#000000' }} /></td>
+      <td><code>yellow-100</code></td>
+      <td><code>--color-yellow-100</code></td>
+      <td><code>#000000</code></td>
+    </tr>
+  </tbody>
+</table>
+
+## Green
+
+<table>
+  <thead>
+    <tr>
+      <th style={{ textAlign: 'left' }}>Swatch</th>
+      <th style={{ textAlign: 'left' }}>Name</th>
+      <th style={{ textAlign: 'left' }}>Variable</th>
+      <th style={{ textAlign: 'left' }}>Hex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FFFFFF', border: '1px solid #CDD1D5' }} /></td>
+      <td><code>green-0</code></td>
+      <td><code>--color-green-0</code></td>
+      <td><code>#FFFFFF</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#EAF6EC' }} /></td>
+      <td><code>green-5</code></td>
+      <td><code>--color-green-5</code></td>
+      <td><code>#EAF6EC</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#D8EEDD' }} /></td>
+      <td><code>green-10</code></td>
+      <td><code>--color-green-10</code></td>
+      <td><code>#D8EEDD</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#A9DAB4' }} /></td>
+      <td><code>green-20</code></td>
+      <td><code>--color-green-20</code></td>
+      <td><code>#A9DAB4</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#7EC88E' }} /></td>
+      <td><code>green-30</code></td>
+      <td><code>--color-green-30</code></td>
+      <td><code>#7EC88E</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#3FA654' }} /></td>
+      <td><code>green-40</code></td>
+      <td><code>--color-green-40</code></td>
+      <td><code>#3FA654</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#228738' }} /></td>
+      <td><code>green-50</code></td>
+      <td><code>--color-green-50</code></td>
+      <td><code>#228738</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#267337' }} /></td>
+      <td><code>green-60</code></td>
+      <td><code>--color-green-60</code></td>
+      <td><code>#267337</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#285D33' }} /></td>
+      <td><code>green-70</code></td>
+      <td><code>--color-green-70</code></td>
+      <td><code>#285D33</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#1F4727' }} /></td>
+      <td><code>green-80</code></td>
+      <td><code>--color-green-80</code></td>
+      <td><code>#1F4727</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#122B18' }} /></td>
+      <td><code>green-90</code></td>
+      <td><code>--color-green-90</code></td>
+      <td><code>#122B18</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#0E2012' }} /></td>
+      <td><code>green-95</code></td>
+      <td><code>--color-green-95</code></td>
+      <td><code>#0E2012</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#000000' }} /></td>
+      <td><code>green-100</code></td>
+      <td><code>--color-green-100</code></td>
+      <td><code>#000000</code></td>
+    </tr>
+  </tbody>
+</table>
+
+## Gray
+
+<table>
+  <thead>
+    <tr>
+      <th style={{ textAlign: 'left' }}>Swatch</th>
+      <th style={{ textAlign: 'left' }}>Name</th>
+      <th style={{ textAlign: 'left' }}>Variable</th>
+      <th style={{ textAlign: 'left' }}>Hex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#FFFFFF', border: '1px solid #CDD1D5' }} /></td>
+      <td><code>gray-0</code></td>
+      <td><code>--color-gray-0</code></td>
+      <td><code>#FFFFFF</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#F4F5F6' }} /></td>
+      <td><code>gray-5</code></td>
+      <td><code>--color-gray-5</code></td>
+      <td><code>#F4F5F6</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#E6E8EA' }} /></td>
+      <td><code>gray-10</code></td>
+      <td><code>--color-gray-10</code></td>
+      <td><code>#E6E8EA</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#CDD1D5' }} /></td>
+      <td><code>gray-20</code></td>
+      <td><code>--color-gray-20</code></td>
+      <td><code>#CDD1D5</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#B1B8BE' }} /></td>
+      <td><code>gray-30</code></td>
+      <td><code>--color-gray-30</code></td>
+      <td><code>#B1B8BE</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#8A949E' }} /></td>
+      <td><code>gray-40</code></td>
+      <td><code>--color-gray-40</code></td>
+      <td><code>#8A949E</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#6D7882' }} /></td>
+      <td><code>gray-50</code></td>
+      <td><code>--color-gray-50</code></td>
+      <td><code>#6D7882</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#58616A' }} /></td>
+      <td><code>gray-60</code></td>
+      <td><code>--color-gray-60</code></td>
+      <td><code>#58616A</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#464C53' }} /></td>
+      <td><code>gray-70</code></td>
+      <td><code>--color-gray-70</code></td>
+      <td><code>#464C53</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#33363D' }} /></td>
+      <td><code>gray-80</code></td>
+      <td><code>--color-gray-80</code></td>
+      <td><code>#33363D</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#1E2124' }} /></td>
+      <td><code>gray-90</code></td>
+      <td><code>--color-gray-90</code></td>
+      <td><code>#1E2124</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#131416' }} /></td>
+      <td><code>gray-95</code></td>
+      <td><code>--color-gray-95</code></td>
+      <td><code>#131416</code></td>
+    </tr>
+    <tr>
+      <td><div style={{ width: 32, height: 32, borderRadius: 6, background: '#000000' }} /></td>
+      <td><code>gray-100</code></td>
+      <td><code>--color-gray-100</code></td>
+      <td><code>#000000</code></td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## TypeScript 타입
+
+```typescript
+import type { CustomColor } from '@shared/config'
+// 'red-40' | 'gray-60' | ...
+```
+
+## 상수 배열
+
+```typescript
+import { CUSTOM_COLORS } from '@shared/config'
+// ['gray-0', 'gray-5', ..., 'yellow-95', 'yellow-100']
+```
+
+스토리 argTypes에 활용:
+
+```tsx
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
+import { CUSTOM_COLORS } from '@shared/config'
+
+const meta = {
+  argTypes: {
+    color: {
+      control: 'select',
+      options: CUSTOM_COLORS,
+    },
+  },
+}
+```
