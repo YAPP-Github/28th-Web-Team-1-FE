@@ -62,15 +62,18 @@ jobs:
       - name: Discord notification
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          STORYBOOK_URL: ${{ steps.chromatic.outputs.storybookUrl }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          STORYBOOK_URL: ${{ steps.chromatic.outputs.storybookUrl }}
         run: |
-          PAYLOAD=$(jq -n \
-                --arg content "🚀 **Storybook 배포 완료**\nPR: [#${PR_NUMBER} - ${PR_TITLE}](${PR_URL}) by **${PR_AUTHOR}**\n📖 [Storybook 열기](${STORYBOOK_URL})" \
-                '{content: $content}')
-              curl -H "Content-Type: application/json" \
-                -d "$PAYLOAD" \
-                "$DISCORD_WEBHOOK_URL"
+          NOTIFICATION_MSG="🚀 **Storybook 배포 완료**
+          PR: [#${PR_NUMBER} - ${PR_TITLE}](${PR_URL}) by **${PR_AUTHOR}**
+          📖 [Storybook 열기](${STORYBOOK_URL})"
+
+          PAYLOAD=$(jq -n --arg content "$NOTIFICATION_MSG" '{content: $content}')
+
+          curl -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL"

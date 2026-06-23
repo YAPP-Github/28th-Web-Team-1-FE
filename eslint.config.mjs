@@ -329,4 +329,14 @@ export default tseslint.config({
     'react/react-in-jsx-scope': 'off',
     'react/no-unknown-property': ['error', { ignore: ['css'] }]
   }
+}, {
+  files: ['**/*.stories.{ts,tsx}', '.storybook/**/*.{ts,tsx}'],
+  languageOptions: {
+    parserOptions: {
+      project: false
+    }
+  },
+  rules: {
+    '@typescript-eslint/naming-convention': 'off'
+  }
 }, prettierConfig, storybook.configs["flat/recommended"]);

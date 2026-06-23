@@ -1,6 +1,10 @@
 import type { Preview } from '@storybook/nextjs-vite'
+import { createElement } from 'react'
+import { Theme } from '@radix-ui/themes'
+import '../src/app/style/globals.css'
 
 const preview: Preview = {
+  decorators: [(Story) => createElement(Theme, null, createElement(Story))],
   parameters: {
     controls: {
       matchers: {
