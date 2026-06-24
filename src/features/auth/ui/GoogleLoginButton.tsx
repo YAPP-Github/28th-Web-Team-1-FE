@@ -1,0 +1,28 @@
+'use client'
+import { useGoogleLogin } from '@react-oauth/google'
+
+/**
+ * 구글 로그인을 시작하는 버튼 컴포넌트이다.
+ * 클릭하면 인가 코드(auth-code) 플로우로 구글 동의 화면으로 리다이렉트되고, 완료 후 `/auth/google/callback`으로 코드를 받아 돌아온다.
+ * @param redirectTo 로그인(기존 회원) 성공 후 돌아올 내부 경로. 콜백 라우트에 `state`로 전달되며, 미지정 시 `/`로 이동한다. (신규 회원은 항상 온보딩으로 이동)
+ * @example
+ * ```tsx
+ * <GoogleLoginButton />                    // 기존 회원 → /
+ * <GoogleLoginButton redirectTo="/jdurl" /> // 기존 회원 → /jdurl
+ * ```
+ */
+export const GoogleLoginButton = ({ redirectTo }: { redirectTo?: string }) => {
+  const startLogin = useGoogleLogin({
+    flow: 'auth-code',
+    ux_mode: 'redirect',
+    redirect_uri: typeof window !== 'undefined' ? `${window.location.origin}/auth/google/callback` : '',
+    state: redirectTo
+  })
+
+  return (
+    // TODO: 버튼 스타일링은 추후 디자인 시스템에 맞춰 수정한다.
+    <button type="button" onClick={() => startLogin()} className="rounded-md border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 shadow-sm transition hover:bg-gray-50">
+      구글로 시작하기
+    </button>
+  )
+}
