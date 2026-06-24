@@ -1,3 +1,5 @@
+import { AUTH_ERROR } from './auth'
+
 /**
  * BFF 라우트(`/api/[...path]`)를 거쳐 API를 호출하는 HTTP 클라이언트이다.
  * 각 메서드는 경로와 옵션을 받아 응답 본문의 `result`를 반환한다.
@@ -111,7 +113,7 @@ const request = async <T = unknown>(path: string, options: RequestOptions = {}):
   const data = await response.json().catch(() => null)
 
   if (!response.ok || data?.ok === false) {
-    const code = data?.ok === false ? data.error.code : 'internal_error'
+    const code = data?.ok === false ? data.error.code : AUTH_ERROR.INTERNAL
     const details = data?.ok === false ? data.error.details : undefined
     throw new ApiError(response.status, code, details)
   }

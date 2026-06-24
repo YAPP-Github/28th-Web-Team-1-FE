@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { ACCESS_TOKEN_MAX_AGE, cookieOptions, refreshTokens } from '@/src/shared/lib/auth'
+import { ACCESS_TOKEN_MAX_AGE, clearAuthCookies, cookieOptions, refreshTokens } from '@/src/shared/lib/auth'
 
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)$).*)']
@@ -17,8 +17,7 @@ export const middleware = async (request: NextRequest) => {
 
   if (!tokens) {
     const response = NextResponse.next()
-    response.cookies.delete('access_token')
-    response.cookies.delete('refresh_token')
+    clearAuthCookies(response.cookies)
     return response
   }
 

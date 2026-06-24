@@ -1,13 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, cookieOptions } from '@shared/lib'
+import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, cookieOptions, authFailureRedirect } from '@/src/shared/lib'
 
 const API_URL = process.env.API_URL
-
-interface LoginApiResult {
-  accessToken: string
-  refreshToken: string
-  isNewUser: boolean
-}
 
 /**
  * `state`로 넘어온 리다이렉트 목적지가 안전한 내부 경로인지 검증한다.
@@ -20,6 +14,11 @@ const safeRedirectPath = (state: string | null) => {
   return state
 }
 
+interface LoginApiResult {
+  accessToken: string
+  refreshToken: string
+  isNewUser: boolean
+}
 /**
  * 구글이 인가 코드를 붙여 리다이렉트하는 콜백을 서버에서 처리하는 라우트 핸들러이다.
  * URL의 `code`를 원본 서버와 교환해 서비스 토큰을 받고, httpOnly 쿠키로 심은 뒤 목적지로 리다이렉트한다.
@@ -41,13 +40,7 @@ export const GET = async (request: NextRequest) => {
   const code = searchParams.get('code')
   const redirectTo = safeRedirectPath(searchParams.get('state'))
 
-  const failureRedirect = () => {
-    const url = new URL('/', origin)
-    url.searchParams.set('error', 'auth')
-    return NextResponse.redirect(url)
-  }
-
-  if (!code) return failureRedirect()
+  if (!code) return authFailureRedirect(origin)
 
   const redirectUri = `${origin}${pathname}`
 
@@ -60,7 +53,7 @@ export const GET = async (request: NextRequest) => {
 
   const data = await res.json().catch(() => null)
 
-  if (!res.ok || data?.ok === false || !data?.result) return failureRedirect()
+  if (!res.ok || data?.ok === false || !data?.result) return authFailureRedirect(origin)
 
   const { accessToken, refreshToken, isNewUser } = data.result as LoginApiResult
 
