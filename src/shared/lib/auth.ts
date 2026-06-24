@@ -21,7 +21,7 @@ export type AuthErrorCode = (typeof AUTH_ERROR)[keyof typeof AUTH_ERROR]
 export const AUTH_ERROR_MESSAGE: Record<AuthErrorCode | 'DEFAULT', string> = {
   [AUTH_ERROR.AUTH]: '로그인에 실패했어요. 다시 시도해 주세요.',
   [AUTH_ERROR.TOKEN_EXPIRED]: '세션이 만료되었습니다. 다시 로그인해주세요.',
-  [AUTH_ERROR.INTERNAL]: '일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요.',
+  [AUTH_ERROR.INTERNAL]: ' 일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요.',
   /** 알 수 없는 코드가 들어왔을 때 보여줄 기본 메시지. */
   DEFAULT: '문제가 발생했어요. 잠시 후 다시 시도해 주세요.'
 }
@@ -83,16 +83,18 @@ export const authFailureRedirect = (origin: string) => {
 
 /**
  * 인증 토큰 쿠키에 사용할 공통 옵션을 생성하는 함수이다.
- * `httpOnly`·`secure`·`sameSite: 'strict'`로 고정하고 만료 시간만 인자로 받는다.
+ * `httpOnly`·`secure`·`sameSite: 'lax'`로 고정하고 만료 시간만 인자로 받는다.
+ * `lax`인 이유: OAuth 콜백(cross-site)에서 `/`로 리다이렉트하는 첫 진입에 쿠키가 실려야 하기 때문이다.
+ * `strict`면 그 첫 네비게이션에서 쿠키가 누락돼 로그인 직후 인증이 풀린다.
  * @param maxAge 쿠키 만료 시간(초)
  * @example
  * ```ts
- * cookieOptions(ACCESS_TOKEN_MAX_AGE); // { httpOnly: true, sameSite: 'strict', secure: true, path: '/', maxAge: 1800 }
+ * cookieOptions(ACCESS_TOKEN_MAX_AGE); // { httpOnly: true, sameSite: 'lax', secure: true, path: '/', maxAge: 1800 }
  * ```
  */
 export const cookieOptions = (maxAge: number) => ({
   httpOnly: true,
-  sameSite: 'strict' as const,
+  sameSite: 'lax' as const,
   secure: true,
   path: '/',
   maxAge
@@ -112,8 +114,7 @@ export const refreshTokens = async (refreshToken: string): Promise<{ accessToken
   try {
     const res = await fetch(`${API_URL}/api/v1/auth/refresh`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ refreshToken }),
+      headers: { Cookie: `refresh_token=${refreshToken}` },
       cache: 'no-store'
     })
     if (!res.ok) return null
