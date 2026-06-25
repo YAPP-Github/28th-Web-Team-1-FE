@@ -84,35 +84,35 @@
   --color-gray-95: #131416;
   --color-gray-100: #000000;
 
-  /* ── Semantic Colors ── */
-  --color-btn-primary-fill: #000000;
-  --color-btn-primary-fill-hovered: #464C53;
-  --color-btn-primary-fill-pressed: #1E2124;
-  --color-btn-disabled-fill: #CDD1D5;
-  --color-btn-secondary-fill: #FFFFFF;
-  --color-btn-secondary-border: #CDD1D5;
-  --color-btn-secondary-fill-hovered: #F4F5F6;
-  --color-btn-secondary-border-hovered: #B1B8BE;
-  --color-btn-secondary-fill-pressed: #E6E8EA;
-  --color-btn-secondary-border-pressed: #B1B8BE;
-  --color-btn-tertiary-fill: #E6E8EA;
-  --color-btn-tertiary-border: #CDD1D5;
-  --color-btn-tertiary-fill-hovered: #CDD1D5;
-  --color-btn-tertiary-border-hovered: #B1B8BE;
-  --color-btn-tertiary-fill-pressed: #B1B8BE;
-  --color-btn-tertiary-border-pressed: #B1B8BE;
+  /* ── 리 ── */
+  --color-btn-primary-fill: var(--color-gray-100);
+  --color-btn-primary-fill-hovered: var(--color-gray-70);
+  --color-btn-primary-fill-pressed: var(--color-gray-90);
+  --color-btn-disabled-fill: var(--color-gray-20);
+  --color-btn-secondary-fill: var(--color-gray-0);
+  --color-btn-secondary-border: var(--color-gray-20);
+  --color-btn-secondary-fill-hovered: var(--color-gray-5);
+  --color-btn-secondary-border-hovered: var(--color-gray-30);
+  --color-btn-secondary-fill-pressed: var(--color-gray-10);
+  --color-btn-secondary-border-pressed: var(--color-gray-30);
+  --color-btn-tertiary-fill: var(--color-gray-10);
+  --color-btn-tertiary-border: var(--color-gray-20);
+  --color-btn-tertiary-fill-hovered: var(--color-gray-20);
+  --color-btn-tertiary-border-hovered: var(--color-gray-30);
+  --color-btn-tertiary-fill-pressed: var(--color-gray-30);
+  --color-btn-tertiary-border-pressed: var(--color-gray-30);
 
-  --color-text-bolder: #000000;
-  --color-text-basic: #131416;
-  --color-text-subtle: #464C53;
-  --color-text-subtler: #6D7882;
-  --color-text-disabled-on: #8A949E;
-  --color-text-bolder-inverse: #FFFFFF;
+  --color-text-bolder: var(--color-gray-100);
+  --color-text-basic: var(--color-gray-95);
+  --color-text-subtle: var(--color-gray-70);
+  --color-text-subtler: var(--color-gray-50);
+  --color-text-disabled-on: var(--color-gray-40);
+  --color-text-bolder-inverse: var(--color-gray-0);
 
-  --color-icon-gray: #1E2124;
-  --color-icon-gray-light: #6D7882;
-  --color-icon-disabled-on: #8A949E;
-  --color-icon-inverse: #FFFFFF;
+  --color-icon-gray: var(--color-gray-90);
+  --color-icon-gray-light: var(--color-gray-50);
+  --color-icon-disabled-on: var(--color-gray-40);
+  --color-icon-inverse: var(--color-gray-0);
 }
 
 /* ── Typography System ── */
