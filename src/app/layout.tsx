@@ -1,16 +1,28 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import localFont from 'next/font/local'
 import './style/globals.css'
 import { Providers } from './provider'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin']
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin']
+const pretendard = localFont({
+  src: [
+    {
+      path: '../../public/font/Pretendard-Regular.subset.woff2',
+      weight: '400',
+      style: 'normal'
+    },
+    {
+      path: '../../public/font/Pretendard-SemiBold.subset.woff2',
+      weight: '600',
+      style: 'normal'
+    },
+    {
+      path: '../../public/font/Pretendard-Bold.subset.woff2',
+      weight: '700',
+      style: 'normal'
+    }
+  ],
+  display: 'swap',
+  variable: '--font-pretendard'
 })
 
 export const metadata: Metadata = {
@@ -24,7 +36,7 @@ const RootLayout = ({
   children: React.ReactNode
 }>) => {
   return (
-    <html lang="ko" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="ko" className={`${pretendard.className} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Providers>{children}</Providers>
       </body>
