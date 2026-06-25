@@ -313,6 +313,10 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.radix-themes {
+  --default-font-family: var(--font-pretendard);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
