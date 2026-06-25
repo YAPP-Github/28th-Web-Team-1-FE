@@ -1,12 +1,10 @@
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
-import { ACCESS_TOKEN_MAX_AGE, cookieOptions, refreshTokens } from '@/src/shared/lib/auth'
+import { ACCESS_TOKEN_MAX_AGE, AUTH_ERROR, cookieOptions, refreshTokens, unauthorizedResponse } from '@/src/shared/lib/auth'
 
 export { handler as GET, handler as POST, handler as PUT, handler as PATCH, handler as DELETE }
 
 const API_URL = process.env.API_URL
-
-type CookieStore = Awaited<ReturnType<typeof cookies>>
 
 /**
  * 모든 HTTP 메서드(GET/POST/PUT/PATCH/DELETE)의 공통 진입점이다.
@@ -48,7 +46,7 @@ const handleProxy = async (req: NextRequest, { path: pathSegments }: { path: str
     if (response.status === 401) {
       const refreshToken = cookieStore.get('refresh_token')?.value
       const newTokens = refreshToken ? await refreshTokens(refreshToken) : null
-      if (!newTokens) return handleUnauthorized(cookieStore)
+      if (!newTokens) return unauthorizedResponse(cookieStore)
       cookieStore.set('access_token', newTokens.accessToken, cookieOptions(ACCESS_TOKEN_MAX_AGE))
       response = await send(newTokens.accessToken)
     }
@@ -56,7 +54,7 @@ const handleProxy = async (req: NextRequest, { path: pathSegments }: { path: str
     return passthrough(response)
   } catch (error) {
     console.error('BFF Error:', error)
-    return NextResponse.json({ ok: false, error: { code: 'internal_error' } }, { status: 500 })
+    return NextResponse.json({ ok: false, error: { code: AUTH_ERROR.INTERNAL } }, { status: 500 })
   }
 }
 
@@ -115,15 +113,4 @@ const passthrough = async (res: Response) => {
   const setCookie = res.headers.getSetCookie?.() ?? []
   setCookie.forEach((c) => headers.append('set-cookie', c))
   return new NextResponse(body, { status: res.status, headers })
-}
-
-/**
- * 인증 실패 시 토큰 쿠키를 삭제하고 401 응답을 반환하는 함수이다.
- * @param store 쿠키 스토어
- * @returns `token_expired` 코드의 401 `NextResponse`
- */
-const handleUnauthorized = (store: CookieStore) => {
-  store.delete('access_token')
-  store.delete('refresh_token')
-  return NextResponse.json({ ok: false, error: { code: 'token_expired' } }, { status: 401 })
 }
