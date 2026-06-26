@@ -320,6 +320,14 @@
   --default-font-family: var(--font-pretendard);
 }
 
+a {
+  cursor: pointer;
+}
+
+button {
+  cursor: pointer;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
