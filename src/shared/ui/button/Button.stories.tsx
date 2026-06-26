@@ -1,9 +1,10 @@
 import { Flex } from '@radix-ui/themes'
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Button } from './Button'
+import { Home } from 'lucide-react'
 
-const VARIANTS = ['default', 'outline', 'secondary', 'ghost', 'destructive', 'link'] as const
-const SIZES = ['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-sm', 'icon-lg'] as const
+const VARIANTS = ['primary', 'secondary', 'tertiary'] as const
+const SIZES = ['xs', 'sm', 'md', 'lg', 'xl', 'icon-xs', 'icon-sm', 'icon-md', 'icon-lg', 'icon-xl'] as const
 
 const meta = {
   title: 'Design System/Button',
@@ -14,8 +15,8 @@ const meta = {
   },
   args: {
     children: 'Button',
-    variant: 'default',
-    size: 'default'
+    variant: 'primary',
+    size: 'lg'
   },
   argTypes: {
     variant: {
@@ -35,6 +36,8 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const isIconOnly = (size: string) => size.startsWith('icon')
+
 export const AllVariants: Story = {
   render: () => (
     <Flex direction={'column'} align={'center'} gap={'4'}>
@@ -42,7 +45,7 @@ export const AllVariants: Story = {
         <Flex key={variant} direction={'row'} gap={'8'} wrap={'wrap'} justify={'center'}>
           {SIZES.map((size) => (
             <Button key={`${variant}-${size}`} variant={variant} size={size}>
-              {variant}
+              {isIconOnly(size) ? <Home /> : variant}
             </Button>
           ))}
         </Flex>
@@ -53,8 +56,34 @@ export const AllVariants: Story = {
 
 export const Playground: Story = {
   args: {
-    variant: 'default',
-    size: 'default',
+    variant: 'primary',
+    size: 'lg',
     children: 'Click me'
   }
+}
+
+export const WithIconEnd: Story = {
+  render: () => (
+    <Flex direction={'column'} align={'center'} gap={'4'}>
+      {SIZES.filter((s) => !s.startsWith('icon')).map((size) => (
+        <Button key={size} size={size}>
+          Button
+          <Home data-icon="inline-end" />
+        </Button>
+      ))}
+    </Flex>
+  )
+}
+
+export const WithIconStart: Story = {
+  render: () => (
+    <Flex direction={'column'} align={'center'} gap={'4'}>
+      {SIZES.filter((s) => !s.startsWith('icon')).map((size) => (
+        <Button key={size} size={size}>
+          <Home data-icon="inline-start" />
+          Button
+        </Button>
+      ))}
+    </Flex>
+  )
 }
