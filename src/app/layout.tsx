@@ -36,7 +36,7 @@ const RootLayout = ({
   children: React.ReactNode
 }>) => {
   return (
-    <html lang="ko" className={`${pretendard.className} h-full antialiased`}>
+    <html lang="ko" className={`${pretendard.className} ${pretendard.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Providers>{children}</Providers>
       </body>
