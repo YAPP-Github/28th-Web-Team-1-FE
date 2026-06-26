@@ -1,7 +1,7 @@
 import { type ComponentProps } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Slot } from 'radix-ui'
-import { cn } from '@shared/lib'
+import { cn } from '@shared/lib/cn'
 
 const buttonVariants = cva(
   cn(
@@ -47,7 +47,7 @@ const buttonVariants = cva(
           'h-9 max-h-9 gap-1 px-4 py-2 text-label1 rounded-md',
           "[&_svg:not([class*='size-'])]:size-4 in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3 [&_svg:not([class*='size-'])]:size-3.5"
         ),
-        md: cn('h-10.5 max-h-10.5 gap-1.5 px-5 py-2.5', "[&_svg:not([class*='size-'])]:size-4.5 has-data-[icon=inline-end]:pr-3.5 has-data-[icon=inline-start]:pl-3.5"),
+        md: cn('h-10.5 max-h-10.5 gap-1.5 px-5 py-2.5 text-headline2', "[&_svg:not([class*='size-'])]:size-4.5 has-data-[icon=inline-end]:pr-3.5 has-data-[icon=inline-start]:pl-3.5"),
         lg: cn('h-12 max-h-12 gap-1.5 px-8 py-3', "[&_svg:not([class*='size-'])]:size-5 has-data-[icon=inline-end]:pr-6.5 has-data-[icon=inline-start]:pl-6.5"),
         xl: cn('h-14 max-h-14 gap-2 px-12 py-4 rounded-xl', "[&_svg:not([class*='size-'])]:size-6 has-data-[icon=inline-end]:pr-10 has-data-[icon=inline-start]:pl-10"),
 
