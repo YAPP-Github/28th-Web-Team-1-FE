@@ -18,7 +18,7 @@ const buttonVariants = cva(
     // Active
     'active:not-aria-[haspopup]:translate-y-px',
     // Disabled
-    'disabled:pointer-events-none disabled:bg-btn-disabled-fill disabled:text-fg-disabled-on',
+    'disabled:pointer-events-none disabled:text-fg-disabled-on',
     // Invalid
     'aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0'
   ),
@@ -35,21 +35,21 @@ const buttonVariants = cva(
           'bg-btn-tertiary-fill border-btn-tertiary-border',
           'hover:bg-btn-tertiary-fill-hovered hover:border-btn-tertiary-border-hovered ',
           'active:bg-btn-tertiary-fill-pressed active:border-btn-tertiary-border-pressed'
-        )
-        // link: 'text-primary underline-offset-4 hover:underline'
+        ),
+        text: 'text-fg-subtler hover:text-fg-bolder'
       },
       size: {
         xs: cn(
-          'h-7.5 max-h-7.5 gap-1 px-3 py-1.5 text-caption1 rounded-sm',
+          'h-7.5 gap-1 px-3 py-1.5 text-caption1 rounded-sm',
           "[&_svg:not([class*='size-'])]:size-3 in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5"
         ),
         sm: cn(
-          'h-9 max-h-9 gap-1 px-4 py-2 text-label1 rounded-md',
+          'h-9 gap-1 px-4 py-2 text-label1 rounded-md',
           "[&_svg:not([class*='size-'])]:size-4 in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3 [&_svg:not([class*='size-'])]:size-3.5"
         ),
-        md: cn('h-10.5 max-h-10.5 gap-1.5 px-5 py-2.5 text-headline2', "[&_svg:not([class*='size-'])]:size-4.5 has-data-[icon=inline-end]:pr-3.5 has-data-[icon=inline-start]:pl-3.5"),
-        lg: cn('h-12 max-h-12 gap-1.5 px-8 py-3', "[&_svg:not([class*='size-'])]:size-5 has-data-[icon=inline-end]:pr-6.5 has-data-[icon=inline-start]:pl-6.5"),
-        xl: cn('h-14 max-h-14 gap-2 px-12 py-4 rounded-xl', "[&_svg:not([class*='size-'])]:size-6 has-data-[icon=inline-end]:pr-10 has-data-[icon=inline-start]:pl-10"),
+        md: cn('h-10.5 gap-1.5 px-5 py-2.5 text-headline2', "[&_svg:not([class*='size-'])]:size-4.5 has-data-[icon=inline-end]:pr-3.5 has-data-[icon=inline-start]:pl-3.5"),
+        lg: cn('h-12 gap-1.5 px-8 py-3', "[&_svg:not([class*='size-'])]:size-5 has-data-[icon=inline-end]:pr-6.5 has-data-[icon=inline-start]:pl-6.5"),
+        xl: cn('h-14 gap-2 px-12 py-4 rounded-xl', "[&_svg:not([class*='size-'])]:size-6 has-data-[icon=inline-end]:pr-10 has-data-[icon=inline-start]:pl-10"),
 
         'icon-xs': "size-7.5 p-2 rounded-sm [&_svg:not([class*='size-'])]:size-3 in-data-[slot=button-group]:rounded-lg",
         'icon-sm': "size-9 p-2.5 rounded-md [&_svg:not([class*='size-'])]:size-4 in-data-[slot=button-group]:rounded-lg",
@@ -58,6 +58,18 @@ const buttonVariants = cva(
         'icon-xl': "size-14 p-4 rounded-xl [&_svg:not([class*='size-'])]:size-6"
       }
     },
+    compoundVariants: [
+      {
+        variant: ['primary', 'secondary', 'tertiary'],
+        class: 'disabled:bg-btn-disabled-fill'
+      },
+      {
+        variant: 'text',
+        class: 'p-0 h-auto rounded-none'
+      },
+      { variant: 'text', size: 'xs', class: 'text-caption2' },
+      { variant: 'text', size: 'xl', class: 'text-heading2' }
+    ],
     defaultVariants: {
       variant: 'primary',
       size: 'lg'
@@ -88,7 +100,9 @@ interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof butt
  * <Button size="xl">더 크게</Button>
  *
  * // 아이콘 + 텍스트
- * // 아이콘에 inline-start, inline-end 속성을 추가해야 위치 보완이 됩니다.
+ * // 일반 버튼에서는 아이콘에 data-icon="inline-start | inline-end"를 추가하면
+ * // 좌우 패딩이 자동으로 보정됩니다.
+ * // text variant에서는 padding이 없으므로 data-icon을 추가하지 않습니다.
  * <Button>
  *   <CheckIcon data-icon="inline-start" />
  *   저장
@@ -106,10 +120,8 @@ interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof butt
  * </Button>
  * ```
  */
-const Button = ({ className, variant = 'primary', size = 'lg', asChild = false, ...props }: ButtonProps) => {
+export const Button = ({ className, variant = 'primary', size = 'lg', asChild = false, ...props }: ButtonProps) => {
   const COMP = asChild ? Slot.Root : 'button'
 
   return <COMP data-slot="button" data-variant={variant} data-size={size} className={cn(buttonVariants({ variant, size, className }))} {...props} />
 }
-
-export { Button, buttonVariants }
