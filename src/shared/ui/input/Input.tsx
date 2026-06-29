@@ -38,7 +38,8 @@ interface InputProps extends React.ComponentProps<'input'> {
  * <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
  * ```
  */
-const Input = ({ className, heading, description, type, error, disabled, onChange, ...props }: InputProps) => {
+
+const Input = ({ className, heading, description, error, disabled, onChange, ...props }: InputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [hasValue, setHasValue] = useState(() => String(props.value ?? props.defaultValue ?? '').length > 0)
 
@@ -70,8 +71,6 @@ const Input = ({ className, heading, description, type, error, disabled, onChang
       <div className="relative">
         <input
           ref={inputRef}
-          type={type}
-          disabled={disabled}
           data-slot="input"
           onChange={handleChange}
           className={cn(

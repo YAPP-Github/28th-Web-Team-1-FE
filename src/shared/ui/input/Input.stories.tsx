@@ -64,7 +64,6 @@ export const AllStates: Story = {
         <Input heading="입력된 상태" placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error defaultValue="잘못된 값" />
       </Flex>
 
-      {/* 비활성화: 기본과 동일한 구조 조합 */}
       <Flex direction={'row'} gap={'4'} wrap={'wrap'}>
         <Input placeholder="내용을 입력해주세요" disabled />
         <Input heading="heading만" placeholder="내용을 입력해주세요" disabled />
