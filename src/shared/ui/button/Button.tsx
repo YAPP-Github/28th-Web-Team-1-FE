@@ -27,6 +27,7 @@ const buttonVariants = cva(
       variant: {
         primary: cn('text-fg-bolder-inverse', 'bg-btn-primary-fill', 'hover:bg-btn-primary-fill-hovered', 'active:bg-btn-primary-fill-pressed'),
         secondary: cn(
+          'text-fg-primary-basic',
           'bg-btn-secondary-fill border-btn-secondary-border',
           'hover:bg-btn-secondary-fill-hovered hover:border-btn-secondary-border-hovered ',
           'active:bg-btn-secondary-fill-pressed active:border-btn-secondary-border-pressed'
@@ -61,7 +62,7 @@ const buttonVariants = cva(
     compoundVariants: [
       {
         variant: ['primary', 'secondary', 'tertiary'],
-        class: 'disabled:bg-btn-disabled-fill'
+        class: 'disabled:bg-btn-disabled-fill disabled:border-btn-disabled-fill'
       },
       {
         variant: 'text',

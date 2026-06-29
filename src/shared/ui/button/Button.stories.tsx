@@ -16,7 +16,8 @@ const meta = {
   args: {
     children: 'Button',
     variant: 'primary',
-    size: 'lg'
+    size: 'lg',
+    disabled: false
   },
   argTypes: {
     variant: {
@@ -28,6 +29,9 @@ const meta = {
       options: SIZES
     },
     asChild: {
+      control: 'boolean'
+    },
+    disabled: {
       control: 'boolean'
     }
   }
@@ -58,6 +62,7 @@ export const Playground: Story = {
   args: {
     variant: 'primary',
     size: 'lg',
+    disabled: false,
     children: 'Click me'
   }
 }
