@@ -24,6 +24,19 @@
 
 /* ── Color Palette ── */
 @theme inline {
+  /* Primary Color Palette */
+  --color-primary-0: #FFFFFF;
+  --color-primary-5: #F0ECFF;
+  --color-primary-10: #D1C5FF;
+  --color-primary-20: #BBA9FF;
+  --color-primary-30: #9C82FF;
+  --color-primary-40: #8969FF;
+  --color-primary-50: #6B44FF;
+  --color-primary-60: #613EE8;
+  --color-primary-70: #4C30B5;
+  --color-primary-80: #3B258C;
+  --color-primary-90: #2D1D6B;
+
   /* Red Color Palette */
   --color-red-0: #FFFFFF;
   --color-red-5: #FDEFEC;
@@ -84,27 +97,28 @@
   --color-gray-95: #131416;
   --color-gray-100: #000000;
 
-  /* ── 리 ── */
-  --color-btn-primary-fill: var(--color-gray-100);
-  --color-btn-primary-fill-hovered: var(--color-gray-70);
-  --color-btn-primary-fill-pressed: var(--color-gray-90);
+  /* ── Button ── */
+  --color-btn-primary-fill: var(--color-primary-5);
+  --color-btn-primary-fill-hovered: var(--color-primary-70);
+  --color-btn-primary-fill-pressed: var(--color-primary-90);
 
   --color-btn-secondary-fill: var(--color-gray-0);
-  --color-btn-secondary-border: var(--color-gray-20);
-  --color-btn-secondary-fill-hovered: var(--color-gray-5);
-  --color-btn-secondary-border-hovered: var(--color-gray-30);
-  --color-btn-secondary-fill-pressed: var(--color-gray-10);
-  --color-btn-secondary-border-pressed: var(--color-gray-30);
+  --color-btn-secondary-border: var(--color-primary-50);
+  --color-btn-secondary-fill-hovered: var(--color-primary-5);
+  --color-btn-secondary-border-hovered: var(--color-primary-60);
+  --color-btn-secondary-fill-pressed: var(--color-primary-10);
+  --color-btn-secondary-border-pressed: var(--color-primary-50);
 
-  --color-btn-tertiary-fill: var(--color-gray-10);
+  --color-btn-tertiary-fill: var(--color-gray-5);
   --color-btn-tertiary-border: var(--color-gray-20);
-  --color-btn-tertiary-fill-hovered: var(--color-gray-20);
-  --color-btn-tertiary-border-hovered: var(--color-gray-30);
-  --color-btn-tertiary-fill-pressed: var(--color-gray-30);
+  --color-btn-tertiary-fill-hovered: var(--color-gray-10);
+  --color-btn-tertiary-border-hovered: var(--color-gray-20);
+  --color-btn-tertiary-fill-pressed: var(--color-gray-20);
   --color-btn-tertiary-border-pressed: var(--color-gray-30);
 
   --color-btn-disabled-fill: var(--color-gray-20);
 
+  --color-fg-primary-basic: var(--color-primary-60);
   --color-fg-bolder: var(--color-gray-100);
   --color-fg-basic: var(--color-gray-95);
   --color-fg-subtle: var(--color-gray-70);
