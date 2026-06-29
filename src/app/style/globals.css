@@ -98,7 +98,7 @@
   --color-gray-100: #000000;
 
   /* ── Button ── */
-  --color-btn-primary-fill: var(--color-primary-5);
+  --color-btn-primary-fill: var(--color-primary-50);
   --color-btn-primary-fill-hovered: var(--color-primary-70);
   --color-btn-primary-fill-pressed: var(--color-primary-90);
 
