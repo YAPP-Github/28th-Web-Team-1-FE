@@ -72,6 +72,7 @@ const Input = ({ className, heading, description, error, disabled, onChange, ...
         <input
           ref={inputRef}
           data-slot="input"
+          aria-invalid={error || undefined}
           onChange={handleChange}
           className={cn(
             // base
@@ -91,7 +92,7 @@ const Input = ({ className, heading, description, error, disabled, onChange, ...
             'disabled:bg-bg-gray-subtle disabled:border-border-subtle disabled:text-text-disabled',
             'disabled:pointer-events-none disabled:cursor-not-allowed',
             // error
-            error && 'border-border-error',
+            'aria-invalid:border-border-error',
             className
           )}
           {...props}
