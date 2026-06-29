@@ -38,6 +38,7 @@ const SearchField = ({ className, type, onSubmit, ...props }: SearchFieldProps) 
       onSubmit={handleSubmit}
       className={cn(
         // base
+        // TODO : 애니메이션이 정해지면 추후 수정 필요
         'group flex w-full items-center gap-2 rounded-full px-4 py-3 transition-[box-shadow,background-color] duration-150',
         'bg-bg-gray-subtler',
         // default

@@ -76,7 +76,7 @@ const Input = ({ className, heading, description, error, disabled, onChange, ...
           onChange={handleChange}
           className={cn(
             // base
-            'h-12 w-full min-w-0 rounded-lg border px-4 py-4 outline-none',
+            'h-14 w-full min-w-0 rounded-lg border px-4 py-4 outline-none',
             'text-headline2 caret-gray-80 text-text-bolder bg-white font-semibold',
             'placeholder:text-body1 placeholder:text-text-subtler placeholder:font-normal',
             'pr-10',
