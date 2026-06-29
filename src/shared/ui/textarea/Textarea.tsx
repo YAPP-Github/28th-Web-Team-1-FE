@@ -66,6 +66,7 @@ const Textarea = ({ className, heading, description, error, maxLength = 2000, on
         <textarea
           maxLength={maxLength}
           onChange={handleChange}
+          aria-invalid={error || undefined}
           data-slot="textarea"
           className={cn(
             'field-sizing-content max-h-60 min-h-30 w-full min-w-60 resize-none rounded-lg border p-4 outline-none',
@@ -83,7 +84,7 @@ const Textarea = ({ className, heading, description, error, maxLength = 2000, on
             'disabled:bg-bg-gray-subtle disabled:border-border-subtle disabled:text-text-disabled',
             'disabled:pointer-events-none disabled:cursor-not-allowed',
             // error
-            error && 'border-border-error',
+            'aria-invalid:border-border-error',
             className
           )}
           {...props}
