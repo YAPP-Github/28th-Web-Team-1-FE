@@ -1,5 +1,5 @@
 import { Heading as RadixHeading, type HeadingProps } from '@radix-ui/themes'
-import { cn } from '@shared/lib'
+import { cn } from '@shared/lib/cn'
 import { typographyVariants } from '../shared'
 import type { TypographyVariant } from '../shared'
 import type { CustomColor } from '@shared/config'
