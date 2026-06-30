@@ -25,17 +25,17 @@
 /* ── Color Palette ── */
 @theme inline {
   /* Primary Color Palette */
-  --color-primary-0: #FFFFFF;
-  --color-primary-5: #F0ECFF;
-  --color-primary-10: #D1C5FF;
-  --color-primary-20: #BBA9FF;
-  --color-primary-30: #9C82FF;
-  --color-primary-40: #8969FF;
-  --color-primary-50: #6B44FF;
-  --color-primary-60: #613EE8;
-  --color-primary-70: #4C30B5;
-  --color-primary-80: #3B258C;
-  --color-primary-90: #2D1D6B;
+  --color-primary-0: #ffffff;
+  --color-primary-5: #f0ecff;
+  --color-primary-10: #d1c5ff;
+  --color-primary-20: #bba9ff;
+  --color-primary-30: #9c82ff;
+  --color-primary-40: #8969ff;
+  --color-primary-50: #6b44ff;
+  --color-primary-60: #613ee8;
+  --color-primary-70: #4c30b5;
+  --color-primary-80: #3b258c;
+  --color-primary-90: #2d1d6b;
 
   /* Red Color Palette */
   --color-red-0: #ffffff;
@@ -116,7 +116,7 @@
   --color-btn-tertiary-fill-pressed: var(--color-gray-20);
   --color-btn-tertiary-border-pressed: var(--color-gray-30);
 
-  --color-text-bolder: var(--color-gray-100);
+  --color-text-border: var(--color-gray-100);
   --color-text-basic: var(--color-gray-95);
   --color-text-subtle: var(--color-gray-70);
   --color-text-subtler: var(--color-gray-50);
@@ -126,7 +126,7 @@
   --color-text-primary-basic: var(--color-primary-60);
   --color-text-primary-bolder: var(--color-primary-70);
   --color-text-error: var(--color-red-50);
-  
+
   --color-btn-disabled-fill: var(--color-gray-20);
 
   --color-fg-primary-basic: var(--color-primary-60);
@@ -141,6 +141,11 @@
   --color-icon-gray-light: var(--color-gray-50);
   --color-icon-disabled-on: var(--color-gray-40);
   --color-icon-inverse: var(--color-gray-0);
+  --color-icon-primary-basic: var(--color-primary-50);
+  --color-icon-primary-border: var(--color-primary-70);
+  --color-icon-success: var(--color-green-50);
+  --color-icon-warning: var(--color-yellow-30);
+  --color-icon-error: var(--color-red-50);
 
   --color-bg-white: var(--color-gray-0);
   --color-bg-gray-subtler: var(--color-gray-5);
@@ -389,4 +394,3 @@ button {
     @apply font-sans;
   }
 }
-
