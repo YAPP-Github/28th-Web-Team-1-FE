@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './style/globals.css'
 import { Providers } from './provider'
-import { Toast } from '../shared/ui/toast'
 
 const pretendard = localFont({
   src: [
@@ -39,7 +38,6 @@ const RootLayout = ({
   return (
     <html lang="ko" className={`${pretendard.className} ${pretendard.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <Toast />
         <Providers>{children}</Providers>
       </body>
     </html>
