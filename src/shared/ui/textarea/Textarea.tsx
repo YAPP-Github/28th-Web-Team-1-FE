@@ -1,10 +1,11 @@
 'use client'
 import { useState } from 'react'
 import { cn } from '@shared/lib/cn'
-import { Heading, Text } from '../typography'
+import { Text } from '../typography'
+import { Flex } from '@radix-ui/themes'
 
 interface TextareaProps extends React.ComponentProps<'textarea'> {
-  heading?: string
+  label?: string
   description?: string
   error?: boolean
 }
@@ -12,7 +13,7 @@ interface TextareaProps extends React.ComponentProps<'textarea'> {
 /**
  * 디자인 시스템 Textarea 컴포넌트
  *
- * heading(상단 라벨), description(하단 설명), error 상태를 지원합니다.
+ * label(상단 라벨), description(하단 설명), error 상태를 지원합니다.
  * textarea 안쪽 우측 하단에는 항상 `현재/최대` 글자수 카운터가 표시됩니다. (기본 최대 2000자)
  *
  * ### 크기 동작
@@ -31,22 +32,22 @@ interface TextareaProps extends React.ComponentProps<'textarea'> {
  * <Textarea placeholder="내용을 입력해주세요" />
  *
  * // 최대 글자수 지정 (우측 하단에 "0/500" 카운터 표시)
- * <Textarea heading="리뷰" maxLength={500} placeholder="내용을 입력해주세요" />
+ * <Textarea label="리뷰" maxLength={500} placeholder="내용을 입력해주세요" />
  *
  * // 크기 커스텀 (최소/최대 높이, 최소 너비 오버라이드)
  * <Textarea className="min-h-40 max-h-100 min-w-80" placeholder="내용을 입력해주세요" />
  *
- * // heading(라벨) + description(설명)
- * <Textarea heading="자기소개" description="200자 이내로 작성해주세요" placeholder="내용을 입력해주세요" />
+ * // label(라벨) + description(설명)
+ * <Textarea label="자기소개" description="200자 이내로 작성해주세요" placeholder="내용을 입력해주세요" />
  *
  * // error 상태 — 테두리가 강조되고 description이 에러 색상으로 표시됩니다
- * <Textarea heading="리뷰" description="최소 10자 이상 입력해주세요" error />
+ * <Textarea label="리뷰" description="최소 10자 이상 입력해주세요" error />
  *
  * // disabled 상태
- * <Textarea heading="메모" defaultValue="readonly content" disabled />
+ * <Textarea label="메모" defaultValue="readonly content" disabled />
  * ```
  */
-const Textarea = ({ className, heading, description, error, maxLength = 2000, onChange, ...props }: TextareaProps) => {
+const Textarea = ({ className, label, description, error, maxLength = 2000, onChange, ...props }: TextareaProps) => {
   const [length, setLength] = useState(() => String(props.value ?? props.defaultValue ?? '').length)
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -55,11 +56,11 @@ const Textarea = ({ className, heading, description, error, maxLength = 2000, on
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      {heading && (
-        <Heading variant="headline2" weight="semibold" className="h-5">
-          {heading}
-        </Heading>
+    <Flex direction="column" gap={'2'}>
+      {label && (
+        <Text as="label" variant="headline2" weight="semibold" className="h-5">
+          {label}
+        </Text>
       )}
 
       <div className="relative">
@@ -102,7 +103,7 @@ const Textarea = ({ className, heading, description, error, maxLength = 2000, on
           {description}
         </Text>
       )}
-    </div>
+    </Flex>
   )
 }
 

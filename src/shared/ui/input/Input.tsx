@@ -2,10 +2,11 @@
 import { X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { cn } from '@shared/lib/cn'
-import { Heading, Text } from '../typography'
+import { Text } from '../typography'
+import { Flex } from '@radix-ui/themes'
 
 interface InputProps extends React.ComponentProps<'input'> {
-  heading?: string
+  label?: string
   description?: string
   error?: boolean
 }
@@ -13,7 +14,7 @@ interface InputProps extends React.ComponentProps<'input'> {
 /**
  * 디자인 시스템 Input 컴포넌트
  *
- * heading(상단 라벨), description(하단 설명), error 상태를 지원하며,
+ * label(상단 라벨), description(하단 설명), error 상태를 지원하며,
  * 값이 있으면 우측에 입력값을 비우는 X(clear) 버튼이 표시됩니다.
  * `value`/`defaultValue` 초기값이 있으면 처음부터 clear 버튼이 노출됩니다.
  *
@@ -22,14 +23,14 @@ interface InputProps extends React.ComponentProps<'input'> {
  * // 기본 사용
  * <Input placeholder="내용을 입력해주세요" />
  *
- * // heading(라벨) + description(설명)
- * <Input heading="이메일" description="회사 이메일을 입력해주세요" placeholder="example@company.com" />
+ * // label(라벨) + description(설명)
+ * <Input label="이메일" description="회사 이메일을 입력해주세요" placeholder="example@company.com" />
  *
  * // error 상태 — 테두리가 강조되고 description이 에러 색상으로 표시됩니다
- * <Input heading="비밀번호" description="8자 이상 입력해주세요" error />
+ * <Input label="비밀번호" description="8자 이상 입력해주세요" error />
  *
  * // disabled 상태 — 입력 불가, clear 버튼도 숨겨집니다
- * <Input heading="아이디" defaultValue="readonly_user" disabled />
+ * <Input label="아이디" defaultValue="readonly_user" disabled />
  *
  * // 초기값 — defaultValue가 있으면 처음부터 clear(X) 버튼이 보입니다
  * <Input defaultValue="입력된 값" />
@@ -39,7 +40,7 @@ interface InputProps extends React.ComponentProps<'input'> {
  * ```
  */
 
-const Input = ({ className, heading, description, error, disabled, onChange, ...props }: InputProps) => {
+const Input = ({ className, label, description, error, disabled, onChange, ...props }: InputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [hasValue, setHasValue] = useState(() => String(props.value ?? props.defaultValue ?? '').length > 0)
 
@@ -61,11 +62,11 @@ const Input = ({ className, heading, description, error, disabled, onChange, ...
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      {heading && (
-        <Heading variant="headline2" weight="semibold" className="h-5">
-          {heading}
-        </Heading>
+    <Flex direction="column" gap={'2'}>
+      {label && (
+        <Text as="label" variant="headline2" weight="semibold" className="h-5">
+          {label}
+        </Text>
       )}
 
       <div className="relative">
@@ -74,6 +75,7 @@ const Input = ({ className, heading, description, error, disabled, onChange, ...
           data-slot="input"
           aria-invalid={error || undefined}
           onChange={handleChange}
+          disabled={disabled}
           className={cn(
             // base
             'h-14 w-full min-w-0 rounded-lg border px-4 py-4 outline-none',
@@ -109,7 +111,7 @@ const Input = ({ className, heading, description, error, disabled, onChange, ...
           {description}
         </Text>
       )}
-    </div>
+    </Flex>
   )
 }
 

@@ -13,7 +13,7 @@ const meta = {
     placeholder: '내용을 입력해주세요'
   },
   argTypes: {
-    heading: {
+    label: {
       control: 'text'
     },
     description: {
@@ -50,26 +50,26 @@ export const AllStates: Story = {
     <Flex direction={'column'} gap={'8'}>
       <Flex direction={'row'} gap={'4'} wrap={'wrap'}>
         <Input placeholder="내용을 입력해주세요" />
-        <Input heading="heading만" placeholder="내용을 입력해주세요" />
+        <Input label="label만" placeholder="내용을 입력해주세요" />
         <Input placeholder="내용을 입력해주세요" description="가이드 메시지" />
-        <Input heading="heading + description" placeholder="내용을 입력해주세요" description="가이드 메시지" />
-        <Input heading="입력된 상태" placeholder="내용을 입력해주세요" description="가이드 메시지" defaultValue="입력된 값" />
+        <Input label="label + description" placeholder="내용을 입력해주세요" description="가이드 메시지" />
+        <Input label="입력된 상태" placeholder="내용을 입력해주세요" description="가이드 메시지" defaultValue="입력된 값" />
       </Flex>
 
       <Flex direction={'row'} gap={'4'} wrap={'wrap'}>
         <Input placeholder="내용을 입력해주세요" error />
-        <Input heading="heading만" placeholder="내용을 입력해주세요" error />
+        <Input label="label만" placeholder="내용을 입력해주세요" error />
         <Input placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error />
-        <Input heading="heading + description" placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error />
-        <Input heading="입력된 상태" placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error defaultValue="잘못된 값" />
+        <Input label="label + description" placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error />
+        <Input label="입력된 상태" placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error defaultValue="잘못된 값" />
       </Flex>
 
       <Flex direction={'row'} gap={'4'} wrap={'wrap'}>
         <Input placeholder="내용을 입력해주세요" disabled />
-        <Input heading="heading만" placeholder="내용을 입력해주세요" disabled />
+        <Input label="label만" placeholder="내용을 입력해주세요" disabled />
         <Input placeholder="내용을 입력해주세요" description="가이드 메시지" disabled />
-        <Input heading="heading + description" placeholder="내용을 입력해주세요" description="가이드 메시지" disabled />
-        <Input heading="입력된 상태" placeholder="내용을 입력해주세요" description="가이드 메시지" defaultValue="비활성화된 값" disabled />
+        <Input label="label + description" placeholder="내용을 입력해주세요" description="가이드 메시지" disabled />
+        <Input label="입력된 상태" placeholder="내용을 입력해주세요" description="가이드 메시지" defaultValue="비활성화된 값" disabled />
       </Flex>
     </Flex>
   )
@@ -79,10 +79,10 @@ export const Default: Story = {
   render: () => (
     <Flex direction={'column'} gap={'8'} wrap={'wrap'}>
       <Input placeholder="내용을 입력해주세요" />
-      <Input heading="heading만" placeholder="내용을 입력해주세요" />
+      <Input label="label만" placeholder="내용을 입력해주세요" />
       <Input placeholder="내용을 입력해주세요" description="가이드 메시지" />
-      <Input heading="heading + description" placeholder="내용을 입력해주세요" description="가이드 메시지" />
-      <Input heading="입력된 상태" placeholder="내용을 입력해주세요" description="가이드 메시지" defaultValue="입력된 값" />
+      <Input label="label + description" placeholder="내용을 입력해주세요" description="가이드 메시지" />
+      <Input label="입력된 상태" placeholder="내용을 입력해주세요" description="가이드 메시지" defaultValue="입력된 값" />
     </Flex>
   )
 }
@@ -91,10 +91,10 @@ export const Error: Story = {
   render: () => (
     <Flex direction={'column'} gap={'8'} wrap={'wrap'}>
       <Input placeholder="내용을 입력해주세요" error />
-      <Input heading="heading만" placeholder="내용을 입력해주세요" error />
+      <Input label="label만" placeholder="내용을 입력해주세요" error />
       <Input placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error />
-      <Input heading="heading + description" placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error />
-      <Input heading="입력된 상태" placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error defaultValue="잘못된 값" />
+      <Input label="label + description" placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error />
+      <Input label="입력된 상태" placeholder="내용을 입력해주세요" description="올바른 값을 입력해주세요" error defaultValue="잘못된 값" />
     </Flex>
   )
 }
@@ -103,17 +103,17 @@ export const Disabled: Story = {
   render: () => (
     <Flex direction={'column'} gap={'8'} wrap={'wrap'}>
       <Input placeholder="내용을 입력해주세요" disabled />
-      <Input heading="heading만" placeholder="내용을 입력해주세요" disabled />
+      <Input label="label만" placeholder="내용을 입력해주세요" disabled />
       <Input placeholder="내용을 입력해주세요" description="가이드 메시지" disabled />
-      <Input heading="heading + description" placeholder="내용을 입력해주세요" description="가이드 메시지" disabled />
-      <Input heading="입력된 상태" placeholder="내용을 입력해주세요" description="가이드 메시지" defaultValue="비활성화된 값" disabled />
+      <Input label="label + description" placeholder="내용을 입력해주세요" description="가이드 메시지" disabled />
+      <Input label="입력된 상태" placeholder="내용을 입력해주세요" description="가이드 메시지" defaultValue="비활성화된 값" disabled />
     </Flex>
   )
 }
 
 export const Playground: Story = {
   args: {
-    heading: '제목',
+    label: '제목',
     description: '도움말 텍스트입니다',
     placeholder: '내용을 입력해주세요',
     error: false,
