@@ -40,13 +40,13 @@ const SearchField = ({ className, type, onSubmit, ...props }: SearchFieldProps) 
         // base
         // TODO : 애니메이션이 정해지면 추후 수정 필요
         'group flex w-full items-center gap-2 rounded-full px-4 py-3 transition-[box-shadow,background-color] duration-150',
-        'bg-bg-gray-subtler',
+        'bg-element-gray-lighter',
         // default
         'ring-border-subtle ring-1 ring-inset',
         // hover
-        'hover:ring-border-primary hover:bg-white hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]',
+        'hover:ring-border-primary hover:bg-element-white hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]',
         // focus
-        'focus-within:ring-border-primary focus-within:bg-white focus-within:shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]',
+        'focus-within:ring-border-primary focus-within:bg-element-white focus-within:shadow-[0_4px_16px_0_rgba(0,0,0,0.05)]',
         className
       )}
     >

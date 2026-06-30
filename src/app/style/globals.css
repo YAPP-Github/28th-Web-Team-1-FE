@@ -142,6 +142,18 @@
   --color-border-subtler: var(--color-gray-10);
   --color-border-error: var(--color-red-50);
   --color-border-primary: var(--color-primary-50);
+
+  --color-element-white: var(--color-gray-0);
+  --color-element-gray-lighter: var(--color-gray-5);
+  --color-element-gray-light: var(--color-gray-10);
+  --color-element-disabled: var(--color-gray-10);
+  --color-element-primary: var(--color-primary-50);
+  --color-element-primary-lighter: var(--color-primary-5);
+  --color-element-primary-light: var(--color-primary-10);
+  --color-element-danger: var(--color-red-50);
+  --color-element-danger-lighter: var(--color-red-5);
+  --color-element-danger-light: var(--color-red-10);
+  --color-element-danger-dark: var(--color-red-20);
 }
 
 /* ── Typography System ── */

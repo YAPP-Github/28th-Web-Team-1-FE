@@ -79,7 +79,7 @@ const Input = ({ className, label, description, error, disabled, onChange, ...pr
           className={cn(
             // base
             'h-14 w-full min-w-0 rounded-lg border px-4 py-4 outline-none',
-            'text-headline2 caret-gray-80 text-text-bolder bg-white font-semibold',
+            'text-headline2 caret-gray-80 text-text-bolder bg-element-white font-semibold',
             'placeholder:text-body1 placeholder:text-text-subtler placeholder:font-normal',
             'pr-10',
             // TODO : 애니메이션이 정해지면 추후 수정 필요
@@ -87,11 +87,11 @@ const Input = ({ className, label, description, error, disabled, onChange, ...pr
             // default
             'border-border-subtle',
             // hover
-            'hover:bg-bg-gray-subtle hover:border-border-subtle hover:text-text-subtle hover:placeholder:text-text-subtler',
+            'hover:bg-element-gray-lighter hover:border-border-subtle hover:text-text-subtle hover:placeholder:text-text-subtler',
             // focus
-            'focus-visible:bg-background focus-visible:border-border-primary',
+            'focus-visible:bg-element-white focus-visible:border-border-primary',
             // disabled
-            'disabled:bg-bg-gray-subtle disabled:border-border-subtle disabled:text-text-disabled',
+            'disabled:bg-element-disabled disabled:border-border-subtle disabled:text-text-disabled',
             'disabled:pointer-events-none disabled:cursor-not-allowed',
             // error
             'aria-invalid:border-border-error',
