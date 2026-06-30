@@ -1,5 +1,17 @@
 import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { extendTailwindMerge } from 'tailwind-merge'
+
+const twMerge = extendTailwindMerge({
+  override: {
+    classGroups: {
+      'font-size': [
+        {
+          text: ['display1', 'display2', 'display3', 'title1', 'title2', 'title3', 'heading1', 'heading2', 'headline1', 'headline2', 'body1', 'body2', 'label1', 'label2', 'caption1', 'caption2']
+        }
+      ]
+    }
+  }
+})
 
 /**
  * Tailwind CSS 클래스를 조건적으로 병합하고 충돌을 해결하는 유틸리티 함수이다.
