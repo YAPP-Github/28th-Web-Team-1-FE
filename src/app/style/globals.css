@@ -1,7 +1,7 @@
-@import "tailwindcss";
-@import "@radix-ui/themes/styles.css" layer(components);
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import '@radix-ui/themes/styles.css' layer(components);
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -38,62 +38,62 @@
   --color-primary-90: #2D1D6B;
 
   /* Red Color Palette */
-  --color-red-0: #FFFFFF;
-  --color-red-5: #FDEFEC;
-  --color-red-10: #FCDFD9;
-  --color-red-20: #F7AFA1;
-  --color-red-30: #F48771;
-  --color-red-40: #F05F42;
-  --color-red-50: #DE3412;
-  --color-red-60: #BD2C0F;
-  --color-red-70: #8A240F;
-  --color-red-80: #5C180A;
-  --color-red-90: #390D05;
+  --color-red-0: #ffffff;
+  --color-red-5: #fdefec;
+  --color-red-10: #fcdfd9;
+  --color-red-20: #f7afa1;
+  --color-red-30: #f48771;
+  --color-red-40: #f05f42;
+  --color-red-50: #de3412;
+  --color-red-60: #bd2c0f;
+  --color-red-70: #8a240f;
+  --color-red-80: #5c180a;
+  --color-red-90: #390d05;
   --color-red-95: #260903;
   --color-red-100: #000000;
 
   /* Yellow Color Palette */
-  --color-yellow-0: #FFFFFF;
-  --color-yellow-5: #FFF3DB;
-  --color-yellow-10: #FFE0A3;
-  --color-yellow-20: #FFC95C;
-  --color-yellow-30: #FFB114;
-  --color-yellow-40: #C78500;
-  --color-yellow-50: #9E6A00;
-  --color-yellow-60: #8A5C00;
+  --color-yellow-0: #ffffff;
+  --color-yellow-5: #fff3db;
+  --color-yellow-10: #ffe0a3;
+  --color-yellow-20: #ffc95c;
+  --color-yellow-30: #ffb114;
+  --color-yellow-40: #c78500;
+  --color-yellow-50: #9e6a00;
+  --color-yellow-60: #8a5c00;
   --color-yellow-70: #614100;
-  --color-yellow-80: #422C00;
-  --color-yellow-90: #2E1F00;
+  --color-yellow-80: #422c00;
+  --color-yellow-90: #2e1f00;
   --color-yellow-95: #241800;
   --color-yellow-100: #000000;
 
   /* Green Color Palette */
-  --color-green-0: #FFFFFF;
-  --color-green-5: #EAF6EC;
-  --color-green-10: #D8EEDD;
-  --color-green-20: #A9DAB4;
-  --color-green-30: #7EC88E;
-  --color-green-40: #3FA654;
+  --color-green-0: #ffffff;
+  --color-green-5: #eaf6ec;
+  --color-green-10: #d8eedd;
+  --color-green-20: #a9dab4;
+  --color-green-30: #7ec88e;
+  --color-green-40: #3fa654;
   --color-green-50: #228738;
   --color-green-60: #267337;
-  --color-green-70: #285D33;
-  --color-green-80: #1F4727;
-  --color-green-90: #122B18;
-  --color-green-95: #0E2012;
+  --color-green-70: #285d33;
+  --color-green-80: #1f4727;
+  --color-green-90: #122b18;
+  --color-green-95: #0e2012;
   --color-green-100: #000000;
 
   /* Gray Color Palette */
-  --color-gray-0: #FFFFFF;
-  --color-gray-5: #F4F5F6;
-  --color-gray-10: #E6E8EA;
-  --color-gray-20: #CDD1D5;
-  --color-gray-30: #B1B8BE;
-  --color-gray-40: #8A949E;
-  --color-gray-50: #6D7882;
-  --color-gray-60: #58616A;
-  --color-gray-70: #464C53;
-  --color-gray-80: #33363D;
-  --color-gray-90: #1E2124;
+  --color-gray-0: #ffffff;
+  --color-gray-5: #f4f5f6;
+  --color-gray-10: #e6e8ea;
+  --color-gray-20: #cdd1d5;
+  --color-gray-30: #b1b8be;
+  --color-gray-40: #8a949e;
+  --color-gray-50: #6d7882;
+  --color-gray-60: #58616a;
+  --color-gray-70: #464c53;
+  --color-gray-80: #33363d;
+  --color-gray-90: #1e2124;
   --color-gray-95: #131416;
   --color-gray-100: #000000;
 
@@ -116,6 +116,17 @@
   --color-btn-tertiary-fill-pressed: var(--color-gray-20);
   --color-btn-tertiary-border-pressed: var(--color-gray-30);
 
+  --color-text-bolder: var(--color-gray-100);
+  --color-text-basic: var(--color-gray-95);
+  --color-text-subtle: var(--color-gray-70);
+  --color-text-subtler: var(--color-gray-50);
+  --color-text-disabled: var(--color-gray-30);
+  --color-text-disabled-on: var(--color-gray-40);
+  --color-text-bolder-inverse: var(--color-gray-0);
+  --color-text-primary-basic: var(--color-primary-60);
+  --color-text-primary-bolder: var(--color-primary-70);
+  --color-text-error: var(--color-red-50);
+  
   --color-btn-disabled-fill: var(--color-gray-20);
 
   --color-fg-primary-basic: var(--color-primary-60);
@@ -130,6 +141,30 @@
   --color-icon-gray-light: var(--color-gray-50);
   --color-icon-disabled-on: var(--color-gray-40);
   --color-icon-inverse: var(--color-gray-0);
+
+  --color-bg-white: var(--color-gray-0);
+  --color-bg-gray-subtler: var(--color-gray-5);
+  --color-bg-gray-subtle: var(--color-gray-10);
+  --color-bg-gray-inverse: var(--color-gray-100);
+
+  --color-border-bolder: var(--color-gray-80);
+  --color-border-basic: var(--color-gray-60);
+  --color-border-subtle: var(--color-gray-20);
+  --color-border-subtler: var(--color-gray-10);
+  --color-border-error: var(--color-red-50);
+  --color-border-primary: var(--color-primary-50);
+
+  --color-element-white: var(--color-gray-0);
+  --color-element-gray-lighter: var(--color-gray-5);
+  --color-element-gray-light: var(--color-gray-10);
+  --color-element-disabled: var(--color-gray-10);
+  --color-element-primary: var(--color-primary-50);
+  --color-element-primary-lighter: var(--color-primary-5);
+  --color-element-primary-light: var(--color-primary-10);
+  --color-element-danger: var(--color-red-50);
+  --color-element-danger-lighter: var(--color-red-5);
+  --color-element-danger-light: var(--color-red-10);
+  --color-element-danger-dark: var(--color-red-20);
 }
 
 /* ── Typography System ── */
