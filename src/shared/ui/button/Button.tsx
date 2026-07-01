@@ -10,7 +10,7 @@ const buttonVariants = cva(
     // Shape
     'rounded-lg border border-transparent bg-clip-padding',
     // Typography
-    'text-fg-bolder text-headline1 whitespace-nowrap',
+    'text-fg-basic text-headline1 whitespace-nowrap',
     // Interaction
     'transition-all outline-none select-none',
     // Focus visible
