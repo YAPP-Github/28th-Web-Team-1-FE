@@ -47,7 +47,7 @@ export const SelectedControlItem = ({ children, className, ...props }: SelectedC
         'group/radio-group-item w-full min-w-0 flex-1 rounded-sm px-2 py-1.5',
         'text-label1 text-text-subtler truncate text-center',
         'transition-all duration-200 ease-in-out',
-        'data-checked:bg-element-white data-checked:text-fg-basic data-checked:shadow-sm',
+        'data-checked:bg-element-white data-checked:text-text-basic data-checked:shadow-sm',
         className
       )}
       {...props}

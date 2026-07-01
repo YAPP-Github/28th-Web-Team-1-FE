@@ -10,7 +10,7 @@ const buttonVariants = cva(
     // Shape
     'rounded-lg border border-transparent bg-clip-padding',
     // Typography
-    'text-fg-bolder text-headline1 whitespace-nowrap',
+    'text-text-basic text-headline1 whitespace-nowrap',
     // Interaction
     'transition-all outline-none select-none',
     // Focus visible
@@ -18,26 +18,24 @@ const buttonVariants = cva(
     // Active
     'active:not-aria-[haspopup]:translate-y-px',
     // Disabled
-    'disabled:pointer-events-none disabled:text-fg-disabled-on',
+    'disabled:pointer-events-none disabled:text-text-disabled-on',
     // Invalid
     'aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0'
   ),
   {
     variants: {
       variant: {
-        primary: cn('text-fg-bolder-inverse', 'bg-btn-primary-fill', 'hover:bg-btn-primary-fill-hovered', 'active:bg-btn-primary-fill-pressed'),
+        primary: cn('text-text-bolder-inverse', 'bg-btn-primary-fill', 'hover:bg-btn-primary-fill-hovered', 'active:bg-btn-primary-fill-pressed'),
         secondary: cn(
-          'text-fg-primary-basic',
+          'text-text-primary-basic',
           'bg-btn-secondary-fill border-btn-secondary-border',
           'hover:bg-btn-secondary-fill-hovered hover:border-btn-secondary-border-hovered ',
           'active:bg-btn-secondary-fill-pressed active:border-btn-secondary-border-pressed'
         ),
-        tertiary: cn(
-          'bg-btn-tertiary-fill border-btn-tertiary-border',
-          'hover:bg-btn-tertiary-fill-hovered hover:border-btn-tertiary-border-hovered ',
-          'active:bg-btn-tertiary-fill-pressed active:border-btn-tertiary-border-pressed'
-        ),
-        text: 'text-fg-subtler hover:text-fg-bolder'
+        tertiary: cn('bg-btn-tertiary-fill', 'hover:bg-btn-tertiary-fill-hovered', 'active:bg-btn-tertiary-fill-pressed'),
+        outline: cn('border-btn-outline-border', 'hover:border-btn-outline-border-hovered hover:bg-element-gray-lighter', 'active:bg-element-gray-light'),
+        text: 'text-text-subtler hover:text-text-basic',
+        danger: cn('text-text-danger bg-element-danger-lighter', 'hover:bg-element-danger-light', 'active:bg-element-danger-dark')
       },
       size: {
         xs: cn(
@@ -66,10 +64,8 @@ const buttonVariants = cva(
       },
       {
         variant: 'text',
-        class: 'p-0 h-auto rounded-none'
-      },
-      { variant: 'text', size: 'xs', class: 'text-caption2' },
-      { variant: 'text', size: 'xl', class: 'text-heading2' }
+        class: 'p-0 h-auto rounded-none disabled:text-text-disabled'
+      }
     ],
     defaultVariants: {
       variant: 'primary',
