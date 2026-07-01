@@ -1,0 +1,189 @@
+# GraphQL 가이드
+
+이 프로젝트에 GraphQL을 도입하며 만든 구조와 사용법을 정리한 문서입니다.
+(작성: 2026-07-01 / 첫 도입 — 인프라 + `me` 쿼리 예제 1개)
+
+---
+
+## 1. 5분 요약
+
+- REST(`/api/v1/...`)는 그대로 두고, **GraphQL을 병행**해서 씁니다.
+- 무거운 라이브러리(Apollo/urql) 안 씁니다. 기존에 손수 만든 `http.ts`처럼 **가벼운 fetcher 하나 + 자동 타입 생성(codegen)** 조합입니다.
+- 데이터 조회는 기존과 똑같이 **TanStack Query(`useQuery`)** 로 합니다.
+
+### REST vs GraphQL (우리 프로젝트 기준)
+
+| | REST (기존) | GraphQL (신규) |
+|---|---|---|
+| 주소 | API마다 다름 (`GET /api/v1/users/me`) | **하나** (`POST /api/graphql`) |
+| 요청 | 주소로 구분 | body에 **쿼리 문자열** 실어 보냄 |
+| 응답 | `{ result }` | `{ data, errors }` |
+| 인증 실패 | HTTP **401** | HTTP **200** + `errors[].extensions.code` |
+| 호출부 | `http.get(...)` | `graphqlFetcher(문서)` |
+
+---
+
+## 2. 폴더 구조 (무엇이 어디에 있나)
+
+```
+codegen.ts                         # 타입 자동생성 설정 (레포 루트)
+app/api/[...path]/route.ts         # BFF 프록시 (GraphQL 인증 처리 추가됨)
+src/
+├─ shared/
+│  ├─ lib/graphql.ts               # graphqlFetcher — GraphQL 요청 함수
+│  └─ api/
+│     ├─ index.ts                  # graphql() 함수 공개 (배럴)
+│     └─ gql/                      # ⚙️ codegen이 자동 생성 (직접 수정 X)
+└─ entities/user/model/
+   ├─ user.queries.ts             # me 쿼리 예제 (여기가 쿼리 작성 위치)
+   └─ user.keys.ts                # 쿼리 키
+```
+
+`src/shared/api/gql/` 안은 **직접 손대지 마세요.** `npm run codegen`이 덮어씁니다.
+
+---
+
+## 3. 데이터 흐름 (한눈에)
+
+```
+[컴포넌트] useQuery(myUserQuery())
+      │
+      ▼
+[graphqlFetcher]  ── POST /api/graphql (query 문자열 + variables)
+      │
+      ▼
+[BFF 프록시 app/api/[...path]/route.ts]
+      │   · 쿠키에서 access_token 꺼내 Authorization: Bearer 붙임
+      │   · 응답에 token_expired 있으면 자동으로 토큰 갱신 후 재요청
+      ▼
+[백엔드 GraphQL 서버]  → { data, errors } 반환
+```
+
+핵심: 컴포넌트는 토큰/쿠키를 전혀 몰라도 됩니다. 프록시가 알아서 붙입니다. (REST와 동일한 원리)
+
+---
+
+## 4. 새 쿼리 추가하는 법 (제일 중요)
+
+`me` 예제를 그대로 따라 하면 됩니다. 3단계입니다.
+
+### ① 쿼리를 `entities/<도메인>/model/*.queries.ts`에 작성
+
+```ts
+// 예: src/entities/user/model/user.queries.ts
+import { queryOptions } from '@tanstack/react-query'
+import { graphql } from '@/src/shared/api'
+import { graphqlFetcher } from '@/src/shared/lib'
+import { userKeys } from './user.keys'
+
+// graphql(`...`) 안에 쿼리를 씁니다. 타입은 codegen이 만들어 줍니다.
+const myUserDocument = graphql(`
+  query Me {
+    me {
+      userId
+      name
+      profileImageUrl
+    }
+  }
+`)
+
+export const myUserQuery = () =>
+  queryOptions({
+    queryKey: userKeys.me(),
+    queryFn: () => graphqlFetcher(myUserDocument)
+  })
+```
+
+### ② 타입 생성 실행
+
+```bash
+npm run codegen
+```
+
+> `graphql(...)` 안의 쿼리를 바꾸거나 새로 추가하면 **매번 이 명령을 다시 실행**해야
+> 타입이 갱신됩니다. (안 하면 `graphql()` 결과가 `unknown`으로 나옵니다)
+> 개발 중엔 `npm run codegen:watch`를 켜두면 자동으로 다시 생성됩니다.
+
+### ③ 컴포넌트에서 사용 (client component)
+
+```tsx
+'use client'
+import { useQuery } from '@tanstack/react-query'
+import { myUserQuery } from '@/src/entities'
+
+export const MyProfile = () => {
+  const { data, isLoading } = useQuery(myUserQuery())
+  if (isLoading) return <p>로딩중…</p>
+  return <p>{data?.me?.name}</p>   // ← data.me.name 자동완성 + 타입 체크됨
+}
+```
+
+변수가 있는 쿼리는 이렇게 씁니다:
+
+```ts
+const experiencesDocument = graphql(`
+  query Experiences($workspaceId: ID!, $size: Int!) {
+    experiences(workspaceId: $workspaceId, size: $size) { ... }
+  }
+`)
+// 호출: graphqlFetcher(experiencesDocument, { workspaceId, size: 20 })
+```
+
+---
+
+## 5. ⚠️ 함정 (꼭 기억)
+
+1. **백엔드 문서 ≠ 실제 스키마.**
+   백엔드 API 문서에는 루트 필드가 `myUser`로 적혀 있지만, **실제 dev 서버 스키마는 `me`** 였습니다.
+   새 쿼리 붙일 때 문서만 믿지 말고, 실제 스키마를 확인하세요:
+   - GraphiQL: `http://dev.api.jobdori.o-r.kr/api/graphiql` 에서 필드 자동완성으로 확인
+   - `npm run codegen`이 실패하면 십중팔구 필드 이름이 스키마와 다른 것입니다.
+
+2. **`graphql`은 버전 16으로 고정.**
+   `package.json`에 `"graphql": "^16"`. 17로 올리면 codegen과 충돌해서 설치가 깨집니다. 올리지 마세요.
+
+3. **쿼리 바꾸면 `npm run codegen` 재실행** (4번 ②와 동일 — 제일 자주 잊는 부분).
+
+4. **`src/shared/api/gql/`는 자동 생성물.** 직접 수정 금지, ESLint/타입 체크에서 제외돼 있습니다.
+
+---
+
+## 6. 인증(토큰 만료)은 어떻게 처리되나
+
+GraphQL은 로그인이 만료돼도 **HTTP 200**을 주고 `errors` 안에 `token_expired`(또는 `invalid_auth_token`) 코드만 넣습니다.
+그래서 BFF 프록시(`app/api/[...path]/route.ts`)가 GraphQL 응답 body를 열어보고, 이 코드가 있으면
+**자동으로 refresh_token으로 토큰을 갱신한 뒤 재요청**합니다. (REST의 401 자동 갱신과 동일한 동작)
+
+에러는 `graphqlFetcher`가 기존 `ApiError`(코드 = `extensions.code`)로 바꿔서 던지므로,
+화면에서는 REST 에러와 똑같이 다룰 수 있습니다.
+
+---
+
+## 7. 검증 방법 (이대로 하면 동작 확인됨)
+
+```bash
+npm run codegen      # 1. 스키마 연결 + 타입 생성 (성공하면 인프라 OK)
+npm run type-check   # 2. 타입 정합성 (참고: src/shared/ui/alert_modal/* 에러는 이 작업과 무관한 별도 WIP)
+npm run lint         # 3. 규칙 통과
+npm run dev          # 4. 서버 띄우고 아래 요청
+```
+
+프록시 GraphQL 인증 처리 확인 (로그인 안 한 상태):
+
+```bash
+curl -i -X POST http://localhost:3000/api/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"query Me { me { userId name } }"}'
+# 기대 결과: HTTP 401 + {"ok":false,"error":{"code":"token_expired"}}
+# → 프록시가 200+errors를 감지해 토큰 갱신을 시도한 뒤 실패 처리했다는 뜻 (정상)
+```
+
+---
+
+## 8. 아직 안 한 것 (다음에 할 일)
+
+- experience / workspace 등 나머지 도메인 쿼리
+- 커서 페이징 훅 (`useInfiniteQuery`)
+- 도메인별 에러코드 → 사용자 메시지 전체 매핑
+- 서버 컴포넌트에서의 prefetch, GraphQL 서버 캐싱
+- (선택) 백엔드 없이 테스트하려면 MSW GraphQL 목 추가 — `src/shared/mocks/handlers/`

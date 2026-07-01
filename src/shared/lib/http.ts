@@ -71,7 +71,7 @@ const serializeBody = (body: unknown): BodyInit | undefined => {
  * await getServerContext(); // { baseUrl: 'https://example.com', cookie: 'access_token=...' }
  * ```
  */
-const getServerContext = async (): Promise<{ baseUrl: string; cookie: string }> => {
+export const getServerContext = async (): Promise<{ baseUrl: string; cookie: string }> => {
   const { headers, cookies } = await import('next/headers')
   const [headerStore, cookieStore] = await Promise.all([headers(), cookies()])
   const host = headerStore.get('x-forwarded-host') ?? headerStore.get('host')

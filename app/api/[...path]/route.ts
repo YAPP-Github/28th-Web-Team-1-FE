@@ -25,6 +25,7 @@ const handler = (req: NextRequest, { params }: { params: Promise<{ path: string[
 const handleProxy = async (req: NextRequest, { path: pathSegments }: { path: string[] }) => {
   const path = pathSegments?.join('/') ?? ''
   const target = `${API_URL}/api/${path}${req.nextUrl.search}`
+  const isGraphql = path === 'graphql'
 
   const hasBody = !['GET', 'HEAD'].includes(req.method)
   const body = hasBody ? await req.arrayBuffer() : undefined
@@ -40,21 +41,48 @@ const handleProxy = async (req: NextRequest, { path: pathSegments }: { path: str
       ...cacheOptions
     })
 
-  try {
-    let response = await send(cookieStore.get('access_token')?.value)
+  const refreshAndRetry = async () => {
+    const refreshToken = cookieStore.get('refresh_token')?.value
+    const newTokens = refreshToken ? await refreshTokens(refreshToken) : null
+    if (!newTokens) return null
+    cookieStore.set('access_token', newTokens.accessToken, cookieOptions(ACCESS_TOKEN_MAX_AGE))
+    return send(newTokens.accessToken)
+  }
 
+  try {
+    const response = await send(cookieStore.get('access_token')?.value)
+
+    // REST: 인증 실패가 HTTP 401로 온다.
     if (response.status === 401) {
-      const refreshToken = cookieStore.get('refresh_token')?.value
-      const newTokens = refreshToken ? await refreshTokens(refreshToken) : null
-      if (!newTokens) return unauthorizedResponse(cookieStore)
-      cookieStore.set('access_token', newTokens.accessToken, cookieOptions(ACCESS_TOKEN_MAX_AGE))
-      response = await send(newTokens.accessToken)
+      const retried = await refreshAndRetry()
+      return retried ? passthrough(retried) : unauthorizedResponse(cookieStore)
+    }
+
+    // GraphQL: 인증 실패도 HTTP 200 + errors[].extensions.code로 온다. body를 읽어 판별한다.
+    if (isGraphql && response.ok) {
+      const text = await response.text()
+      if (hasGraphqlAuthError(text)) {
+        const retried = await refreshAndRetry()
+        return retried ? passthrough(retried) : unauthorizedResponse(cookieStore)
+      }
+      return buildResponse(response, text)
     }
 
     return passthrough(response)
   } catch (error) {
     console.error('BFF Error:', error)
     return NextResponse.json({ ok: false, error: { code: AUTH_ERROR.INTERNAL } }, { status: 500 })
+  }
+}
+
+/** GraphQL 응답 body(문자열)에 토큰 갱신이 필요한 인증 오류 코드가 있는지 판별하는 함수이다. */
+const GRAPHQL_AUTH_ERROR_CODES = new Set<string>([AUTH_ERROR.TOKEN_EXPIRED, 'invalid_auth_token'])
+const hasGraphqlAuthError = (body: string): boolean => {
+  try {
+    const parsed: { errors?: Array<{ extensions?: { code?: string } }> } = JSON.parse(body)
+    return Array.isArray(parsed.errors) && parsed.errors.some((error) => Boolean(error.extensions?.code) && GRAPHQL_AUTH_ERROR_CODES.has(error.extensions!.code!))
+  } catch {
+    return false
   }
 }
 
@@ -109,6 +137,17 @@ const buildHeaders = (req: NextRequest, accessToken?: string) => {
 const passthrough = async (res: Response) => {
   if (res.status === 204) return new NextResponse(null, { status: 204 })
   const body = await res.text()
+  return buildResponse(res, body)
+}
+
+/**
+ * 원본 응답과 미리 읽어둔 body 문자열로 클라이언트 응답을 만드는 함수이다.
+ * body를 이미 소비한 경우(GraphQL 인증 오류 판별 등)에도 `content-type`·`Set-Cookie`를 보존해 재구성한다.
+ * @param res 원본 서버 응답(헤더 참조용)
+ * @param body 이미 읽어둔 응답 본문 문자열
+ * @returns 클라이언트로 반환할 `NextResponse`
+ */
+const buildResponse = (res: Response, body: string) => {
   const headers = new Headers({ 'content-type': res.headers.get('content-type') ?? 'application/json' })
   const setCookie = res.headers.getSetCookie?.() ?? []
   setCookie.forEach((c) => headers.append('set-cookie', c))
