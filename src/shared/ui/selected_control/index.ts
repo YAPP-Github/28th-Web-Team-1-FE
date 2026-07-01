@@ -1,1 +1,1 @@
-export { SelectedControl } from './SelectedControl'
+export { SelectedControl, SelectedControlItem } from './SelectedControl'

@@ -1,6 +1,6 @@
 import { Flex } from '@radix-ui/themes'
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import { SelectedControl } from './SelectedControl'
+import { SelectedControl, SelectedControlItem } from './SelectedControl'
 
 const OPTIONS = ['옵션 1', '옵션 2', '옵션 3']
 const OPTIONS_2 = ['옵션 1', '옵션 2']
@@ -45,48 +45,48 @@ export const AllStates: Story = {
       <Flex direction={'column'} gap={'4'}>
         <SelectedControl defaultValue="옵션 2" className="w-80">
           {OPTIONS_2.map((option) => (
-            <SelectedControl.Item key={option} value={option}>
+            <SelectedControlItem key={option} value={option}>
               {option}
-            </SelectedControl.Item>
+            </SelectedControlItem>
           ))}
         </SelectedControl>
 
         <SelectedControl defaultValue="옵션 2" className="w-80">
           {OPTIONS.map((option) => (
-            <SelectedControl.Item key={option} value={option}>
+            <SelectedControlItem key={option} value={option}>
               {option}
-            </SelectedControl.Item>
+            </SelectedControlItem>
           ))}
         </SelectedControl>
 
         <SelectedControl defaultValue="옵션 2" className="w-80">
           {OPTIONS_4.map((option) => (
-            <SelectedControl.Item key={option} value={option}>
+            <SelectedControlItem key={option} value={option}>
               {option}
-            </SelectedControl.Item>
+            </SelectedControlItem>
           ))}
         </SelectedControl>
 
         <SelectedControl defaultValue="옵션 2" className="w-80">
           {OPTIONS_5.map((option) => (
-            <SelectedControl.Item key={option} value={option}>
+            <SelectedControlItem key={option} value={option}>
               {option}
-            </SelectedControl.Item>
+            </SelectedControlItem>
           ))}
         </SelectedControl>
       </Flex>
 
       <Flex direction={'column'} gap={'4'}>
         <SelectedControl defaultValue="긴 옵션 라벨" className="w-60">
-          <SelectedControl.Item value="짧은 옵션">짧은 옵션</SelectedControl.Item>
-          <SelectedControl.Item value="긴 옵션 라벨">긴 옵션 라벨</SelectedControl.Item>
-          <SelectedControl.Item value="더 긴 옵션 라벨 텍스트입니다">더 긴 옵션 라벨 텍스트입니다</SelectedControl.Item>
+          <SelectedControlItem value="짧은 옵션">짧은 옵션</SelectedControlItem>
+          <SelectedControlItem value="긴 옵션 라벨">긴 옵션 라벨</SelectedControlItem>
+          <SelectedControlItem value="더 긴 옵션 라벨 텍스트입니다">더 긴 옵션 라벨 텍스트입니다</SelectedControlItem>
         </SelectedControl>
 
         <SelectedControl defaultValue="긴 옵션 라벨" className="w-80">
-          <SelectedControl.Item value="짧은 옵션">짧은 옵션</SelectedControl.Item>
-          <SelectedControl.Item value="긴 옵션 라벨">긴 옵션 라벨</SelectedControl.Item>
-          <SelectedControl.Item value="더 긴 옵션 라벨 텍스트입니다">더 긴 옵션 라벨 텍스트입니다</SelectedControl.Item>
+          <SelectedControlItem value="짧은 옵션">짧은 옵션</SelectedControlItem>
+          <SelectedControlItem value="긴 옵션 라벨">긴 옵션 라벨</SelectedControlItem>
+          <SelectedControlItem value="더 긴 옵션 라벨 텍스트입니다">더 긴 옵션 라벨 텍스트입니다</SelectedControlItem>
         </SelectedControl>
       </Flex>
     </Flex>
@@ -99,17 +99,17 @@ export const Default: Story = {
       <Flex direction={'column'} gap={'4'}>
         <SelectedControl defaultValue="옵션 2" className="w-80">
           {OPTIONS_2.map((option) => (
-            <SelectedControl.Item key={option} value={option}>
+            <SelectedControlItem key={option} value={option}>
               {option}
-            </SelectedControl.Item>
+            </SelectedControlItem>
           ))}
         </SelectedControl>
 
         <SelectedControl defaultValue="옵션 2" className="w-80">
           {OPTIONS_4.map((option) => (
-            <SelectedControl.Item key={option} value={option}>
+            <SelectedControlItem key={option} value={option}>
               {option}
-            </SelectedControl.Item>
+            </SelectedControlItem>
           ))}
         </SelectedControl>
       </Flex>
@@ -117,17 +117,17 @@ export const Default: Story = {
       <Flex direction={'column'} gap={'4'}>
         <SelectedControl defaultValue="옵션 2" className="w-80">
           {OPTIONS_5.map((option) => (
-            <SelectedControl.Item key={option} value={option}>
+            <SelectedControlItem key={option} value={option}>
               {option}
-            </SelectedControl.Item>
+            </SelectedControlItem>
           ))}
         </SelectedControl>
 
         <SelectedControl defaultValue="옵션 2" className="w-160">
           {OPTIONS.map((option) => (
-            <SelectedControl.Item key={option} value={option}>
+            <SelectedControlItem key={option} value={option}>
               {option}
-            </SelectedControl.Item>
+            </SelectedControlItem>
           ))}
         </SelectedControl>
       </Flex>
@@ -143,9 +143,9 @@ export const Playground: Story = {
   render: (args) => (
     <SelectedControl {...args}>
       {OPTIONS.map((option) => (
-        <SelectedControl.Item key={option} value={option}>
+        <SelectedControlItem key={option} value={option}>
           {option}
-        </SelectedControl.Item>
+        </SelectedControlItem>
       ))}
     </SelectedControl>
   )
