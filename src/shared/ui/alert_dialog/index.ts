@@ -11,4 +11,4 @@ export {
   AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger
-} from './AlertModal'
+} from './AlertDialog'
