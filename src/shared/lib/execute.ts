@@ -1,5 +1,4 @@
-import { print } from 'graphql'
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
+import type { TypedDocumentString } from '@/src/shared/api'
 import { AUTH_ERROR } from './auth'
 import { ApiError, getServerContext, type ApiErrorDetail } from './http'
 
@@ -25,9 +24,9 @@ interface GraphQLResponse<T> {
 }
 
 /**
- * codegen이 만든 `TypedDocumentNode`를 받아 GraphQL 쿼리를 실행하는 클라이언트이다.
+ * GraphQL 요청을 실행하는 클라이언트이다.
  * `errors`가 있으면 `extensions.code`를 담아 `ApiError`를 던지고, 없으면 `data`를 반환한다.
- * @param document codegen `graphql(...)`으로 만든 타입 있는 문서
+ * @param query codegen `graphql(...)`으로 만든 타입 있는 문서
  * @param variables 쿼리 변수(변수가 없는 쿼리는 생략)
  * @returns 응답 본문의 `data`
  * @example
@@ -36,7 +35,7 @@ interface GraphQLResponse<T> {
  * const list = await execute(ExperiencesDocument, { workspaceId, size: 20 });
  * ```
  */
-export const execute = async <TResult, TVariables>(document: TypedDocumentNode<TResult, TVariables>, variables?: TVariables): Promise<TResult> => {
+export const execute = async <TResult, TVariables>(query: TypedDocumentString<TResult, TVariables>, variables?: TVariables): Promise<TResult> => {
   const server = isServer ? await getServerContext() : null
 
   const response = await fetch(`${server?.baseUrl ?? ''}/api/graphql`, {
@@ -46,7 +45,7 @@ export const execute = async <TResult, TVariables>(document: TypedDocumentNode<T
       'Content-Type': 'application/json',
       ...(server?.cookie ? { Cookie: server.cookie } : {})
     },
-    body: JSON.stringify({ query: print(document), variables })
+    body: JSON.stringify({ query: query, variables })
   })
 
   const body: GraphQLResponse<TResult> | null = await response.json().catch(() => null)

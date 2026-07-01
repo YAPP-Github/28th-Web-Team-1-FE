@@ -14,9 +14,8 @@ const config: CodegenConfig = {
   generates: {
     'src/shared/api/gql/': {
       preset: 'client',
-      presetConfig: {
-        // 초보 단계 복잡도를 낮추기 위해 fragment masking 비활성화
-        fragmentMasking: false
+      config: {
+        documentMode: 'string'
       }
     }
   }
