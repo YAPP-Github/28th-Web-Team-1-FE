@@ -33,6 +33,7 @@ const buttonVariants = cva(
           'active:bg-btn-secondary-fill-pressed active:border-btn-secondary-border-pressed'
         ),
         tertiary: cn('bg-btn-tertiary-fill', 'hover:bg-btn-tertiary-fill-hovered', 'active:bg-btn-tertiary-fill-pressed'),
+        outline: cn('border-btn-outline-border', 'hover:border-btn-outline-border-hovered hover:bg-element-gray-lighter', 'active:bg-element-gray-light'),
         text: 'text-fg-subtler hover:text-fg-basic'
       },
       size: {

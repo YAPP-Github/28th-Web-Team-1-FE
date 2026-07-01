@@ -116,6 +116,10 @@
   --color-btn-tertiary-fill-pressed: var(--color-gray-20);
   --color-btn-tertiary-border-pressed: var(--color-gray-30);
 
+  --color-btn-outline-border: var(--color-gray-20);
+  --color-btn-outline-border-hovered: var(--color-gray-30);
+  --color-btn-outline-border-pressed: var(--color-gray-40);
+
   --color-text-border: var(--color-gray-100);
   --color-text-basic: var(--color-gray-95);
   --color-text-subtle: var(--color-gray-70);
