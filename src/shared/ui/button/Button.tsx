@@ -34,7 +34,8 @@ const buttonVariants = cva(
         ),
         tertiary: cn('bg-btn-tertiary-fill', 'hover:bg-btn-tertiary-fill-hovered', 'active:bg-btn-tertiary-fill-pressed'),
         outline: cn('border-btn-outline-border', 'hover:border-btn-outline-border-hovered hover:bg-element-gray-lighter', 'active:bg-element-gray-light'),
-        text: 'text-text-subtler hover:text-text-basic'
+        text: 'text-text-subtler hover:text-text-basic',
+        danger: cn('text-text-danger bg-element-danger-lighter', 'hover:bg-element-danger-light', 'active:bg-element-danger-dark')
       },
       size: {
         xs: cn(
