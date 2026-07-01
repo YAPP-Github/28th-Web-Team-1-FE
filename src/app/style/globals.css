@@ -120,6 +120,8 @@
   --color-btn-outline-border-hovered: var(--color-gray-30);
   --color-btn-outline-border-pressed: var(--color-gray-40);
 
+  --color-btn-disabled-fill: var(--color-gray-20);
+
   --color-text-border: var(--color-gray-100);
   --color-text-basic: var(--color-gray-95);
   --color-text-subtle: var(--color-gray-70);
@@ -130,17 +132,8 @@
   --color-text-primary-basic: var(--color-primary-60);
   --color-text-primary-bolder: var(--color-primary-70);
   --color-text-error: var(--color-red-50);
-
-  --color-btn-disabled-fill: var(--color-gray-20);
-
-  --color-fg-primary-basic: var(--color-primary-60);
-  --color-fg-bolder: var(--color-gray-100);
-  --color-fg-basic: var(--color-gray-95);
-  --color-fg-subtle: var(--color-gray-70);
-  --color-fg-subtler: var(--color-gray-50);
-  --color-fg-disabled: var(--color-gray-30);
-  --color-fg-disabled-on: var(--color-gray-40);
-  --color-fg-bolder-inverse: var(--color-gray-0);
+  --color-text-danger: var(--color-red-50);
+  --color-text-bolder: var(--color-gray-100);
 
   --color-icon-gray: var(--color-gray-90);
   --color-icon-gray-light: var(--color-gray-50);
