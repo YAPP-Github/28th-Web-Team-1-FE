@@ -68,8 +68,7 @@ const AlertDialogOverlay = ({ className, ...props }: React.ComponentProps<typeof
     <AlertDialogPrimitive.Overlay
       data-slot="alert-dialog-overlay"
       className={cn(
-        // Todo : 추후 디자인에서 background blur랑 배경색을 제공하면 수정필요
-        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs',
+        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 bg-black-50 fixed inset-0 z-50 duration-100 supports-backdrop-filter:backdrop-blur-[2px]',
         className
       )}
       {...props}
