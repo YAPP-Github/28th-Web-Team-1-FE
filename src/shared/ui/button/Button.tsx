@@ -37,7 +37,7 @@ const buttonVariants = cva(
           'hover:bg-btn-tertiary-fill-hovered hover:border-btn-tertiary-border-hovered ',
           'active:bg-btn-tertiary-fill-pressed active:border-btn-tertiary-border-pressed'
         ),
-        text: 'text-fg-subtler hover:text-fg-bolder'
+        text: 'text-fg-subtler hover:text-fg-basic'
       },
       size: {
         xs: cn(
@@ -66,10 +66,8 @@ const buttonVariants = cva(
       },
       {
         variant: 'text',
-        class: 'p-0 h-auto rounded-none'
-      },
-      { variant: 'text', size: 'xs', class: 'text-caption2' },
-      { variant: 'text', size: 'xl', class: 'text-heading2' }
+        class: 'p-0 h-auto rounded-none disabled:text-fg-disabled'
+      }
     ],
     defaultVariants: {
       variant: 'primary',

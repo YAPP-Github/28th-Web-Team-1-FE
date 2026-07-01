@@ -134,6 +134,7 @@
   --color-fg-basic: var(--color-gray-95);
   --color-fg-subtle: var(--color-gray-70);
   --color-fg-subtler: var(--color-gray-50);
+  --color-fg-disabled: var(--color-gray-30);
   --color-fg-disabled-on: var(--color-gray-40);
   --color-fg-bolder-inverse: var(--color-gray-0);
 
