@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Button } from './Button'
 import { Home } from 'lucide-react'
 
-const VARIANTS = ['primary', 'secondary', 'tertiary'] as const
+const VARIANTS = ['primary', 'secondary', 'tertiary', 'outline', 'text', 'danger'] as const
 const SIZES = ['xs', 'sm', 'md', 'lg', 'xl', 'icon-xs', 'icon-sm', 'icon-md', 'icon-lg', 'icon-xl'] as const
 
 const meta = {
