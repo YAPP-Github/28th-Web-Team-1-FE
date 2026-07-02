@@ -110,7 +110,7 @@ const request = async <T = unknown>(path: string, options: RequestOptions = {}):
     body: serializeBody(body)
   })
 
-  const data = await response.json().catch(() => null)
+  const data = await response.json().catch(() => ({}))
 
   if (!response.ok || data?.ok === false) {
     throw new ApiError(response.status, data?.error?.code ?? AUTH_ERROR.INTERNAL, data?.error?.details)

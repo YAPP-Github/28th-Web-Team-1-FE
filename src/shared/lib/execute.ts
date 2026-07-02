@@ -33,13 +33,12 @@ export const execute = async <TResult, TVariables>(query: TypedDocumentString<TR
     body: JSON.stringify({ query, variables })
   })
 
-  const body: GraphQLResponse<TResult> | null = await response.json().catch(() => null)
+  const body: GraphQLResponse<TResult> = await response.json().catch(() => ({}))
 
-  // 프록시 REST 봉투(`error`, 세션 만료 401) 또는 GraphQL(`errors`)이 있으면 오류로 처리한다.
-  if (!response.ok || body?.error || body?.errors?.length) {
-    const error = body?.error ?? body?.errors?.[0]?.extensions
+  if (!response.ok || body.error || body.errors?.length) {
+    const error = body.error ?? body.errors?.[0]?.extensions
     throw new ApiError(response.status, error?.code ?? AUTH_ERROR.INTERNAL, error?.details)
   }
 
-  return body?.data as TResult
+  return body.data as TResult
 }
