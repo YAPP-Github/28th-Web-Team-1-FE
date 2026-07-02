@@ -113,9 +113,7 @@ const request = async <T = unknown>(path: string, options: RequestOptions = {}):
   const data = await response.json().catch(() => null)
 
   if (!response.ok || data?.ok === false) {
-    const code = data?.ok === false ? data.error.code : AUTH_ERROR.INTERNAL
-    const details = data?.ok === false ? data.error.details : undefined
-    throw new ApiError(response.status, code, details)
+    throw new ApiError(response.status, data?.error?.code ?? AUTH_ERROR.INTERNAL, data?.error?.details)
   }
 
   return data?.result
