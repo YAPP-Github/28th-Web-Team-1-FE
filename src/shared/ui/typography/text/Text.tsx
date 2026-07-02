@@ -1,17 +1,19 @@
 import { Text as RadixText, type TextProps } from '@radix-ui/themes'
-import { cn } from '@shared/lib'
+import { cn } from '@shared/lib/cn'
 import { typographyVariants } from '../shared'
 import type { TypographyVariant } from '../shared'
 import type { CustomColor } from '@shared/config'
 
 type RadixWeight = TextProps['weight']
 
-type CustomTextProps = {
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
+
+type CustomTextProps = DistributiveOmit<TextProps, 'weight' | 'color'> & {
   variant?: TypographyVariant
   className?: string
   weight?: TextProps['weight'] | 'semibold'
   color?: CustomColor
-} & Omit<TextProps, 'weight' | 'color'>
+}
 
 /**
  * 디자인 시스템 타이포그래피 컴포넌트.
