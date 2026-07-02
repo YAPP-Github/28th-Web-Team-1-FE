@@ -1,8 +1,7 @@
 import { Text as RadixText, type TextProps } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { typographyVariants } from '../shared'
-import type { TypographyVariant } from '../shared'
-import type { CustomColor } from '@shared/config'
+import type { TextColor, TypographyVariant } from '../shared'
 
 type RadixWeight = TextProps['weight']
 
@@ -12,13 +11,13 @@ type CustomTextProps = DistributiveOmit<TextProps, 'weight' | 'color'> & {
   variant?: TypographyVariant
   className?: string
   weight?: TextProps['weight'] | 'semibold'
-  color?: CustomColor
+  color?: TextColor
 }
 
 /**
  * 디자인 시스템 타이포그래피 컴포넌트.
  * Radix UI `<Text>`를 기반으로 Pretendard 폰트 스타일(variant)을 적용합니다.
- * 색상은 `color` prop에 커스텀 팔레트(`{color}-{shade}`)를 사용합니다.
+ * 색상은 `color` prop에 커스텀 팔레트(`{color}-{shade}`) 또는 시맨틱 토큰(`text-*`)을 사용합니다.
  *
  * Radix `size`별 font-size (scaling 100% 기준):
  *   size="1" → 12px
@@ -39,7 +38,8 @@ type CustomTextProps = DistributiveOmit<TextProps, 'weight' | 'color'> & {
  * <Text variant="body1">본문 텍스트</Text>
  * <Text variant="title1" size="8" weight="bold">큰 제목</Text>
  * <Text variant="caption1" color="gray-60">회색 캡션</Text>
- * <Text variant="body1" color="red-40" weight="semibold">빨간 semibold 텍스트</Text>
+ * <Text variant="body1" color="text-basic" weight="semibold">시맨틱 토큰</Text>
+ * <Text color="text-error">에러 메시지</Text>
  * <Text as="p" variant="body2">단락</Text>
  * ```
  */
@@ -48,7 +48,7 @@ export const Text = ({ variant, className, children, weight, color, ...props }: 
 
   return (
     <RadixText
-      {...(props as TextProps)}
+      {...props}
       weight={isSemibold ? undefined : (weight as RadixWeight)}
       style={color ? { color: `var(--color-${color})` } : undefined}
       className={cn(variant && typographyVariants[variant], isSemibold && 'font-semibold', className)}

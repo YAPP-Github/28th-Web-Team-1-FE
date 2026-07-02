@@ -1,3 +1,5 @@
+import type { CustomColor } from '@shared/config'
+
 export type TypographyVariant =
   | 'display1'
   | 'display2'
@@ -34,3 +36,21 @@ export const typographyVariants: Record<TypographyVariant, string> = {
   caption1: 'text-caption1',
   caption2: 'text-caption2'
 }
+
+export const TEXT_COLOR_TOKENS = [
+  'text-border',
+  'text-basic',
+  'text-subtle',
+  'text-subtler',
+  'text-disabled',
+  'text-disabled-on',
+  'text-bolder-inverse',
+  'text-primary-basic',
+  'text-primary-bolder',
+  'text-error',
+  'text-danger',
+  'text-bolder'
+] as const
+
+export type TextColorToken = (typeof TEXT_COLOR_TOKENS)[number]
+export type TextColor = CustomColor | TextColorToken
