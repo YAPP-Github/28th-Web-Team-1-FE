@@ -97,6 +97,26 @@
   --color-gray-95: #131416;
   --color-gray-100: #000000;
 
+  /* Black Color Palette */
+  --color-black-0: rgba(0, 0, 0, 0);
+  --color-black-5: rgba(0, 0, 0, 0.05);
+  --color-black-10: rgba(0, 0, 0, 0.1);
+  --color-black-15: rgba(0, 0, 0, 0.15);
+  --color-black-25: rgba(0, 0, 0, 0.25);
+  --color-black-50: rgba(0, 0, 0, 0.5);
+  --color-black-75: rgba(0, 0, 0, 0.75);
+  --color-black-100: rgba(0, 0, 0, 1);
+
+  /* White Color Palette */
+  --color-white-0: rgba(255, 255, 255, 0);
+  --color-white-5: rgba(255, 255, 255, 0.05);
+  --color-white-10: rgba(255, 255, 255, 0.1);
+  --color-white-15: rgba(255, 255, 255, 0.15);
+  --color-white-25: rgba(255, 255, 255, 0.25);
+  --color-white-50: rgba(255, 255, 255, 0.5);
+  --color-white-75: rgba(255, 255, 255, 0.75);
+  --color-white-100: rgba(255, 255, 255, 1);
+
   /* ── Button ── */
   --color-btn-primary-fill: var(--color-primary-50);
   --color-btn-primary-fill-hovered: var(--color-primary-70);
