@@ -1,4 +1,4 @@
-import type { TypedDocumentString } from '@/src/shared/api'
+import type { TypedDocumentString } from './gql/graphql'
 import { AUTH_ERROR } from './auth'
 import { ApiError, getServerContext, type ApiErrorDetail } from './http'
 
@@ -21,6 +21,16 @@ interface GraphQLResponseError {
 interface GraphQLResponse<T> {
   data?: T | null
   errors?: GraphQLResponseError[]
+}
+
+/**
+ * BFF 프록시(`app/api/[...path]/route.ts`)가 실패 시 반환하는 REST 봉투.
+ * 세션 만료 후 토큰 갱신까지 실패하면 프록시가 GraphQL `{ errors }`가 아니라 이 모양(HTTP 401)으로 응답한다.
+ * `http.ts`의 `request()`가 읽는 것과 동일한 형태이다.
+ */
+interface ProxyErrorEnvelope {
+  ok?: false
+  error?: { code: string; details?: ApiErrorDetail[] }
 }
 
 /**
@@ -48,10 +58,12 @@ export const execute = async <TResult, TVariables>(query: TypedDocumentString<TR
     body: JSON.stringify({ query: query, variables })
   })
 
-  const body: GraphQLResponse<TResult> | null = await response.json().catch(() => null)
+  const body: (GraphQLResponse<TResult> & ProxyErrorEnvelope) | null = await response.json().catch(() => null)
 
   if (!response.ok) {
-    throw new ApiError(response.status, body?.errors?.[0]?.extensions?.code ?? AUTH_ERROR.INTERNAL, body?.errors?.[0]?.extensions?.details)
+    // 프록시가 인증 실패 시 주는 REST 봉투(`{ ok:false, error }`)를 먼저 읽고, 없으면 GraphQL `errors[]`로 폴백한다.
+    const gqlExtensions = body?.errors?.[0]?.extensions
+    throw new ApiError(response.status, body?.error?.code ?? gqlExtensions?.code ?? AUTH_ERROR.INTERNAL, body?.error?.details ?? gqlExtensions?.details)
   }
 
   if (body?.errors?.length) {

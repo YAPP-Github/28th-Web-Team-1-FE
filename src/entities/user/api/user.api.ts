@@ -1,5 +1,4 @@
-import { graphql } from '@/src/shared/api'
-import { execute, http } from '@/src/shared/lib'
+import { execute, graphql, http } from '@/src/shared/lib'
 import type { UserInfo } from '../model/user.types'
 
 const myUserDocument = graphql(`

@@ -1,5 +1,7 @@
 /* eslint-disable */
-import * as types from './graphql'
+import * as types from './graphql';
+
+
 
 /**
  * Map of all GraphQL operations in the project.
@@ -13,17 +15,18 @@ import * as types from './graphql'
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-  '\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n    }\n  }\n': typeof types.MeDocument
-}
+    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n    }\n  }\n": typeof types.MeDocument,
+};
 const documents: Documents = {
-  '\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n    }\n  }\n': types.MeDocument
-}
+    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n    }\n  }\n": types.MeDocument,
+};
 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: '\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n    }\n  }\n'): typeof import('./graphql').MeDocument
+export function graphql(source: "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n    }\n  }\n"): typeof import('./graphql').MeDocument;
+
 
 export function graphql(source: string) {
-  return (documents as any)[source] ?? {}
+  return (documents as any)[source] ?? {};
 }
