@@ -1,10 +1,10 @@
-import { userAPI } from '@/src/entities'
-import { GoogleLoginButton, LogoutButton } from '@/src/features/authenticate'
 import { Flex } from '@radix-ui/themes'
+import { GoogleLoginButton, LogoutButton } from '@features/authenticate'
+import { userAPI } from '@entities/user'
 import { Heading, Text } from '@shared/ui'
 
 export const HomePage = async () => {
-  const data = await userAPI.getUserInfo()
+  const data = await userAPI.getMe()
 
   return (
     <Flex direction={'column'} align={'center'} justify={'center'} className="h-screen">
@@ -17,8 +17,16 @@ export const HomePage = async () => {
       {data ? (
         <div className="flex flex-col items-center gap-3">
           <div className="flex items-center">
-            <span>{data.name}</span>
-            <img src={data.profileImageUrl} alt="Profile" className="ml-2 h-8 w-8 rounded-full" />
+            <span>{data.me.name}</span>
+            <img src={data.me.profileImageUrl ? data.me.profileImageUrl : undefined} alt="Profile" className="ml-2 h-8 w-8 rounded-full" />
+          </div>
+          <div className="flex flex-col items-center">
+            <span>내 워크스페이스</span>
+            <ul>
+              {data.me.workspaces.map((workspace) => (
+                <li key={workspace.workspaceId}>{workspace.workspaceId}</li>
+              ))}
+            </ul>
           </div>
           <LogoutButton />
         </div>

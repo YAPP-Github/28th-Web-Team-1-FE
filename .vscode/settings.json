@@ -1,0 +1,6 @@
+{
+  // 자동 import(Ctrl+.) 시 상대경로 대신 tsconfig paths alias(@entities/user 등)를 우선 제안
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  // 슬라이스 내부 파일 대신 배럴(index.ts)에서 import하도록 내부 경로를 자동 import 후보에서 제외
+  "typescript.preferences.autoImportFileExcludePatterns": ["**/entities/*/api/**", "**/entities/*/model/**"]
+}

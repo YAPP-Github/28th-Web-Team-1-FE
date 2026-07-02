@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "predev": "graphql-codegen",
-    "dev": "concurrently -n next,codegen -c blue,green \"next dev\" \"npm run codegen:watch\"",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -52,7 +52,6 @@
     "@vitest/browser-playwright": "^4.1.8",
     "@vitest/coverage-v8": "^4.1.8",
     "chromatic": "^17.3.0",
-    "concurrently": "^10.0.3",
     "dotenv": "^17.4.2",
     "eslint-config-next": "16.1.1",
     "eslint-config-prettier": "^10.1.8",
