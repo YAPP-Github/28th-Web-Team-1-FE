@@ -1,0 +1,284 @@
+# GraphQL 가이드
+
+이 프로젝트의 GraphQL 구조와 사용법을 정리한 문서입니다.
+
+---
+
+## 1. 요약
+
+- 쿼리 작업 시에는 터미널에 `npm run codegen` 또는 `npm run codegen:watch`를 켜두고 하면 자동으로 타입 추론이 됩니다.
+  - codegen은 **서버 스키마 + 내가 작성한 쿼리**를 조합해 "이 쿼리를 날리면 정확히 이런 타입이 온다"는 TS 타입을 자동 생성해 줍니다.
+- 확장 프로그램으로 `GraphQL : Language Feature Support`을 설치하세요
+- 쿼리를 작성할때는 `shared/lib/gql` 에서 `graphql` 함수를 import하여 사용합니다. (VS Code GraphQL 확장 설치 시 자동완성 지원)
+- 쿼리를 호출할때는 `shared/lib/execute`를 호출해서 쿼리문과 변수를 넣으면 됩니다.
+
+```ts
+import { execute, graphql } from '@shared/lib'
+
+const experiencesDocument = graphql(`
+  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {
+    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {
+      cursor {
+        hasNext
+        nextCursor
+      }
+      experiences {
+        experienceId
+        title
+        tags
+        project {
+          projectId
+          name
+        }
+      }
+    }
+  }
+`)
+
+export const experienceAPI = {
+  getExperiences: (variables: { workspaceId: string; size: number; cursor?: string | null }) => execute(experiencesDocument, variables)
+}
+```
+
+### REST vs GraphQL (우리 프로젝트 기준)
+
+|           | REST (기존)                           | GraphQL (신규)                            |
+| --------- | ------------------------------------- | ----------------------------------------- |
+| 주소      | API마다 다름 (`GET /api/v1/users/me`) | **하나** (`POST /api/graphql`)            |
+| 요청      | 주소로 구분                           | body에 **쿼리 문자열** 실어 보냄          |
+| 응답      | `{ result }`                          | `{ data, errors }`                        |
+| 인증 실패 | HTTP **401**                          | HTTP **200** + `errors[].extensions.code` |
+| 호출 함수 | `http.get(...)`                       | `execute(문서, 변수)`                     |
+
+둘 다 `@/src/shared/lib` 배럴에서 import하고, 에러는 둘 다 같은 `ApiError`(코드 = `error.code`/`extensions.code`)로 던져집니다.
+
+---
+
+## 2. 폴더 구조
+
+```
+📄 schema.graphql                      # 백엔드 스키마 스냅샷(SDL). schema:pull이 덤프, 커밋함 (직접 수정 X)
+📄 codegen.pull.ts                     # 원격 → schema.graphql 덤프 설정 (네트워크 타는 유일한 곳)
+📄 codegen.ts                          # 타입 생성 설정 — 로컬 schema.graphql을 읽음 (오프라인, --config 없이 자동 로드)
+📄 graphql.config.yml                  # VS Code GraphQL 확장용 설정 (로컬 스키마 참조)
+📁 app/api/[...path]/
+└─ 📄 route.ts                         # BFF 프록시 (REST/GraphQL 인증을 한 곳에서 처리)
+📁 src/
+├─ 📁 shared/lib/
+│  ├─ 📄 execute.ts                    # execute — GraphQL 요청 함수 (REST의 http에 대응)
+│  ├─ 📄 http.ts                       # http — REST 요청 함수 (ApiError·getServerContext 정의처)
+│  ├─ 📄 index.ts                      # 배럴: execute, http, ApiError, graphql, TypedDocumentString
+│  └─ 📁 gql/                          # ⚙️ codegen 자동 생성물 (직접 수정 X, eslint 제외)
+│     ├─ 📄 graphql.ts                 #   쿼리별 타입 + TypedDocumentString + 문서 객체 (실체)
+│     ├─ 📄 gql.ts                     #   graphql() 함수 — 쿼리 문자열 → 타입 있는 문서로 매핑
+│     └─ 📄 index.ts                   #   내부 배럴
+└─ 📁 entities/
+   ├─ 📁 user/                         # 기본 예제 (단건 조회)
+   │  ├─ 📄 index.ts                   #   슬라이스 배럴 — @entities/user 로 import
+   │  ├─ 📁 api/
+   │  │  └─ 📄 user.api.ts             #   graphql 문서 + execute/http 호출
+   │  └─ 📁 model/
+   │     └─ 📄 user.keys.ts            #   userKeys(쿼리키) + userQueries(queryOptions 팩토리)
+   └─ 📁 experience/                   # 확장 예제 (변수 + 무한스크롤)
+      ├─ 📄 index.ts
+      ├─ 📁 api/
+      │  └─ 📄 experience.api.ts       #   변수 있는 쿼리 ($workspaceId, $size, $cursor)
+      └─ 📁 model/
+         ├─ 📄 experience.keys.ts      #   experienceKeys + experienceQueries(infiniteQueryOptions)
+         └─ 📄 experience.queries.ts   #   useExperienceList — select 평탄화 + enabled 가드 (훅이 정당한 케이스)
+```
+
+`src/shared/lib/gql/` 안은 **수정하지 마세요.** `npm run codegen`이 덮어씁니다.
+
+---
+
+## 3. 데이터 흐름
+
+```
+[컴포넌트] useQuery(userQueries.me())
+      │
+      ▼
+[userAPI.getMe → execute]  ── POST /api/graphql (query 문자열 + variables)
+      │
+      ▼
+[BFF 프록시 app/api/[...path]/route.ts]
+      │   · 쿠키에서 access_token 꺼내 Authorization: Bearer 붙임
+      │   · 인증 실패(REST 401 / GraphQL 200+errors) 감지 시 refresh 후 1회 재요청 (isAuthFailure)
+      │   · 갱신도 실패하면 쿠키 비우고 401 + { ok:false, error:{ code:"token_expired" } }
+      ▼
+[백엔드 GraphQL 서버]  → { data, errors } 반환
+```
+
+핵심: 컴포넌트는 토큰/쿠키를 전혀 몰라도 됩니다. 프록시가 알아서 처리합니다. (REST와 동일한 원리)
+
+`execute`는 서버/클라 공용(isomorphic)입니다 — 서버에선 절대 URL + 쿠키를 수동 주입하고,
+클라에선 `credentials: 'include'`를 씁니다. 서버 컴포넌트에서도 `await userAPI.getMe()`로 직접 부를 수 있습니다.
+
+---
+
+## 4. 새 쿼리 추가하는 법 (제일 중요)
+
+도메인당 파일 구조와 컨벤션:
+
+| 파일                 | 역할                                                       | 언제 만드나                      |
+| -------------------- | ---------------------------------------------------------- | -------------------------------- |
+| `api/*.api.ts`       | `graphql(...)` 문서 정의 + `execute` 호출                  | 항상                             |
+| `model/*.keys.ts`    | 쿼리키 + **queryOptions 팩토리** (`userQueries.me()` 형태) | 항상                             |
+| `model/*.queries.ts` | useQuery 래핑 훅                                           | **로직이 생길 때만** (아래 참고) |
+
+### ① 문서 정의 + 호출 — `api/*.api.ts`
+
+```ts
+// src/entities/user/api/user.api.ts
+import { execute, graphql, http } from '@/src/shared/lib'
+
+const myUserDocument = graphql(`
+  query Me {
+    me {
+      userId
+      name
+      workspaces {
+        workspaceId
+      }
+    }
+  }
+`)
+
+export const userAPI = {
+  getMe: () => execute(myUserDocument).catch(() => null)
+}
+```
+
+변수가 있는 쿼리는 두 번째 인자로 넘깁니다:
+
+```ts
+// src/entities/experience/api/experience.api.ts
+const experiencesDocument = graphql(`
+  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {
+    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {
+      cursor {
+        hasNext
+        nextCursor
+      }
+      experiences {
+        experienceId
+        title
+        tags
+      }
+    }
+  }
+`)
+
+export const experienceAPI = {
+  getExperiences: (variables: { workspaceId: string; size: number; cursor?: string | null }) => execute(experiencesDocument, variables)
+}
+```
+
+### ② 키 + queryOptions 팩토리 — `model/*.keys.ts`
+
+키와 옵션 모두 **팩토리 객체**입니다 (낱개 함수 X). 커서 페이징은 `infiniteQueryOptions`를 씁니다.
+
+```ts
+// src/entities/experience/model/experience.keys.ts
+export const experienceKeys = {
+  all: ['experience'] as const,
+  lists: () => [...experienceKeys.all, 'list'] as const,
+  list: (workspaceId: string) => [...experienceKeys.lists(), workspaceId] as const
+}
+
+export const experienceQueries = {
+  list: (workspaceId: string, size = 20) =>
+    infiniteQueryOptions({
+      queryKey: experienceKeys.list(workspaceId),
+      queryFn: ({ pageParam }) => experienceAPI.getExperiences({ workspaceId, size, cursor: pageParam }),
+      initialPageParam: null as string | null,
+      getNextPageParam: (lastPage) => (lastPage.experiences.cursor.hasNext ? lastPage.experiences.cursor.nextCursor : null)
+    })
+}
+```
+
+### ③ 타입 생성
+
+```bash
+npm run codegen       # 쿼리를 바꾸거나 추가할 때마다 (오프라인·즉시)
+npm run codegen:watch # 쿼리를 활발히 수정할 때는 watch 켜두면 저장마다 자동 생성
+```
+
+`npm run dev` 시작 시 1회는 자동입니다(`predev`).
+
+쿼리를 활발히 수정할 때는**별도 터미널에서 `npm run codegen:watch`** 를 켜두면 저장마다 자동 생성됩니다.
+
+### ④ 컴포넌트에서 사용
+
+```tsx
+'use client'
+import { useQuery } from '@tanstack/react-query'
+import { userQueries } from '@entities/user'
+import { useExperienceList } from '@entities/experience'
+
+export const ExperiencePage = () => {
+  const { data } = useQuery(userQueries.me())
+  const workspaceId = data?.me?.workspaces[0]?.workspaceId   // me → workspaceId 의존 관계
+
+  const { experiences, fetchNextPage, hasNextPage } = useExperienceList(workspaceId)
+  // workspaceId가 없으면(=me 응답 전) 요청이 나가지 않음 (enabled 가드)
+  ...
+}
+```
+
+무효화는 키로 합니다: `queryClient.invalidateQueries({ queryKey: experienceKeys.lists() })`
+
+## 5. codegen 2단계 구조
+
+### 왜 codegen이 필요한가
+
+GraphQL 서버는 스키마(전체 타입 정의)를 가지고 있지만, 클라이언트는 쿼리로 **필드를 선택적으로**
+가져옵니다. 응답 모양이 "내가 뭘 선택했느냐"에 따라 달라지므로 TS만으로는 결과 타입을 추론할 수 없습니다
+(런타임에 응답이 오니까). codegen은 **서버 스키마 + 내가 작성한 쿼리**를 조합해
+"이 쿼리를 날리면 정확히 이런 타입이 온다"는 TS 타입을 자동 생성해 줍니다.
+
+| 명령                  | 설정 파일         | 하는 일                                                 | 네트워크 | 언제                              |
+| --------------------- | ----------------- | ------------------------------------------------------- | -------- | --------------------------------- |
+| `npm run schema:pull` | `codegen.pull.ts` | 원격 스키마 → 로컬 `schema.graphql` 덤프 후 타입 재생성 | ✅ 탐    | **백엔드 스키마가 바뀌었을 때만** |
+| `npm run codegen`     | `codegen.ts`      | 로컬 `schema.graphql` + 내 쿼리 → 타입 생성             | ❌ 안 탐 | 쿼리 바꿀 때                      |
+
+- 평소 개발(쿼리 추가/수정)은 **오프라인·즉시**로 돕니다. 백엔드가 안 떠 있어도 됩니다.
+- `schema.graphql`은 **커밋**하므로 clone 직후에도 네트워크 없이 타입이 생성됩니다.
+  백엔드 변경 후 `schema:pull` 하면 git diff로 뭐가 바뀌었는지 바로 보입니다.
+- `codegen.ts`는 graphql-codegen이 `--config` 없이 자동으로 찾는 기본 이름이라 그대로 두고,
+  pull 설정만 동작을 드러내는 이름(`codegen.pull.ts`)을 씁니다.
+
+### 생성물 파일별 역할 (`src/shared/lib/gql/`)
+
+| 파일         | 역할                                                                                                                             |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| `graphql.ts` | **실체** — 쿼리별 결과/변수 타입(`MeQuery` 등) + `TypedDocumentString` 클래스 + 문서 객체(`MeDocument`)                          |
+| `gql.ts`     | **진입점** — 쿼리 문자열을 넣으면 `graphql.ts`의 대응 문서 객체를 돌려주는 `graphql()` 함수 (우리가 쿼리 작성할 때 쓰는 그 함수) |
+| `index.ts`   | 내부 배럴                                                                                                                        |
+
+### VS Code 확장 (권장)
+
+**GraphQL : Language Feature Support**
+
+설치하면 `graphql(\`...\`)`안에서 **스키마 기반 자동완성·필드 오타 검증·hover 문서**가 됩니다.
+
+루트의`graphql.config.yml`이 로컬 `schema.graphql`을 가리키므로 오프라인에서도 동작합니다.
+
+---
+
+## 6. 인증(토큰 만료) 처리
+
+GraphQL은 로그인이 만료돼도 **HTTP 200**을 주고 `errors[].extensions.code`에 `token_expired`(또는 `invalid_auth_token`)만 넣습니다.
+
+BFF 프록시가 이를 한 곳(`isAuthFailure`)에서 판별합니다:
+
+- **REST**: HTTP 401
+- **GraphQL**: 200 + body의 errors 코드 검사
+
+인증 실패면 refresh_token으로 **자동 갱신 후 1회 재요청**하고, 갱신마저 실패하면 쿠키를 비우고
+`401 + { ok:false, error:{ code:"token_expired" } }`(REST)를 반환합니다.
+
+`execute`는 이 REST를 먼저 읽고, 없으면 GraphQL `errors`를 읽어 **동일한 `ApiError`로** 던집니다.
+그래서 화면에서는 REST 에러와 GraphQL 에러를 똑같이 다룰 수 있습니다.
+
+QueryProvider의 retry 정책: `ApiError` 4xx(인증 실패 포함)는 **재시도하지 않습니다** — 재시도해도 결과가 같기 때문.

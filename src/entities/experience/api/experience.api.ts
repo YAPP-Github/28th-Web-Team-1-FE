@@ -1,4 +1,4 @@
-import { execute, graphql } from '@/src/shared/lib'
+import { execute, graphql } from '@shared/lib'
 
 const experiencesDocument = graphql(`
   query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {
