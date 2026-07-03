@@ -18,8 +18,8 @@ export const Avatar = ({ imageUrl, className }: AvatarProps) => {
   return (
     <AvatarRoot size="lg" className={className}>
       <AvatarImage src={imageUrl ?? undefined} alt="User Avatar" />
-      <AvatarFallback>
-        <UserRoundIcon />
+      <AvatarFallback className={'bg-element-primary-lighter'}>
+        <UserRoundIcon className="text-icon-primary-basic" />
       </AvatarFallback>
     </AvatarRoot>
   )
