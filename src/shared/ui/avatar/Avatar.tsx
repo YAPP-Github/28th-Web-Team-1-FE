@@ -4,7 +4,7 @@ import { UserRoundIcon } from 'lucide-react'
 
 interface AvatarProps {
   /** 아바타 이미지 URL. 제공되지 않으면 fallback 아이콘이 표시됩니다. */
-  imageUrl?: string
+  imageUrl?: string | null
   /** 추가 CSS 클래스 */
   className?: string
 }
@@ -17,7 +17,7 @@ interface AvatarProps {
 export const Avatar = ({ imageUrl, className }: AvatarProps) => {
   return (
     <AvatarRoot size="lg" className={className}>
-      <AvatarImage src={imageUrl} alt="User Avatar" />
+      <AvatarImage src={imageUrl ?? undefined} alt="User Avatar" />
       <AvatarFallback>
         <UserRoundIcon />
       </AvatarFallback>
