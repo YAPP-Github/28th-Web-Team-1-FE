@@ -1,2 +1,3 @@
 export { userAPI } from './api/user.api'
-export { userQueries, userKeys } from './model/user.keys'
+export { userKeys } from './model/user.keys'
+export { userQueries } from './model/user.queries'
