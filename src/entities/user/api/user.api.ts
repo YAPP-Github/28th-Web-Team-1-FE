@@ -7,6 +7,7 @@ const myUserDocument = graphql(`
       userId
       name
       profileImageUrl
+      email
       workspaces {
         workspaceId
       }
