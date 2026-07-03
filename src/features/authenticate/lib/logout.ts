@@ -1,6 +1,5 @@
 'use server'
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { clearAuthCookies } from '@/src/shared/lib'
 
 const API_URL = process.env.API_URL
@@ -20,5 +19,4 @@ export const logout = async () => {
     })
   }
   clearAuthCookies(cookieStore)
-  redirect('/')
 }
