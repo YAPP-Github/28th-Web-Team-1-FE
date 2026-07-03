@@ -117,6 +117,10 @@
   --color-white-75: rgba(255, 255, 255, 0.75);
   --color-white-100: rgba(255, 255, 255, 1);
 
+  /* Shadow Color Palette */
+  --color-shadow-1: rgba(0, 0, 0, 0.03);
+  --color-shadow-2: rgba(0, 0, 0, 0.05);
+
   /* ── Button ── */
   --color-btn-primary-fill: var(--color-primary-50);
   --color-btn-primary-fill-hovered: var(--color-primary-70);
@@ -269,6 +273,10 @@
 
 /* ── Other Design System ── */
 @theme inline {
+  /* Easing */
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Border Radius */
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 10px;
@@ -276,11 +284,10 @@
   --radius-xl: 16px;
   --radius-2xl: 20px;
 
-  /*!* ── Box Shadow (TODO) ── *!*/
-  /*--shadow-sm: !* TODO *!;*/
-  /*--shadow-md: !* TODO *!;*/
-  /*--shadow-lg: !* TODO *!;*/
-  /*--shadow-xl: !* TODO *!;*/
+  /* ── Box Shadow ── */
+  --shadow-1: 0px 2px 8px var(--color-shadow-1);
+  --shadow-2: 0px 4px 16px var(--color-shadow-2);
+  --shadow-3: 0px 4px 12px var(--color-shadow-1), 0px 0px 32px var(--color-shadow-2);
 }
 
 /* ── Shadcn Design System ── */
