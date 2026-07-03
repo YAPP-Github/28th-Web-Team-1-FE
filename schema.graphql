@@ -1,0 +1,207 @@
+"""This directive allows results to be deferred during execution"""
+directive @defer(
+  """Deferred behaviour is controlled by this argument"""
+  if: Boolean! = true
+
+  """A unique label that represents the fragment being deferred"""
+  label: String
+) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"""
+This directive disables error propagation when a non nullable field returns null for the given operation.
+"""
+directive @experimental_disableErrorPropagation on MUTATION | QUERY | SUBSCRIPTION
+
+"""커서 정보입니다."""
+type Cursor {
+  """다음 페이지 존재 여부입니다."""
+  hasNext: Boolean!
+
+  """다음 페이지를 조회할 때 사용할 커서입니다."""
+  nextCursor: String
+}
+
+"""경험입니다."""
+type Experience {
+  """경험 상세 내용입니다."""
+  contents: ExperienceContents!
+
+  """경험을 식별하는 ID입니다."""
+  experienceId: ID!
+
+  """경험이 연결된 프로젝트입니다."""
+  project: ExperienceProject
+
+  """경험에 부여된 태그 목록입니다."""
+  tags: [String!]!
+
+  """경험 제목입니다."""
+  title: String!
+}
+
+"""경험 상세 내용입니다."""
+type ExperienceContents {
+  """FREE 형식의 상세 내용입니다."""
+  free: FreeExperienceContents
+
+  """STAR 형식의 상세 내용입니다."""
+  star: StarExperienceContents
+
+  """경험 상세 내용 타입입니다."""
+  type: ExperienceContentsType!
+}
+
+"""경험 상세 내용 타입입니다."""
+enum ExperienceContentsType {
+  """자유 서술 형식입니다."""
+  FREE
+
+  """Situation, Task, Action, Result로 구성된 형식입니다."""
+  STAR
+}
+
+"""경험 프로젝트입니다."""
+type ExperienceProject {
+  """경험 프로젝트 이름입니다."""
+  name: String!
+
+  """경험 프로젝트 진행 기간입니다."""
+  period: Period
+
+  """경험 프로젝트를 식별하는 ID입니다."""
+  projectId: ID!
+
+  """경험 프로젝트에서 맡은 역할입니다."""
+  role: String
+
+  """경험 프로젝트 요약입니다."""
+  summary: String!
+}
+
+"""경험 프로젝트 상태입니다."""
+enum ExperienceProjectStatus {
+  """활성 상태입니다."""
+  ACTIVE
+
+  """삭제된 상태입니다."""
+  DELETED
+}
+
+"""경험 프로젝트 목록입니다."""
+type ExperienceProjects {
+  """다음 페이지 조회에 사용하는 커서 정보입니다."""
+  cursor: Cursor!
+
+  """조회된 경험 프로젝트 목록입니다."""
+  projects: [ExperienceProject!]!
+}
+
+"""경험 상태입니다."""
+enum ExperienceStatus {
+  """활성 상태입니다."""
+  ACTIVE
+
+  """삭제된 상태입니다."""
+  DELETED
+}
+
+"""경험 목록입니다."""
+type Experiences {
+  """다음 페이지 조회에 사용하는 커서 정보입니다."""
+  cursor: Cursor!
+
+  """조회된 경험 목록입니다."""
+  experiences: [Experience!]!
+}
+
+"""FREE 형식의 경험 상세 내용입니다."""
+type FreeExperienceContents {
+  """자유 내용입니다."""
+  content: String!
+}
+
+"""기간입니다."""
+type Period {
+  """기간 종료일입니다."""
+  endAt: String
+
+  """기간 시작일입니다."""
+  startAt: String
+}
+
+type Query {
+  """경험 단건을 조회합니다."""
+  experience(
+    """조회할 경험 ID입니다."""
+    id: ID!
+
+    """경험이 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Experience
+
+  """경험 프로젝트 목록을 조회합니다."""
+  experienceProjects(
+    """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
+    cursor: String
+
+    """한 번에 조회할 경험 프로젝트 개수입니다. (1 이상 30 이하)"""
+    size: Int!
+
+    """경험 프로젝트 목록을 조회할 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): ExperienceProjects!
+
+  """경험 목록을 조회합니다 (프로젝트 ID가 있는 경우 특정 프로젝트 내로 한정)"""
+  experiences(
+    """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
+    cursor: String
+
+    """특정 프로젝트의 경험만 조회할 때 사용하는 프로젝트 ID입니다."""
+    projectId: ID
+
+    """한 번에 조회할 경험 개수입니다. (1 이상 30 이하)"""
+    size: Int!
+
+    """경험 목록을 조회할 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Experiences!
+
+  """인증된 사용자의 정보를 조회합니다."""
+  me: User!
+}
+
+"""STAR 형식의 경험 상세 내용입니다."""
+type StarExperienceContents {
+  """행동입니다."""
+  action: String!
+
+  """결과입니다."""
+  result: String!
+
+  """상황입니다."""
+  situation: String!
+
+  """과제입니다."""
+  task: String!
+}
+
+"""사용자 정보입니다."""
+type User {
+  """사용자 이름입니다."""
+  name: String!
+
+  """사용자 프로필 이미지 URL입니다."""
+  profileImageUrl: String
+
+  """사용자를 식별하는 ID입니다."""
+  userId: ID!
+
+  """사용자가 속한 워크스페이스 목록입니다."""
+  workspaces: [Workspace!]!
+}
+
+"""워크스페이스 정보입니다."""
+type Workspace {
+  """워크스페이스를 식별하는 ID입니다."""
+  workspaceId: ID!
+}

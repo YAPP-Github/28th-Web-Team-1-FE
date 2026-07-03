@@ -71,7 +71,7 @@ const serializeBody = (body: unknown): BodyInit | undefined => {
  * await getServerContext(); // { baseUrl: 'https://example.com', cookie: 'access_token=...' }
  * ```
  */
-const getServerContext = async (): Promise<{ baseUrl: string; cookie: string }> => {
+export const getServerContext = async (): Promise<{ baseUrl: string; cookie: string }> => {
   const { headers, cookies } = await import('next/headers')
   const [headerStore, cookieStore] = await Promise.all([headers(), cookies()])
   const host = headerStore.get('x-forwarded-host') ?? headerStore.get('host')
@@ -110,12 +110,10 @@ const request = async <T = unknown>(path: string, options: RequestOptions = {}):
     body: serializeBody(body)
   })
 
-  const data = await response.json().catch(() => null)
+  const data = await response.json().catch(() => ({}))
 
   if (!response.ok || data?.ok === false) {
-    const code = data?.ok === false ? data.error.code : AUTH_ERROR.INTERNAL
-    const details = data?.ok === false ? data.error.details : undefined
-    throw new ApiError(response.status, code, details)
+    throw new ApiError(response.status, data?.error?.code ?? AUTH_ERROR.INTERNAL, data?.error?.details)
   }
 
   return data?.result

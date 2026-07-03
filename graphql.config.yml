@@ -1,0 +1,5 @@
+# VS Code GraphQL 확장(GraphQL: Language Feature Support)용 설정.
+# graphql(`...`) 안에서 스키마 기반 자동완성·필드 검증·hover 문서를 제공한다.
+# 스키마는 로컬 스냅샷(schema.graphql)을 읽으므로 오프라인에서도 동작한다.
+schema: schema.graphql
+documents: src/**/*.{ts,tsx}
