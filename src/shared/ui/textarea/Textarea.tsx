@@ -1,8 +1,8 @@
 'use client'
 import { useId, useState } from 'react'
+import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { Text } from '../typography'
-import { Flex } from '@radix-ui/themes'
 
 interface TextareaProps extends React.ComponentProps<'textarea'> {
   label?: string

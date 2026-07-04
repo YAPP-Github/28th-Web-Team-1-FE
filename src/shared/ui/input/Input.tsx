@@ -1,9 +1,9 @@
 'use client'
-import { X } from 'lucide-react'
 import { useId, useRef, useState } from 'react'
+import { Flex } from '@radix-ui/themes'
+import { X } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Text } from '../typography'
-import { Flex } from '@radix-ui/themes'
 
 interface InputProps extends React.ComponentProps<'input'> {
   label?: string
