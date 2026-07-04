@@ -1,6 +1,6 @@
 'use client'
 import { X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { cn } from '@shared/lib/cn'
 import { Text } from '../typography'
 import { Flex } from '@radix-ui/themes'
@@ -40,7 +40,9 @@ interface InputProps extends React.ComponentProps<'input'> {
  * ```
  */
 
-const Input = ({ className, label, description, error, disabled, onChange, ...props }: InputProps) => {
+const Input = ({ className, label, description, error, disabled, onChange, id, ...props }: InputProps) => {
+  const generatedId = useId()
+  const inputId = id ?? generatedId
   const inputRef = useRef<HTMLInputElement>(null)
   const [hasValue, setHasValue] = useState(() => String(props.value ?? props.defaultValue ?? '').length > 0)
 
@@ -63,24 +65,32 @@ const Input = ({ className, label, description, error, disabled, onChange, ...pr
 
   return (
     <Flex direction="column" gap={'2'}>
-      {label && (
-        <Text as="label" variant="headline2" weight="semibold" className="h-5">
-          {label}
-        </Text>
-      )}
+      <Flex direction="row" justify="between">
+        {label && (
+          <Text variant="label1" as="label" htmlFor={inputId} weight="semibold">
+            {label}
+          </Text>
+        )}
+        {description && (
+          <Text variant="label2" weight="regular" color={error ? 'red-50' : 'gray-50'}>
+            {description}
+          </Text>
+        )}
+      </Flex>
 
       <div className="relative">
         <input
           ref={inputRef}
+          id={inputId}
           data-slot="input"
           aria-invalid={error || undefined}
           onChange={handleChange}
           disabled={disabled}
           className={cn(
             // base
-            'h-14 w-full min-w-0 rounded-lg border px-4 py-4 outline-none',
-            'text-headline2 caret-gray-80 text-text-bolder bg-element-white font-semibold',
-            'placeholder:text-body1 placeholder:text-text-subtler placeholder:font-normal',
+            'w-full min-w-0 rounded-lg border px-4 py-3 outline-none',
+            'text-body2 caret-gray-80 text-text-basic bg-element-white',
+            'placeholder:text-body2 placeholder:text-text-subtler',
             'pr-10',
             // TODO : 애니메이션이 정해지면 추후 수정 필요
             'transition-[border-color,background-color] duration-150',
@@ -105,12 +115,6 @@ const Input = ({ className, label, description, error, disabled, onChange, ...pr
           </button>
         )}
       </div>
-
-      {description && (
-        <Text variant="label2" weight="regular" color={error ? 'red-50' : 'gray-50'}>
-          {description}
-        </Text>
-      )}
     </Flex>
   )
 }
