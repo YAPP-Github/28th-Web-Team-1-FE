@@ -1,7 +1,6 @@
 import { Flex } from '@radix-ui/themes'
 import { GoogleLoginButton, LogoutButton } from '@features/authenticate'
 import { Heading, Text } from '@shared/ui'
-import { UserProfile } from '@entities/user'
 
 export const HomePage = async () => {
   return (
@@ -13,7 +12,6 @@ export const HomePage = async () => {
         This is the main landing page of our application.
       </Text>
       <div className="flex flex-col items-center gap-3">
-        <UserProfile />
         <LogoutButton />
       </div>
       <div className="flex space-x-4">
