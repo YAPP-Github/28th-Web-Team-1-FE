@@ -9,6 +9,7 @@ interface InputProps extends React.ComponentProps<'input'> {
   label?: string
   description?: string
   error?: boolean
+  clearable?: boolean
 }
 
 /**
@@ -17,6 +18,7 @@ interface InputProps extends React.ComponentProps<'input'> {
  * label(상단 라벨), description(하단 설명), error 상태를 지원하며,
  * 값이 있으면 우측에 입력값을 비우는 X(clear) 버튼이 표시됩니다.
  * `value`/`defaultValue` 초기값이 있으면 처음부터 clear 버튼이 노출됩니다.
+ * `clearable={false}`를 주면 clear 버튼이 표시되지 않습니다. (기본값: true)
  *
  * @example
  * ```tsx
@@ -37,10 +39,13 @@ interface InputProps extends React.ComponentProps<'input'> {
  *
  * // type 지정 + 제어 컴포넌트
  * <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+ *
+ * // clear(X) 버튼 숨기기
+ * <Input defaultValue="입력된 값" clearable={false} />
  * ```
  */
 
-const Input = ({ className, label, description, error, disabled, onChange, id, ...props }: InputProps) => {
+const Input = ({ className, label, description, error, disabled, onChange, id, clearable = true, ...props }: InputProps) => {
   const generatedId = useId()
   const inputId = id ?? generatedId
   const inputRef = useRef<HTMLInputElement>(null)
@@ -91,7 +96,7 @@ const Input = ({ className, label, description, error, disabled, onChange, id, .
             'w-full min-w-0 rounded-lg border px-4 py-3 outline-none',
             'text-body2 caret-gray-80 text-text-basic bg-element-white',
             'placeholder:text-body2 placeholder:text-text-subtler',
-            'pr-10',
+            clearable && 'pr-10',
             // TODO : 애니메이션이 정해지면 추후 수정 필요
             'transition-[border-color,background-color] duration-150',
             // default
@@ -109,7 +114,7 @@ const Input = ({ className, label, description, error, disabled, onChange, id, .
           )}
           {...props}
         />
-        {hasValue && (
+        {clearable && hasValue && (
           <button type="button" onClick={handleClear} disabled={disabled} className="text-icon-gray absolute top-1/2 right-4 -translate-y-1/2 disabled:hidden">
             <X size={20} strokeWidth={1.67} />
           </button>
