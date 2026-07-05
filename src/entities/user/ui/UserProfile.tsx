@@ -55,3 +55,32 @@ const UserProfileSkeleton = () => {
     </Flex>
   )
 }
+
+const UserAvatarContent = () => {
+  const { data: profileImageUrl } = useSuspenseQuery({
+    ...userQueries.me(),
+    select: (data) => data.me.profileImageUrl
+  })
+
+  return (
+    <Flex className={'hover:bg-element-gray-light rounded-sm p-1 hover:shadow-sm'}>
+      <Avatar imageUrl={profileImageUrl} />
+    </Flex>
+  )
+}
+
+export const UserAvatar = () => {
+  return (
+    <ErrorBoundary
+      fallback={
+        <Text className={'text-center'} variant={'caption2'}>
+          실패
+        </Text>
+      }
+    >
+      <Suspense fallback={<Skeleton className="h-10 w-10 rounded-full" />}>
+        <UserAvatarContent />
+      </Suspense>
+    </ErrorBoundary>
+  )
+}
