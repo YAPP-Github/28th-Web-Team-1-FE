@@ -3,8 +3,6 @@ import { cn } from '@shared/lib/cn'
 import { typographyVariants } from '../shared'
 import type { TextColor, TypographyVariant } from '../shared'
 
-type RadixWeight = TextProps['weight']
-
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
 
 type CustomTextProps = DistributiveOmit<TextProps, 'weight' | 'color'> & {
@@ -49,7 +47,7 @@ export const Text = ({ variant, className, children, weight, color, ...props }: 
   return (
     <RadixText
       {...props}
-      weight={isSemibold ? undefined : (weight as RadixWeight)}
+      weight={isSemibold ? undefined : weight}
       style={color ? { color: `var(--color-${color})` } : undefined}
       className={cn(variant && typographyVariants[variant], isSemibold && 'font-semibold', className)}
     >
