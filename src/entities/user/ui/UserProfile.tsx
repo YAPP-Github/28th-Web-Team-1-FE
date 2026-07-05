@@ -46,7 +46,7 @@ export const UserProfile = () => {
 
 const UserProfileSkeleton = () => {
   return (
-    <Flex gap={'2'} align={'center'} className={'p-1.5'}>
+    <Flex gap={'2'} align={'center'} className={'p-0.5'}>
       <Skeleton className="h-10 w-10 rounded-full" />
       <div className="space-y-2">
         <Skeleton className="h-3 w-15" />
