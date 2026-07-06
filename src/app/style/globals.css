@@ -161,6 +161,7 @@
 
   --color-icon-gray: var(--color-gray-90);
   --color-icon-gray-light: var(--color-gray-50);
+  --color-icon-gray-lighter: var(--color-gray-30);
   --color-icon-disabled-on: var(--color-gray-40);
   --color-icon-inverse: var(--color-gray-0);
   --color-icon-primary-basic: var(--color-primary-50);
