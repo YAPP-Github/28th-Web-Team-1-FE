@@ -8,9 +8,11 @@ import { cn } from '@shared/lib/cn'
 import { Divider, Heading, Spacing, Text } from '@shared/ui'
 import { UserProfile, UserAvatar } from '@entities/user'
 import { useActivePath } from '@shared/hooks/useActivePath'
+import { useLogout } from '@features/authenticate'
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(true)
+  const { handleLogout } = useLogout()
 
   return (
     <aside className={cn('vh-100 bg-bg-gray-subtler flex flex-col px-4 py-5', 'transition-all duration-300 ease-in-out', isOpen ? 'w-55' : 'w-19')}>
@@ -62,7 +64,7 @@ export const Sidebar = () => {
             console.log('제보')
           }}
         />
-        <MenuItem icon={LogOut} label={'로그아웃'} onSelect={() => {}} />
+        <MenuItem icon={LogOut} label={'로그아웃'} onSelect={handleLogout} />
       </Menu>
     </aside>
   )
