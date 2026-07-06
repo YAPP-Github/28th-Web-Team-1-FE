@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { type LucideIcon, Home, Layers, PanelLeft, PencilLineIcon } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Divider, Heading, Spacing, Text } from '@shared/ui'
 import { UserProfile, UserAvatar } from '@entities/user'
+import { useActivePath } from '@shared/hooks/useActivePath'
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(true)
@@ -63,23 +63,4 @@ const LinkButton = ({ icon: Icon, href, label }: LinkButtonProps) => {
       )}
     </Link>
   )
-}
-
-/**
- * 현재 라우트 경로(pathname)가 인자로 받은 특정 주소(href)와 일치하거나
- * 하위 경로에 속해 있는지 체크하여 활성화 상태를 반환하는 커스텀 훅입니다.
- *
- * @param href - 검사할 대상 경로 (예: '/', '/experiences')
- * @returns 현재 경로가 대상 경로와 일치하거나 하위 경로이면 `true`, 그렇지 않으면 `false`
- *
- * @example
- * ```tsx
- * const isActive = useActivePath('/experiences'); // 현재 /experiences/123 이라면 true
- * const isHomeActive = useActivePath('/');        // 현재 / 이외의 경로에서는 false
- * ```
- */
-// Todo: 파일 분리 고려 (Breadcrumb 등 공용으로 사용 가능 )
-export const useActivePath = (href: string): boolean => {
-  const pathname = usePathname()
-  return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
 }
