@@ -419,6 +419,7 @@ a {
 
 button {
   cursor: pointer;
+  text-align: inherit;
 }
 
 @layer base {

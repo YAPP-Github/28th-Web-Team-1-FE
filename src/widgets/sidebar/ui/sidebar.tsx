@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { type LucideIcon, Home, Layers, PanelLeft, PencilLineIcon } from 'lucide-react'
+import { DropdownMenu } from 'radix-ui'
+import { type LucideIcon, Home, Layers, PanelLeft, PencilLineIcon, Settings, UserRoundIcon, MessageCircleMore, LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Divider, Heading, Spacing, Text } from '@shared/ui'
 import { UserProfile, UserAvatar } from '@entities/user'
@@ -39,7 +40,30 @@ export const Sidebar = () => {
       <Divider />
       <Spacing size={16} />
 
-      {isOpen ? <UserProfile /> : <UserAvatar />}
+      <Menu trigger={isOpen ? <UserProfile /> : <UserAvatar />}>
+        <MenuItem
+          icon={Settings}
+          label={'내 정보'}
+          onSelect={() => {
+            console.log('내 정보')
+          }}
+        />
+        <MenuItem
+          icon={UserRoundIcon}
+          label={'계정관리'}
+          onSelect={() => {
+            console.log('계정관리')
+          }}
+        />
+        <MenuItem
+          icon={MessageCircleMore}
+          label={'제보'}
+          onSelect={() => {
+            console.log('제보')
+          }}
+        />
+        <MenuItem icon={LogOut} label={'로그아웃'} onSelect={() => {}} />
+      </Menu>
     </aside>
   )
 }
@@ -68,5 +92,56 @@ const LinkButton = ({ icon: Icon, href, label, isCollapsed }: LinkButtonProps) =
         </Text>
       )}
     </Link>
+  )
+}
+
+interface MenuProps {
+  trigger: React.ReactNode
+  children: React.ReactNode
+}
+
+const Menu = ({ trigger, children }: MenuProps) => {
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button type="button" aria-label="사용자 메뉴 열기" className={'outline-none'}>
+          {trigger}
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content
+        className={'bg-element-white text-text-subtler shadow-3 shadow-shadow-3 w-47 overflow-hidden rounded-md'}
+        side={'top'}
+        align={'center'}
+        sideOffset={10}
+        collisionPadding={15}
+      >
+        {children}
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+  )
+}
+
+interface MenuItemProps {
+  icon: LucideIcon
+  label: string
+  onSelect?: () => void
+  disabled?: boolean
+}
+
+const MenuItem = ({ icon: Icon, label, onSelect: handleSelect, disabled }: MenuItemProps) => {
+  return (
+    <DropdownMenu.Item
+      className={cn(
+        'flex items-center gap-3 px-4 py-3.5',
+        'data-highlighted:bg-element-gray-lighter data-highlighted:text-text-basic',
+        'cursor-pointer outline-none',
+        disabled && 'pointer-events-none opacity-50'
+      )}
+      onSelect={handleSelect}
+      disabled={disabled}
+    >
+      <Icon size={16} />
+      <Text variant={'label1'}>{label}</Text>
+    </DropdownMenu.Item>
   )
 }
