@@ -1,9 +1,10 @@
 import { Flex } from '@radix-ui/themes'
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Button } from '../button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip'
+import { HelpTooltip, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip'
 
 const SIDES = ['top', 'right', 'bottom', 'left'] as const
+const OFFSETS = [4, 8, 12] as const
 
 const meta = {
   title: 'Design System/Tooltip',
@@ -58,33 +59,36 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  render: () => (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="secondary">Hover me</Button>
-        </TooltipTrigger>
-        <TooltipContent>안내 문구예요.</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  )
-}
-
-export const Sides: Story = {
   parameters: {
-    docs: { description: { story: '표시 방향(top / right / bottom / left)별 예시' } }
+    docs: { description: { story: '기본 버튼 트리거를 표시 방향(top / right / bottom / left)별로 배치하고, sideOffset 커스텀 예시와 HelpTooltip 예시도 함께 표시' } }
   },
   render: () => (
     <TooltipProvider>
-      <Flex direction={'row'} gap={'8'} align={'center'}>
-        {SIDES.map((side) => (
-          <Tooltip key={side}>
-            <TooltipTrigger asChild>
-              <Button variant="secondary">{side}</Button>
-            </TooltipTrigger>
-            <TooltipContent side={side}>{side} 방향 툴팁</TooltipContent>
-          </Tooltip>
-        ))}
+      <Flex direction={'column'} gap={'8'} align={'center'}>
+        <Flex direction={'row'} gap={'8'} align={'center'}>
+          {SIDES.map((side) => (
+            <Tooltip key={side}>
+              <TooltipTrigger asChild>
+                <Button variant="secondary">{side}</Button>
+              </TooltipTrigger>
+              <TooltipContent side={side}>{side} 방향 툴팁</TooltipContent>
+            </Tooltip>
+          ))}
+          <HelpTooltip side="right" sideOffset={8}>
+            도움말 문구예요.
+          </HelpTooltip>
+        </Flex>
+
+        <Flex direction={'row'} align={'center'} gap={'4'}>
+          {OFFSETS.map((offset) => (
+            <Tooltip key={offset}>
+              <TooltipTrigger asChild>
+                <Button variant="secondary">sideOffset {offset}</Button>
+              </TooltipTrigger>
+              <TooltipContent sideOffset={offset}>{offset}px 간격 툴팁</TooltipContent>
+            </Tooltip>
+          ))}
+        </Flex>
       </Flex>
     </TooltipProvider>
   )
