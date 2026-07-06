@@ -31,6 +31,9 @@ const meta = {
     },
     disabled: {
       control: 'boolean'
+    },
+    clearable: {
+      control: 'boolean'
     }
   },
   decorators: [
@@ -111,12 +114,22 @@ export const Disabled: Story = {
   )
 }
 
+export const Clearable: Story = {
+  render: () => (
+    <Flex direction={'column'} gap={'8'} wrap={'wrap'}>
+      <Input label="clearable (기본값)" placeholder="내용을 입력해주세요" description="값이 있으면 X 버튼이 표시됩니다" defaultValue="입력된 값" />
+      <Input label="clearable={false}" placeholder="내용을 입력해주세요" description="값이 있어도 X 버튼이 표시되지 않습니다" defaultValue="입력된 값" clearable={false} />
+    </Flex>
+  )
+}
+
 export const Playground: Story = {
   args: {
     label: '제목',
     description: '도움말 텍스트입니다',
     placeholder: '내용을 입력해주세요',
     error: false,
-    disabled: false
+    disabled: false,
+    clearable: true
   }
 }

@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useId, useState } from 'react'
+import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { Text } from '../typography'
-import { Flex } from '@radix-ui/themes'
 
 interface TextareaProps extends React.ComponentProps<'textarea'> {
   label?: string
@@ -47,7 +47,9 @@ interface TextareaProps extends React.ComponentProps<'textarea'> {
  * <Textarea label="메모" defaultValue="readonly content" disabled />
  * ```
  */
-const Textarea = ({ className, label, description, error, maxLength = 2000, onChange, ...props }: TextareaProps) => {
+const Textarea = ({ className, label, description, error, maxLength = 2000, onChange, id, ...props }: TextareaProps) => {
+  const generatedId = useId()
+  const textareaId = id ?? generatedId
   const [length, setLength] = useState(() => String(props.value ?? props.defaultValue ?? '').length)
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -57,17 +59,25 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
 
   return (
     <Flex direction="column" gap={'2'}>
-      {label && (
-        <Text as="label" variant="headline2" weight="semibold" className="h-5">
-          {label}
-        </Text>
-      )}
+      <Flex direction="row" justify="between" gap={'2'}>
+        {label && (
+          <Text variant="label1" as="label" htmlFor={textareaId} weight="semibold" className="truncate">
+            {label}
+          </Text>
+        )}
+        {description && (
+          <Text variant="label2" weight="regular" color={error ? 'red-50' : 'gray-50'} className="truncate">
+            {description}
+          </Text>
+        )}
+      </Flex>
 
       <label
         data-slot="textarea"
         className={cn(
           // label로 감싸 박스 어디를 클릭해도 textarea에 포커스되도록 함
           'group flex max-h-60 min-h-30 w-full min-w-60 cursor-text flex-col gap-3 rounded-lg border p-4',
+          // TODO : 애니메이션이 정해지면 추후 수정 필요
           'bg-element-white transition-[border-color,background-color] duration-150',
           // default
           'border-border-subtle',
@@ -83,13 +93,14 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
         )}
       >
         <textarea
+          id={textareaId}
           maxLength={maxLength}
           onChange={handleChange}
           aria-invalid={error || undefined}
           className={cn(
             'field-sizing-content min-h-0 w-full flex-1 resize-none overflow-y-auto border-none bg-transparent p-0 outline-none',
-            'text-headline2 caret-gray-80 text-text-bolder font-semibold',
-            'placeholder:text-body1 placeholder:text-text-subtler placeholder:font-normal',
+            'text-body2 caret-gray-80 text-text-basic',
+            'placeholder:text-body2 placeholder:text-text-subtler',
             // hover
             'group-hover:not-focus:text-text-subtle group-hover:not-focus:placeholder:text-text-subtler',
             // disabled
@@ -100,17 +111,11 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
         />
 
         <Flex justify="end" className="pointer-events-none shrink-0">
-          <Text variant="label2" weight="regular" color={'gray-50'}>
+          <Text variant="label2" weight="regular" color={length > maxLength ? 'red-50' : 'gray-50'}>
             {length}/{maxLength}
           </Text>
         </Flex>
       </label>
-
-      {description && (
-        <Text variant="label2" weight="regular" color={error ? 'red-50' : 'gray-50'}>
-          {description}
-        </Text>
-      )}
     </Flex>
   )
 }

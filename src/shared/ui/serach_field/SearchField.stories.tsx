@@ -20,6 +20,14 @@ const meta = {
       control: 'select',
       options: ['text', 'search']
     },
+    rounded: {
+      control: 'radio',
+      options: ['full', 'top']
+    },
+    size: {
+      control: 'radio',
+      options: ['default', 'sm']
+    },
     onSubmit: {
       action: 'submit'
     }
@@ -43,6 +51,13 @@ export const AllStates: Story = {
       <SearchField placeholder="검색어를 입력해주세요" />
       {/* 입력된 상태 */}
       <SearchField placeholder="검색어를 입력해주세요" defaultValue="검색어" />
+      {/* rounded="top" — 하단에 드롭다운이 붙는 형태 */}
+      <SearchField placeholder="검색어를 입력해주세요" rounded="top" />
+      {/* size="sm" — 작은 사이즈 */}
+      <SearchField placeholder="검색어를 입력해주세요" size="sm" />
+      <SearchField placeholder="검색어를 입력해주세요" size="sm" />
+      {/* size="sm" + rounded="top" — 작은 사이즈 + 하단에 드롭다운이 붙는 형태 */}
+      <SearchField placeholder="검색어를 입력해주세요" size="sm" rounded="top" />
     </Flex>
   )
 }
@@ -58,6 +73,22 @@ export const Filled: Story = {
     placeholder: '검색어를 입력해주세요',
     defaultValue: '검색어'
   }
+}
+
+export const RoundedTop: Story = {
+  args: {
+    placeholder: '검색어를 입력해주세요',
+    rounded: 'top'
+  }
+}
+
+export const Size: Story = {
+  render: () => (
+    <Flex direction={'column'} gap={'4'}>
+      <SearchField placeholder="검색어를 입력해주세요" />
+      <SearchField placeholder="검색어를 입력해주세요" size="sm" />
+    </Flex>
+  )
 }
 
 export const Playground: Story = {
