@@ -11,21 +11,21 @@ import { useActivePath } from '@shared/hooks/useActivePath'
 import { useLogout } from '@features/authenticate'
 
 export const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(true)
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true)
   const { handleLogout } = useLogout()
 
   return (
-    <aside className={cn('vh-100 bg-bg-gray-subtler flex flex-col px-4 py-5', 'transition-all duration-300 ease-in-out', isOpen ? 'w-55' : 'w-19')}>
-      <header className={cn('flex h-10', isOpen ? 'justify-between' : 'justify-center')}>
-        {isOpen && (
+    <aside className={cn('vh-100 bg-bg-gray-subtler flex flex-col px-4 py-5', 'transition-all duration-300 ease-in-out', isCollapsed ? 'w-55' : 'w-19')}>
+      <header className={cn('flex h-10', isCollapsed ? 'justify-between' : 'justify-center')}>
+        {isCollapsed && (
           <Heading size={'6'} weight={'bold'} className={cn('border-border-subtle overflow-hidden rounded-sm border px-2 py-1 whitespace-nowrap')}>
             Scoop
           </Heading>
         )}
         <button
           className={'bg-element-gray-lighter hover:bg-element-gray-light text-icon-gray-light hover:text-icon-gray h-fit cursor-pointer rounded-sm p-1.5'}
-          onClick={() => setIsOpen((prev) => !prev)}
-          aria-label={isOpen ? '사이드바 접기' : '사이드바 펼치기'}
+          onClick={() => setIsCollapsed((prev) => !prev)}
+          aria-label={isCollapsed ? '사이드바 접기' : '사이드바 펼치기'}
         >
           <PanelLeft size={16} />
         </button>
@@ -34,15 +34,15 @@ export const Sidebar = () => {
       <Spacing size={32} />
 
       <nav className={'flex flex-1 flex-col gap-1'}>
-        <LinkButton icon={Home} href={'/'} label={'홈'} isCollapsed={!isOpen} />
-        <LinkButton icon={PencilLineIcon} href={'/experiences'} label={'경험정리'} isCollapsed={!isOpen} />
-        <LinkButton icon={Layers} href={'/resumes'} label={'이력서'} isCollapsed={!isOpen} />
+        <LinkButton icon={Home} href={'/'} label={'홈'} isCollapsed={!isCollapsed} />
+        <LinkButton icon={PencilLineIcon} href={'/experiences'} label={'경험정리'} isCollapsed={!isCollapsed} />
+        <LinkButton icon={Layers} href={'/resumes'} label={'이력서'} isCollapsed={!isCollapsed} />
       </nav>
 
       <Divider />
       <Spacing size={16} />
 
-      <Menu trigger={isOpen ? <UserProfile /> : <UserAvatar />}>
+      <Menu trigger={isCollapsed ? <UserProfile /> : <UserAvatar />}>
         <MenuItem
           icon={Settings}
           label={'내 정보'}
