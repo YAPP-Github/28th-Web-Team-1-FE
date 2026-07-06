@@ -16,7 +16,7 @@ export type ExperiencesQuery = { experiences: { cursor: { hasNext: boolean, next
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { userId: string, name: string, profileImageUrl: string | null, workspaces: Array<{ workspaceId: string }> } };
+export type MeQuery = { me: { userId: string, name: string, profileImageUrl: string | null, email: string, workspaces: Array<{ workspaceId: string }> } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -62,6 +62,7 @@ export const MeDocument = new TypedDocumentString(`
     userId
     name
     profileImageUrl
+    email
     workspaces {
       workspaceId
     }

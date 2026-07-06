@@ -1,8 +1,7 @@
 import { Heading as RadixHeading, type HeadingProps } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { typographyVariants } from '../shared'
-import type { TypographyVariant } from '../shared'
-import type { CustomColor } from '@shared/config'
+import type { TextColor, TypographyVariant } from '../shared'
 
 type RadixWeight = HeadingProps['weight']
 
@@ -10,13 +9,13 @@ type CustomTextProps = {
   variant?: TypographyVariant
   className?: string
   weight?: HeadingProps['weight'] | 'semibold'
-  color?: CustomColor
+  color?: TextColor
 } & Omit<HeadingProps, 'weight' | 'color'>
 
 /**
  * 디자인 시스템 타이포그래피 컴포넌트.
  * Radix UI `<Heading>`를 기반으로 Pretendard 폰트 스타일(variant)을 적용합니다.
- * 색상은 `color` prop에 커스텀 팔레트(`{color}-{shade}`)를 사용합니다.
+ * 색상은 `color` prop에 커스텀 팔레트(`{color}-{shade}`) 또는 시맨틱 토큰(`text-*`)을 사용합니다.
  *
  * Radix `size`별 font-size (scaling 100% 기준):
  *   size="1" → 12px

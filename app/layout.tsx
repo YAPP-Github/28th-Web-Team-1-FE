@@ -1,3 +1,3 @@
-import RootLayout, { metadata } from '@app/layout'
+import { RootLayout, metadata } from '@app/layouts/RootLayout'
 export { metadata }
 export default RootLayout

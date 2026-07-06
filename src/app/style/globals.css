@@ -360,6 +360,19 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --color-text-border: var(--color-gray-100);
+  --color-text-basic: var(--color-gray-95);
+  --color-text-subtle: var(--color-gray-70);
+  --color-text-subtler: var(--color-gray-50);
+  --color-text-disabled: var(--color-gray-30);
+  --color-text-disabled-on: var(--color-gray-40);
+  --color-text-bolder-inverse: var(--color-gray-0);
+  --color-text-primary-basic: var(--color-primary-60);
+  --color-text-primary-bolder: var(--color-primary-70);
+  --color-text-error: var(--color-red-50);
+  --color-text-danger: var(--color-red-50);
+  --color-text-bolder: var(--color-gray-100);
 }
 
 .dark {

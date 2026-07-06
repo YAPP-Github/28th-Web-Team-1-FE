@@ -16,11 +16,11 @@ import * as types from './graphql';
  */
 type Documents = {
     "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n": typeof types.ExperiencesDocument,
-    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": typeof types.MeDocument,
+    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": typeof types.MeDocument,
 };
 const documents: Documents = {
     "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n": types.ExperiencesDocument,
-    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": types.MeDocument,
+    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": types.MeDocument,
 };
 
 /**
@@ -30,7 +30,7 @@ export function graphql(source: "\n  query Experiences($workspaceId: ID!, $size:
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n"): typeof import('./graphql').MeDocument;
+export function graphql(source: "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n"): typeof import('./graphql').MeDocument;
 
 
 export function graphql(source: string) {

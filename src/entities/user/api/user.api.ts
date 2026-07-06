@@ -7,6 +7,7 @@ const myUserDocument = graphql(`
       userId
       name
       profileImageUrl
+      email
       workspaces {
         workspaceId
       }
@@ -16,5 +17,5 @@ const myUserDocument = graphql(`
 export const userAPI = {
   // 두 개는 같은 데이터를 가져옵니다.
   getUserInfo: () => http.get<UserInfo>('/api/v1/users/me').catch(() => null),
-  getMe: () => execute(myUserDocument).catch(() => null)
+  getMe: () => execute(myUserDocument)
 }
