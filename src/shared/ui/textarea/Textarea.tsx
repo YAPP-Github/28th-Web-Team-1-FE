@@ -59,14 +59,14 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
 
   return (
     <Flex direction="column" gap={'2'}>
-      <Flex direction="row" justify="between">
+      <Flex direction="row" justify="between" gap={'2'}>
         {label && (
-          <Text variant="label1" as="label" htmlFor={textareaId} weight="semibold">
+          <Text variant="label1" as="label" htmlFor={textareaId} weight="semibold" className="truncate">
             {label}
           </Text>
         )}
         {description && (
-          <Text variant="label2" weight="regular" color={error ? 'red-50' : 'gray-50'}>
+          <Text variant="label2" weight="regular" color={error ? 'red-50' : 'gray-50'} className="truncate">
             {description}
           </Text>
         )}

@@ -70,14 +70,14 @@ const Input = ({ className, label, description, error, disabled, onChange, id, c
 
   return (
     <Flex direction="column" gap={'2'}>
-      <Flex direction="row" justify="between">
+      <Flex direction="row" justify="between" gap={'2'}>
         {label && (
-          <Text variant="label1" as="label" htmlFor={inputId} weight="semibold">
+          <Text variant="label1" as="label" htmlFor={inputId} weight="semibold" className="truncate">
             {label}
           </Text>
         )}
         {description && (
-          <Text variant="label2" weight="regular" color={error ? 'red-50' : 'gray-50'}>
+          <Text variant="label2" weight="regular" color={error ? 'red-50' : 'gray-50'} className="shrink-999 truncate">
             {description}
           </Text>
         )}
