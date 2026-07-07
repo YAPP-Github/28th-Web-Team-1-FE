@@ -1,2 +1,2 @@
 export { GoogleLoginButton } from './ui/GoogleLoginButton'
-export { LogoutButton } from './ui/LogoutButton'
+export { useLogout } from './hooks/useLogout'

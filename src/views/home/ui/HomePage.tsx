@@ -1,5 +1,5 @@
 import { Flex } from '@radix-ui/themes'
-import { GoogleLoginButton, LogoutButton } from '@features/authenticate'
+import { GoogleLoginButton } from '@features/authenticate'
 import { Heading, Text } from '@shared/ui'
 
 export const HomePage = async () => {
@@ -11,9 +11,6 @@ export const HomePage = async () => {
       <Text as={'p'} size={'6'} color={'gray-10'} className="mb-8">
         This is the main landing page of our application.
       </Text>
-      <div className="flex flex-col items-center gap-3">
-        <LogoutButton />
-      </div>
       <div className="flex space-x-4">
         <div className="flex flex-col items-center">
           <span>홈으로 돌아오는 로그인 버튼</span>
