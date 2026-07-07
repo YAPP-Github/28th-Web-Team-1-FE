@@ -106,7 +106,7 @@ const Menu = ({ trigger, children }: MenuProps) => {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button type="button" aria-label="사용자 메뉴 열기" className={'outline-none'}>
+        <button type="button" aria-label="사용자 메뉴 열기" className={'text-left outline-none'}>
           {trigger}
         </button>
       </DropdownMenu.Trigger>
