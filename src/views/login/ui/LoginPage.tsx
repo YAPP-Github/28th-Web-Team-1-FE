@@ -34,25 +34,19 @@ export const LoginPage = () => {
         </Flex>
         <Flex direction="column" gap="4" align="center">
           <GoogleLoginButton />
-          <Flex>
-            <Text variant="label1" color="text-disabled-on">
-              계속 진행함에 따라
-            </Text>
-            {/* TODO : 이용약관 링크 추가 필요 */}
-            <Text variant="label1" color="text-subtle">
-              이용약관
-            </Text>
-            <Text variant="label1" color="text-disabled-on">
-              및
-            </Text>
-            {/* TODO : 개인정보 처리방침 링크 추가 필요 */}
-            <Text variant="label1" color="text-subtle">
-              개인정보 처리방침
-            </Text>
-            <Text variant="label1" color="text-disabled-on">
-              에 동의합니다.
-            </Text>
-          </Flex>
+          <Text variant="label1" color="text-disabled-on" className="text-center">
+            계속 진행함에 따라{' '}
+            <Button asChild variant="text" size="sm">
+              {/* TODO : 이용약관 링크 추가 필요 */}
+              <Link href="/login#">이용약관</Link>
+            </Button>{' '}
+            및{' '}
+            <Button asChild variant="text" size="sm">
+              {/* TODO : 개인정보 처리방침 링크 추가 필요 */}
+              <Link href="/login#">개인정보 처리방침</Link>
+            </Button>
+            에 동의합니다.
+          </Text>
         </Flex>
       </Flex>
     </main>
