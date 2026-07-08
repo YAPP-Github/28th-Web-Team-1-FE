@@ -27,7 +27,7 @@ export const GoogleLoginButton = ({ redirectTo }: { redirectTo?: string }) => {
       type="button"
       onClick={() => startLogin()}
       className={cn(
-        'ring-btn-outline-border text-text-basic text-body1 flex w-83.75 items-center justify-center gap-1.5 rounded-lg py-4 font-semibold ring-1 ring-inset',
+        'ring-btn-outline-border text-text-basic text-body1 flex w-full min-w-83.75 items-center justify-center gap-1.5 rounded-lg py-4 font-semibold ring-1 ring-inset',
         'hover:bg-btn-tertiary-fill-hovered active:bg-btn-tertiary-fill-pressed'
       )}
     >
