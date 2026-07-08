@@ -15,7 +15,7 @@ export const Sidebar = () => {
   const { handleLogout } = useLogout()
 
   return (
-    <aside className={cn('vh-100 bg-bg-gray-subtler flex flex-col px-4 py-5', 'transition-all duration-300 ease-in-out', isCollapsed ? 'w-55' : 'w-19')}>
+    <aside className={cn('bg-bg-gray-subtler flex h-full flex-col px-4 py-5', 'transition-all duration-300 ease-in-out', isCollapsed ? 'w-55' : 'w-19')}>
       <header className={cn('flex h-10', isCollapsed ? 'justify-between' : 'justify-center')}>
         {isCollapsed && (
           <Heading size={'6'} weight={'bold'} className={cn('border-border-subtle overflow-hidden rounded-sm border px-2 py-1 whitespace-nowrap')}>

@@ -37,7 +37,7 @@ export const RootLayout = ({
 }>) => {
   return (
     <html lang="ko" className={`${pretendard.className} ${pretendard.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">
+      <body className="flex h-full flex-col">
         <Providers>{children}</Providers>
       </body>
     </html>

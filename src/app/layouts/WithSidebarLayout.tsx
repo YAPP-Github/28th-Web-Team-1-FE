@@ -7,9 +7,9 @@ export const WithSidebarLayout = ({
   children: React.ReactNode
 }>) => {
   return (
-    <Flex className={'min-h-full'}>
+    <Flex className={'h-full'}>
       <Sidebar />
-      <Flex direction={'column'} justify={'center'} className={'w-full flex-1'}>
+      <Flex direction={'column'} justify={'center'} className={'flex-1'}>
         {children}
       </Flex>
     </Flex>
