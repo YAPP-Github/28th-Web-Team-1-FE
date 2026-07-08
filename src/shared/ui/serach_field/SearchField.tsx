@@ -1,3 +1,4 @@
+'use client'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Search } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
