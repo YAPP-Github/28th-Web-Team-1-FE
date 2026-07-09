@@ -1,13 +1,12 @@
 import { Flex, Grid } from '@radix-ui/themes'
 import { Text } from '@shared/ui'
 import { ExperiencesCard } from './ExperiencesCard'
-import { cn } from '@shared/lib/cn'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
 import { AddProjectDialog } from './AddProjectDialog'
 
 export const ExperiencesPage = () => {
   return (
-    <Flex direction="column" gap="8" className={cn('p-8')}>
+    <Flex direction="column" gap="8" className="h-screen overflow-y-auto p-8">
       <Flex direction="column" gap="2">
         <Text variant="heading2" color="text-basic">
           경험정리
