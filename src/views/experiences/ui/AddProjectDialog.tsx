@@ -43,15 +43,14 @@ const ResumeDropzone = ({ onFileSelect }: { onFileSelect?: (file: File) => void 
     selectFile(e.dataTransfer.files[0])
   }
 
-  const handleClearFile = (e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handleClearFile = () => {
     setFile(null)
     if (inputRef.current) inputRef.current.value = ''
   }
 
   return (
-    <Flex direction="column" gap="2" className={cn('flex h-100 gap-4')}>
-      <input ref={inputRef} type="file" accept={'.pdf'} className="hidden" onChange={(e) => selectFile(e.target.files?.[0])} />
+    <Flex direction="column" className="h-100 gap-4">
+      <input ref={inputRef} type="file" accept=".pdf" className="hidden" onChange={(e) => selectFile(e.target.files?.[0])} />
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
@@ -68,17 +67,15 @@ const ResumeDropzone = ({ onFileSelect }: { onFileSelect?: (file: File) => void 
           'hover:border-btn-secondary-border hover:bg-element-primary-lighter'
         )}
       >
-        <>
-          <FilePlusCorner size={24} className="text-text-subtler" />
-          <Flex direction="column" gap="2px" align="center">
-            <Text variant="headline2" color="text-subtler">
-              이력서 파일을 드래그하거나 선택해 주세요.
-            </Text>
-            <Text variant="caption1" color="text-subtler">
-              지원가능 파일 : pdf (최대 4.5MB까지 업로드 가능)
-            </Text>
-          </Flex>
-        </>
+        <FilePlusCorner size={24} className="text-text-subtler" />
+        <Flex direction="column" align="center" className="gap-0.5">
+          <Text variant="headline2" color="text-subtler">
+            이력서 파일을 드래그하거나 선택해 주세요.
+          </Text>
+          <Text variant="caption1" color="text-subtler">
+            지원가능 파일 : pdf (최대 4.5MB까지 업로드 가능)
+          </Text>
+        </Flex>
       </button>
       {file ? (
         <Flex direction="column" align="start" className="gap-2">
@@ -89,18 +86,9 @@ const ResumeDropzone = ({ onFileSelect }: { onFileSelect?: (file: File) => void 
             <Text variant="headline2" color="text-basic">
               {file.name}
             </Text>
-            <span
-              role="button"
-              tabIndex={0}
-              aria-label="파일 제거"
-              onClick={handleClearFile}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') handleClearFile(e as unknown as React.MouseEvent)
-              }}
-              className="text-icon-error bg-element-danger-lighter cursor-pointer rounded-sm p-2.25"
-            >
+            <Button variant="danger" size="xs" onClick={handleClearFile} className="w-7.5">
               <Trash2 size={12} />
-            </span>
+            </Button>
           </Flex>
           <Button variant="primary" size="xl" className="mt-6 w-full">
             경험 추출하기
@@ -127,7 +115,7 @@ const ExperiencesButton = ({ title, description, icon }: { title: string; descri
       )}
     >
       <div className="bg-btn-tertiary-fill flex h-10.5 w-10.5 items-center justify-center rounded-lg">{icon}</div>
-      <Flex direction="column" gap="0.5px" align="start">
+      <Flex direction="column" align="start" className="gap-0.5">
         <Text variant="label1" color="text-basic">
           {title}
         </Text>
