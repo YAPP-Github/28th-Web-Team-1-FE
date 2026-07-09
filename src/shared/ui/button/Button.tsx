@@ -76,6 +76,7 @@ const buttonVariants = cva(
 
 interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  fullWidth?: boolean
 }
 
 /**
@@ -117,8 +118,8 @@ interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof butt
  * </Button>
  * ```
  */
-export const Button = ({ className, variant = 'primary', size = 'lg', asChild = false, ...props }: ButtonProps) => {
+export const Button = ({ className, variant = 'primary', size = 'lg', asChild = false, fullWidth = false, ...props }: ButtonProps) => {
   const COMP = asChild ? Slot.Root : 'button'
 
-  return <COMP data-slot="button" data-variant={variant} data-size={size} className={cn(buttonVariants({ variant, size, className }))} {...props} />
+  return <COMP data-slot="button" data-variant={variant} data-size={size} className={cn(buttonVariants({ variant, size, className }), fullWidth && 'w-full')} {...props} />
 }
