@@ -4,10 +4,11 @@ import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { Text } from '../typography'
 
-interface TextareaProps extends React.ComponentProps<'textarea'> {
+interface TextareaProps extends Omit<React.ComponentProps<'textarea'>, 'maxLength'> {
   label?: string
   description?: string
   error?: boolean
+  maxLength?: number | null
 }
 
 /**
@@ -15,6 +16,7 @@ interface TextareaProps extends React.ComponentProps<'textarea'> {
  *
  * label(상단 라벨), description(하단 설명), error 상태를 지원합니다.
  * 입력 박스 안쪽 우측 하단에 본문과 12px(gap-3) 간격을 두고 `현재/최대` 글자수 카운터가 표시됩니다. (기본 최대 2000자)
+ * `maxLength={null}`을 주면 글자 수 제한이 사라지고 카운터도 숨겨집니다.
  *
  * ### 크기 동작
  * - **너비**: `w-full`로 부모를 채우되, 최소 너비 `min-w-60`(240px)이 보장됩니다.
@@ -94,7 +96,7 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
       >
         <textarea
           id={textareaId}
-          maxLength={maxLength}
+          maxLength={maxLength ?? undefined}
           onChange={handleChange}
           aria-invalid={error || undefined}
           className={cn(
@@ -110,11 +112,13 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
           {...props}
         />
 
-        <Flex justify="end" className="pointer-events-none shrink-0">
-          <Text variant="label2" weight="regular" color={length > maxLength ? 'red-50' : 'gray-50'}>
-            {length}/{maxLength}
-          </Text>
-        </Flex>
+        {maxLength !== null && (
+          <Flex justify="end" className="pointer-events-none shrink-0">
+            <Text variant="label2" weight="regular" color={length > maxLength ? 'red-50' : 'gray-50'}>
+              {length}/{maxLength}
+            </Text>
+          </Flex>
+        )}
       </label>
     </Flex>
   )
