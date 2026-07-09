@@ -84,7 +84,7 @@ const DialogOverlay = ({ className, ...props }: React.ComponentProps<typeof Dial
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs',
+        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 bg-black-50 fixed inset-0 isolate z-50 duration-100 supports-backdrop-filter:backdrop-blur-[1px]',
         className
       )}
       {...props}
@@ -117,7 +117,7 @@ const DialogContent = ({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-4 text-sm ring-1 duration-100 outline-none sm:max-w-sm',
+          'bg-popover text-popover-foreground data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-6 text-sm duration-100 outline-none',
           className
         )}
         {...props}
@@ -125,8 +125,8 @@ const DialogContent = ({
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
-            <Button variant="text" className="absolute top-2 right-2" size="icon-sm">
-              <XIcon />
+            <Button variant="text" className="absolute top-6 right-6">
+              <XIcon size={24} />
               <span className="sr-only">Close</span>
             </Button>
           </DialogPrimitive.Close>
@@ -167,7 +167,7 @@ const DialogFooter = ({
   showCloseButton?: boolean
 }) => {
   return (
-    <div data-slot="dialog-footer" className={cn('bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end', className)} {...props}>
+    <div data-slot="dialog-footer" className={cn('flex flex-col-reverse gap-2 rounded-b-xl sm:flex-row sm:justify-end', className)} {...props}>
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
@@ -178,20 +178,10 @@ const DialogFooter = ({
   )
 }
 
-/**
- * 모달 제목이다. 스크린 리더가 모달의 이름으로 읽으므로 접근성상 함께 두는 것을 권장한다.
- *
- * @param props Radix `Dialog.Title` props
- */
 const DialogTitle = ({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) => {
   return <DialogPrimitive.Title data-slot="dialog-title" className={cn('cn-font-heading text-base leading-none font-medium', className)} {...props} />
 }
 
-/**
- * 모달 보조 설명이다. 내부 `<a>`에는 밑줄 스타일이 자동 적용된다.
- *
- * @param props Radix `Dialog.Description` props
- */
 const DialogDescription = ({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Description>) => {
   return (
     <DialogPrimitive.Description

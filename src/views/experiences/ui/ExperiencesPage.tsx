@@ -1,8 +1,9 @@
 import { Flex, Grid } from '@radix-ui/themes'
-import { Button, Text } from '@shared/ui'
+import { Text } from '@shared/ui'
 import { ExperiencesCard } from './ExperiencesCard'
 import { cn } from '@shared/lib/cn'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
+import { AddProjectDialog } from './AddProjectDialog'
 
 export const ExperiencesPage = () => {
   return (
@@ -17,9 +18,7 @@ export const ExperiencesPage = () => {
       </Flex>
       <Flex direction="row" gap="4" justify="between">
         <ExperiencesSearchField />
-        <Button variant="secondary" size="md">
-          프로젝트 추가하기
-        </Button>
+        <AddProjectDialog />
       </Flex>
       <Grid columns="4" gapX="4" gapY="6">
         {[...Array(10)].map((_, index) => (

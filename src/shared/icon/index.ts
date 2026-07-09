@@ -1,0 +1,1 @@
+export { NotionIcon } from './NotionIcon'
