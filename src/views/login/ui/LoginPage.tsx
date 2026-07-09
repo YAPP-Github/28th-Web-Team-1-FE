@@ -32,7 +32,7 @@ export const LoginPage = () => {
             </Flex>
           </Flex>
         </Flex>
-        <Flex direction="column" gap="4" align="center">
+        <Flex direction="column" gap="4" align="center" className="w-100">
           <GoogleLoginButton />
           <Text variant="label1" color="text-disabled-on" className="text-center">
             계속 진행함에 따라{' '}
