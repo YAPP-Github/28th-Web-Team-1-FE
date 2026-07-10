@@ -76,6 +76,7 @@ const buttonVariants = cva(
 
 interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  fullWidth?: boolean
 }
 
 /**
@@ -95,6 +96,9 @@ interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof butt
  * <Button size="xs">작게</Button>
  * <Button size="lg">크게</Button>
  * <Button size="xl">더 크게</Button>
+ *
+ * // fullWidth (부모 너비를 꽉 채움)
+ * <Button fullWidth>전체 너비</Button>
  *
  * // 아이콘 + 텍스트
  * // 일반 버튼에서는 아이콘에 data-icon="inline-start | inline-end"를 추가하면
@@ -117,8 +121,8 @@ interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof butt
  * </Button>
  * ```
  */
-export const Button = ({ className, variant = 'primary', size = 'lg', asChild = false, ...props }: ButtonProps) => {
+export const Button = ({ className, variant = 'primary', size = 'lg', asChild = false, fullWidth = false, ...props }: ButtonProps) => {
   const COMP = asChild ? Slot.Root : 'button'
 
-  return <COMP data-slot="button" data-variant={variant} data-size={size} className={cn(buttonVariants({ variant, size, className }))} {...props} />
+  return <COMP data-slot="button" data-variant={variant} data-size={size} className={cn(buttonVariants({ variant, size, className }), fullWidth && 'w-full')} {...props} />
 }

@@ -48,31 +48,43 @@ const Toast = ({ ...props }: ToasterProps) => {
   const { theme = 'system' } = useTheme()
 
   return (
-    <Sonner
-      theme={theme as ToasterProps['theme']}
-      className="toaster group"
-      icons={{
-        warning: <TriangleAlert className="size-4.5" strokeWidth={1.5} />,
-        success: <CircleCheck className="size-4.5" strokeWidth={1.5} />,
-        error: <CircleX className="size-4.5" strokeWidth={1.5} />,
-        loading: <Loader2Icon className="size-4.5 animate-spin" strokeWidth={1.5} />
-      }}
-      style={{
-        fontFamily: 'Pretendard, "Segoe UI Symbol", sans-serif'
-      }}
-      toastOptions={{
-        classNames: {
-          toast: 'rounded-full! px-4! py-3! gap-2! w-fit! bg-bg-white! inset-ring!  border-none! inset-ring-border-subtler! shadow-[0_4px_16px_rgba(0,0,0,0.03),0_0_32px_rgba(0,0,0,0.05)]!',
-          title: 'text-label1! font-semibold! text-text-border!',
-          icon: '!size-4.5 !mx-0 !justify-center [&>svg]:!m-0',
-          success: '[&_[data-icon]]:text-icon-success',
-          error: '[&_[data-icon]]:text-icon-error',
-          warning: '[&_[data-icon]]:text-icon-warning',
-          loading: '[&_[data-icon]]:text-black'
+    <>
+      {/* 사이드바 영역을 제외한 콘텐츠 영역 기준으로 center 정렬
+           sidebar.tsx의 data-sidebar 속성으로 오프셋 조정 */}
+      <style>{`
+        body:has([data-sidebar='expanded']) [data-sonner-toaster][data-x-position='center'] {
+          transform: translateX(calc(-50% + var(--sidebar-width-expanded) / 2));
         }
-      }}
-      {...props}
-    />
+        body:has([data-sidebar='collapsed']) [data-sonner-toaster][data-x-position='center'] {
+          transform: translateX(calc(-50% + var(--sidebar-width-collapsed) / 2));
+        }
+      `}</style>
+      <Sonner
+        theme={theme as ToasterProps['theme']}
+        className="toaster group"
+        icons={{
+          warning: <TriangleAlert className="size-4.5" strokeWidth={1.5} />,
+          success: <CircleCheck className="size-4.5" strokeWidth={1.5} />,
+          error: <CircleX className="size-4.5" strokeWidth={1.5} />,
+          loading: <Loader2Icon className="size-4.5 animate-spin" strokeWidth={1.5} />
+        }}
+        style={{
+          fontFamily: 'Pretendard, "Segoe UI Symbol", sans-serif'
+        }}
+        toastOptions={{
+          classNames: {
+            toast: 'rounded-full! px-4! py-3! gap-2! w-fit! bg-bg-white! inset-ring!  border-none! inset-ring-border-subtler! shadow-[0_4px_16px_rgba(0,0,0,0.03),0_0_32px_rgba(0,0,0,0.05)]!',
+            title: 'text-label1! font-semibold! text-text-border!',
+            icon: '!size-4.5 !mx-0 !justify-center [&>svg]:!m-0',
+            success: '[&_[data-icon]]:text-icon-success',
+            error: '[&_[data-icon]]:text-icon-error',
+            warning: '[&_[data-icon]]:text-icon-warning',
+            loading: '[&_[data-icon]]:text-black'
+          }
+        }}
+        {...props}
+      />
+    </>
   )
 }
 
