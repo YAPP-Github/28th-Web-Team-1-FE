@@ -36,7 +36,7 @@ type SelectedControlItemProps = PropsWithChildren<ComponentProps<typeof RadioGro
  */
 
 export const SelectedControl = ({ className, ...props }: SelectedControlProps) => {
-  return <RadioGroupPrimitive.Root data-slot="radio-group" className={cn('bg-element-gray-lighter flex w-full justify-around gap-2 overflow-hidden rounded-sm p-1', className)} {...props} />
+  return <RadioGroupPrimitive.Root data-slot="radio-group" className={cn('bg-element-gray-light flex w-full justify-around gap-2 overflow-hidden rounded-md p-1', className)} {...props} />
 }
 
 export const SelectedControlItem = ({ children, className, ...props }: SelectedControlItemProps) => {

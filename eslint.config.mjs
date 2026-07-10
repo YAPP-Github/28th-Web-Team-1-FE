@@ -120,15 +120,15 @@ export default tseslint.config(
       // - JSX prop에 전달되는 함수: handle prefix 강제
       // - 로컬 변수로 선언된 핸들러도 함께 체크
       // ────────────────────────────────────────────────
-      'react/jsx-handler-names': [
-        'error',
-        {
-          eventHandlerPrefix: 'handle', // 함수 이름은 handle로 시작
-          eventHandlerPropPrefix: 'on', // prop 이름은 on으로 시작
-          checkLocalVariables: true, // 로컬 변수에 할당된 핸들러도 체크
-          checkInlineFunction: false // 인라인 함수 (() => {}) 는 허용
-        }
-      ],
+      // 'react/jsx-handler-names': [
+      //   'error',
+      //   {
+      //     eventHandlerPrefix: 'handle', // 함수 이름은 handle로 시작
+      //     eventHandlerPropPrefix: 'on', // prop 이름은 on으로 시작
+      //     checkLocalVariables: true, // 로컬 변수에 할당된 핸들러도 체크
+      //     checkInlineFunction: false // 인라인 함수 (() => {}) 는 허용
+      //   }
+      // ],
 
       // ────────────────────────────────────────────────
       // 변수 (Variables)

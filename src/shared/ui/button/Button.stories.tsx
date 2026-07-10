@@ -17,7 +17,8 @@ const meta = {
     children: 'Button',
     variant: 'primary',
     size: 'lg',
-    disabled: false
+    disabled: false,
+    fullWidth: false
   },
   argTypes: {
     variant: {
@@ -32,6 +33,9 @@ const meta = {
       control: 'boolean'
     },
     disabled: {
+      control: 'boolean'
+    },
+    fullWidth: {
       control: 'boolean'
     }
   }
@@ -65,6 +69,18 @@ export const Playground: Story = {
     disabled: false,
     children: 'Click me'
   }
+}
+
+export const FullWidth: Story = {
+  render: () => (
+    <Flex direction={'column'} align={'stretch'} gap={'4'} style={{ width: 320 }}>
+      {VARIANTS.map((variant) => (
+        <Button key={variant} variant={variant} fullWidth>
+          {variant}
+        </Button>
+      ))}
+    </Flex>
+  )
 }
 
 export const WithIconEnd: Story = {
