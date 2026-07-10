@@ -1,5 +1,7 @@
 'use client'
 import { useGoogleLogin } from '@react-oauth/google'
+import { GoogleIcon } from '@shared/icon'
+import { Button } from '@shared/ui'
 
 /**
  * 구글 로그인을 시작하는 버튼 컴포넌트이다.
@@ -21,9 +23,9 @@ export const GoogleLoginButton = ({ redirectTo }: { redirectTo?: string }) => {
   })
 
   return (
-    // TODO: 버튼 스타일링은 추후 디자인 시스템에 맞춰 수정한다.
-    <button type="button" onClick={() => startLogin()} className="rounded-md border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 shadow-sm transition hover:bg-gray-50">
-      구글로 시작하기
-    </button>
+    <Button type="button" variant="tertiary" size="xl" className={'text-body1 border-btn-outline-border w-full rounded-lg bg-transparent font-semibold'} onClick={() => startLogin()}>
+      <GoogleIcon size={24} />
+      Google로 계속하기
+    </Button>
   )
 }
