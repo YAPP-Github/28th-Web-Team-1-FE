@@ -37,7 +37,7 @@ export const Sidebar = () => {
       <Spacing size={32} />
 
       <nav className={'flex flex-1 flex-col gap-1'}>
-        <LinkButton icon={Home} href={'/'} label={'홈'} isCollapsed={!isCollapsed} />
+        <LinkButton icon={Home} href={'/home'} label={'홈'} isCollapsed={!isCollapsed} />
         <LinkButton icon={PencilLineIcon} href={'/experiences'} label={'경험정리'} isCollapsed={!isCollapsed} />
         <LinkButton icon={Layers} href={'/resumes'} label={'이력서'} isCollapsed={!isCollapsed} />
       </nav>
