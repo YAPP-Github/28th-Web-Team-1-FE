@@ -331,6 +331,10 @@
 
 :root {
   --font-pretendard: 'Pretendard';
+
+  --sidebar-width-expanded: 220px;
+  --sidebar-width-collapsed: 76px;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

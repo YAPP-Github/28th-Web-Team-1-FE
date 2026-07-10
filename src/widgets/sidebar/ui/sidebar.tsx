@@ -17,7 +17,7 @@ export const Sidebar = () => {
   return (
     <aside
       data-sidebar={isExpanded ? 'expanded' : 'collapsed'}
-      className={cn('bg-bg-gray-subtler flex h-full flex-col px-4 py-5', 'transition-all duration-300 ease-in-out', isExpanded ? 'w-55' : 'w-19')}
+      className={cn('bg-bg-gray-subtler flex h-full flex-col px-4 py-5', 'transition-all duration-300 ease-in-out', isExpanded ? 'w-(--sidebar-width-expanded)' : 'w-(--sidebar-width-collapsed)')}
     >
       <header className={cn('flex h-10', isExpanded ? 'justify-between' : 'justify-center')}>
         {isExpanded && (

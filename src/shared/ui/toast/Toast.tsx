@@ -53,10 +53,10 @@ const Toast = ({ ...props }: ToasterProps) => {
            sidebar.tsx의 data-sidebar 속성으로 오프셋 조정 */}
       <style>{`
         body:has([data-sidebar='expanded']) [data-sonner-toaster][data-x-position='center'] {
-          transform: translateX(calc(-50% + 110px));
+          transform: translateX(calc(-50% + var(--sidebar-width-expanded) / 2));
         }
         body:has([data-sidebar='collapsed']) [data-sonner-toaster][data-x-position='center'] {
-          transform: translateX(calc(-50% + 38px));
+          transform: translateX(calc(-50% + var(--sidebar-width-collapsed) / 2));
         }
       `}</style>
       <Sonner
