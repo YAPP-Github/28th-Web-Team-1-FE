@@ -48,31 +48,43 @@ const Toast = ({ ...props }: ToasterProps) => {
   const { theme = 'system' } = useTheme()
 
   return (
-    <Sonner
-      theme={theme as ToasterProps['theme']}
-      className="toaster group"
-      icons={{
-        warning: <TriangleAlert className="size-4.5" strokeWidth={1.5} />,
-        success: <CircleCheck className="size-4.5" strokeWidth={1.5} />,
-        error: <CircleX className="size-4.5" strokeWidth={1.5} />,
-        loading: <Loader2Icon className="size-4.5 animate-spin" strokeWidth={1.5} />
-      }}
-      style={{
-        fontFamily: 'Pretendard, "Segoe UI Symbol", sans-serif'
-      }}
-      toastOptions={{
-        classNames: {
-          toast: 'rounded-full! px-4! py-3! gap-2! w-fit! bg-bg-white! inset-ring!  border-none! inset-ring-border-subtler! shadow-[0_4px_16px_rgba(0,0,0,0.03),0_0_32px_rgba(0,0,0,0.05)]!',
-          title: 'text-label1! font-semibold! text-text-border!',
-          icon: '!size-4.5 !mx-0 !justify-center [&>svg]:!m-0',
-          success: '[&_[data-icon]]:text-icon-success',
-          error: '[&_[data-icon]]:text-icon-error',
-          warning: '[&_[data-icon]]:text-icon-warning',
-          loading: '[&_[data-icon]]:text-black'
+    <>
+      {/* w-fit 토스트는 sonner center 컨테이너(고정 width) 왼쪽에 붙어 치우쳐 보임.
+           transform(var(--y) 세로 애니메이션)을 건드리지 않고 좌우 auto 마진으로 컨테이너 내부 중앙 정렬 */}
+      <style>{`
+        [data-sonner-toast][data-x-position='center'] {
+          left: 0;
+          right: 0;
+          margin-inline: auto;
         }
-      }}
-      {...props}
-    />
+      `}</style>
+
+      <Sonner
+        theme={theme as ToasterProps['theme']}
+        className="toaster group"
+        icons={{
+          warning: <TriangleAlert className="size-4.5" strokeWidth={1.5} />,
+          success: <CircleCheck className="size-4.5" strokeWidth={1.5} />,
+          error: <CircleX className="size-4.5" strokeWidth={1.5} />,
+          loading: <Loader2Icon className="size-4.5 animate-spin" strokeWidth={1.5} />
+        }}
+        style={{
+          fontFamily: 'Pretendard, "Segoe UI Symbol", sans-serif'
+        }}
+        toastOptions={{
+          classNames: {
+            toast: 'rounded-full! px-4! py-3! gap-2! w-fit! bg-bg-white! inset-ring!  border-none! inset-ring-border-subtler! shadow-[0_4px_16px_rgba(0,0,0,0.03),0_0_32px_rgba(0,0,0,0.05)]!',
+            title: 'text-label1! font-semibold! text-text-border!',
+            icon: '!size-4.5 !mx-0 !justify-center [&>svg]:!m-0',
+            success: '[&_[data-icon]]:text-icon-success',
+            error: '[&_[data-icon]]:text-icon-error',
+            warning: '[&_[data-icon]]:text-icon-warning',
+            loading: '[&_[data-icon]]:text-black'
+          }
+        }}
+        {...props}
+      />
+    </>
   )
 }
 
