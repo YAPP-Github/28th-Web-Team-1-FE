@@ -97,6 +97,9 @@ interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof butt
  * <Button size="lg">크게</Button>
  * <Button size="xl">더 크게</Button>
  *
+ * // fullWidth (부모 너비를 꽉 채움)
+ * <Button fullWidth>전체 너비</Button>
+ *
  * // 아이콘 + 텍스트
  * // 일반 버튼에서는 아이콘에 data-icon="inline-start | inline-end"를 추가하면
  * // 좌우 패딩이 자동으로 보정됩니다.
