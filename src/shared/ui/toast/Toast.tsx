@@ -49,6 +49,16 @@ const Toast = ({ ...props }: ToasterProps) => {
 
   return (
     <>
+      {/* w-fit 토스트는 sonner center 컨테이너(고정 width) 왼쪽에 붙어 치우쳐 보임.
+           transform(var(--y) 세로 애니메이션)을 건드리지 않고 좌우 auto 마진으로 컨테이너 내부 중앙 정렬 */}
+      <style>{`
+        [data-sonner-toast][data-x-position='center'] {
+          left: 0;
+          right: 0;
+          margin-inline: auto;
+        }
+      `}</style>
+
       {/* 사이드바 영역을 제외한 콘텐츠 영역 기준으로 center 정렬
            sidebar.tsx의 data-sidebar 속성으로 오프셋 조정 */}
       <style>{`
