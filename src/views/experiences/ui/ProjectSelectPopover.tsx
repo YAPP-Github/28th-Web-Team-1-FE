@@ -9,7 +9,6 @@ interface ProjectSelectPopoverProps {
   selected: string
   onSelect: (project: string) => void
 }
-
 export const ProjectSelectPopover = ({ projects, selected, onSelect }: ProjectSelectPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -25,15 +24,16 @@ export const ProjectSelectPopover = ({ projects, selected, onSelect }: ProjectSe
           variant="secondary"
           size="md"
           className={cn(
-            'bg-btn-tertiary-fill text-icon-gray border-transparent',
+            'bg-btn-tertiary-fill text-icon-gray max-w-50 border-transparent',
             // open
             'data-[state=open]:bg-btn-secondary-fill-pressed data-[state=open]:text-text-primary-bolder data-[state=open]:border-btn-secondary-border-pressed'
           )}
         >
-          {selected} <ChevronDown />
+          <span className="min-w-0 truncate">{selected}</span>
+          <ChevronDown className="shrink-0" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} align="start" className="shadow-1 w-60 overflow-hidden rounded-sm">
+      <PopoverContent sideOffset={10} align="start" className="shadow-1 max-w-60 overflow-hidden rounded-sm">
         {projects.map((project) => (
           <button
             key={project}

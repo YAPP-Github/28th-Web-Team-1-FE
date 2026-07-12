@@ -1,7 +1,7 @@
 'use client'
+import { useState } from 'react'
 import { Button } from '@shared/ui'
 import { Dialog, DialogTrigger, DialogContent } from '@shared/ui/dialog'
-import { useState } from 'react'
 import { AddProjectDefaultView } from './AddProjectDefaultView'
 import { AddProjectManualView } from './AddProjectManualView'
 import { AddProjectProgressView } from './AddProjectProgressView'

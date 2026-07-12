@@ -7,8 +7,7 @@ import { ChevronLeft } from 'lucide-react'
 import { ProjectSelectPopover } from './ProjectSelectPopover'
 import { ProjectCreatePopover } from './ProjectCreatePopover'
 
-// TODO : 실제 프로젝트 목록/추가 연동 예정
-const PROJECTS = ['프로젝트 1ddddddddddddddddddddddddd', '프로젝트 2', '프로젝트 3']
+const PROJECTS = ['프로젝트1', '프로젝트2', '프로젝트3', '프로젝트4']
 
 export const AddProjectManualView = ({ onBack }: { onBack: () => void }) => {
   const [selected, setSelected] = useState(PROJECTS[0])
@@ -33,10 +32,10 @@ export const AddProjectManualView = ({ onBack }: { onBack: () => void }) => {
         </Flex>
         <DialogDescription className="text-body1 text-text-subtler">떠오르는 경험을 자유롭게 작성해 주세요. AI가 이력서에 적합한 STAR 구조로 정리해 드려요.</DialogDescription>
       </DialogHeader>
-      <Flex direction="column" className="max-h-[60vh] gap-4 overflow-y-auto">
+      <Flex direction="column" className="max-h-[60vh] gap-6 overflow-y-auto">
         <Flex className="gap-2">
-          <ProjectSelectPopover projects={PROJECTS} selected={selected} onSelect={handleSelectProject} />
-          <ProjectCreatePopover onCreate={handleCreateProject} />
+          {PROJECTS.length > 0 && <ProjectSelectPopover projects={PROJECTS} selected={selected} onSelect={handleSelectProject} />}
+          <ProjectCreatePopover projects={PROJECTS} onCreate={handleCreateProject} />
         </Flex>
         <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} />
       </Flex>

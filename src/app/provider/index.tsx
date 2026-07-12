@@ -7,14 +7,16 @@ import { TooltipProvider } from '@shared/ui/tooltip'
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Theme>
-      <TooltipProvider>
-        <GoogleOAuthProvider>
-          <MSWInitializer />
-          <Toast />
-          <QueryProvider>{children}</QueryProvider>
-        </GoogleOAuthProvider>
-      </TooltipProvider>
-    </Theme>
+    <>
+      <Theme>
+        <TooltipProvider>
+          <GoogleOAuthProvider>
+            <MSWInitializer />
+            <QueryProvider>{children}</QueryProvider>
+          </GoogleOAuthProvider>
+        </TooltipProvider>
+      </Theme>
+      <Toast />
+    </>
   )
 }
