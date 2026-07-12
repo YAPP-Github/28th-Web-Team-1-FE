@@ -35,8 +35,7 @@ export const AddProjectProgressView = ({ isComplete, onCancel }: AddProjectProgr
     return () => clearInterval(timer)
   }, [isComplete])
 
-  // 백엔드 완료 → 100%를 채운 뒤 성공 화면으로 전환한다.
-  // TODO : 실제로는 백엔드 단건 조회(polling)로 완료 여부를 받도록 교체. 지금은 임의 타이머로 완료 처리한다.
+  // TODO : 실제로는 백엔드 단건 조회로 완료 여부를 받도록 교체. 지금은 임의 타이머로 완료 처리한다.
   useEffect(() => {
     if (!isComplete) return
     const timer = setTimeout(() => setIsSuccess(true), 700)

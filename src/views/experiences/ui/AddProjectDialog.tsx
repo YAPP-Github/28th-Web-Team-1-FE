@@ -29,7 +29,7 @@ export const AddProjectDialog = () => {
     setView('progress')
   }
 
-  // TODO: 백엔드 단건 조회(polling)로 완료 여부를 받도록 교체. 지금은 임의 타이머로 완료 처리한다.
+  // TODO : 더미 완료 신호, 실제로는 백엔드 단건 조회로 완료 여부를 받도록 교체
   useEffect(() => {
     if (view !== 'progress') return
     const timer = setTimeout(() => setIsExtractDone(true), 4000)
