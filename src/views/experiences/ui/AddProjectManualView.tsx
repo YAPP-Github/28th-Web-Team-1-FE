@@ -9,7 +9,7 @@ import { ProjectCreatePopover } from './ProjectCreatePopover'
 
 const PROJECTS = ['프로젝트1', '프로젝트2', '프로젝트3', '프로젝트4']
 
-export const AddProjectManualView = ({ onBack }: { onBack: () => void }) => {
+export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: () => void }) => {
   const [selected, setSelected] = useState(PROJECTS[0])
 
   const handleSelectProject = (project: string) => {
@@ -17,7 +17,7 @@ export const AddProjectManualView = ({ onBack }: { onBack: () => void }) => {
   }
 
   const handleCreateProject = (name: string) => {
-    // TODO : 실제 프로젝트 추가 연동 예정
+    // TODO : 실제 프로젝트 추가 연동 필요
     console.log('create project:', name)
   }
 
@@ -39,7 +39,7 @@ export const AddProjectManualView = ({ onBack }: { onBack: () => void }) => {
         </Flex>
         <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} />
       </Flex>
-      <Button variant="primary" size="xl" className="w-full">
+      <Button variant="primary" size="xl" className="w-full" onClick={() => onExtract()}>
         경험 추출하기
       </Button>
     </>

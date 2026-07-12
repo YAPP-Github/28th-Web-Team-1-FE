@@ -6,7 +6,7 @@ import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@sha
 import { FilePlusCorner, Pencil, Trash2 } from 'lucide-react'
 import { useRef, useState, type DragEvent } from 'react'
 
-export const AddProjectDefaultView = ({ onManualClick }: { onManualClick: () => void }) => {
+export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualClick: () => void; onExtract: () => void }) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -74,7 +74,7 @@ export const AddProjectDefaultView = ({ onManualClick }: { onManualClick: () => 
                 <Trash2 size={12} />
               </Button>
             </Flex>
-            <Button variant="primary" size="xl" className="mt-6 w-full">
+            <Button variant="primary" size="xl" className="mt-6 w-full" onClick={() => onExtract()}>
               경험 추출하기
             </Button>
           </Flex>
