@@ -27,11 +27,13 @@ pre-commit:
 
 # pre-push: push 전에 전체 타입체크 수행
 # build: CI에서 자동 검증되므로 생략
+# typegen: tsc 이전에 라우트 타입(.next/types)을 먼저 갱신해야 함.
+#   브랜치 전환/라우트 이동 후 stale해진 validator.ts로 tsc가 오탐하는 문제 방지.
 pre-push:
   parallel: true
   commands:
     typecheck:
-      run: npx tsc --noEmit
+      run: npx next typegen && npx tsc --noEmit
     # build:
     #   run: npm run build
 
