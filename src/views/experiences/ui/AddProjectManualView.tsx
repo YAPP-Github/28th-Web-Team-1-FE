@@ -1,11 +1,27 @@
+import { useState } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Button } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
 import { DialogHeader, DialogTitle, DialogDescription } from '@shared/ui/dialog'
 import { ChevronLeft } from 'lucide-react'
-import { AddProjectTabs } from './AddProjectTabs'
+import { ProjectSelectPopover } from './ProjectSelectPopover'
+import { ProjectCreatePopover } from './ProjectCreatePopover'
+
+// TODO : 실제 프로젝트 목록/추가 연동 예정
+const PROJECTS = ['프로젝트 1ddddddddddddddddddddddddd', '프로젝트 2', '프로젝트 3']
 
 export const AddProjectManualView = ({ onBack }: { onBack: () => void }) => {
+  const [selected, setSelected] = useState(PROJECTS[0])
+
+  const handleSelectProject = (project: string) => {
+    setSelected(project)
+  }
+
+  const handleCreateProject = (name: string) => {
+    // TODO : 실제 프로젝트 추가 연동 예정
+    console.log('create project:', name)
+  }
+
   return (
     <>
       <DialogHeader>
@@ -18,7 +34,10 @@ export const AddProjectManualView = ({ onBack }: { onBack: () => void }) => {
         <DialogDescription className="text-body1 text-text-subtler">떠오르는 경험을 자유롭게 작성해 주세요. AI가 이력서에 적합한 STAR 구조로 정리해 드려요.</DialogDescription>
       </DialogHeader>
       <Flex direction="column" className="max-h-[60vh] gap-4 overflow-y-auto">
-        <AddProjectTabs />
+        <Flex className="gap-2">
+          <ProjectSelectPopover projects={PROJECTS} selected={selected} onSelect={handleSelectProject} />
+          <ProjectCreatePopover onCreate={handleCreateProject} />
+        </Flex>
         <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} />
       </Flex>
       <Button variant="primary" size="xl" className="w-full">
