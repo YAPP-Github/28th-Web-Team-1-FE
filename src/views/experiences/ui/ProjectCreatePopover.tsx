@@ -61,7 +61,7 @@ export const ProjectCreatePopover = ({ projects, onCreate }: ProjectCreatePopove
           </Button>
         )}
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} align="start" className="shadow-1 w-max max-w-lg min-w-80 overflow-hidden rounded-sm">
+      <PopoverContent sideOffset={10} align="start" className="shadow-1 max-w-lg min-w-80 overflow-hidden rounded-sm">
         <div className="bg-bg-gray-subtler px-2.5 py-2.5">
           <Input placeholder="프로젝트 명을 직접 입력해서 추가할 수 있어요." value={text} onChange={(e) => handleChange(e.target.value)} />
         </div>

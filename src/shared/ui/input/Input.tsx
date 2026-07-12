@@ -96,7 +96,8 @@ const Input = ({ className, label, description, error, disabled, onChange, id, c
             'w-full min-w-0 rounded-lg border px-4 py-3 outline-none',
             'text-body2 caret-gray-80 text-text-basic bg-element-white',
             'placeholder:text-body2 placeholder:text-text-subtler',
-            clearable && 'pr-10',
+            // X(clear) 버튼이 표시될 때 padding-right를 늘려 버튼과 겹치지 않도록 함
+            clearable && hasValue && 'pr-10',
             // TODO : 애니메이션이 정해지면 추후 수정 필요
             'transition-[border-color,background-color] duration-150',
             // default
