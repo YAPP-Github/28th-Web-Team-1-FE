@@ -65,6 +65,11 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = { me: { userId: string, name: string, profileImageUrl: string | null, email: string, workspaces: Array<{ workspaceId: string }> } };
 
+export type UserWorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserWorkspacesQuery = { me: { workspaces: Array<{ workspaceId: string }> } };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -172,3 +177,12 @@ export const MeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<MeQuery, MeQueryVariables>;
+export const UserWorkspacesDocument = new TypedDocumentString(`
+    query UserWorkspaces {
+  me {
+    workspaces {
+      workspaceId
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<UserWorkspacesQuery, UserWorkspacesQueryVariables>;

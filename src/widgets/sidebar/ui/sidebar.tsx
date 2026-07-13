@@ -10,9 +10,12 @@ import { UserProfile, UserAvatar } from '@entities/user'
 import { useActivePath } from '@shared/hooks/useActivePath'
 import { useLogout } from '@features/authenticate'
 
-export const Sidebar = () => {
+export const Sidebar = ({ defaultWorkspaceId }: { defaultWorkspaceId: string }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true)
   const { handleLogout } = useLogout()
+
+  // 사이드바는 /home 등 workspaceId가 없는 경로에도 뜨므로, 기본 워크스페이스로 경로를 만든다.
+  const experiencesHref = defaultWorkspaceId ? `/workspace/${defaultWorkspaceId}/experiences` : '/experiences'
 
   return (
     <aside
@@ -38,7 +41,7 @@ export const Sidebar = () => {
 
       <nav className={'flex flex-1 flex-col gap-1'}>
         <LinkButton icon={Home} href={'/home'} label={'홈'} isExpanded={isExpanded} />
-        <LinkButton icon={PencilLineIcon} href={'/experiences'} label={'경험 정리'} isExpanded={isExpanded} />
+        <LinkButton icon={PencilLineIcon} href={experiencesHref} label={'경험 정리'} isExpanded={isExpanded} />
         <LinkButton icon={Layers} href={'/resumes'} label={'이력서'} isExpanded={isExpanded} />
       </nav>
 

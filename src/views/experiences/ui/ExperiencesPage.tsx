@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Flex, Grid } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { useExperienceProjectList } from '@entities/experience'
+import { useWorkspaceId } from '@entities/workspace'
 import { Text } from '@shared/ui'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
 import { AddProjectDialog } from './AddProjectDialog'
@@ -55,7 +56,8 @@ export const ExperiencesPage = () => {
 }
 
 const ExperiencesProjectGrid = () => {
-  const { projects } = useExperienceProjectList()
+  const workspaceId = useWorkspaceId()
+  const { projects } = useExperienceProjectList(workspaceId)
 
   if (projects.length === 0) {
     return (
@@ -73,33 +75,22 @@ const ExperiencesProjectGrid = () => {
   return (
     <Grid columns="4" gapX="4" gapY="6">
       {projects.map((project) => (
-        <ExperiencesCard key={project.projectId} projectId={project.projectId} name={project.name} period={formatPeriod(project.period)} />
+        <Link key={project.projectId} href={`/workspace/${workspaceId}/experiences/${project.projectId}`} className="w-full">
+          <Flex direction="column" gap="3" className="group pointer-cursor">
+            <div className="bg-element-primary-lighter group-hover:border-btn-secondary-border h-25 w-full rounded-lg transition-all group-hover:border" />
+            <Flex direction="column" gap="1">
+              <Text variant="caption1" color="text-subtler">
+                {/** TODO : 프로젝트 생성 시 기간 설정 여부를 기획에서 정해지면 필요 */}
+                {project.period ? formatPeriod(project.period) : '기간 미정'}
+              </Text>
+              <Text variant="headline2" className="text-text-basic group-hover:text-text-primary-basic transition-colors">
+                {project.name}
+              </Text>
+            </Flex>
+          </Flex>
+        </Link>
       ))}
     </Grid>
-  )
-}
-
-interface ExperiencesCardProps {
-  projectId: string
-  name: string
-  period: string
-}
-
-const ExperiencesCard = ({ projectId, name, period }: ExperiencesCardProps) => {
-  return (
-    <Link href={`/experiences/${projectId}`} className="w-full">
-      <Flex direction="column" gap="3" className="group pointer-cursor">
-        <div className="bg-element-primary-lighter group-hover:border-btn-secondary-border h-25 w-full rounded-lg transition-all group-hover:border" />
-        <Flex direction="column" gap="1">
-          <Text variant="caption1" color="text-subtler">
-            {period}
-          </Text>
-          <Text variant="headline2" className="text-text-basic group-hover:text-text-primary-basic transition-colors">
-            {name}
-          </Text>
-        </Flex>
-      </Flex>
-    </Link>
   )
 }
 

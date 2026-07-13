@@ -4,24 +4,25 @@ import { useRouter } from 'next/navigation'
 import { Flex } from '@radix-ui/themes'
 import { ArrowRight, Search } from 'lucide-react'
 import { useSearchExperiences } from '@entities/experience'
+import { useWorkspaceId } from '@entities/workspace'
 import { useDebounce } from '@shared/hooks/useDebounce'
 import { SearchField, Text } from '@shared/ui'
 
 export const ExperiencesSearchField = () => {
   const router = useRouter()
+  const workspaceId = useWorkspaceId()
   const [isFocused, setIsFocused] = useState(false)
   const [keyword, setKeyword] = useState('')
 
   const debouncedKeyword = useDebounce(keyword, 300)
-  const { results } = useSearchExperiences(debouncedKeyword)
-  console.log('results', results)
+  const { results } = useSearchExperiences(workspaceId, debouncedKeyword)
 
   const isOpen = isFocused && keyword.trim().length > 0
 
   const handleSelect = (projectId?: string | null) => {
     if (!projectId) return
     setIsFocused(false)
-    router.push(`/experiences/${projectId}`)
+    router.push(`/workspace/${workspaceId}/experiences/${projectId}`)
   }
 
   return (
@@ -40,9 +41,10 @@ export const ExperiencesSearchField = () => {
           {results.length > 0 ? (
             results.map((experience) => <ExperiencesSearchItem key={experience.experienceId} label={experience.title} onSelect={() => handleSelect(experience.project?.projectId)} />)
           ) : (
-            <Flex align="center" className="px-5 py-4">
-              <Text variant="body2" color="text-subtler">
-                검색 결과가 없어요.
+            <Flex direction="row" align="center" gap="3" className="bg-element-gray-lighter w-full px-5 py-3">
+              <Search size={18} className="bg-btn-secondary-fill text-icon-disabled h-8 w-8 rounded-full p-1.75" />
+              <Text variant="headline2" color="text-disabled">
+                검색결과가 없어요.
               </Text>
             </Flex>
           )}
@@ -56,9 +58,7 @@ const ExperiencesSearchItem = ({ label, onSelect }: { label: string; onSelect?: 
   return (
     <button type="button" onClick={onSelect} className="group hover:bg-element-gray-light flex w-full cursor-pointer items-center justify-between px-5 py-3 text-left transition-colors">
       <Flex direction="row" align="center" gap="3">
-        <div className="bg-btn-tertiary-fill flex h-8 w-8 items-center justify-center rounded-full">
-          <Search size={18} className="text-icon-disabled group-hover:text-icon-gray-light" />
-        </div>
+        <Search size={18} className="text-icon-disabled group-hover:text-icon-gray-light bg-btn-tertiary-fill box-content rounded-full p-1.75" />
         <Text variant="body2" color="text-subtler">
           {label}
         </Text>
