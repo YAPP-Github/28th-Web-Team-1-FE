@@ -1,26 +1,19 @@
 import { Flex } from '@radix-ui/themes'
-import { GoogleLoginButton } from '@features/authenticate'
-import { Heading, Text } from '@shared/ui'
+import { Heading, Spacing, Text } from '@shared/ui'
+import { JDAnalysisForm } from './JDAnalysisForm'
 
-export const HomePage = async () => {
+export const HomePage = () => {
   return (
-    <Flex direction={'column'} align={'center'} justify={'center'} className="h-screen">
-      <Heading weight={'bold'} size={'8'} className="mb-4">
-        Welcome to the Home Page
-      </Heading>
-      <Text as={'p'} size={'6'} color={'gray-10'} className="mb-8">
-        This is the main landing page of our application.
+    <Flex direction={'column'} align={'center'} justify={'center'} px={'5'}>
+      <Heading variant={'title2'}>지원할 공고의 링크를 입력해주세요</Heading>
+      <Spacing size={12} />
+      <Text as={'p'} variant={'body1'} color={'text-subtler'}>
+        공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.
       </Text>
-      <div className="flex space-x-4">
-        <div className="flex flex-col items-center">
-          <span>홈으로 돌아오는 로그인 버튼</span>
-          <GoogleLoginButton />
-        </div>
-        <div className="flex flex-col items-center">
-          <span>특정 URL로 이동하는 로그인 버튼</span>
-          <GoogleLoginButton redirectTo="/jdurl" />
-        </div>
-      </div>
+
+      <Spacing size={40} />
+
+      <JDAnalysisForm />
     </Flex>
   )
 }
