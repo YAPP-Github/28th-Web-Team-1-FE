@@ -27,6 +27,10 @@ const meta = {
     },
     disabled: {
       control: 'boolean'
+    },
+    maxLength: {
+      control: 'number',
+      description: '최대 글자 수. `null`이면 제한 없이 카운터도 숨겨집니다. 기본 2000'
     }
   },
   decorators: [
@@ -103,6 +107,16 @@ export const Disabled: Story = {
       <Textarea placeholder="내용을 입력해주세요" description="가이드 메시지" disabled />
       <Textarea label="label + description" placeholder="내용을 입력해주세요" description="가이드 메시지" disabled />
       <Textarea label="입력된 상태" placeholder="내용을 입력해주세요" description="가이드 메시지" defaultValue="비활성화된 값" disabled />
+    </Flex>
+  )
+}
+
+export const MaxLength: Story = {
+  render: () => (
+    <Flex direction={'column'} gap={'8'} wrap={'wrap'}>
+      <Textarea label="기본 (0/2000)" placeholder="내용을 입력해주세요" />
+      <Textarea label="maxLength={500}" placeholder="내용을 입력해주세요" maxLength={500} />
+      <Textarea label="maxLength={null} — 제한 없음, 카운터 숨김" placeholder="내용을 입력해주세요" maxLength={null} />
     </Flex>
   )
 }

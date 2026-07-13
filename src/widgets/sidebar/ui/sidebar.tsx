@@ -38,7 +38,7 @@ export const Sidebar = () => {
 
       <nav className={'flex flex-1 flex-col gap-1'}>
         <LinkButton icon={Home} href={'/home'} label={'홈'} isExpanded={isExpanded} />
-        <LinkButton icon={PencilLineIcon} href={'/experiences'} label={'경험정리'} isExpanded={isExpanded} />
+        <LinkButton icon={PencilLineIcon} href={'/experiences'} label={'경험 정리'} isExpanded={isExpanded} />
         <LinkButton icon={Layers} href={'/resumes'} label={'이력서'} isExpanded={isExpanded} />
       </nav>
 

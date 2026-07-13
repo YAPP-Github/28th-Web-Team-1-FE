@@ -8,7 +8,7 @@ const chipVariants = cva(
     variants: {
       variant: {
         tertiary: 'bg-element-gray-lighter text-text-bolder',
-        ghost: 'bg-transparent text-text-bolder'
+        ghost: 'bg-element-white text-text-bolder'
       },
       size: {
         default: 'px-1.5 py-0.5 text-label2',
