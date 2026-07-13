@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { DropdownMenu } from 'radix-ui'
 import { type LucideIcon, Home, Layers, PanelLeft, PencilLineIcon, Settings, UserRoundIcon, MessageCircleMore, LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
@@ -10,12 +11,13 @@ import { UserProfile, UserAvatar } from '@entities/user'
 import { useActivePath } from '@shared/hooks/useActivePath'
 import { useLogout } from '@features/authenticate'
 
-export const Sidebar = ({ defaultWorkspaceId }: { defaultWorkspaceId: string }) => {
+export const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true)
   const { handleLogout } = useLogout()
+  const { workspaceId } = useParams<{ workspaceId?: string }>()
 
-  // 사이드바는 /home 등 workspaceId가 없는 경로에도 뜨므로, 기본 워크스페이스로 경로를 만든다.
-  const experiencesHref = defaultWorkspaceId ? `/workspace/${defaultWorkspaceId}/experiences` : '/experiences'
+  // 경험 정리 링크: 현재 URL에 workspaceId가 있으면 직접 이동, 없으면(/home 등) /experiences로 폴백(→ redirect가 해결).
+  const experiencesHref = workspaceId ? `/workspace/${workspaceId}/experiences` : '/experiences'
 
   return (
     <aside

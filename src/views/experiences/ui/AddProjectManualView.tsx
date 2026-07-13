@@ -1,9 +1,9 @@
 import { toast } from 'sonner'
 import { useState } from 'react'
+import { useParams } from 'next/navigation'
 import { ChevronDown, ChevronLeft, Plus } from 'lucide-react'
 import { Flex } from '@radix-ui/themes'
 import { useCreateExperienceProject } from '@entities/experience'
-import { useWorkspaceId } from '@entities/workspace'
 import { Button, Text } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
 import { DialogHeader, DialogTitle, DialogDescription } from '@shared/ui/dialog'
@@ -15,7 +15,7 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
   const [projects, setProjects] = useState<string[]>([])
   const [selected, setSelected] = useState('')
   const [content, setContent] = useState('')
-  const workspaceId = useWorkspaceId()
+  const { workspaceId } = useParams<{ workspaceId: string }>()
   const { mutate: createProject, isPending } = useCreateExperienceProject(workspaceId)
 
   const handleSelectProject = (project: string) => {

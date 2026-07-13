@@ -28,6 +28,19 @@ export const useExperienceProjectList = (workspaceId: string) => {
 }
 
 /**
+ * 프로젝트 개수를 비-Suspense로 조회한다. `useExperienceProjectList`와 같은 캐시를 읽으므로
+ * 목록이 이미 로드돼 있으면 추가 요청 없이 개수를 얻는다. (헤더의 '프로젝트 추가' 제한 체크 등)
+ * @param workspaceId 라우트 `[workspaceId]`에서 온 워크스페이스 ID
+ */
+export const useExperienceProjectCount = (workspaceId: string) => {
+  const { data } = useInfiniteQuery({
+    ...experienceQueries.projectList(workspaceId),
+    select: (data) => data.pages.flatMap((page) => page.experienceProjects.projects).length
+  })
+  return data ?? 0
+}
+
+/**
  * 키워드로 경험을 검색한다. 검색창 드롭다운용 훅으로, 키워드가 비어 있으면 요청하지 않는다.
  * 타이핑 중 깜빡임을 줄이려 이전 결과를 유지한다.
  * @param workspaceId 라우트 `[workspaceId]`에서 온 워크스페이스 ID

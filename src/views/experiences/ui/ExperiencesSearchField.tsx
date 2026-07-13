@@ -1,16 +1,15 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Flex } from '@radix-ui/themes'
 import { ArrowRight, Search } from 'lucide-react'
 import { useSearchExperiences } from '@entities/experience'
-import { useWorkspaceId } from '@entities/workspace'
 import { useDebounce } from '@shared/hooks/useDebounce'
 import { SearchField, Text } from '@shared/ui'
 
 export const ExperiencesSearchField = () => {
   const router = useRouter()
-  const workspaceId = useWorkspaceId()
+  const { workspaceId } = useParams<{ workspaceId: string }>()
   const [isFocused, setIsFocused] = useState(false)
   const [keyword, setKeyword] = useState('')
 

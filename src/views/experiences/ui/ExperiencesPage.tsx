@@ -1,10 +1,10 @@
 'use client'
 import { Suspense } from 'react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { Flex, Grid } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { useExperienceProjectList } from '@entities/experience'
-import { useWorkspaceId } from '@entities/workspace'
 import { Text } from '@shared/ui'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
 import { AddProjectDialog } from './AddProjectDialog'
@@ -47,7 +47,18 @@ export const ExperiencesPage = () => {
           </Flex>
         }
       >
-        <Suspense fallback={<ExperiencesGridSkeleton />}>
+        <Suspense
+          fallback={
+            <Flex direction="column" align="center" justify="center" className="border-border-subtle h-129 rounded-lg border border-dashed" gap="3">
+              <Text variant="headline2" color="text-basic">
+                로딩중
+              </Text>
+              <Text variant="body2" color="text-subtler">
+                디자인 시안을 기다리고있어요
+              </Text>
+            </Flex>
+          }
+        >
           <ExperiencesProjectGrid />
         </Suspense>
       </ErrorBoundary>
@@ -56,7 +67,7 @@ export const ExperiencesPage = () => {
 }
 
 const ExperiencesProjectGrid = () => {
-  const workspaceId = useWorkspaceId()
+  const { workspaceId } = useParams<{ workspaceId: string }>()
   const { projects } = useExperienceProjectList(workspaceId)
 
   if (projects.length === 0) {
@@ -80,7 +91,7 @@ const ExperiencesProjectGrid = () => {
             <div className="bg-element-primary-lighter group-hover:border-btn-secondary-border h-25 w-full rounded-lg transition-all group-hover:border" />
             <Flex direction="column" gap="1">
               <Text variant="caption1" color="text-subtler">
-                {/** TODO : 프로젝트 생성 시 기간 설정 여부를 기획에서 정해지면 필요 */}
+                {/** TODO : 프로젝트 생성 시 기간 설정 여부를 기획에서 정해지면 수정 필요 */}
                 {project.period ? formatPeriod(project.period) : '기간 미정'}
               </Text>
               <Text variant="headline2" className="text-text-basic group-hover:text-text-primary-basic transition-colors">
@@ -93,14 +104,3 @@ const ExperiencesProjectGrid = () => {
     </Grid>
   )
 }
-
-const ExperiencesGridSkeleton = () => (
-  <Flex direction="column" align="center" justify="center" className="border-border-subtle h-129 rounded-lg border border-dashed" gap="3">
-    <Text variant="headline2" color="text-basic">
-      로딩중
-    </Text>
-    <Text variant="body2" color="text-subtler">
-      디자인 시안을 기다리고있어요
-    </Text>
-  </Flex>
-)
