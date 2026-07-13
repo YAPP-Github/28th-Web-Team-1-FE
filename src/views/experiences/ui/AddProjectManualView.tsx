@@ -2,6 +2,7 @@ import { toast } from 'sonner'
 import { useState } from 'react'
 import { ChevronDown, ChevronLeft, Plus } from 'lucide-react'
 import { Flex } from '@radix-ui/themes'
+import { useCreateExperienceProject } from '@entities/experience'
 import { Button, Text } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
 import { DialogHeader, DialogTitle, DialogDescription } from '@shared/ui/dialog'
@@ -10,16 +11,36 @@ import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
 import { Input } from '@shared/ui/input'
 
 export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: () => void }) => {
-  const PROJECTS = ['프로젝트1', '프로젝트2', '프로젝트3', '프로젝트4']
-  const [selected, setSelected] = useState(PROJECTS[0])
+  const [projects, setProjects] = useState<string[]>([])
+  const [selected, setSelected] = useState('')
+  const [content, setContent] = useState('')
+  const { mutate: createProject, isPending } = useCreateExperienceProject()
 
   const handleSelectProject = (project: string) => {
     setSelected(project)
   }
 
   const handleCreateProject = (name: string) => {
-    // TODO : 실제 프로젝트 추가 연동 필요
-    console.log('create project:', name)
+    setProjects((prev) => [name, ...prev])
+    setSelected(name)
+  }
+
+  const handleExtract = () => {
+    if (!selected) {
+      toast.warning('프로젝트를 먼저 추가해 주세요.', { id: 'project-required', position: 'top-center' })
+      return
+    }
+    if (!content.trim()) {
+      toast.warning('경험 내용을 입력해 주세요.', { id: 'content-required', position: 'top-center' })
+      return
+    }
+    createProject(
+      { name: selected, summary: content },
+      {
+        onSuccess: () => onExtract(),
+        onError: () => toast.error('제출에 실패했어요. 다시 시도해 주세요.', { position: 'top-center' })
+      }
+    )
   }
 
   return (
@@ -35,12 +56,12 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
       </DialogHeader>
       <Flex direction="column" className="max-h-[60vh] gap-6 overflow-y-auto">
         <Flex className="gap-2">
-          {PROJECTS.length > 0 && <ProjectSelectPopover projects={PROJECTS} selected={selected} onSelect={handleSelectProject} />}
-          <ProjectCreatePopover projects={PROJECTS} onCreate={handleCreateProject} />
+          {projects.length > 0 && <ProjectSelectPopover projects={projects} selected={selected} onSelect={handleSelectProject} />}
+          <ProjectCreatePopover projects={projects} onCreate={handleCreateProject} />
         </Flex>
-        <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} />
+        <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />
       </Flex>
-      <Button variant="primary" size="xl" className="w-full" onClick={() => onExtract()}>
+      <Button variant="primary" size="xl" className="w-full" onClick={handleExtract} disabled={isPending}>
         경험 추출하기
       </Button>
     </>
