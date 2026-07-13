@@ -1,2 +1,2 @@
-import { ExperienceDetailPage } from '@views/experiences'
+import { ExperienceDetailPage } from '@views/experiences_detail'
 export default ExperienceDetailPage
