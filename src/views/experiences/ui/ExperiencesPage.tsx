@@ -1,10 +1,10 @@
 'use client'
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 import { Flex, Grid } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { useExperienceProjectList } from '@entities/experience'
+import { useWorkspaceId } from '@entities/user'
 import { Text } from '@shared/ui'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
 import { AddProjectDialog } from './AddProjectDialog'
@@ -67,7 +67,7 @@ export const ExperiencesPage = () => {
 }
 
 const ExperiencesProjectGrid = () => {
-  const { workspaceId } = useParams<{ workspaceId: string }>()
+  const workspaceId = useWorkspaceId()
   const { projects } = useExperienceProjectList(workspaceId)
 
   if (projects.length === 0) {
@@ -86,7 +86,7 @@ const ExperiencesProjectGrid = () => {
   return (
     <Grid columns="4" gapX="4" gapY="6">
       {projects.map((project) => (
-        <Link key={project.projectId} href={`/workspace/${workspaceId}/experiences/${project.projectId}`} className="w-full">
+        <Link key={project.projectId} href={`/experiences/${project.projectId}`} className="w-full">
           <Flex direction="column" gap="3" className="group pointer-cursor">
             <div className="bg-element-primary-lighter group-hover:border-btn-secondary-border h-25 w-full rounded-lg transition-all group-hover:border" />
             <Flex direction="column" gap="1">

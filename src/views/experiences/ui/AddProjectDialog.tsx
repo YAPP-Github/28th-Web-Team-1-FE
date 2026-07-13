@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { useExperienceProjectCount } from '@entities/experience'
+import { useWorkspaceId } from '@entities/user'
 import { cn } from '@shared/lib/cn'
 import { Button } from '@shared/ui'
 import { Dialog, DialogTrigger, DialogContent } from '@shared/ui/dialog'
@@ -15,7 +15,7 @@ type DialogView = 'default' | 'manual' | 'progress'
 const MAX_PROJECTS = 10
 
 export const AddProjectDialog = () => {
-  const { workspaceId } = useParams<{ workspaceId: string }>()
+  const workspaceId = useWorkspaceId()
   const projectCount = useExperienceProjectCount(workspaceId)
   const [isOpen, setIsOpen] = useState(false)
   const [view, setView] = useState<DialogView>('default')

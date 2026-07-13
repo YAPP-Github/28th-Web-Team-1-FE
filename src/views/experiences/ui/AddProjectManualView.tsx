@@ -1,9 +1,9 @@
 import { toast } from 'sonner'
 import { useState } from 'react'
-import { useParams } from 'next/navigation'
 import { ChevronDown, ChevronLeft, Plus } from 'lucide-react'
 import { Flex } from '@radix-ui/themes'
-import { useCreateExperienceProject } from '@entities/experience'
+import { useCreateExperienceProject, useExperienceProjectOptions } from '@entities/experience'
+import { useWorkspaceId } from '@entities/user'
 import { Button, Text } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
 import { DialogHeader, DialogTitle, DialogDescription } from '@shared/ui/dialog'
@@ -12,23 +12,26 @@ import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
 import { Input } from '@shared/ui/input'
 
 export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: () => void }) => {
-  const [projects, setProjects] = useState<string[]>([])
   const [selected, setSelected] = useState('')
   const [content, setContent] = useState('')
-  const { workspaceId } = useParams<{ workspaceId: string }>()
+  const [createdProjects, setCreatedProjects] = useState<string[]>([])
+  const workspaceId = useWorkspaceId()
   const { mutate: createProject, isPending } = useCreateExperienceProject(workspaceId)
 
-  const handleSelectProject = (project: string) => {
-    setSelected(project)
-  }
+  // 서버의 기존 프로젝트 목록 + 이번 세션에서 새로 입력한 이름(아직 생성 전)을 합쳐 선택지로 보여준다.
+  const serverProjectNames = useExperienceProjectOptions(workspaceId).map((project) => project.name)
+  const projects = [...createdProjects, ...serverProjectNames.filter((name) => !createdProjects.includes(name))]
+
+  // 아직 명시적으로 고르지 않았으면 목록 첫 번째 프로젝트를 기본 선택으로 사용한다.
+  const selectedProject = selected || projects[0] || ''
 
   const handleCreateProject = (name: string) => {
-    setProjects((prev) => [name, ...prev])
+    setCreatedProjects((prev) => (prev.includes(name) ? prev : [name, ...prev]))
     setSelected(name)
   }
 
   const handleExtract = () => {
-    if (!selected) {
+    if (!selectedProject) {
       toast.warning('프로젝트를 먼저 추가해 주세요.', { id: 'project-required', position: 'top-center' })
       return
     }
@@ -37,7 +40,7 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
       return
     }
     createProject(
-      { name: selected, summary: content },
+      { name: selectedProject, summary: content },
       {
         onSuccess: () => onExtract(),
         onError: () => toast.error('제출에 실패했어요. 다시 시도해 주세요.', { position: 'top-center' })
@@ -58,7 +61,7 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
       </DialogHeader>
       <Flex direction="column" className="max-h-[60vh] gap-6 overflow-y-auto">
         <Flex className="gap-2">
-          {projects.length > 0 && <ProjectSelectPopover projects={projects} selected={selected} onSelect={handleSelectProject} />}
+          {projects.length > 0 && <ProjectSelectPopover projects={projects} selected={selectedProject} onSelect={setSelected} />}
           <ProjectCreatePopover projects={projects} onCreate={handleCreateProject} />
         </Flex>
         <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />

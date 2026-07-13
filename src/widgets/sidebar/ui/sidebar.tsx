@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 import { DropdownMenu } from 'radix-ui'
 import { type LucideIcon, Home, Layers, PanelLeft, PencilLineIcon, Settings, UserRoundIcon, MessageCircleMore, LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
@@ -14,10 +13,6 @@ import { useLogout } from '@features/authenticate'
 export const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true)
   const { handleLogout } = useLogout()
-  const { workspaceId } = useParams<{ workspaceId?: string }>()
-
-  // 경험 정리 링크: 현재 URL에 workspaceId가 있으면 직접 이동, 없으면(/home 등) /experiences로 폴백(→ redirect가 해결).
-  const experiencesHref = workspaceId ? `/workspace/${workspaceId}/experiences` : '/experiences'
 
   return (
     <aside
@@ -43,7 +38,7 @@ export const Sidebar = () => {
 
       <nav className={'flex flex-1 flex-col gap-1'}>
         <LinkButton icon={Home} href={'/home'} label={'홈'} isExpanded={isExpanded} />
-        <LinkButton icon={PencilLineIcon} href={experiencesHref} label={'경험 정리'} isExpanded={isExpanded} />
+        <LinkButton icon={PencilLineIcon} href={'/experiences'} label={'경험 정리'} isExpanded={isExpanded} />
         <LinkButton icon={Layers} href={'/resumes'} label={'이력서'} isExpanded={isExpanded} />
       </nav>
 
