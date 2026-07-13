@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
-import { GoogleLoginButton } from '@/src/features/authenticate'
+import { GoogleLoginButton } from '@features/authenticate'
 import { Button, Heading, Text } from '@shared/ui'
 import { Logo } from '@shared/icon'
 
