@@ -15,18 +15,30 @@ import * as types from './graphql';
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n": typeof types.ExperiencesDocument,
+    "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n          role\n          period {\n            startAt\n            endAt\n          }\n        }\n      }\n    }\n  }\n": typeof types.ExperiencesDocument,
+    "\n  query ExperienceProjects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        summary\n        role\n        experienceCount\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": typeof types.ExperienceProjectsDocument,
+    "\n  query ExperienceProject($id: ID!, $workspaceId: ID!) {\n    experienceProject(id: $id, workspaceId: $workspaceId) {\n      projectId\n      name\n      summary\n      role\n      experienceCount\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": typeof types.ExperienceProjectDocument,
     "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": typeof types.MeDocument,
 };
 const documents: Documents = {
-    "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n": types.ExperiencesDocument,
+    "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n          role\n          period {\n            startAt\n            endAt\n          }\n        }\n      }\n    }\n  }\n": types.ExperiencesDocument,
+    "\n  query ExperienceProjects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        summary\n        role\n        experienceCount\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": types.ExperienceProjectsDocument,
+    "\n  query ExperienceProject($id: ID!, $workspaceId: ID!) {\n    experienceProject(id: $id, workspaceId: $workspaceId) {\n      projectId\n      name\n      summary\n      role\n      experienceCount\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": types.ExperienceProjectDocument,
     "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": types.MeDocument,
 };
 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ExperiencesDocument;
+export function graphql(source: "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n          role\n          period {\n            startAt\n            endAt\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ExperiencesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ExperienceProjects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        summary\n        role\n        experienceCount\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ExperienceProjectsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ExperienceProject($id: ID!, $workspaceId: ID!) {\n    experienceProject(id: $id, workspaceId: $workspaceId) {\n      projectId\n      name\n      summary\n      role\n      experienceCount\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n"): typeof import('./graphql').ExperienceProjectDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
