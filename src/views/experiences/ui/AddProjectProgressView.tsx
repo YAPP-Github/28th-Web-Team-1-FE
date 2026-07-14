@@ -13,7 +13,6 @@ const FAKE_STEP_MIN = 2
 const FAKE_STEP_RANGE = 8
 
 interface AddProjectProgressViewProps {
-  /** 백엔드 완료 신호. true가 되면 100%로 채운 뒤 성공 화면으로 전환한다. */
   isComplete: boolean
   onCancel: () => void
 }
@@ -22,7 +21,7 @@ export const AddProjectProgressView = ({ isComplete, onCancel }: AddProjectProgr
   const [progress, setProgress] = useState(0)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  // 완료 신호 전까지 진행률을 상한선까지 임의로 채운다.
+  // 완료 신호 전까지 진행률을 상한선(90%)까지만 채우고, 실제 응답을 기다린다.
   useEffect(() => {
     if (isComplete) return
     const timer = setInterval(() => {
@@ -35,7 +34,7 @@ export const AddProjectProgressView = ({ isComplete, onCancel }: AddProjectProgr
     return () => clearInterval(timer)
   }, [isComplete])
 
-  // TODO : 실제로는 백엔드 단건 조회로 완료 여부를 받도록 교체. 지금은 임의 타이머로 완료 처리한다.
+  // 완료되면 잠시 뒤 성공 화면으로 전환한다.
   useEffect(() => {
     if (!isComplete) return
     const timer = setTimeout(() => setIsSuccess(true), 700)
@@ -44,7 +43,7 @@ export const AddProjectProgressView = ({ isComplete, onCancel }: AddProjectProgr
 
   if (isSuccess) return <SuccessView />
 
-  // 완료 신호가 오면 실제 진행률과 무관하게 100%로 표시한다.
+  // 완료되면 실제 진행률과 무관하게 100%로 표시한다.
   const displayProgress = isComplete ? 100 : Math.round(progress)
   // 진행률을 단계 수로 나눠, 몫을 넘긴 단계까지 체크 처리한다. (100%에서 마지막 단계 체크)
   const completedSteps = Math.floor((displayProgress / 100) * STEPS.length)

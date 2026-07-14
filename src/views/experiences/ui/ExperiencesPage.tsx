@@ -34,10 +34,24 @@ export const ExperiencesPage = () => {
           경험을 정리해서 이력서 소재로 활용해요.
         </Text>
       </Flex>
-      <Flex direction="row" gap="4" justify="between">
-        <ExperiencesSearchField />
-        <AddProjectDialog />
-      </Flex>
+      {/* 검색/다이얼로그가 useWorkspaceId(useSuspenseQuery)를 호출하므로 반드시 Suspense 경계로 감싼다.
+          경계가 없으면 렌더 중단→재시도 과정에서 쿼리가 취소·재조회를 반복해 /api/graphql가 무한 호출된다. */}
+      <ErrorBoundary
+        fallback={
+          <Flex direction="row" gap="4" justify="between" className="h-11">
+            <Text variant="body2" color="text-subtler">
+              불러오는데 실패했습니다.
+            </Text>
+          </Flex>
+        }
+      >
+        <Suspense fallback={<div className="h-11" />}>
+          <Flex direction="row" gap="4" justify="between">
+            <ExperiencesSearchField />
+            <AddProjectDialog />
+          </Flex>
+        </Suspense>
+      </ErrorBoundary>
       <ErrorBoundary
         fallback={
           <Flex align="center" justify="center" className="py-20">

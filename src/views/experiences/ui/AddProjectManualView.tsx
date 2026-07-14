@@ -2,7 +2,7 @@ import { toast } from 'sonner'
 import { useState } from 'react'
 import { ChevronDown, ChevronLeft, Plus } from 'lucide-react'
 import { Flex } from '@radix-ui/themes'
-import { useCreateExperienceProject, useExperienceProjectOptions } from '@entities/experience'
+import { useExperienceProjectOptions, type CreateExperienceProjectInput } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { Button, Text } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
@@ -11,12 +11,11 @@ import { cn } from '@shared/lib/cn'
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
 import { Input } from '@shared/ui/input'
 
-export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: () => void }) => {
+export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: (input: CreateExperienceProjectInput) => void }) => {
   const [selected, setSelected] = useState('')
   const [content, setContent] = useState('')
   const [createdProjects, setCreatedProjects] = useState<string[]>([])
   const workspaceId = useWorkspaceId()
-  const { mutate: createProject, isPending } = useCreateExperienceProject(workspaceId)
 
   // 서버의 기존 프로젝트 목록 + 이번 세션에서 새로 입력한 이름(아직 생성 전)을 합쳐 선택지로 보여준다.
   const serverProjectNames = useExperienceProjectOptions(workspaceId).map((project) => project.name)
@@ -39,13 +38,7 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
       toast.warning('경험 내용을 입력해 주세요.', { id: 'content-required', position: 'top-center' })
       return
     }
-    createProject(
-      { name: selectedProject, summary: content },
-      {
-        onSuccess: () => onExtract(),
-        onError: () => toast.error('제출에 실패했어요. 다시 시도해 주세요.', { position: 'top-center' })
-      }
-    )
+    onExtract({ name: selectedProject, summary: content })
   }
 
   return (
@@ -66,7 +59,7 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
         </Flex>
         <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />
       </Flex>
-      <Button variant="primary" size="xl" className="w-full" onClick={handleExtract} disabled={isPending}>
+      <Button variant="primary" size="xl" className="w-full" onClick={handleExtract}>
         경험 추출하기
       </Button>
     </>

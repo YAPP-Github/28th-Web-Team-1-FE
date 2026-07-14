@@ -25,3 +25,22 @@ export const useCreateExperienceProject = (workspaceId: string) => {
     }
   })
 }
+
+/**
+ * PDF 이력서 파일에서 경험을 가져온다. 성공 시 프로젝트 목록 캐시를 무효화한다.
+ * @param workspaceId 라우트 `[workspaceId]`에서 온 워크스페이스 ID
+ * @example
+ * ```tsx
+ * const { mutate } = useCreateExperienceFromPdf(workspaceId)
+ * mutate(pdfFile)
+ * ```
+ */
+export const useCreateExperienceFromPdf = (workspaceId: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (pdfFile: File) => experienceAPI.createExperienceFromPdf({ workspaceId, pdfFile }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: experienceKeys.projects() })
+    }
+  })
+}
