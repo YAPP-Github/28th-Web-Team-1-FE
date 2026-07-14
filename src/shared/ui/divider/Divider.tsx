@@ -1,4 +1,5 @@
 import type { CustomColor } from '@shared/config'
+import { cn } from '@shared/lib'
 
 interface DividerProps {
   /**
@@ -16,6 +17,7 @@ interface DividerProps {
    * @default 'horizontal'
    */
   orientation?: 'horizontal' | 'vertical'
+  className?: string
 }
 /**
  * 경계를 표시할 때 사용되는 `<Divider />` 컴포넌트 입니다.
@@ -27,12 +29,12 @@ interface DividerProps {
  * <Divider size={16} />
  * ```
  */
-export const Divider = ({ size = 1, color = 'gray-20', orientation = 'horizontal' }: DividerProps) => {
+export const Divider = ({ size = 1, color = 'gray-20', orientation = 'horizontal', className }: DividerProps) => {
   const isHorizontal = orientation === 'horizontal'
 
   return (
     <div
-      className={`flex-none ${isHorizontal ? 'w-full' : 'h-full'}`}
+      className={cn(`flex-none ${isHorizontal ? 'w-full' : 'h-full'}`, className)}
       style={{
         width: isHorizontal ? undefined : size,
         height: isHorizontal ? size : undefined,
