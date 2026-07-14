@@ -60,7 +60,7 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
   }
 
   return (
-    <Flex direction="column" className="gap-2">
+    <Flex direction="column" gap={'2'}>
       <Flex direction="row" justify="between" gap={'2'}>
         {label && (
           <Text variant="label1" as="label" htmlFor={textareaId} weight="semibold" className="truncate">

@@ -14,9 +14,13 @@ export const ExperiencesSearchField = () => {
   const [keyword, setKeyword] = useState('')
 
   const debouncedKeyword = useDebounce(keyword, 300)
-  const { results } = useSearchExperiences(workspaceId, debouncedKeyword)
+  const { results, isFetching } = useSearchExperiences(workspaceId, debouncedKeyword)
 
-  const isOpen = isFocused && keyword.trim().length > 0
+  const trimmedKeyword = keyword.trim()
+  // 조회 중이거나 입력값이 아직 디바운스에 반영 안 된 구간(지웠다 다시 입력한 직후 등)에는
+  // keepPreviousData로 남아있는 '이전 검색어' 결과가 보이지 않도록 드롭다운을 닫아둔다.
+  const isSearching = isFetching || trimmedKeyword !== debouncedKeyword.trim()
+  const isOpen = isFocused && trimmedKeyword.length > 0 && !isSearching
 
   return (
     <Flex direction="column" className="relative w-142.5">
@@ -27,7 +31,7 @@ export const ExperiencesSearchField = () => {
         onChange={(e) => setKeyword(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        rounded={isOpen ? 'top' : 'full'}
+        rounded={isFocused ? 'top' : 'full'}
       />
       {isOpen && (
         <Flex direction="column" onMouseDown={(e) => e.preventDefault()} className="bg-element-white shadow-2 absolute top-full left-0 z-10 w-full overflow-hidden rounded-b-2xl">
