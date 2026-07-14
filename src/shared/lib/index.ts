@@ -1,4 +1,5 @@
 export { cn } from './cn'
+export { formatYYYYMM } from './date'
 export { http, ApiError } from './http'
 export { execute } from './execute'
 export { graphql } from './gql/gql'
