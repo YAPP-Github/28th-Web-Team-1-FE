@@ -2,7 +2,7 @@ import { toast } from 'sonner'
 import { useState } from 'react'
 import { ChevronDown, ChevronLeft, Plus } from 'lucide-react'
 import { Flex } from '@radix-ui/themes'
-import { useExperienceProjectOptions, type CreateExperienceProjectInput } from '@entities/experience'
+import { useProjectOptions, type CreateProjectInput } from '@entities/project'
 import { useWorkspaceId } from '@entities/user'
 import { Button, Text } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
@@ -11,14 +11,14 @@ import { cn } from '@shared/lib/cn'
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
 import { Input } from '@shared/ui/input'
 
-export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: (input: CreateExperienceProjectInput) => void }) => {
+export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: (input: CreateProjectInput) => void }) => {
   const [selected, setSelected] = useState('')
   const [content, setContent] = useState('')
   const [createdProjects, setCreatedProjects] = useState<string[]>([])
   const workspaceId = useWorkspaceId()
 
   // 서버의 기존 프로젝트 목록 + 화면에서 새로 추가한 이름(아직 생성 전)을 합쳐 선택지로 보여준다.
-  const serverProjectNames = useExperienceProjectOptions(workspaceId).map((project) => project.name)
+  const serverProjectNames = useProjectOptions(workspaceId).map((project) => project.name)
   const projects = [...createdProjects, ...serverProjectNames.filter((name) => !createdProjects.includes(name))]
 
   // 명시적으로 고르지 않았으면 목록 첫 번째 프로젝트를 기본 선택으로 사용한다.

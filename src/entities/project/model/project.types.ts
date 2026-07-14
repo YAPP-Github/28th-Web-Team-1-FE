@@ -1,4 +1,4 @@
-export interface CreateExperienceProjectInput {
+export interface CreateProjectInput {
   name: string
   summary: string
   role?: string | null

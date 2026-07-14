@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { Flex, Grid } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
-import { useExperienceProjectList } from '@entities/experience'
+import { useProjectList } from '@entities/project'
 import { useWorkspaceId } from '@entities/user'
 import { Text } from '@shared/ui'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
@@ -79,7 +79,7 @@ export const ExperiencesPage = () => {
 
 const ExperiencesProjectGrid = () => {
   const workspaceId = useWorkspaceId()
-  const { projects } = useExperienceProjectList(workspaceId)
+  const { projects } = useProjectList(workspaceId)
 
   if (projects.length === 0) {
     return (

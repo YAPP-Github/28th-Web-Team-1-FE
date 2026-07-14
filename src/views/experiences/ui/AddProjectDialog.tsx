@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useExperienceProjectCount, useCreateExperienceFromPdf, useCreateExperienceProject, type CreateExperienceProjectInput } from '@entities/experience'
+import { useProjectCount, useCreateProjectFromPdf, useCreateProject, type CreateProjectInput } from '@entities/project'
 import { useWorkspaceId } from '@entities/user'
 import { cn } from '@shared/lib/cn'
 import { Button } from '@shared/ui'
@@ -15,9 +15,9 @@ type DialogView = 'default' | 'manual' | 'progress'
 
 export const AddProjectDialog = () => {
   const workspaceId = useWorkspaceId()
-  const projectCount = useExperienceProjectCount(workspaceId)
-  const { mutate: uploadPdf, isSuccess: isPdfDone, reset: resetPdf } = useCreateExperienceFromPdf(workspaceId)
-  const { mutate: createProject, isSuccess: isManualDone, reset: resetManual } = useCreateExperienceProject(workspaceId)
+  const projectCount = useProjectCount(workspaceId)
+  const { mutate: uploadPdf, isSuccess: isPdfDone, reset: resetPdf } = useCreateProjectFromPdf(workspaceId)
+  const { mutate: createProject, isSuccess: isManualDone, reset: resetManual } = useCreateProject(workspaceId)
   const [isOpen, setIsOpen] = useState(false)
   const [view, setView] = useState<DialogView>('default')
 
@@ -49,7 +49,7 @@ export const AddProjectDialog = () => {
   }
 
   // 직접 입력: 진행 화면으로 전환한 뒤 생성하고, 완료는 생성 응답(isManualDone)으로 판정한다.
-  const handleExtractManual = (input: CreateExperienceProjectInput) => {
+  const handleExtractManual = (input: CreateProjectInput) => {
     setView('progress')
     createProject(input, { onError: handleExtractError })
   }

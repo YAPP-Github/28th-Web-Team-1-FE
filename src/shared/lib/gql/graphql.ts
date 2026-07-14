@@ -33,15 +33,6 @@ export type ExperiencesQueryVariables = Exact<{
 
 export type ExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, project: { projectId: string, name: string } | null }> } };
 
-export type ExperienceProjectsQueryVariables = Exact<{
-  workspaceId: string | number;
-  size: number;
-  cursor?: string | null | undefined;
-}>;
-
-
-export type ExperienceProjectsQuery = { experienceProjects: { cursor: { hasNext: boolean, nextCursor: string | null }, projects: Array<{ projectId: string, name: string, period: { startAt: string | null, endAt: string | null } | null }> } };
-
 export type SearchExperiencesQueryVariables = Exact<{
   workspaceId: string | number;
   keyword: string;
@@ -52,13 +43,22 @@ export type SearchExperiencesQueryVariables = Exact<{
 
 export type SearchExperiencesQuery = { searchExperiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, project: { projectId: string, name: string } | null }> } };
 
-export type CreateExperienceProjectMutationVariables = Exact<{
+export type ProjectsQueryVariables = Exact<{
+  workspaceId: string | number;
+  size: number;
+  cursor?: string | null | undefined;
+}>;
+
+
+export type ProjectsQuery = { projectList: { cursor: { hasNext: boolean, nextCursor: string | null }, projects: Array<{ projectId: string, name: string, period: { startAt: string | null, endAt: string | null } | null }> } };
+
+export type CreateProjectMutationVariables = Exact<{
   workspaceId: string | number;
   input: CreateExperienceProjectRequest;
 }>;
 
 
-export type CreateExperienceProjectMutation = { createExperienceProject: { projectId: string, name: string, summary: string, role: string | null, period: { startAt: string | null, endAt: string | null } | null } };
+export type CreateProjectMutation = { createProject: { projectId: string, name: string, summary: string, period: { startAt: string | null, endAt: string | null } | null } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -108,24 +108,6 @@ export const ExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<ExperiencesQuery, ExperiencesQueryVariables>;
-export const ExperienceProjectsDocument = new TypedDocumentString(`
-    query ExperienceProjects($workspaceId: ID!, $size: Int!, $cursor: String) {
-  experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {
-    cursor {
-      hasNext
-      nextCursor
-    }
-    projects {
-      projectId
-      name
-      period {
-        startAt
-        endAt
-      }
-    }
-  }
-}
-    `) as unknown as TypedDocumentString<ExperienceProjectsQuery, ExperienceProjectsQueryVariables>;
 export const SearchExperiencesDocument = new TypedDocumentString(`
     query SearchExperiences($workspaceId: ID!, $keyword: String!, $size: Int!, $cursor: String) {
   searchExperiences(
@@ -150,20 +132,41 @@ export const SearchExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<SearchExperiencesQuery, SearchExperiencesQueryVariables>;
-export const CreateExperienceProjectDocument = new TypedDocumentString(`
-    mutation CreateExperienceProject($workspaceId: ID!, $input: CreateExperienceProjectRequest!) {
-  createExperienceProject(workspaceId: $workspaceId, input: $input) {
+export const ProjectsDocument = new TypedDocumentString(`
+    query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {
+  projectList: experienceProjects(
+    workspaceId: $workspaceId
+    size: $size
+    cursor: $cursor
+  ) {
+    cursor {
+      hasNext
+      nextCursor
+    }
+    projects {
+      projectId
+      name
+      period {
+        startAt
+        endAt
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ProjectsQuery, ProjectsQueryVariables>;
+export const CreateProjectDocument = new TypedDocumentString(`
+    mutation CreateProject($workspaceId: ID!, $input: CreateExperienceProjectRequest!) {
+  createProject: createExperienceProject(workspaceId: $workspaceId, input: $input) {
     projectId
     name
     summary
-    role
     period {
       startAt
       endAt
     }
   }
 }
-    `) as unknown as TypedDocumentString<CreateExperienceProjectMutation, CreateExperienceProjectMutationVariables>;
+    `) as unknown as TypedDocumentString<CreateProjectMutation, CreateProjectMutationVariables>;
 export const MeDocument = new TypedDocumentString(`
     query Me {
   me {
