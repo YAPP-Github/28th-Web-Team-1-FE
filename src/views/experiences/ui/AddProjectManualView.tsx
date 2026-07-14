@@ -17,11 +17,11 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
   const [createdProjects, setCreatedProjects] = useState<string[]>([])
   const workspaceId = useWorkspaceId()
 
-  // 서버의 기존 프로젝트 목록 + 이번 세션에서 새로 입력한 이름(아직 생성 전)을 합쳐 선택지로 보여준다.
+  // 서버의 기존 프로젝트 목록 + 화면에서 새로 추가한 이름(아직 생성 전)을 합쳐 선택지로 보여준다.
   const serverProjectNames = useExperienceProjectOptions(workspaceId).map((project) => project.name)
   const projects = [...createdProjects, ...serverProjectNames.filter((name) => !createdProjects.includes(name))]
 
-  // 아직 명시적으로 고르지 않았으면 목록 첫 번째 프로젝트를 기본 선택으로 사용한다.
+  // 명시적으로 고르지 않았으면 목록 첫 번째 프로젝트를 기본 선택으로 사용한다.
   const selectedProject = selected || projects[0] || ''
 
   const handleCreateProject = (name: string) => {
@@ -152,11 +152,6 @@ interface ProjectSelectPopoverProps {
 const ProjectSelectPopover = ({ projects, selected, onSelect }: ProjectSelectPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const handleSelect = (project: string) => {
-    onSelect(project)
-    setIsOpen(false)
-  }
-
   return (
     <Popover open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <PopoverTrigger asChild>
@@ -178,7 +173,10 @@ const ProjectSelectPopover = ({ projects, selected, onSelect }: ProjectSelectPop
           <button
             key={project}
             type="button"
-            onClick={() => handleSelect(project)}
+            onClick={() => {
+              onSelect(project)
+              setIsOpen(false)
+            }}
             className="text-text-subtle hover:text-text-basic bg-element-gray-lighter hover:bg-element-gray-light px-3 py-2.5 text-start"
           >
             <Text variant="body2">{project}</Text>

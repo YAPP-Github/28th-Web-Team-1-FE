@@ -16,7 +16,6 @@ interface AddProjectProgressViewProps {
   isComplete: boolean
   onCancel: () => void
 }
-
 export const AddProjectProgressView = ({ isComplete, onCancel }: AddProjectProgressViewProps) => {
   const [progress, setProgress] = useState(0)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -34,19 +33,19 @@ export const AddProjectProgressView = ({ isComplete, onCancel }: AddProjectProgr
     return () => clearInterval(timer)
   }, [isComplete])
 
-  // 완료되면 잠시 뒤 성공 화면으로 전환한다.
   useEffect(() => {
     if (!isComplete) return
+    // 완료되면 잠시 뒤 성공 화면으로 전환한다.
     const timer = setTimeout(() => setIsSuccess(true), 700)
     return () => clearTimeout(timer)
   }, [isComplete])
-
-  if (isSuccess) return <SuccessView />
 
   // 완료되면 실제 진행률과 무관하게 100%로 표시한다.
   const displayProgress = isComplete ? 100 : Math.round(progress)
   // 진행률을 단계 수로 나눠, 몫을 넘긴 단계까지 체크 처리한다. (100%에서 마지막 단계 체크)
   const completedSteps = Math.floor((displayProgress / 100) * STEPS.length)
+
+  if (isSuccess) return <SuccessView />
 
   return (
     <Flex direction="column" align="center" className="gap-8 px-16 py-10">

@@ -10,9 +10,8 @@ import { AddProjectDefaultView } from './AddProjectDefaultView'
 import { AddProjectManualView } from './AddProjectManualView'
 import { AddProjectProgressView } from './AddProjectProgressView'
 
+// TODO : 노션 연동 페이지 완성 시 수정 필요
 type DialogView = 'default' | 'manual' | 'progress'
-
-const MAX_PROJECTS = 10
 
 export const AddProjectDialog = () => {
   const workspaceId = useWorkspaceId()
@@ -21,6 +20,8 @@ export const AddProjectDialog = () => {
   const { mutate: createProject, isSuccess: isManualDone, reset: resetManual } = useCreateExperienceProject(workspaceId)
   const [isOpen, setIsOpen] = useState(false)
   const [view, setView] = useState<DialogView>('default')
+
+  const MAX_PROJECTS = 10
 
   const handleOpenChange = (next: boolean) => {
     if (next && projectCount >= MAX_PROJECTS) {
@@ -47,7 +48,7 @@ export const AddProjectDialog = () => {
     uploadPdf(file, { onError: handleExtractError })
   }
 
-  // 수동 입력: 진행 화면으로 전환한 뒤 생성하고, 완료는 생성 응답(isManualDone)으로 판정한다.
+  // 직접 입력: 진행 화면으로 전환한 뒤 생성하고, 완료는 생성 응답(isManualDone)으로 판정한다.
   const handleExtractManual = (input: CreateExperienceProjectInput) => {
     setView('progress')
     createProject(input, { onError: handleExtractError })
@@ -55,13 +56,14 @@ export const AddProjectDialog = () => {
 
   const renderView = () => {
     switch (view) {
+      case 'default':
+        return <AddProjectDefaultView onManualClick={() => setView('manual')} onExtract={handleExtractPdf} />
       case 'manual':
         return <AddProjectManualView onBack={() => setView('default')} onExtract={handleExtractManual} />
       case 'progress':
         return <AddProjectProgressView isComplete={isPdfDone || isManualDone} onCancel={() => handleOpenChange(false)} />
-      case 'default':
       default:
-        return <AddProjectDefaultView onManualClick={() => setView('manual')} onExtract={handleExtractPdf} />
+        return null
     }
   }
 
