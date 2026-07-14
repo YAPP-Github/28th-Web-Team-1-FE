@@ -17,6 +17,7 @@ export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualCl
 
   const selectFile = async (selected: File | undefined) => {
     if (!selected) return
+    console.log('selected', selected)
     const isPdf = await isPdfFile(selected)
     if (isPdf === false) {
       toast.warning('PDF 파일만 업로드할 수 있어요.', { id: 'pdf-type', position: 'top-center' })

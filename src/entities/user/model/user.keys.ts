@@ -3,7 +3,8 @@ import { userAPI } from '@entities/user'
 
 export const userKeys = {
   all: ['user'] as const,
-  me: () => [...userKeys.all, 'me'] as const
+  me: () => [...userKeys.all, 'me'] as const,
+  workspaces: () => [...userKeys.all, 'workspaces'] as const
 }
 
 /**
@@ -20,5 +21,10 @@ export const userQueries = {
     queryOptions({
       queryKey: userKeys.me(),
       queryFn: userAPI.getMe
+    }),
+  workspaces: () =>
+    queryOptions({
+      queryKey: userKeys.workspaces(),
+      queryFn: userAPI.getUserWorkspaces
     })
 }
