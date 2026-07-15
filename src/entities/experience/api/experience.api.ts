@@ -19,6 +19,11 @@ const experiencesDocument = graphql(`
         project {
           projectId
           name
+          role
+          period {
+            startAt
+            endAt
+          }
         }
       }
     }

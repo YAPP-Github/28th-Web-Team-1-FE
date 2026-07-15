@@ -4,7 +4,8 @@ import { projectAPI } from '../api/project.api'
 export const projectKeys = {
   all: ['project'] as const,
   lists: () => [...projectKeys.all, 'list'] as const,
-  list: (workspaceId: string) => [...projectKeys.lists(), workspaceId] as const
+  list: (workspaceId: string) => [...projectKeys.lists(), workspaceId] as const,
+  filterOptions: (workspaceId: string) => [...projectKeys.lists(), 'filter-options', workspaceId] as const
 }
 
 export const projectQueries = {
@@ -15,5 +16,12 @@ export const projectQueries = {
       queryFn: ({ pageParam }) => projectAPI.getProjects({ workspaceId, size, cursor: pageParam }),
       initialPageParam: null as string | null,
       getNextPageParam: (lastPage) => (lastPage.projectList.cursor.hasNext ? lastPage.projectList.cursor.nextCursor : null)
+    }),
+  filterOptions: (workspaceId: string, size = 10) =>
+    infiniteQueryOptions({
+      queryKey: projectKeys.filterOptions(workspaceId),
+      queryFn: ({ pageParam }) => projectAPI.getProjectFilterOptions({ workspaceId, size, cursor: pageParam }),
+      initialPageParam: null as string | null,
+      getNextPageParam: (lastPage) => (lastPage.experienceProjects.cursor.hasNext ? lastPage.experienceProjects.cursor.nextCursor : null)
     })
 }

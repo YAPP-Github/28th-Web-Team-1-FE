@@ -43,3 +43,11 @@ export const useProjectOptions = (workspaceId: string) => {
   })
   return data ?? []
 }
+
+export const useProjectFilterOptions = (workspaceId?: string) => {
+  const { data, ...rest } = useSuspenseInfiniteQuery({
+    ...projectQueries.filterOptions(workspaceId ?? ''),
+    select: (data) => data.pages.flatMap((page) => page.experienceProjects.projects)
+  })
+  return { projects: data ?? [], ...rest }
+}
