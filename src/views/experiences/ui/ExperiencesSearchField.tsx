@@ -23,18 +23,18 @@ export const ExperiencesSearchField = () => {
   const isOpen = isFocused && trimmedKeyword.length > 0 && !isSearching
 
   return (
-    <Flex direction="column" className="relative w-142.5">
-      <SearchField
-        placeholder="경험 이름, 태그로 검색하세요"
-        className="w-full"
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        rounded={isFocused ? 'top' : 'full'}
-      />
+    <Flex
+      direction="column"
+      className="relative w-142.5"
+      onFocus={() => setIsFocused(true)}
+      // 포커스가 컨테이너(입력창+드롭다운) 밖으로 나갈 때만 닫아, Tab으로 결과 링크에 접근할 수 있게 한다.
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setIsFocused(false)
+      }}
+    >
+      <SearchField placeholder="경험 이름, 태그로 검색하세요" className="w-full" value={keyword} onChange={(e) => setKeyword(e.target.value)} rounded={isFocused ? 'top' : 'full'} />
       {isOpen && (
-        <Flex direction="column" onMouseDown={(e) => e.preventDefault()} className="bg-element-white shadow-2 absolute top-full left-0 z-10 w-full overflow-hidden rounded-b-2xl">
+        <Flex direction="column" className="bg-element-white shadow-2 absolute top-full left-0 z-10 w-full overflow-hidden rounded-b-2xl">
           {results.length > 0 ? (
             results.map((experience) => <ExperiencesSearchItem key={experience.experienceId} experience={experience} />)
           ) : (
@@ -55,10 +55,10 @@ const ExperiencesSearchItem = ({ experience }: { experience: ReturnType<typeof u
   return (
     <Link
       href={`/experiences/${experience.project?.projectId}`}
-      className="group hover:bg-element-gray-light flex w-full cursor-pointer items-center justify-between px-5 py-3 text-left transition-colors"
+      className="group hover:bg-element-gray-light focus-visible:bg-element-gray-light flex w-full cursor-pointer items-center justify-between px-5 py-3 text-left transition-colors outline-none"
     >
       <Flex direction="row" align="center" gap="3">
-        <Search size={18} className="text-icon-disabled group-hover:text-icon-gray-light bg-btn-tertiary-fill box-content rounded-full p-1.75" />
+        <Search size={18} className="text-icon-disabled group-hover:text-icon-gray-light group-focus-visible:text-icon-gray-light bg-btn-tertiary-fill box-content rounded-full p-1.75" />
         <Flex direction="row" align="center" gap="6px">
           <Text variant="headline2" color="text-subtler">
             {experience.project?.name}
@@ -69,7 +69,7 @@ const ExperiencesSearchItem = ({ experience }: { experience: ReturnType<typeof u
           </Text>
         </Flex>
       </Flex>
-      <ArrowRight size={18} className="text-icon-disabled-on group-hover:text-icon-gray-light" />
+      <ArrowRight size={18} className="text-icon-disabled-on group-hover:text-icon-gray-light group-focus-visible:text-icon-gray-light" />
     </Link>
   )
 }

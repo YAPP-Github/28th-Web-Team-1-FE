@@ -59,6 +59,7 @@ export const ExperiencesPage = () => {
         }
       >
         <Suspense
+          // TODO : 디자인 미정
           fallback={
             <Flex direction="column" align="center" justify="center" className="border-border-subtle h-129 rounded-lg border border-dashed" gap="3">
               <Text variant="headline2" color="text-basic">
@@ -102,8 +103,7 @@ const ExperiencesProjectGrid = () => {
             <div className="bg-element-primary-lighter group-hover:border-btn-secondary-border h-25 w-full rounded-lg transition-all group-hover:border" />
             <Flex direction="column" gap="1">
               <Text variant="caption1" color="text-subtler">
-                {/** TODO : 프로젝트 생성 시 기간 설정 여부를 기획에서 정해지면 수정 필요 */}
-                {project.period ? formatPeriod(project.period) : '기간 미정'}
+                {formatPeriod(project.period) || '-'}
               </Text>
               <Text variant="headline2" className="text-text-basic group-hover:text-text-primary-basic transition-colors">
                 {project.name}
