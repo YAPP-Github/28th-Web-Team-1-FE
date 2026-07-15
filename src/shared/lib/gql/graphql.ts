@@ -13,22 +13,16 @@ export type ExperiencesQueryVariables = Exact<{
 
 export type ExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, project: { projectId: string, name: string, role: string | null, period: { startAt: string | null, endAt: string | null } | null } | null }> } };
 
-export type ExperienceProjectsQueryVariables = Exact<{
+export type ProjectListItemFragment = { projectId: string, name: string };
+
+export type ProjectFilterOptionsQueryVariables = Exact<{
   workspaceId: string | number;
   size: number;
   cursor?: string | null | undefined;
 }>;
 
 
-export type ExperienceProjectsQuery = { experienceProjects: { cursor: { hasNext: boolean, nextCursor: string | null }, projects: Array<{ projectId: string, name: string, summary: string, role: string | null, experienceCount: number | null, period: { startAt: string | null, endAt: string | null } | null }> } };
-
-export type ExperienceProjectQueryVariables = Exact<{
-  id: string | number;
-  workspaceId: string | number;
-}>;
-
-
-export type ExperienceProjectQuery = { experienceProject: { projectId: string, name: string, summary: string, role: string | null, experienceCount: number | null, period: { startAt: string | null, endAt: string | null } | null } };
+export type ProjectFilterOptionsQuery = { experienceProjects: { cursor: { hasNext: boolean, nextCursor: string | null }, projects: Array<{ projectId: string, name: string }> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -53,7 +47,12 @@ export class TypedDocumentString<TResult, TVariables>
     return this.value;
   }
 }
-
+export const ProjectListItemFragmentDoc = new TypedDocumentString(`
+    fragment ProjectListItem on ExperienceProject {
+  projectId
+  name
+}
+    `, {"fragmentName":"ProjectListItem"}) as unknown as TypedDocumentString<ProjectListItemFragment, unknown>;
 export const ExperiencesDocument = new TypedDocumentString(`
     query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {
   experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {
@@ -78,42 +77,22 @@ export const ExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<ExperiencesQuery, ExperiencesQueryVariables>;
-export const ExperienceProjectsDocument = new TypedDocumentString(`
-    query ExperienceProjects($workspaceId: ID!, $size: Int!, $cursor: String) {
+export const ProjectFilterOptionsDocument = new TypedDocumentString(`
+    query ProjectFilterOptions($workspaceId: ID!, $size: Int!, $cursor: String) {
   experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {
     cursor {
       hasNext
       nextCursor
     }
     projects {
-      projectId
-      name
-      summary
-      role
-      experienceCount
-      period {
-        startAt
-        endAt
-      }
+      ...ProjectListItem
     }
   }
 }
-    `) as unknown as TypedDocumentString<ExperienceProjectsQuery, ExperienceProjectsQueryVariables>;
-export const ExperienceProjectDocument = new TypedDocumentString(`
-    query ExperienceProject($id: ID!, $workspaceId: ID!) {
-  experienceProject(id: $id, workspaceId: $workspaceId) {
-    projectId
-    name
-    summary
-    role
-    experienceCount
-    period {
-      startAt
-      endAt
-    }
-  }
-}
-    `) as unknown as TypedDocumentString<ExperienceProjectQuery, ExperienceProjectQueryVariables>;
+    fragment ProjectListItem on ExperienceProject {
+  projectId
+  name
+}`) as unknown as TypedDocumentString<ProjectFilterOptionsQuery, ProjectFilterOptionsQueryVariables>;
 export const MeDocument = new TypedDocumentString(`
     query Me {
   me {
