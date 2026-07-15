@@ -17,7 +17,7 @@ export const projectQueries = {
       initialPageParam: null as string | null,
       getNextPageParam: (lastPage) => (lastPage.projectList.cursor.hasNext ? lastPage.projectList.cursor.nextCursor : null)
     }),
-  filterOptions: (workspaceId: string, size = 20) =>
+  filterOptions: (workspaceId: string, size = 10) =>
     infiniteQueryOptions({
       queryKey: projectKeys.filterOptions(workspaceId),
       queryFn: ({ pageParam }) => projectAPI.getProjectFilterOptions({ workspaceId, size, cursor: pageParam }),
