@@ -1,19 +1,20 @@
-import { queryOptions } from '@tanstack/react-query'
-import { userAPI, userKeys } from '@entities/user'
+'use client'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { userQueries } from './user.keys'
 
 /**
- * user 도메인의 queryOptions 팩토리이다.
- * 키(`userKeys`)와 짝을 이루며, 컴포넌트에서 `useQuery(userQueries.me())` 형태로 사용한다.
+ * 현재 사용자의 첫 번째 워크스페이스 ID를 `workspaces` 쿼리에서 확정해서 반환한다.
+ * (URL에 workspaceId를 두지 않고, 서버 데이터 기반으로 가져오는 방식 — 추후 팀 논의 예정)
  * @example
- * ```ts
- * const { data } = useQuery(userQueries.me());
- * queryClient.invalidateQueries({ queryKey: userKeys.all }); // 무효화는 키로
+ * ```tsx
+ * const workspaceId = useWorkspaceId()
+ * const { projects } = useExperienceProjectList(workspaceId)
  * ```
  */
-export const userQueries = {
-  me: () =>
-    queryOptions({
-      queryKey: userKeys.me(),
-      queryFn: userAPI.getMe
-    })
+export const useWorkspaceId = () => {
+  const { data } = useSuspenseQuery({
+    ...userQueries.workspaces(),
+    select: (data) => data.me.workspaces[0]?.workspaceId ?? ''
+  })
+  return data
 }

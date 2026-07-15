@@ -12,12 +12,51 @@ This directive disables error propagation when a non nullable field returns null
 """
 directive @experimental_disableErrorPropagation on MUTATION | QUERY | SUBSCRIPTION
 
+"""Notion 연결 요청입니다."""
+input ConnectNotionRequest {
+  """Notion OAuth authorization code입니다."""
+  authorizationCode: String!
+
+  """Notion OAuth redirect URI입니다."""
+  redirectUri: String!
+}
+
+"""경험 프로젝트 생성 입력입니다."""
+input CreateExperienceProjectRequest {
+  """경험 프로젝트 이름입니다."""
+  name: String!
+
+  """경험 프로젝트 진행 기간입니다."""
+  period: PeriodInput
+
+  """경험 프로젝트 역할입니다."""
+  role: String
+
+  """경험 프로젝트 요약입니다."""
+  summary: String!
+}
+
+"""경험 생성 입력입니다."""
+input CreateExperienceRequest {
+  """경험 상세 내용입니다."""
+  contents: ExperienceContentsRequest!
+
+  """연결할 경험 프로젝트 ID입니다."""
+  projectId: ID!
+
+  """경험에 부여할 태그 목록입니다."""
+  tags: [String!] = []
+
+  """경험 제목입니다."""
+  title: String!
+}
+
 """커서 정보입니다."""
 type Cursor {
   """다음 페이지 존재 여부입니다."""
   hasNext: Boolean!
 
-  """다음 페이지를 조회할 때 사용할 커서입니다."""
+  """다음 페이지를 조회할 때 사용할 커서입니다. (다음 페이지가 없는 경우 null 응답)"""
   nextCursor: String
 }
 
@@ -51,6 +90,18 @@ type ExperienceContents {
   type: ExperienceContentsType!
 }
 
+"""경험 상세 내용 입력입니다."""
+input ExperienceContentsRequest {
+  """FREE 형식의 상세 내용입니다."""
+  free: FreeExperienceContentsRequest
+
+  """STAR 형식의 상세 내용입니다."""
+  star: StarExperienceContentsRequest
+
+  """경험 상세 내용 타입입니다."""
+  type: ExperienceContentsType!
+}
+
 """경험 상세 내용 타입입니다."""
 enum ExperienceContentsType {
   """자유 서술 형식입니다."""
@@ -63,7 +114,7 @@ enum ExperienceContentsType {
 """경험 프로젝트입니다."""
 type ExperienceProject {
   """경험 프로젝트에 연결된 활성 경험 개수입니다."""
-  experienceCount: Int
+  experienceCount: Long
 
   """경험 프로젝트 이름입니다."""
   name: String!
@@ -81,15 +132,6 @@ type ExperienceProject {
   summary: String!
 }
 
-"""경험 프로젝트 상태입니다."""
-enum ExperienceProjectStatus {
-  """활성 상태입니다."""
-  ACTIVE
-
-  """삭제된 상태입니다."""
-  DELETED
-}
-
 """경험 프로젝트 목록입니다."""
 type ExperienceProjects {
   """다음 페이지 조회에 사용하는 커서 정보입니다."""
@@ -97,15 +139,6 @@ type ExperienceProjects {
 
   """조회된 경험 프로젝트 목록입니다."""
   projects: [ExperienceProject!]!
-}
-
-"""경험 상태입니다."""
-enum ExperienceStatus {
-  """활성 상태입니다."""
-  ACTIVE
-
-  """삭제된 상태입니다."""
-  DELETED
 }
 
 """경험 목록입니다."""
@@ -123,6 +156,194 @@ type FreeExperienceContents {
   content: String!
 }
 
+"""FREE 형식의 경험 상세 내용 입력입니다."""
+input FreeExperienceContentsRequest {
+  """자유 내용입니다."""
+  content: String!
+}
+
+"""64-bit signed integer"""
+scalar Long
+
+type Mutation {
+  """워크스페이스에 Notion을 연결합니다."""
+  connectNotion(
+    """Notion 연결 요청입니다."""
+    request: ConnectNotionRequest!
+
+    """Notion을 연결할 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): NotionConnection!
+
+  """경험을 생성합니다."""
+  createExperience(
+    """생성할 경험 정보입니다."""
+    request: CreateExperienceRequest!
+
+    """경험을 생성할 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Experience!
+
+  """경험 프로젝트를 생성합니다."""
+  createExperienceProject(
+    """생성할 경험 프로젝트 정보입니다."""
+    input: CreateExperienceProjectRequest!
+
+    """경험 프로젝트를 생성할 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): ExperienceProject!
+
+  """새 이력서를 전체 스냅샷 단위로 생성합니다."""
+  createResume(
+    """생성할 이력서 전체 스냅샷입니다."""
+    input: SaveResumeInput!
+
+    """이력서를 생성할 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Resume!
+
+  """경험을 삭제합니다."""
+  deleteExperience(
+    """삭제할 경험 ID입니다."""
+    experienceId: ID!
+
+    """경험이 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Boolean!
+
+  """경험 프로젝트를 삭제합니다."""
+  deleteExperienceProject(
+    """삭제할 경험 프로젝트 ID입니다."""
+    projectId: ID!
+
+    """경험 프로젝트가 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Boolean!
+
+  """이력서를 삭제합니다."""
+  deleteResume(
+    """삭제할 이력서 ID입니다."""
+    resumeId: ID!
+
+    """이력서가 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Boolean!
+
+  """워크스페이스에서 Notion 연결을 해제합니다."""
+  disconnectNotion(
+    """Notion 연결 ID입니다."""
+    connectionId: ID!
+
+    """Notion 연결이 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Boolean!
+
+  """Notion 페이지 내용을 경험으로 가져옵니다."""
+  importNotionExperiences(
+    """Notion 경험 가져오기 요청입니다."""
+    request: NotionExperienceImportRequest!
+
+    """경험을 가져올 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Boolean!
+
+  """Free Style 경험 내용을 STAR 형식으로 다듬습니다."""
+  polishExperienceContents(
+    """STAR 형식으로 변환할 Free Style 경험 내용입니다."""
+    request: PolishExperienceContentsRequest!
+  ): StarExperienceContents!
+
+  """경험을 수정합니다."""
+  updateExperience(
+    """수정할 경험 ID입니다."""
+    experienceId: ID!
+
+    """수정할 경험 정보입니다."""
+    request: UpdateExperienceRequest!
+
+    """경험이 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Experience!
+
+  """경험 프로젝트를 수정합니다."""
+  updateExperienceProject(
+    """수정할 경험 프로젝트 ID입니다."""
+    projectId: ID!
+
+    """수정할 경험 프로젝트 정보입니다."""
+    request: UpdateExperienceProjectRequest!
+
+    """경험 프로젝트가 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): ExperienceProject!
+
+  """기존 이력서를 전체 스냅샷 단위로 수정합니다."""
+  updateResume(
+    """수정할 이력서 전체 스냅샷입니다."""
+    input: SaveResumeInput!
+
+    """수정할 이력서 ID입니다."""
+    resumeId: ID!
+
+    """이력서가 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Resume!
+}
+
+"""Notion 연결입니다."""
+type NotionConnection {
+  """Notion 연결 ID입니다."""
+  connectionId: ID!
+
+  """Notion 워크스페이스 아이콘 URL입니다."""
+  notionWorkspaceIcon: String
+
+  """Notion 워크스페이스 이름입니다."""
+  notionWorkspaceName: String
+}
+
+"""Notion 연결 목록입니다."""
+type NotionConnections {
+  """조회된 Notion 연결 목록입니다."""
+  connections: [NotionConnection!]!
+
+  """다음 페이지 조회에 사용하는 커서 정보입니다."""
+  cursor: Cursor!
+}
+
+"""Notion 경험 가져오기 요청입니다."""
+input NotionExperienceImportRequest {
+  """Notion 연결 ID입니다."""
+  connectionId: ID!
+
+  """가져올 Notion 페이지 ID입니다."""
+  pageId: String!
+}
+
+"""Notion 페이지 요약입니다."""
+type NotionPageSummary {
+  """마지막 수정 시각입니다."""
+  lastEditedTime: String
+
+  """Notion 페이지 ID입니다."""
+  pageId: ID!
+
+  """Notion 페이지 제목입니다."""
+  title: String!
+
+  """Notion 페이지 URL입니다."""
+  url: String
+}
+
+"""Notion 페이지 목록입니다."""
+type NotionPages {
+  """다음 페이지 조회에 사용하는 커서 정보입니다."""
+  cursor: Cursor!
+
+  """조회된 Notion 페이지 목록입니다."""
+  pages: [NotionPageSummary!]!
+}
+
 """기간입니다."""
 type Period {
   """기간 종료일입니다."""
@@ -132,20 +353,35 @@ type Period {
   startAt: String
 }
 
+"""기간 입력입니다."""
+input PeriodInput {
+  """기간 종료일입니다."""
+  endAt: String
+
+  """기간 시작일입니다."""
+  startAt: String
+}
+
+"""경험 내용 AI 다듬기 입력입니다."""
+input PolishExperienceContentsRequest {
+  """STAR 형식으로 변환할 자유 서술 경험 내용입니다."""
+  content: String!
+}
+
 type Query {
   """경험 단건을 조회합니다."""
   experience(
     """조회할 경험 ID입니다."""
-    id: ID!
+    experienceId: ID!
 
-    """경험이 속한 워크스페이스 ID입니다."""
+    """경험을 조회할 워크스페이스 ID입니다."""
     workspaceId: ID!
   ): Experience
 
   """경험 프로젝트 단건을 조회합니다."""
   experienceProject(
     """조회할 경험 프로젝트 ID입니다."""
-    id: ID!
+    projectId: ID!
 
     """경험 프로젝트가 속한 워크스페이스 ID입니다."""
     workspaceId: ID!
@@ -168,7 +404,7 @@ type Query {
     """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
     cursor: String
 
-    """특정 프로젝트의 경험만 조회할 때 사용하는 프로젝트 ID입니다."""
+    """특정 프로젝트의 경험만 조회할 때 사용하는 프로젝트 ID입니다 (선택)"""
     projectId: ID
 
     """한 번에 조회할 경험 개수입니다. (1 이상 30 이하)"""
@@ -181,12 +417,66 @@ type Query {
   """인증된 사용자의 정보를 조회합니다."""
   me: User!
 
-  """경험 목록을 검색합니다."""
+  """워크스페이스에 연결된 Notion 연결 목록을 조회합니다."""
+  notionConnections(
+    """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
+    cursor: String
+
+    """한 번에 조회할 Notion 연결 개수입니다. (1 이상 30 이하)"""
+    size: Int!
+
+    """워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): NotionConnections!
+
+  """연결된 Notion 워크스페이스에서 페이지를 검색합니다."""
+  notionPages(
+    """Notion 연결 ID입니다."""
+    connectionId: ID!
+
+    """다음 페이지를 조회할 때 사용하는 Notion 커서입니다. (첫 페이지는 null)"""
+    cursor: String
+
+    """페이지 검색어입니다 (선택)"""
+    query: String
+
+    """한 번에 조회할 Notion 페이지 개수입니다. (1 이상 100 이하)"""
+    size: Int!
+
+    """워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): NotionPages!
+
+  """이력서 상세를 조회합니다."""
+  resume(
+    """조회할 이력서 ID입니다."""
+    resumeId: ID!
+
+    """이력서가 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Resume!
+
+  """워크스페이스의 이력서 수를 상태별로 조회합니다."""
+  resumeCounts(
+    """이력서 수를 조회할 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): [ResumeStatusCount!]!
+
+  """워크스페이스의 이력서 목록을 조회합니다."""
+  resumes(
+    """조회할 이력서 상태 목록입니다 (생략하면 COMPLETED, DRAFT를 모두 조회)"""
+    statuses: [ResumeStatusType!]
+
+    """이력서 목록을 조회할 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): [ResumeSummary!]!
+
+  """키워드 기반으로 경험 목록을 검색합니다."""
   searchExperiences(
     """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
     cursor: String
 
-    """경험 제목에 포함된 검색어입니다."""
+    """검색어입니다."""
     keyword: String!
 
     """한 번에 조회할 경험 개수입니다. (1 이상 30 이하)"""
@@ -195,6 +485,477 @@ type Query {
     """경험을 검색할 워크스페이스 ID입니다."""
     workspaceId: ID!
   ): Experiences!
+}
+
+"""이력서 상세 응답입니다."""
+type Resume {
+  """생성 시각입니다."""
+  createdAt: String!
+
+  """이력서 ID입니다."""
+  resumeId: ID!
+
+  """요청한 선택 필드에 따라 포함되는 섹션 목록입니다."""
+  sections: [ResumeSection!]!
+
+  """이력서 상태입니다."""
+  status: ResumeStatusType!
+
+  """이력서 템플릿입니다."""
+  template: ResumeTemplate!
+
+  """마지막 수정 시각입니다."""
+  updatedAt: String!
+}
+
+"""수상 payload 응답입니다."""
+type ResumeAwardPayload {
+  """수상일입니다."""
+  awardedAt: String
+
+  """수상명입니다."""
+  name: String!
+
+  """수상 기관명입니다."""
+  organization: String
+}
+
+"""수상 payload 입력입니다."""
+input ResumeAwardPayloadInput {
+  """수상일입니다."""
+  awardedAt: String
+
+  """수상명입니다."""
+  name: String!
+
+  """수상 기관명입니다."""
+  organization: String
+}
+
+"""기본 정보 payload 응답입니다."""
+type ResumeBasicInfoPayload {
+  """이메일 주소입니다."""
+  email: String
+
+  """이름입니다."""
+  name: String!
+
+  """전화번호입니다."""
+  phone: String
+}
+
+"""기본 정보 payload 입력입니다."""
+input ResumeBasicInfoPayloadInput {
+  """이메일 주소입니다."""
+  email: String
+
+  """이름입니다."""
+  name: String!
+
+  """전화번호입니다."""
+  phone: String
+}
+
+"""경력 payload 응답입니다."""
+type ResumeCareerPayload {
+  """회사명입니다."""
+  companyName: String!
+
+  """경력 상세 내용입니다."""
+  contents: String!
+
+  """재직 기간입니다."""
+  period: Period
+
+  """직무 또는 역할입니다."""
+  role: String
+}
+
+"""경력 payload 입력입니다."""
+input ResumeCareerPayloadInput {
+  """회사명입니다."""
+  companyName: String!
+
+  """경력 상세 내용입니다."""
+  contents: String!
+
+  """재직 기간입니다."""
+  period: PeriodInput
+
+  """직무 또는 역할입니다."""
+  role: String
+}
+
+"""자격증 payload 응답입니다."""
+type ResumeCertificatePayload {
+  """취득일입니다."""
+  acquiredAt: String
+
+  """자격증명입니다."""
+  name: String!
+
+  """발급 기관입니다."""
+  organization: String
+}
+
+"""자격증 payload 입력입니다."""
+input ResumeCertificatePayloadInput {
+  """취득일입니다."""
+  acquiredAt: String
+
+  """자격증명입니다."""
+  name: String!
+
+  """발급 기관입니다."""
+  organization: String
+}
+
+"""핵심 역량 payload 응답입니다."""
+type ResumeCoreSkillPayload {
+  """핵심 역량 내용입니다."""
+  content: String!
+}
+
+"""핵심 역량 payload 입력입니다."""
+input ResumeCoreSkillPayloadInput {
+  """핵심 역량 내용입니다."""
+  content: String!
+}
+
+"""학력 payload 응답입니다."""
+type ResumeEducationPayload {
+  """학위 또는 학력 구분입니다."""
+  degree: String
+
+  """전공명입니다."""
+  major: String
+
+  """재학 기간입니다."""
+  period: Period
+
+  """학교명입니다."""
+  schoolName: String!
+
+  """학력 상태입니다. 예: 졸업 예정"""
+  status: String
+}
+
+"""학력 payload 입력입니다."""
+input ResumeEducationPayloadInput {
+  """학위 또는 학력 구분입니다."""
+  degree: String
+
+  """전공명입니다."""
+  major: String
+
+  """재학 기간입니다."""
+  period: PeriodInput
+
+  """학교명입니다."""
+  schoolName: String!
+
+  """학력 상태입니다. 예: 졸업 예정"""
+  status: String
+}
+
+"""경험 payload 응답입니다."""
+type ResumeExperiencePayload {
+  """경험 상세 내용 목록입니다."""
+  contents: String
+
+  """경험 이름입니다."""
+  name: String!
+
+  """경험 수행 기간입니다."""
+  period: Period
+
+  """경험에서 맡은 역할입니다."""
+  role: String
+}
+
+"""경험 payload 입력입니다."""
+input ResumeExperiencePayloadInput {
+  """경험 상세 내용 목록입니다."""
+  contents: String
+
+  """경험 이름입니다."""
+  name: String!
+
+  """경험 수행 기간입니다."""
+  period: PeriodInput
+
+  """경험에서 맡은 역할입니다."""
+  role: String
+}
+
+"""어학 payload 응답입니다."""
+type ResumeLanguagePayload {
+  """어학 취득일입니다."""
+  acquiredAt: String
+
+  """어학 시험명입니다."""
+  examName: String!
+
+  """어학 점수 또는 등급입니다."""
+  scoreOrGrade: String!
+}
+
+"""어학 payload 입력입니다."""
+input ResumeLanguagePayloadInput {
+  """어학 취득일입니다."""
+  acquiredAt: String
+
+  """어학 시험명입니다."""
+  examName: String!
+
+  """어학 점수 또는 등급입니다."""
+  scoreOrGrade: String!
+}
+
+"""이력서 섹션 응답입니다."""
+type ResumeSection {
+  """생성 시각입니다."""
+  createdAt: String!
+
+  """섹션 표시 순서입니다."""
+  displayOrder: Float!
+
+  """화면에 표시할 섹션명입니다."""
+  displayText: String!
+
+  """섹션에 포함된 아이템 목록입니다."""
+  items: [ResumeSectionItem!]!
+
+  """섹션 ID입니다."""
+  sectionId: ID!
+
+  """섹션 종류입니다."""
+  type: ResumeSectionType!
+
+  """마지막 수정 시각입니다."""
+  updatedAt: String!
+
+  """섹션 노출 여부입니다."""
+  visible: Boolean!
+}
+
+"""이력서 섹션 아이템 응답입니다."""
+type ResumeSectionItem {
+  """생성 시각입니다."""
+  createdAt: String!
+
+  """아이템 표시 순서입니다."""
+  displayOrder: Float!
+
+  """아이템 ID입니다."""
+  itemId: ID!
+
+  """아이템 상세 payload입니다."""
+  payload: ResumeSectionItemPayload!
+
+  """마지막 수정 시각입니다."""
+  updatedAt: String!
+
+  """아이템 노출 여부입니다."""
+  visible: Boolean!
+}
+
+"""섹션 아이템 payload 응답입니다. 섹션 타입과 일치하는 필드 하나가 채워집니다."""
+type ResumeSectionItemPayload {
+  """수상 payload입니다."""
+  award: ResumeAwardPayload
+
+  """기본 정보 payload입니다."""
+  basicInfo: ResumeBasicInfoPayload
+
+  """경력 payload입니다."""
+  career: ResumeCareerPayload
+
+  """자격증 payload입니다."""
+  certificate: ResumeCertificatePayload
+
+  """핵심 역량 payload입니다."""
+  coreSkill: ResumeCoreSkillPayload
+
+  """학력 payload입니다."""
+  education: ResumeEducationPayload
+
+  """경험 payload입니다."""
+  experience: ResumeExperiencePayload
+
+  """어학 payload입니다."""
+  language: ResumeLanguagePayload
+
+  """기술 payload입니다."""
+  skill: ResumeSkillPayload
+}
+
+"""섹션 아이템 payload 입력입니다. 정확히 하나의 필드만 채웁니다."""
+input ResumeSectionItemPayloadInput {
+  """수상 payload입니다."""
+  award: ResumeAwardPayloadInput
+
+  """기본 정보 payload입니다."""
+  basicInfo: ResumeBasicInfoPayloadInput
+
+  """경력 payload입니다."""
+  career: ResumeCareerPayloadInput
+
+  """자격증 payload입니다."""
+  certificate: ResumeCertificatePayloadInput
+
+  """핵심 역량 payload입니다."""
+  coreSkill: ResumeCoreSkillPayloadInput
+
+  """학력 payload입니다."""
+  education: ResumeEducationPayloadInput
+
+  """경험 payload입니다."""
+  experience: ResumeExperiencePayloadInput
+
+  """어학 payload입니다."""
+  language: ResumeLanguagePayloadInput
+
+  """기술 payload입니다."""
+  skill: ResumeSkillPayloadInput
+}
+
+"""이력서 섹션 종류입니다."""
+enum ResumeSectionType {
+  """수상 섹션입니다."""
+  AWARD
+
+  """기본 정보 섹션입니다."""
+  BASIC_INFO
+
+  """경력 섹션입니다."""
+  CAREER
+
+  """자격증 섹션입니다."""
+  CERTIFICATE
+
+  """핵심 역량 섹션입니다."""
+  CORE_SKILL
+
+  """학력 섹션입니다."""
+  EDUCATION
+
+  """경험 섹션입니다."""
+  EXPERIENCE
+
+  """어학 섹션입니다."""
+  LANGUAGE
+
+  """기술 섹션입니다."""
+  SKILL
+}
+
+"""기술 payload 응답입니다."""
+type ResumeSkillPayload {
+  """숙련도 또는 수준입니다."""
+  level: String
+
+  """기술명입니다."""
+  name: String!
+}
+
+"""기술 payload 입력입니다."""
+input ResumeSkillPayloadInput {
+  """숙련도 또는 수준입니다."""
+  level: String
+
+  """기술명입니다."""
+  name: String!
+}
+
+"""이력서 상태별 개수 응답입니다."""
+type ResumeStatusCount {
+  """해당 상태의 이력서 수입니다."""
+  count: Long!
+
+  """이력서 상태입니다."""
+  status: ResumeStatusType!
+}
+
+"""이력서 상태입니다."""
+enum ResumeStatusType {
+  """활성 이력서입니다."""
+  COMPLETED
+
+  """임시 저장된 이력서입니다."""
+  DRAFT
+}
+
+"""이력서 목록용 요약 응답입니다."""
+type ResumeSummary {
+  """생성 시각입니다."""
+  createdAt: String!
+
+  """이력서 ID입니다."""
+  resumeId: ID!
+
+  """이력서 상태입니다."""
+  status: ResumeStatusType!
+
+  """이력서 템플릿입니다."""
+  template: ResumeTemplate!
+
+  """마지막 수정 시각입니다."""
+  updatedAt: String!
+}
+
+"""이력서 템플릿 종류입니다."""
+enum ResumeTemplate {
+  """기본 이력서 템플릿입니다."""
+  DEFAULT
+}
+
+"""이력서 생성 및 수정에 사용하는 전체 스냅샷 입력입니다."""
+input SaveResumeInput {
+  """저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다."""
+  sections: [SaveResumeSectionInput!]!
+
+  """저장할 이력서 상태입니다."""
+  status: ResumeStatusType!
+
+  """이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다."""
+  targetJdId: ID
+
+  """이력서 렌더링에 사용할 템플릿입니다."""
+  template: ResumeTemplate!
+}
+
+"""이력서 섹션 저장 입력입니다."""
+input SaveResumeSectionInput {
+  """섹션 표시 순서입니다."""
+  displayOrder: Float!
+
+  """섹션에 포함할 아이템 목록입니다. 요청에 없는 기존 아이템은 삭제됩니다."""
+  items: [SaveResumeSectionItemInput!]!
+
+  """기존 섹션을 수정할 때 사용하는 섹션 ID입니다. 없으면 새 섹션으로 생성됩니다."""
+  sectionId: ID
+
+  """섹션 타입입니다. 하위 아이템 payload 타입과 일치해야 합니다."""
+  type: ResumeSectionType!
+
+  """섹션 노출 여부입니다."""
+  visible: Boolean!
+}
+
+"""이력서 섹션 아이템 저장 입력입니다."""
+input SaveResumeSectionItemInput {
+  """아이템 표시 순서입니다."""
+  displayOrder: Float!
+
+  """기존 아이템을 수정할 때 사용하는 아이템 ID입니다. 없으면 새 아이템으로 생성됩니다."""
+  itemId: ID
+
+  """섹션 타입과 일치해야 하는 payload 입력입니다."""
+  payload: ResumeSectionItemPayloadInput!
+
+  """아이템 노출 여부입니다."""
+  visible: Boolean!
 }
 
 """STAR 형식의 경험 상세 내용입니다."""
@@ -212,15 +973,60 @@ type StarExperienceContents {
   task: String!
 }
 
+"""STAR 형식의 경험 상세 내용 입력입니다."""
+input StarExperienceContentsRequest {
+  """A"""
+  action: String!
+
+  """R"""
+  result: String!
+
+  """S"""
+  situation: String!
+
+  """T"""
+  task: String!
+}
+
+"""경험 프로젝트 수정 입력입니다."""
+input UpdateExperienceProjectRequest {
+  """변경할 경험 프로젝트 이름입니다."""
+  name: String
+
+  """변경할 경험 프로젝트 진행 기간입니다."""
+  period: PeriodInput
+
+  """변경할 경험 프로젝트 역할입니다."""
+  role: String
+
+  """변경할 경험 프로젝트 요약입니다."""
+  summary: String
+}
+
+"""경험 수정 입력입니다."""
+input UpdateExperienceRequest {
+  """변경할 경험 상세 내용입니다."""
+  contents: ExperienceContentsRequest
+
+  """변경할 경험 프로젝트 ID입니다."""
+  projectId: ID
+
+  """변경할 태그 목록입니다."""
+  tags: [String!]
+
+  """변경할 경험 제목입니다."""
+  title: String
+}
+
 """사용자 정보입니다."""
 type User {
-  """사용자 이메일입니다."""
+  """이메일입니다."""
   email: String!
 
-  """사용자 이름입니다."""
+  """이름입니다."""
   name: String!
 
-  """사용자 프로필 이미지 URL입니다."""
+  """프로필 이미지 URL입니다."""
   profileImageUrl: String
 
   """사용자를 식별하는 ID입니다."""

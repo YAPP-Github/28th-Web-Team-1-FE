@@ -14,8 +14,20 @@ const myUserDocument = graphql(`
     }
   }
 `)
+
+const userWorkspacesDocument = graphql(`
+  query UserWorkspaces {
+    me {
+      workspaces {
+        workspaceId
+      }
+    }
+  }
+`)
+
 export const userAPI = {
   // 두 개는 같은 데이터를 가져옵니다.
   getUserInfo: () => http.get<UserInfo>('/api/v1/users/me').catch(() => null),
+  getUserWorkspaces: () => execute(userWorkspacesDocument),
   getMe: () => execute(myUserDocument)
 }
