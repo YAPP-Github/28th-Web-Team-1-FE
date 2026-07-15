@@ -3,12 +3,12 @@
 import { Dialog, DialogContent } from '@shared/ui/dialog'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Flex } from '@radix-ui/themes'
-import { useCurrentWorkspaceId } from '@entities/user'
-import { useExperienceList } from '@entities/experience'
+import { useWorkspaceId } from '@entities/user'
 import { ExperienceCard } from './ExperienceCard'
 import { ExperienceSearchPanel } from './ExperienceSearchPanel'
 import { useExperienceSelection } from '../model/useExperienceSelection'
 import type { Experience } from '../model/experience.types'
+import { useExperienceList } from '@entities/experience'
 
 const MAX_SELECT = 5
 
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete }: Props) => {
-  const workspaceId = useCurrentWorkspaceId()
+  const workspaceId = useWorkspaceId()
   const { experiences } = useExperienceList(workspaceId)
 
   const { selectedIds, toggle, isFull } = useExperienceSelection(MAX_SELECT)

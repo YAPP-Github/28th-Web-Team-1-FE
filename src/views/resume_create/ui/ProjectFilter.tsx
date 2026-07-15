@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Button } from '@shared/ui'
 import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
-import { useCurrentWorkspaceId } from '@entities/user'
+import { useWorkspaceId } from '@entities/user'
 import { useProjectFilterOptions } from '@entities/project'
 
 /** 'recommended' | 'all' | projectId */
@@ -21,7 +21,7 @@ interface Props {
 }
 
 export const ProjectFilter = ({ value, onChange }: Props) => {
-  const workspaceId = useCurrentWorkspaceId()
+  const workspaceId = useWorkspaceId()
   const { projects, fetchNextPage, hasNextPage, isFetchingNextPage } = useProjectFilterOptions(workspaceId)
 
   const scrollRef = useRef<HTMLDivElement>(null)
