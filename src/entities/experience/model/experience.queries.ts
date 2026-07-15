@@ -21,7 +21,6 @@ export const useSearchExperiences = (workspaceId: string, keyword: string) => {
     placeholderData: keepPreviousData,
     select: (data) => data.searchExperiences.experiences
   })
-  return { experiences: data, ...rest }
   return { results: data ?? [], ...rest }
 }
 
