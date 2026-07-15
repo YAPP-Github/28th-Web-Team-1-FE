@@ -6,7 +6,7 @@ import { Flex } from '@radix-ui/themes'
 import { useWorkspaceId } from '@entities/user'
 import { ExperienceCard } from './ExperienceCard'
 import { ExperienceSearchPanel } from './ExperienceSearchPanel'
-import { useExperienceSelection } from '../model/useExperienceSelection'
+import { useMultiSelect } from '@shared/hooks/useMultiSelect'
 import type { Experience } from '../model/experience.types'
 import { useExperienceList } from '@entities/experience'
 
@@ -23,7 +23,7 @@ export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete }: Pro
   const workspaceId = useWorkspaceId()
   const { experiences } = useExperienceList(workspaceId)
 
-  const { selectedIds, toggle, isFull } = useExperienceSelection(MAX_SELECT)
+  const { selectedIds, toggle, isFull } = useMultiSelect(MAX_SELECT)
 
   const browseList = sortByMatchRateDesc(experiences)
   const selectedExperiences = browseList.filter((experience) => selectedIds.has(experience.experienceId))
