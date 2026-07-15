@@ -1,18 +1,31 @@
+import { useRef, useState, type DragEvent } from 'react'
+import { toast } from 'sonner'
+import { Flex } from '@radix-ui/themes'
+import { FilePlusCorner, Pencil, Trash2 } from 'lucide-react'
 import { NotionIcon } from '@shared/icon'
 import { cn } from '@shared/lib/cn'
-import { Flex } from '@radix-ui/themes'
 import { Button, Text } from '@shared/ui'
 import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@shared/ui/dialog'
-import { FilePlusCorner, Pencil, Trash2 } from 'lucide-react'
-import { useRef, useState, type DragEvent } from 'react'
+import { isPdfFile } from '@shared/lib/isPdfFile'
 
-export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualClick: () => void; onExtract: () => void }) => {
+const MAX_FILE_SIZE = 4.5 * 1024 * 1024
+
+export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualClick: () => void; onExtract: (file: File) => void }) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
 
-  const selectFile = (selected: File | undefined) => {
+  const selectFile = async (selected: File | undefined) => {
     if (!selected) return
+    const isPdf = await isPdfFile(selected)
+    if (isPdf === false) {
+      toast.warning('PDF 파일만 업로드할 수 있어요.', { id: 'pdf-type', position: 'top-center' })
+      return
+    }
+    if (selected.size > MAX_FILE_SIZE) {
+      toast.warning('파일 크기는 최대 4.5MB까지 업로드할 수 있어요.', { id: 'pdf-size', position: 'top-center' })
+      return
+    }
     setFile(selected)
   }
 
@@ -20,11 +33,6 @@ export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualCl
     e.preventDefault()
     setIsDragging(false)
     selectFile(e.dataTransfer.files[0])
-  }
-
-  const handleClearFile = () => {
-    setFile(null)
-    if (inputRef.current) inputRef.current.value = ''
   }
 
   return (
@@ -70,11 +78,27 @@ export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualCl
               <Text variant="headline2" color="text-basic">
                 {file.name}
               </Text>
-              <Button variant="danger" size="xs" onClick={handleClearFile} className="w-7.5">
+              <Button
+                variant="danger"
+                size="xs"
+                onClick={() => {
+                  setFile(null)
+                  if (inputRef.current) inputRef.current.value = ''
+                }}
+                className="w-7.5"
+              >
                 <Trash2 size={12} />
               </Button>
             </Flex>
-            <Button variant="primary" size="xl" className="mt-6 w-full" onClick={() => onExtract()}>
+            <Button
+              variant="primary"
+              size="xl"
+              className="mt-6 w-full"
+              onClick={() => {
+                if (!file) return
+                onExtract(file)
+              }}
+            >
               경험 추출하기
             </Button>
           </Flex>

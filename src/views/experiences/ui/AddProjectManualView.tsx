@@ -2,6 +2,8 @@ import { toast } from 'sonner'
 import { useState } from 'react'
 import { ChevronDown, ChevronLeft, Plus } from 'lucide-react'
 import { Flex } from '@radix-ui/themes'
+import { useProjectOptions, type CreateProjectInput } from '@entities/project'
+import { useWorkspaceId } from '@entities/user'
 import { Button, Text } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
 import { DialogHeader, DialogTitle, DialogDescription } from '@shared/ui/dialog'
@@ -9,17 +11,34 @@ import { cn } from '@shared/lib/cn'
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
 import { Input } from '@shared/ui/input'
 
-export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: () => void }) => {
-  const PROJECTS = ['프로젝트1', '프로젝트2', '프로젝트3', '프로젝트4']
-  const [selected, setSelected] = useState(PROJECTS[0])
+export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: (input: CreateProjectInput) => void }) => {
+  const [selected, setSelected] = useState('')
+  const [content, setContent] = useState('')
+  const [createdProjects, setCreatedProjects] = useState<string[]>([])
+  const workspaceId = useWorkspaceId()
 
-  const handleSelectProject = (project: string) => {
-    setSelected(project)
-  }
+  // 서버의 기존 프로젝트 목록 + 화면에서 새로 추가한 이름(아직 생성 전)을 합쳐 선택지로 보여준다.
+  const serverProjectNames = useProjectOptions(workspaceId).map((project) => project.name)
+  const projects = [...createdProjects, ...serverProjectNames.filter((name) => !createdProjects.includes(name))]
+
+  // 명시적으로 고르지 않았으면 목록 첫 번째 프로젝트를 기본 선택으로 사용한다.
+  const selectedProject = selected || projects[0] || ''
 
   const handleCreateProject = (name: string) => {
-    // TODO : 실제 프로젝트 추가 연동 필요
-    console.log('create project:', name)
+    setCreatedProjects((prev) => (prev.includes(name) ? prev : [name, ...prev]))
+    setSelected(name)
+  }
+
+  const handleExtract = () => {
+    if (!selectedProject) {
+      toast.warning('프로젝트를 먼저 추가해 주세요.', { id: 'project-required', position: 'top-center' })
+      return
+    }
+    if (!content.trim()) {
+      toast.warning('경험 내용을 입력해 주세요.', { id: 'content-required', position: 'top-center' })
+      return
+    }
+    onExtract({ name: selectedProject, summary: content })
   }
 
   return (
@@ -35,12 +54,12 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
       </DialogHeader>
       <Flex direction="column" className="max-h-[60vh] gap-6 overflow-y-auto">
         <Flex className="gap-2">
-          {PROJECTS.length > 0 && <ProjectSelectPopover projects={PROJECTS} selected={selected} onSelect={handleSelectProject} />}
-          <ProjectCreatePopover projects={PROJECTS} onCreate={handleCreateProject} />
+          {projects.length > 0 && <ProjectSelectPopover projects={projects} selected={selectedProject} onSelect={setSelected} />}
+          <ProjectCreatePopover projects={projects} onCreate={handleCreateProject} />
         </Flex>
-        <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} />
+        <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />
       </Flex>
-      <Button variant="primary" size="xl" className="w-full" onClick={() => onExtract()}>
+      <Button variant="primary" size="xl" className="w-full" onClick={handleExtract}>
         경험 추출하기
       </Button>
     </>
@@ -133,11 +152,6 @@ interface ProjectSelectPopoverProps {
 const ProjectSelectPopover = ({ projects, selected, onSelect }: ProjectSelectPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const handleSelect = (project: string) => {
-    onSelect(project)
-    setIsOpen(false)
-  }
-
   return (
     <Popover open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <PopoverTrigger asChild>
@@ -159,7 +173,10 @@ const ProjectSelectPopover = ({ projects, selected, onSelect }: ProjectSelectPop
           <button
             key={project}
             type="button"
-            onClick={() => handleSelect(project)}
+            onClick={() => {
+              onSelect(project)
+              setIsOpen(false)
+            }}
             className="text-text-subtle hover:text-text-basic bg-element-gray-lighter hover:bg-element-gray-light px-3 py-2.5 text-start"
           >
             <Text variant="body2">{project}</Text>
