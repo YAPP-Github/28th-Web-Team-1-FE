@@ -60,6 +60,36 @@ type Cursor {
   nextCursor: String
 }
 
+"""학위입니다."""
+enum Degree {
+  """학사"""
+  BACHELOR
+
+  """박사"""
+  DOCTOR
+
+  """석사"""
+  MASTER
+}
+
+"""학적 상태입니다."""
+enum EducationStatus {
+  """수료"""
+  COMPLETED
+
+  """재학"""
+  ENROLLED
+
+  """졸업예정"""
+  EXPECTED_GRADUATION
+
+  """졸업"""
+  GRADUATED
+
+  """휴학"""
+  ON_LEAVE
+}
+
 """경험입니다."""
 type Experience {
   """경험 상세 내용입니다."""
@@ -68,8 +98,14 @@ type Experience {
   """경험을 식별하는 ID입니다."""
   experienceId: ID!
 
+  """JD 기준 매칭률(0~100)입니다. experiences 조회에 jdId를 준 경우에만 채워집니다."""
+  matchRate: Int
+
   """경험이 연결된 프로젝트입니다."""
   project: ExperienceProject
+
+  """선정 이유입니다. 매칭률 상위 5개 경험에만 채워집니다. (그 외 null)"""
+  reason: String
 
   """경험에 부여된 태그 목록입니다."""
   tags: [String!]!
@@ -162,10 +198,174 @@ input FreeExperienceContentsRequest {
   content: String!
 }
 
+"""비로그인 JD 분석 결과(단일 공고)입니다. 저장되지 않으며 jdId가 없습니다."""
+type GuestJdAnalysis {
+  """기업/팀 소개입니다."""
+  companyIntro: String!
+
+  """기업 이름입니다. (추출 실패 시 빈 문자열)"""
+  companyName: String!
+
+  """핵심 역량 태그입니다. AI가 공고에서 추출한 상위 핵심 역량(최대 5개)."""
+  coreCompetencies: [String!]!
+
+  """전형 절차 목록입니다."""
+  hiringProcess: [String!]!
+
+  """AI 인사이트(공고 핵심/지원 전략)입니다."""
+  insight: JdInsight!
+
+  """포지션 이름입니다. (추출 실패 시 빈 문자열)"""
+  positionTitle: String!
+
+  """우대 경험 목록입니다."""
+  preferredExperiences: [String!]!
+
+  """필요 경험(자격요건) 목록입니다."""
+  requiredExperiences: [String!]!
+
+  """업무 내용 목록입니다."""
+  responsibilities: [String!]!
+
+  """분석에 사용된 공고 원문입니다."""
+  sourceBody: String
+
+  """원본 공고 URL입니다. (붙여넣기 분석이면 null)"""
+  sourceUrl: String
+}
+
+"""비로그인 JD 분석 결과입니다. 단일 공고면 analysis, 다중 공고면 candidates가 채워집니다."""
+type GuestJdAnalysisResult {
+  """분석 결과입니다. (단일 공고)"""
+  analysis: GuestJdAnalysis
+
+  """저장되지 않은 공고 후보 목록입니다. (다중 공고 - 하나를 골라 body로 재분석)"""
+  candidates: [JdCandidate!]
+}
+
+"""JD입니다."""
+type Jd {
+  """기업/팀 소개입니다."""
+  companyIntro: String!
+
+  """기업 이름입니다. (추출 실패 시 빈 문자열)"""
+  companyName: String!
+
+  """핵심 역량 태그입니다. AI가 공고에서 추출한 상위 핵심 역량(최대 5개). 아카이브 카드용."""
+  coreCompetencies: [String!]!
+
+  """등록일입니다. (ISO-8601)"""
+  createdAt: String
+
+  """전형 절차 목록입니다."""
+  hiringProcess: [String!]!
+
+  """JD를 식별하는 ID입니다."""
+  jdId: ID!
+
+  """포지션 이름입니다. (추출 실패 시 빈 문자열)"""
+  positionTitle: String!
+
+  """우대 경험 목록입니다."""
+  preferredExperiences: [String!]!
+
+  """필요 경험(자격요건) 목록입니다."""
+  requiredExperiences: [String!]!
+
+  """업무 내용 목록입니다."""
+  responsibilities: [String!]!
+
+  """등록에 사용된 공고 원문입니다. 원문 조회 화면용이며, 기능 이전에 등록된 JD는 null입니다."""
+  sourceBody: String
+
+  """원본 공고 URL입니다. (붙여넣기 등록이면 null)"""
+  sourceUrl: String
+
+  """이력서 생성 진행 상태입니다. (AR0001 진행 중/완료 섹션 구분)"""
+  status: JdStatus!
+}
+
+"""다중 공고 후보입니다."""
+type JdCandidate {
+  """공고 원문 본문입니다. (재등록 시 body로 전달)"""
+  body: String!
+
+  """공고 제목입니다. (없으면 빈 문자열)"""
+  title: String!
+}
+
+"""JD의 AI 인사이트입니다."""
+type JdInsight {
+  """공고 핵심입니다. 공고가 원하는 인재상/핵심 요구를 요약한 서술형 문단입니다."""
+  keyPoints: String!
+
+  """지원 전략입니다. 어떤 경험을 어떻게 강조하면 좋을지 조언하는 서술형 문단입니다."""
+  strategy: String!
+}
+
+"""JD 등록 입력입니다. sourceUrl 또는 body 중 정확히 하나여야 합니다."""
+input JdRegisterRequest {
+  """붙여넣은 JD 본문입니다. (붙여넣기 등록)"""
+  body: String
+
+  """등록할 JD 공고의 URL입니다. (크롤 등록)"""
+  sourceUrl: String
+}
+
+"""JD 등록 결과입니다. 단일 공고면 jd, 다중 공고면 candidates가 채워집니다."""
+type JdRegisterResult {
+  """저장되지 않은 공고 후보 목록입니다. (다중 공고 - 하나를 골라 body로 재등록)"""
+  candidates: [JdCandidate!]
+
+  """등록된 JD입니다. (단일 공고)"""
+  jd: Jd
+}
+
+"""JD 목록 정렬 기준입니다."""
+enum JdSortType {
+  """최신순(등록 역순)입니다."""
+  LATEST
+
+  """회사명 가나다순입니다."""
+  NAME
+}
+
+"""JD의 이력서 생성 진행 상태입니다."""
+enum JdStatus {
+  """연결된 이력서 생성 완료입니다."""
+  COMPLETED
+
+  """이력서 미완성(등록 직후 기본)입니다."""
+  IN_PROGRESS
+}
+
+"""키워드 종류입니다."""
+enum KeywordType {
+  """자격명"""
+  CERTIFICATION
+
+  """어학 시험명"""
+  LANGUAGE_TEST
+
+  """기술/도구명"""
+  SKILL
+}
+
 """64-bit signed integer"""
 scalar Long
 
 type Mutation {
+  """
+  비로그인 상태에서 JD를 분석합니다. (온보딩 유입용)
+  저장하지 않고 7필드 추출과 AI 인사이트(공고 핵심/지원 전략)를 즉시 반환합니다.
+  본문에 여러 공고가 있으면 후보 목록(candidates)을 반환하며, 하나를 골라 body로 다시 분석합니다.
+  인증이 필요 없는 공개 요청입니다.
+  """
+  analyzeGuestJd(
+    """분석 입력입니다. sourceUrl(크롤) 또는 body(붙여넣기) 중 정확히 하나를 채웁니다."""
+    request: JdRegisterRequest!
+  ): GuestJdAnalysisResult!
+
   """워크스페이스에 Notion을 연결합니다."""
   connectNotion(
     """Notion 연결 요청입니다."""
@@ -220,6 +420,18 @@ type Mutation {
     workspaceId: ID!
   ): Boolean!
 
+  """
+  JD를 삭제합니다. 연관된 AI 인사이트/경험 추천 캐시도 함께 영구 삭제됩니다.
+  워크스페이스 밖 JD면 오류를 반환합니다.
+  """
+  deleteJd(
+    """삭제할 JD의 ID입니다."""
+    id: ID!
+
+    """JD가 속한 워크스페이스의 ID입니다."""
+    workspaceId: ID!
+  ): Boolean!
+
   """이력서를 삭제합니다."""
   deleteResume(
     """삭제할 이력서 ID입니다."""
@@ -238,6 +450,12 @@ type Mutation {
     workspaceId: ID!
   ): Boolean!
 
+  """프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성합니다. 결과만 반환하고 저장하지 않습니다."""
+  generateCoreCompetency(
+    """워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): String!
+
   """Notion 페이지 내용을 경험으로 가져옵니다."""
   importNotionExperiences(
     """Notion 경험 가져오기 요청입니다."""
@@ -247,11 +465,43 @@ type Mutation {
     workspaceId: ID!
   ): Boolean!
 
+  """
+  이력서 생성이 완료된 JD를 완료 상태(COMPLETED)로 전환합니다. (AR0001 진행 중 -> 완료)
+  이미 완료면 그대로 반환하며, 워크스페이스 밖 JD면 오류를 반환합니다.
+  """
+  markJdCompleted(
+    """완료 처리할 JD의 ID입니다."""
+    id: ID!
+
+    """JD가 속한 워크스페이스의 ID입니다."""
+    workspaceId: ID!
+  ): Jd!
+
   """Free Style 경험 내용을 STAR 형식으로 다듬습니다."""
   polishExperienceContents(
     """STAR 형식으로 변환할 Free Style 경험 내용입니다."""
     request: PolishExperienceContentsRequest!
   ): StarExperienceContents!
+
+  """프로필 텍스트(핵심역량/경력 세부/경험명/STAR 설명)를 AI로 다듬습니다. 결과만 반환하고 저장하지 않습니다."""
+  polishProfileText(
+    """텍스트 다듬기 입력입니다."""
+    request: PolishProfileTextRequest!
+  ): String!
+
+  """
+  JD를 URL(크롤) 또는 붙여넣기(본문)로 등록합니다.
+  본문에 여러 공고가 있으면 저장하지 않고 후보 목록(candidates)을 반환하고,
+  하나면 7필드(기업명/포지션/소개/업무/필요/우대경험/전형절차)를 추출/저장해 jd를 반환합니다.
+  크롤/추출 실패 시 오류를 반환합니다.
+  """
+  registerJd(
+    """등록 입력입니다. sourceUrl(크롤) 또는 body(붙여넣기) 중 정확히 하나를 채웁니다."""
+    request: JdRegisterRequest!
+
+    """등록할 워크스페이스의 ID입니다."""
+    workspaceId: ID!
+  ): JdRegisterResult!
 
   """경험을 수정합니다."""
   updateExperience(
@@ -276,6 +526,17 @@ type Mutation {
     """경험 프로젝트가 속한 워크스페이스 ID입니다."""
     workspaceId: ID!
   ): ExperienceProject!
+
+  """
+  이력서 기본 정보 프로필을 수정합니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다 (빈 리스트 = 비우기, 배열 순서 = 노출 순서).
+  """
+  updateProfile(
+    """수정할 프로필 정보입니다."""
+    request: UpdateProfileRequest!
+
+    """프로필이 속한 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Profile!
 
   """기존 이력서를 전체 스냅샷 단위로 수정합니다."""
   updateResume(
@@ -368,6 +629,222 @@ input PolishExperienceContentsRequest {
   content: String!
 }
 
+"""프로필 텍스트 AI 다듬기 입력입니다."""
+input PolishProfileTextRequest {
+  """다듬기 대상 항목입니다. 항목별 글자수 제한에 맞춰 다듬습니다."""
+  kind: ProfilePolishKind!
+
+  """다듬을 원문입니다. (최대 600자)"""
+  text: String!
+}
+
+"""이력서 기본 정보 프로필입니다. 이력서에 들어가는 정보의 원본을 워크스페이스당 1개 관리합니다."""
+type Profile {
+  """수상 목록입니다."""
+  awards: [ProfileAward!]!
+
+  """경력 목록입니다."""
+  careers: [ProfileCareer!]!
+
+  """자격증 목록입니다."""
+  certifications: [ProfileCertification!]!
+
+  """핵심역량입니다. (최대 500자)"""
+  coreCompetency: String
+
+  """학력 목록입니다."""
+  educations: [ProfileEducation!]!
+
+  """이메일입니다."""
+  email: String
+
+  """어학 목록입니다."""
+  languageTests: [ProfileLanguageTest!]!
+
+  """이름입니다."""
+  name: String
+
+  """전화번호입니다."""
+  phone: String
+
+  """프로필을 식별하는 ID입니다."""
+  profileId: ID!
+
+  """스킬 목록입니다."""
+  skills: [ProfileSkill!]!
+}
+
+"""수상입니다."""
+type ProfileAward {
+  """수상일입니다. (YYYY-MM-DD)"""
+  awardedAt: String
+
+  """수여 기관명입니다."""
+  organization: String
+
+  """수상명입니다."""
+  title: String
+}
+
+"""수상 입력입니다."""
+input ProfileAwardRequest {
+  """수상일입니다. (YYYY-MM-DD)"""
+  awardedAt: String
+
+  """수여 기관명입니다."""
+  organization: String
+
+  """수상명입니다."""
+  title: String
+}
+
+"""경력입니다."""
+type ProfileCareer {
+  """회사명입니다."""
+  company: String
+
+  """세부 내용입니다. (최대 500자)"""
+  description: String
+
+  """기간입니다."""
+  period: Period
+
+  """직책입니다."""
+  position: String
+}
+
+"""경력 입력입니다."""
+input ProfileCareerRequest {
+  """회사명입니다."""
+  company: String
+
+  """세부 내용입니다. (최대 500자)"""
+  description: String
+
+  """기간입니다."""
+  period: PeriodInput
+
+  """직책입니다."""
+  position: String
+}
+
+"""자격증입니다."""
+type ProfileCertification {
+  """취득일입니다. (YYYY-MM-DD)"""
+  acquiredAt: String
+
+  """발급 기관명입니다."""
+  issuer: String
+
+  """자격명입니다."""
+  name: String
+}
+
+"""자격증 입력입니다."""
+input ProfileCertificationRequest {
+  """취득일입니다. (YYYY-MM-DD)"""
+  acquiredAt: String
+
+  """발급 기관명입니다."""
+  issuer: String
+
+  """자격명입니다."""
+  name: String
+}
+
+"""학력입니다."""
+type ProfileEducation {
+  """학위입니다. (학사/석사/박사)"""
+  degree: Degree
+
+  """전공명입니다."""
+  major: String
+
+  """기간입니다."""
+  period: Period
+
+  """학교 또는 기관명입니다."""
+  school: String
+
+  """학적 상태입니다. (재학/휴학/졸업/졸업예정/수료)"""
+  status: EducationStatus
+}
+
+"""학력 입력입니다."""
+input ProfileEducationRequest {
+  """학위입니다. (학사/석사/박사)"""
+  degree: Degree
+
+  """전공명입니다."""
+  major: String
+
+  """기간입니다."""
+  period: PeriodInput
+
+  """학교 또는 기관명입니다."""
+  school: String
+
+  """학적 상태입니다. (재학/휴학/졸업/졸업예정/수료)"""
+  status: EducationStatus
+}
+
+"""어학입니다."""
+type ProfileLanguageTest {
+  """취득일입니다. (YYYY-MM-DD)"""
+  acquiredAt: String
+
+  """점수 또는 등급입니다."""
+  score: String
+
+  """시험명입니다."""
+  testName: String
+}
+
+"""어학 입력입니다."""
+input ProfileLanguageTestRequest {
+  """취득일입니다. (YYYY-MM-DD)"""
+  acquiredAt: String
+
+  """점수 또는 등급입니다."""
+  score: String
+
+  """시험명입니다."""
+  testName: String
+}
+
+"""프로필 텍스트 다듬기 대상 항목입니다."""
+enum ProfilePolishKind {
+  """경력 세부 내용 (최대 500자)"""
+  CAREER_DESCRIPTION
+
+  """핵심역량 (최대 500자)"""
+  CORE_COMPETENCY
+
+  """경험 STAR 설명 (최대 600자)"""
+  EXPERIENCE_DESCRIPTION
+
+  """경험명 (최대 48자)"""
+  EXPERIENCE_TITLE
+}
+
+"""스킬입니다."""
+type ProfileSkill {
+  """숙련도입니다. (상/중/하)"""
+  level: SkillLevel
+
+  """기술 또는 도구명입니다."""
+  name: String
+}
+
+"""스킬 입력입니다."""
+input ProfileSkillRequest {
+  """숙련도입니다. (상/중/하)"""
+  level: SkillLevel
+
+  """기술 또는 도구명입니다."""
+  name: String
+}
+
 type Query {
   """경험 단건을 조회합니다."""
   experience(
@@ -404,6 +881,9 @@ type Query {
     """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
     cursor: String
 
+    """JD ID입니다. 주면 각 경험에 해당 JD 기준 matchRate와 reason(상위 5개)을 채웁니다. (선택)"""
+    jdId: ID
+
     """특정 프로젝트의 경험만 조회할 때 사용하는 프로젝트 ID입니다 (선택)"""
     projectId: ID
 
@@ -413,6 +893,39 @@ type Query {
     """경험 목록을 조회할 워크스페이스 ID입니다."""
     workspaceId: ID!
   ): Experiences!
+
+  """등록된 JD 단건을 조회합니다."""
+  jd(
+    """조회할 JD의 ID입니다."""
+    id: ID!
+
+    """조회할 워크스페이스의 ID입니다."""
+    workspaceId: ID!
+  ): Jd
+
+  """
+  JD의 AI 인사이트(공고 핵심/지원 전략)를 조회합니다.
+  최초 조회 시 AI로 생성/저장하며, 이후에는 저장된 값을 반환합니다.
+  """
+  jdInsight(
+    """조회할 JD의 ID입니다."""
+    jdId: ID!
+
+    """조회할 워크스페이스의 ID입니다."""
+    workspaceId: ID!
+  ): JdInsight
+
+  """워크스페이스의 JD 목록을 조회합니다."""
+  jds(
+    """정렬 기준입니다. LATEST(최신순, 기본값) 또는 NAME(회사명 가나다순)."""
+    sort: JdSortType! = LATEST
+
+    """상태 필터입니다. 생략하면 전체, IN_PROGRESS/COMPLETED면 해당 상태만. (AR0001 진행 중/완료 섹션)"""
+    status: JdStatus
+
+    """조회할 워크스페이스의 ID입니다."""
+    workspaceId: ID!
+  ): [Jd!]!
 
   """인증된 사용자의 정보를 조회합니다."""
   me: User!
@@ -446,6 +959,12 @@ type Query {
     """워크스페이스 ID입니다."""
     workspaceId: ID!
   ): NotionPages!
+
+  """이력서 기본 정보 프로필을 조회합니다. 프로필이 없으면 빈 프로필을 생성해 반환합니다. (워크스페이스당 1개)"""
+  profile(
+    """프로필을 조회할 워크스페이스 ID입니다."""
+    workspaceId: ID!
+  ): Profile!
 
   """이력서 상세를 조회합니다."""
   resume(
@@ -485,6 +1004,18 @@ type Query {
     """경험을 검색할 워크스페이스 ID입니다."""
     workspaceId: ID!
   ): Experiences!
+
+  """키워드 사전에서 자동완성 제안을 조회합니다. 다른 사용자가 저장한 시험명/자격명/기술명이 재사용됩니다."""
+  suggestKeywords(
+    """검색어입니다."""
+    keyword: String!
+
+    """최대 제안 개수입니다. (1 이상 20 이하)"""
+    size: Int! = 10
+
+    """키워드 종류입니다."""
+    type: KeywordType!
+  ): [String!]!
 }
 
 """이력서 상세 응답입니다."""
@@ -958,6 +1489,18 @@ input SaveResumeSectionItemInput {
   visible: Boolean!
 }
 
+"""스킬 숙련도입니다."""
+enum SkillLevel {
+  """상"""
+  HIGH
+
+  """하"""
+  LOW
+
+  """중"""
+  MEDIUM
+}
+
 """STAR 형식의 경험 상세 내용입니다."""
 type StarExperienceContents {
   """행동입니다."""
@@ -1016,6 +1559,39 @@ input UpdateExperienceRequest {
 
   """변경할 경험 제목입니다."""
   title: String
+}
+
+"""프로필 수정 입력입니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다."""
+input UpdateProfileRequest {
+  """변경할 수상 목록입니다. (전체 교체)"""
+  awards: [ProfileAwardRequest!]
+
+  """변경할 경력 목록입니다. (전체 교체)"""
+  careers: [ProfileCareerRequest!]
+
+  """변경할 자격증 목록입니다. (전체 교체)"""
+  certifications: [ProfileCertificationRequest!]
+
+  """변경할 핵심역량입니다. (최대 500자)"""
+  coreCompetency: String
+
+  """변경할 학력 목록입니다. (전체 교체)"""
+  educations: [ProfileEducationRequest!]
+
+  """변경할 이메일입니다."""
+  email: String
+
+  """변경할 어학 목록입니다. (전체 교체)"""
+  languageTests: [ProfileLanguageTestRequest!]
+
+  """변경할 이름입니다."""
+  name: String
+
+  """변경할 전화번호입니다. (형식: 010-1234-5678, 빈 문자열 = 비우기)"""
+  phone: String
+
+  """변경할 스킬 목록입니다. (전체 교체)"""
+  skills: [ProfileSkillRequest!]
 }
 
 """사용자 정보입니다."""
