@@ -91,7 +91,7 @@ const ExperiencesProjectGrid = () => {
             <div className="bg-element-primary-lighter group-hover:border-btn-secondary-border h-25 w-full rounded-lg transition-all group-hover:border" />
             <Flex direction="column" gap="1">
               <Text variant="caption1" color="text-subtler">
-                {formatPeriod(project.period?.startAt, project.period?.endAt) || '-'}
+                {formatPeriod(project.period?.startAt, project.period?.endAt, 'YYYY.MM') || '-'}
               </Text>
               <Text variant="headline2" className="text-text-basic group-hover:text-text-primary-basic transition-colors">
                 {project.name}

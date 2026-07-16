@@ -1,7 +1,7 @@
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { Divider, Spacing, Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
-import { cn, formatDate } from '@shared/lib'
+import { cn, formatPeriod } from '@shared/lib'
 import type { ReactNode } from 'react'
 import type { Experience } from '../model/experience.types'
 import { CheckboxCard } from './CheckboxCard'
@@ -41,7 +41,7 @@ export const ExperienceCard = ({ experience, checked, onCheckedChange, disabled,
               </Text>
               <Divider orientation={'vertical'} size={1} className={'h-2.5 shrink-0'} />
               <Text variant={'label2'} color={'text-bolder'} className={'shrink-0 text-nowrap'}>
-                {formatDate(project?.period?.startAt, 'YYYY.MM')} ~ {formatDate(project?.period?.endAt, 'YYYY.MM')}
+                {formatPeriod(project?.period?.startAt, project?.period?.endAt, 'YYYY.MM') || '-'}
               </Text>
             </Flex>
           </InfoRow>

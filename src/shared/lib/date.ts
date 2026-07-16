@@ -38,6 +38,6 @@ const formatDate = (date?: dayjs.ConfigType, format: DateFormat = 'YYYY.MM.DD'):
  * ```
  */
 const formatPeriod = (startAt?: dayjs.ConfigType, endAt?: dayjs.ConfigType, format: DateFormat = 'YYYY.MM'): string =>
-  [formatDate(startAt, format), formatDate(endAt, format)].filter(Boolean).join('-')
+  [formatDate(startAt, format), formatDate(endAt, format)].filter(Boolean).join(' - ')
 
 export { formatDate, formatPeriod }
