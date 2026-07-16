@@ -1,5 +1,5 @@
 'use client'
-import { useInfiniteQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { projectQueries } from './project.keys'
 
 /**
@@ -16,6 +16,23 @@ export const useProjectList = (workspaceId: string) => {
     select: (data) => data.pages.flatMap((page) => page.projectList.projects)
   })
   return { projects: data, ...rest }
+}
+
+/**
+ * 경험 상세 페이지 상단의 프로젝트 단건 정보를 Suspense로 조회한다.
+ * @param workspaceId 라우트에서 확정된 워크스페이스 ID
+ * @param projectId 라우트 `[id]`에서 온 프로젝트 ID
+ * @example
+ * ```tsx
+ * const { project } = useProject(workspaceId, projectId)
+ * ```
+ */
+export const useProject = (workspaceId: string, projectId: string) => {
+  const { data, ...rest } = useSuspenseQuery({
+    ...projectQueries.detail(workspaceId, projectId),
+    select: (data) => data.project
+  })
+  return { project: data, ...rest }
 }
 
 /**

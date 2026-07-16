@@ -1,9 +1,12 @@
 import { execute, graphql, http } from '@shared/lib'
-import type { CreateProjectInput } from '../model/project.types'
+import type { CreateProjectInput, UpdateProjectInput } from '../model/project.types'
 
 export const projectAPI = {
   getProjects: (variables: { workspaceId: string; size: number; cursor?: string | null }) => execute(projectsDocument, variables),
+  getProject: (variables: { workspaceId: string; projectId: string }) => execute(projectDocument, variables),
   createProject: (variables: { workspaceId: string; input: CreateProjectInput }) => execute(createProjectDocument, variables),
+  updateProject: (variables: { workspaceId: string; projectId: string; request: UpdateProjectInput }) => execute(updateProjectDocument, variables),
+  deleteProject: (variables: { workspaceId: string; projectId: string }) => execute(deleteProjectDocument, variables),
   createProjectFromPdf: (variables: { workspaceId: string; pdfFile: File }) => {
     const formData = new FormData()
     /** MIME 타입을 'application/pdf'로 정규화합니다. (한컴오피스 등 비표준 타입 대응) */
@@ -42,6 +45,21 @@ const projectsDocument = graphql(`
   }
 `)
 
+const projectDocument = graphql(`
+  query Project($workspaceId: ID!, $projectId: ID!) {
+    project: experienceProject(workspaceId: $workspaceId, projectId: $projectId) {
+      projectId
+      name
+      role
+      summary
+      period {
+        startAt
+        endAt
+      }
+    }
+  }
+`)
+
 const createProjectDocument = graphql(`
   mutation CreateProject($workspaceId: ID!, $input: CreateExperienceProjectRequest!) {
     createProject: createExperienceProject(workspaceId: $workspaceId, input: $input) {
@@ -55,7 +73,6 @@ const createProjectDocument = graphql(`
     }
   }
 `)
-
 const projectFilterOptionsDocument = graphql(`
   query ProjectFilterOptions($workspaceId: ID!, $size: Int!, $cursor: String) {
     experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {
@@ -67,5 +84,25 @@ const projectFilterOptionsDocument = graphql(`
         ...ProjectListItem
       }
     }
+  }
+`)
+const updateProjectDocument = graphql(`
+  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {
+    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {
+      projectId
+      name
+      role
+      summary
+      period {
+        startAt
+        endAt
+      }
+    }
+  }
+`)
+
+const deleteProjectDocument = graphql(`
+  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {
+    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)
   }
 `)
