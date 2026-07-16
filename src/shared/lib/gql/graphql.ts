@@ -51,6 +51,16 @@ export type SearchExperiencesQueryVariables = Exact<{
 
 export type SearchExperiencesQuery = { searchExperiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, project: { projectId: string, name: string } | null }> } };
 
+export type MatchedExperiencesQueryVariables = Exact<{
+  workspaceId: string | number;
+  jdId: string | number;
+  size: number;
+  cursor?: string | null | undefined;
+}>;
+
+
+export type MatchedExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, matchRate: number | null, recommendedReason: string | null, project: { projectId: string, name: string, role: string | null, period: { startAt: string | null, endAt: string | null } | null } | null }> } };
+
 export type JdInsightQueryVariables = Exact<{
   workspaceId: string | number;
   jdId: string | number;
@@ -177,6 +187,37 @@ export const SearchExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<SearchExperiencesQuery, SearchExperiencesQueryVariables>;
+export const MatchedExperiencesDocument = new TypedDocumentString(`
+    query MatchedExperiences($workspaceId: ID!, $jdId: ID!, $size: Int!, $cursor: String) {
+  experiences(
+    workspaceId: $workspaceId
+    jdId: $jdId
+    size: $size
+    cursor: $cursor
+  ) {
+    cursor {
+      hasNext
+      nextCursor
+    }
+    experiences {
+      experienceId
+      title
+      tags
+      matchRate
+      recommendedReason: reason
+      project {
+        projectId
+        name
+        role
+        period {
+          startAt
+          endAt
+        }
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<MatchedExperiencesQuery, MatchedExperiencesQueryVariables>;
 export const JdInsightDocument = new TypedDocumentString(`
     query JdInsight($workspaceId: ID!, $jdId: ID!) {
   jdInsight(workspaceId: $workspaceId, jdId: $jdId) {

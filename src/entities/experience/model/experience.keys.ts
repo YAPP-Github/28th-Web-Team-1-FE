@@ -5,6 +5,8 @@ export const experienceKeys = {
   all: ['experience'] as const,
   lists: () => [...experienceKeys.all, 'list'] as const,
   list: (workspaceId: string) => [...experienceKeys.lists(), workspaceId] as const,
+  matches: () => [...experienceKeys.all, 'matched'] as const,
+  matched: (workspaceId: string, jdId: string) => [...experienceKeys.matches(), workspaceId, jdId] as const,
   searches: () => [...experienceKeys.all, 'search'] as const,
   search: (workspaceId: string, keyword: string) => [...experienceKeys.searches(), workspaceId, keyword] as const
 }
@@ -15,6 +17,15 @@ export const experienceQueries = {
     infiniteQueryOptions({
       queryKey: experienceKeys.list(workspaceId),
       queryFn: ({ pageParam }) => experienceAPI.getExperiences({ workspaceId, size, cursor: pageParam }),
+      initialPageParam: null as string | null,
+      getNextPageParam: (lastPage) => (lastPage.experiences.cursor.hasNext ? lastPage.experiences.cursor.nextCursor : null)
+    }),
+
+  /** JD 기준으로 매칭된 경험 목록을 조회한다. 각 경험에 matchRate와 상위 5개 recommendedReason이 채워진다. */
+  matched: (workspaceId: string, jdId: string, size = 20) =>
+    infiniteQueryOptions({
+      queryKey: experienceKeys.matched(workspaceId, jdId),
+      queryFn: ({ pageParam }) => experienceAPI.getMatchedExperiences({ workspaceId, jdId, size, cursor: pageParam }),
       initialPageParam: null as string | null,
       getNextPageParam: (lastPage) => (lastPage.experiences.cursor.hasNext ? lastPage.experiences.cursor.nextCursor : null)
     }),
