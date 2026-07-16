@@ -1,16 +1,20 @@
 'use client'
 
+import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Dialog, DialogContent } from '@shared/ui/dialog'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { Flex } from '@radix-ui/themes'
+import { Flex, Skeleton } from '@radix-ui/themes'
 import { useWorkspaceId } from '@entities/user'
+import { useJdInsight } from '@entities/jd'
 import { ExperienceCard } from './ExperienceCard'
 import { ExperienceSearchPanel } from './ExperienceSearchPanel'
 import { useMultiSelect } from '@shared/hooks/useMultiSelect'
 import type { Experience } from '../model/experience.types'
-import { useExperienceList } from '@entities/experience'
 
 const MAX_SELECT = 5
+
+const getExperienceId = (experience: Experience) => experience.experienceId
 
 interface Props {
   isOpen: boolean
@@ -21,20 +25,19 @@ interface Props {
 
 export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete }: Props) => {
   const workspaceId = useWorkspaceId()
-  const { experiences } = useExperienceList(workspaceId)
+  const jdId = useSearchParams().get('jdId') ?? ''
 
-  const { selectedIds, toggle, isFull } = useMultiSelect(MAX_SELECT)
-
-  const browseList = sortByMatchRateDesc(experiences)
-  const selectedExperiences = browseList.filter((experience) => selectedIds.has(experience.experienceId))
+  const { selectedItems, isSelected, toggle, isFull, count } = useMultiSelect(getExperienceId, MAX_SELECT)
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className={'bg-bg-gray-subtler flex h-200 min-h-200 w-215 min-w-215 justify-around gap-7 p-4'}>
-        <Flex direction="column" minWidth={'0'} p={'4'}>
+        <Flex direction="column" flexGrow={'1'} flexBasis={'0'} minWidth={'0'} p={'4'}>
           <Flex direction={'column'} gap={'4'} flexShrink={'0'}>
             <Text variant={'headline1'}>공고 인사이트</Text>
-            <JdInsight />
+            <Suspense fallback={<JdInsightLoading />}>
+              <JdInsight workspaceId={workspaceId} jdId={jdId} />
+            </Suspense>
           </Flex>
 
           <Spacing size={24} />
@@ -48,7 +51,7 @@ export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete }: Pro
                   선택된 경험
                 </Text>
                 <Text variant={'headline2'} color={'text-subtler'} className={'tabular-nums'}>
-                  ({selectedIds.size}/{MAX_SELECT})
+                  ({count}/{MAX_SELECT})
                 </Text>
               </Flex>
 
@@ -57,18 +60,18 @@ export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete }: Pro
               </Text>
             </Flex>
 
-            {selectedExperiences.length === 0 ? (
+            {selectedItems.length === 0 ? (
               <EmptySelectedExperience />
             ) : (
               <Flex direction={'column'} gap={'2'} minHeight={'0'} flexGrow={'1'} className={'overflow-y-auto'}>
-                {selectedExperiences.map((experience) => (
+                {selectedItems.map((experience) => (
                   <ExperienceCard
                     key={experience.experienceId}
                     experience={experience}
                     bordered={false}
-                    checked={selectedIds.has(experience.experienceId)}
-                    disabled={isFull && !selectedIds.has(experience.experienceId)}
-                    onCheckedChange={() => toggle(experience.experienceId)}
+                    checked={isSelected(experience.experienceId)}
+                    disabled={isFull && !isSelected(experience.experienceId)}
+                    onCheckedChange={() => toggle(experience)}
                   />
                 ))}
               </Flex>
@@ -77,13 +80,13 @@ export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete }: Pro
 
           <Spacing size={16} />
 
-          <Button size={'md'} className={'mt-auto'} disabled={selectedIds.size === 0} onClick={() => onComplete(selectedExperiences)}>
+          <Button size={'md'} className={'mt-auto'} disabled={count === 0} onClick={() => onComplete(selectedItems)}>
             선택 완료
           </Button>
         </Flex>
 
-        {/*프로젝트 및 경험 조회 */}
-        <ExperienceSearchPanel experiences={browseList} selectedIds={selectedIds} isFull={isFull} onToggle={toggle} />
+        {/*프로젝트 및 경험 조회 — 패널이 검색창/필터/리스트를 각자 Suspense로 관리하므로 바깥 경계 불필요 */}
+        <ExperienceSearchPanel workspaceId={workspaceId} jdId={jdId} isSelected={isSelected} isFull={isFull} onToggle={toggle} />
       </DialogContent>
     </Dialog>
   )
@@ -100,8 +103,16 @@ const EmptySelectedExperience = () => (
   </Flex>
 )
 
-const JdInsight = () => {
-  // Todo: JD 분석 api 요청
+const JdInsight = ({ workspaceId, jdId }: { workspaceId: string; jdId: string }) => {
+  const { insight } = useJdInsight(workspaceId, jdId)
+
+  if (!insight) {
+    return (
+      <Text variant={'label2'} color={'text-subtler'}>
+        공고 인사이트를 불러오지 못했어요.
+      </Text>
+    )
+  }
 
   return (
     <Flex direction={'column'} gap={'2'}>
@@ -110,8 +121,7 @@ const JdInsight = () => {
           핵심
         </Text>
         <Text variant={'label2'} color={'text-subtle'}>
-          최고의 사용자 경험을 제공하고자 하는 금융 서비스 분야에서 주도적으로 디자인을 이끌어갈 수 있는 사람을 원해요. 특히, 사용자 경험에 대한 책임감을 가지고, 다양한 팀과 협력하며 특히, 사용자
-          경험에 대한 책임감을 가지고, 다양한 팀과 협력하며 다양한 팀과 협력하며
+          {insight.keyPoints}
         </Text>
       </Flex>
 
@@ -120,13 +130,23 @@ const JdInsight = () => {
           지원 전략
         </Text>
         <Text variant={'label2'} color={'text-subtle'}>
-          최고의 사용자 경험을 제공하고자 하는 금융 서비스 분야에서 주도적으로 디자인을 이끌어갈 수 있는 사람을 원해요. 특히, 사용자 경험에 대한 책임감을 가지고, 다양한 팀과 협력하며 특히, 사용자
-          경험에 대한 책임감을 가지고, 다양한 팀과 협력하며 다양한 팀과 협력하며
+          {insight.strategy}
         </Text>
       </Flex>
     </Flex>
   )
 }
 
-/** 매칭률 내림차순 정렬 (원본 불변, matchRate 없으면 맨 뒤) */
-const sortByMatchRateDesc = (experiences: Experience[]): Experience[] => [...experiences].sort((a, b) => (b.matchRate ?? 0) - (a.matchRate ?? 0))
+/** 인사이트(AI 생성) 로딩 스켈레톤. 실제 JdInsight의 두 블록(핵심/지원 전략) 모양을 따른다. */
+const JdInsightLoading = () => (
+  <Flex direction={'column'} gap={'2'}>
+    {[0, 1].map((block) => (
+      <Flex key={block} direction={'column'} gap={'1'}>
+        <Skeleton height={'18px'} width={'72px'} />
+        <Skeleton height={'14px'} width={'100%'} />
+        <Skeleton height={'14px'} width={'100%'} />
+        <Skeleton height={'14px'} width={'100%'} />
+      </Flex>
+    ))}
+  </Flex>
+)
