@@ -14,8 +14,6 @@ import type { Experience } from '../model/experience.types'
 
 const MAX_SELECT = 5
 
-const getExperienceId = (experience: Experience) => experience.experienceId
-
 interface Props {
   isOpen: boolean
   //Todo:  api 요청 시 experienceID(매개변수) 만 전달할지 확인 필요
@@ -27,7 +25,7 @@ export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete }: Pro
   const workspaceId = useWorkspaceId()
   const jdId = useSearchParams().get('jdId') ?? ''
 
-  const { selectedItems, isSelected, toggle, isFull, count } = useMultiSelect(getExperienceId, MAX_SELECT)
+  const { selectedItems, isSelected, toggle, isFull, count } = useMultiSelect((experience: Experience) => experience.experienceId, MAX_SELECT)
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
