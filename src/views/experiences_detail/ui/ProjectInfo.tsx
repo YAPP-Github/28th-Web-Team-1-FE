@@ -20,7 +20,7 @@ import {
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
-import { formatPeriod } from '../lib/formatPeriod'
+import { formatPeriod } from '@shared/lib'
 
 interface ProjectInfoCardProps {
   workspaceId: string
@@ -34,7 +34,7 @@ interface ProjectInfoCardProps {
 }
 export const ProjectInfo = ({ workspaceId, project }: ProjectInfoCardProps) => {
   const { projectId, name, role, summary } = project
-  const periodText = formatPeriod(project.period)
+  const periodText = formatPeriod(project.period?.startAt, project.period?.endAt)
 
   return (
     <div className="group hover:bg-btn-tertiary-fill flex flex-col gap-3 py-2 transition-colors">

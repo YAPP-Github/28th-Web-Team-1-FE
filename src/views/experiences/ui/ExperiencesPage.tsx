@@ -5,22 +5,10 @@ import { Flex, Grid } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { useProjectList } from '@entities/project'
 import { useWorkspaceId } from '@entities/user'
+import { formatPeriod } from '@shared/lib'
 import { Text } from '@shared/ui'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
 import { AddProjectDialog } from './AddProjectDialog'
-
-/** `"2025-05"` / `"2025.05"` 값을 `"2025.05"`로 표기한다. 값이 없으면 빈 문자열. */
-const formatPeriod = (period?: { startAt?: string | null; endAt?: string | null } | null) => {
-  if (!period) return ''
-  const formatYearMonth = (value?: string | null) => {
-    if (!value) return ''
-    const [year, month] = value.split(/[-.]/)
-    return month ? `${year}.${month}` : year
-  }
-  const start = formatYearMonth(period.startAt)
-  const end = formatYearMonth(period.endAt)
-  return start && end ? `${start} - ${end}` : start || end
-}
 
 export const ExperiencesPage = () => {
   return (
@@ -103,7 +91,7 @@ const ExperiencesProjectGrid = () => {
             <div className="bg-element-primary-lighter group-hover:border-btn-secondary-border h-25 w-full rounded-lg transition-all group-hover:border" />
             <Flex direction="column" gap="1">
               <Text variant="caption1" color="text-subtler">
-                {formatPeriod(project.period) || '-'}
+                {formatPeriod(project.period?.startAt, project.period?.endAt) || '-'}
               </Text>
               <Text variant="headline2" className="text-text-basic group-hover:text-text-primary-basic transition-colors">
                 {project.name}

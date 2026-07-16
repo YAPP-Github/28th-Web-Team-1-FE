@@ -1,4 +1,4 @@
-import { formatPeriod } from './formatPeriod'
+import { formatPeriod } from '@shared/lib'
 
 /**
  * 프로젝트 단위의 역할·기간 값. 경험별로 저장되지 않아 프로젝트 값을 공통 표시한다.
@@ -19,5 +19,5 @@ export interface ProjectMeta {
  */
 export const getProjectMeta = (project: { role?: string | null; period?: { startAt?: string | null; endAt?: string | null } | null }): ProjectMeta => ({
   role: project.role ?? '',
-  period: formatPeriod(project.period)
+  period: formatPeriod(project.period?.startAt, project.period?.endAt)
 })

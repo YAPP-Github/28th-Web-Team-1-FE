@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Flex } from '@radix-ui/themes'
 import { ChevronsRight, Trash2 } from 'lucide-react'
-import { useDeleteExperience, useExperience, useUpdateExperience } from '@entities/experience'
+import { useDeleteExperience, useUpdateExperience } from '@entities/experience'
 import { useProject } from '@entities/project'
 import { Button, Text } from '@shared/ui'
 import {
@@ -19,21 +19,11 @@ import {
 } from '@shared/ui/alert_dialog'
 import { Chip } from '@shared/ui/chip'
 import { Divider } from '@shared/ui/divider'
-import { Textarea } from '@shared/ui/textarea'
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
 import { getProjectMeta, type ProjectMeta } from '../lib/projectMeta'
-
-const STAR_FIELDS = [
-  { key: 'situation', label: 'Situation', sublabel: '상황' },
-  { key: 'task', label: 'Task', sublabel: '과업' },
-  { key: 'action', label: 'Action', sublabel: '행동' },
-  { key: 'result', label: 'Result', sublabel: '결과' }
-] as const
-
-type StarKey = (typeof STAR_FIELDS)[number]['key']
-
-const EMPTY_STAR: Record<StarKey, string> = { situation: '', task: '', action: '', result: '' }
+import { StarEditor } from './StarEditor'
+import { formatPeriod } from '@shared/lib'
 
 interface ExperienceDetailPanelProps {
   workspaceId: string
@@ -43,36 +33,10 @@ interface ExperienceDetailPanelProps {
 }
 export const ExperienceDetailPanel = ({ workspaceId, projectId, experience, onClose }: ExperienceDetailPanelProps) => {
   const { experienceId, title, tags: keywords } = experience
-  const { experience: detail } = useExperience(workspaceId, experienceId)
-  const { mutate: updateExperience, isPending } = useUpdateExperience(workspaceId, projectId)
 
   // 역할·기간은 프로젝트 값(경험 단위 값 없음). 페이지가 이미 받아둔 프로젝트 캐시를 dedupe로 읽는다.
   const { project } = useProject(workspaceId, projectId)
   const projectMeta = getProjectMeta(project)
-
-  const [values, setValues] = useState<Record<StarKey, string>>(EMPTY_STAR)
-
-  // 단건 조회가 도착하면(비동기) STAR 입력값을 한 번 채운다. (렌더 중 상태 조정 패턴)
-  const [syncedId, setSyncedId] = useState<string | null>(null)
-  if (detail && syncedId !== detail.experienceId) {
-    const star = detail.contents?.star
-    setValues(star ? { situation: star.situation ?? '', task: star.task ?? '', action: star.action ?? '', result: star.result ?? '' } : EMPTY_STAR)
-    setSyncedId(detail.experienceId)
-  }
-
-  const handleChange = (key: StarKey) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValues((prev) => ({ ...prev, [key]: e.target.value }))
-  }
-
-  const handleSave = () => {
-    updateExperience(
-      { experienceId, request: { contents: { type: 'STAR', star: values } } },
-      {
-        onSuccess: () => toast.success('경험이 저장되었어요.', { id: 'experience-star-saved', position: 'top-center' }),
-        onError: () => toast.error('저장에 실패했어요. 다시 시도해 주세요.', { id: 'experience-star-save-error', position: 'top-center' })
-      }
-    )
-  }
 
   return (
     <Flex direction="column" className="border-border-subtle bg-bg-gray-subtler h-screen w-148.5 shrink-0 overflow-y-auto border-l p-8">
@@ -102,7 +66,7 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experience, onCl
                 </Text>
                 <Divider orientation="vertical" color="gray-20" />
                 <Text variant="label2" color="text-bolder">
-                  {projectMeta.period || '-'}
+                  {formatPeriod(project.period?.startAt, project.period?.endAt) || '-'}
                 </Text>
               </Flex>
             </Flex>
@@ -123,28 +87,7 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experience, onCl
 
         <Divider />
 
-        {/* STAR 입력 */}
-        <Flex direction="column" className="gap-4">
-          {STAR_FIELDS.map((field) => (
-            <Flex key={field.key} className="gap-4">
-              <Flex direction="column" className="w-18.5 shrink-0">
-                <Text variant="label1" weight="semibold" color="text-basic">
-                  {field.label}
-                </Text>
-                <Text variant="label2" color="text-subtler">
-                  {field.sublabel}
-                </Text>
-              </Flex>
-              <div className="min-w-0 flex-1">
-                <Textarea maxLength={600} placeholder="텍스트를 입력해 주세요." value={values[field.key]} onChange={handleChange(field.key)} />
-              </div>
-            </Flex>
-          ))}
-        </Flex>
-
-        <Button variant="primary" size="lg" className="w-full" onClick={handleSave} disabled={isPending}>
-          저장
-        </Button>
+        <StarEditor workspaceId={workspaceId} projectId={projectId} experienceId={experienceId} />
       </Flex>
     </Flex>
   )
