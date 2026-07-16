@@ -17,11 +17,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@shared/ui/alert_dialog'
-import { Dialog, DialogContent, DialogTitle } from '@shared/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
 import { formatPeriod } from '../lib/formatPeriod'
-import { FieldRow } from './FieldRow'
 
 interface ProjectInfoCardProps {
   workspaceId: string
@@ -36,8 +35,6 @@ interface ProjectInfoCardProps {
 
 /** 경험 상세 페이지 상단의 프로젝트 정보 카드. hover 시 수정/삭제 노출. (Figma: experience/project) */
 export const ProjectInfoCard = ({ workspaceId, project }: ProjectInfoCardProps) => {
-  const [isEditOpen, setIsEditOpen] = useState(false)
-
   const { projectId, name, role, summary } = project
   const periodText = formatPeriod(project.period)
 
@@ -48,9 +45,7 @@ export const ProjectInfoCard = ({ workspaceId, project }: ProjectInfoCardProps) 
           {name}
         </Text>
         <Flex align="center" gap="2" className="hidden pr-2 group-hover:flex">
-          <Button variant="tertiary" size="xs" className="bg-btn-secondary-fill" onClick={() => setIsEditOpen(true)}>
-            수정하기
-          </Button>
+          <EditProjectButton workspaceId={workspaceId} projectId={projectId} initial={{ name, role: role ?? '', period: periodText, summary }} />
           <DeleteProjectButton workspaceId={workspaceId} projectId={projectId} />
         </Flex>
       </Flex>
@@ -82,8 +77,6 @@ export const ProjectInfoCard = ({ workspaceId, project }: ProjectInfoCardProps) 
           </Text>
         </Flex>
       </Flex>
-
-      {isEditOpen && <ProjectFormDialog onClose={() => setIsEditOpen(false)} workspaceId={workspaceId} projectId={projectId} initial={{ name, role: role ?? '', period: periodText, summary }} />}
     </div>
   )
 }
@@ -91,10 +84,6 @@ export const ProjectInfoCard = ({ workspaceId, project }: ProjectInfoCardProps) 
 const DeleteProjectButton = ({ workspaceId, projectId }: { workspaceId: string; projectId: string }) => {
   const router = useRouter()
   const { mutate: deleteProject } = useDeleteProject(workspaceId)
-
-  const handleDelete = () => {
-    deleteProject(projectId, { onSuccess: () => router.push('/experiences') })
-  }
 
   return (
     <AlertDialog>
@@ -110,7 +99,7 @@ const DeleteProjectButton = ({ workspaceId, projectId }: { workspaceId: string; 
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel variant="tertiary">닫기</AlertDialogCancel>
-          <AlertDialogAction variant="danger" onClick={handleDelete}>
+          <AlertDialogAction variant="danger" onClick={() => deleteProject(projectId, { onSuccess: () => router.push('/experiences') })}>
             삭제
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -122,13 +111,10 @@ const DeleteProjectButton = ({ workspaceId, projectId }: { workspaceId: string; 
 interface ProjectInitialValues {
   name: string
   role: string
-  /** "2025.05 - 2025.08" 형태로 포맷된 기간 문자열 (없으면 빈 문자열) */
   period: string
   summary: string
 }
-
-interface ProjectFormDialogProps {
-  onClose: () => void
+interface EditProjectButtonProps {
   workspaceId: string
   projectId: string
   initial: ProjectInitialValues
@@ -142,10 +128,8 @@ const parsePeriodInput = (value: string): { startAt: string | null; endAt: strin
   return { startAt: start || null, endAt: end || null }
 }
 
-/**
- * 프로젝트 수정 모달.
- */
-const ProjectFormDialog = ({ onClose, workspaceId, projectId, initial }: ProjectFormDialogProps) => {
+/** 프로젝트 수정 모달. */
+const EditProjectButton = ({ workspaceId, projectId, initial }: EditProjectButtonProps) => {
   const [name, setName] = useState(initial.name)
   const [role, setRole] = useState(initial.role)
   const [period, setPeriod] = useState(initial.period)
@@ -154,18 +138,11 @@ const ProjectFormDialog = ({ onClose, workspaceId, projectId, initial }: Project
   const { mutate: updateProject, isPending } = useUpdateProject(workspaceId, projectId)
 
   const handleSubmit = () => {
-    const trimmedName = name.trim()
-    if (!trimmedName) {
-      toast.warning('프로젝트 이름을 입력해 주세요.', { id: 'project-name-required', position: 'top-center' })
-      return
-    }
-
     updateProject(
-      { name: trimmedName, role: role.trim(), summary: summary.trim(), period: parsePeriodInput(period) },
+      { name: name.trim(), role: role.trim(), summary: summary.trim(), period: parsePeriodInput(period) },
       {
         onSuccess: () => {
           toast.success('프로젝트가 수정되었어요.', { id: 'project-updated', position: 'top-center' })
-          onClose()
         },
         onError: () => toast.error('프로젝트 수정에 실패했어요. 다시 시도해 주세요.', { id: 'project-update-error', position: 'top-center' })
       }
@@ -173,7 +150,12 @@ const ProjectFormDialog = ({ onClose, workspaceId, projectId, initial }: Project
   }
 
   return (
-    <Dialog open onOpenChange={(next) => !next && onClose()}>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="tertiary" size="xs" className="bg-btn-secondary-fill">
+          수정하기
+        </Button>
+      </DialogTrigger>
       <DialogContent className="w-150 gap-6">
         <DialogTitle>
           <Text variant="heading2" weight="semibold" color="text-basic">
@@ -182,30 +164,51 @@ const ProjectFormDialog = ({ onClose, workspaceId, projectId, initial }: Project
         </DialogTitle>
 
         <Flex direction="column" className="gap-4">
-          <FieldRow label="이름">
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="입력된 프로젝트 명" clearable={false} />
-          </FieldRow>
-          <Flex className="gap-5">
-            <FieldRow label="역할" className="flex-1">
-              <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="입력된 역할" clearable={false} />
-            </FieldRow>
-            <FieldRow label="기간" className="flex-1">
-              <Input value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="입력된 기간" clearable={false} />
-            </FieldRow>
+          <Flex align="center" className="gap-4">
+            <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+              이름
+            </Text>
+            <div className="min-w-0 flex-1">
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="입력된 프로젝트 명" clearable={false} />
+            </div>
           </Flex>
-          <FieldRow label="설명" align="start">
-            <Textarea maxLength={2000} placeholder="텍스트를 입력해 주세요." value={summary} onChange={(e) => setSummary(e.target.value)} className="min-h-19.25" />
-          </FieldRow>
+          <Flex className="gap-5">
+            <Flex align="center" className="flex-1 gap-4">
+              <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                역할
+              </Text>
+              <div className="min-w-0 flex-1">
+                <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="입력된 역할" clearable={false} />
+              </div>
+            </Flex>
+            <Flex align="center" className="flex-1 gap-4">
+              <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                기간
+              </Text>
+              <div className="min-w-0 flex-1">
+                <Input value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="입력된 기간" clearable={false} />
+              </div>
+            </Flex>
+          </Flex>
+          <Flex align="start" className="gap-4">
+            <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+              설명
+            </Text>
+            <div className="min-w-0 flex-1">
+              <Textarea maxLength={2000} placeholder="텍스트를 입력해 주세요." value={summary} onChange={(e) => setSummary(e.target.value)} className="min-h-19.25" />
+            </div>
+          </Flex>
         </Flex>
-
-        <Flex className="gap-4">
-          <Button variant="tertiary" size="lg" className="flex-1" onClick={() => onClose()} disabled={isPending}>
-            취소
-          </Button>
+        <DialogFooter className="flex-col gap-4">
+          <DialogClose asChild>
+            <Button variant="tertiary" size="lg" className="flex-1" disabled={isPending}>
+              취소
+            </Button>
+          </DialogClose>
           <Button variant="primary" size="lg" className="flex-1" onClick={handleSubmit} disabled={isPending}>
             저장
           </Button>
-        </Flex>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
