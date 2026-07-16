@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { Flex } from '@radix-ui/themes'
 import { ChevronsLeft, Trash2 } from 'lucide-react'
 import { useDeleteExperience, useExperience, useUpdateExperience } from '@entities/experience'
+import { useProject } from '@entities/project'
 import { Button, Text } from '@shared/ui'
 import {
   AlertDialog,
@@ -19,8 +20,9 @@ import {
 import { Chip } from '@shared/ui/chip'
 import { Divider } from '@shared/ui/divider'
 import { Textarea } from '@shared/ui/textarea'
-import type { ProjectMeta } from '../lib/projectMeta'
-import { ExperienceFormDialog } from './ExperienceFormDialog'
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
+import { Input } from '@shared/ui/input'
+import { getProjectMeta, type ProjectMeta } from '../lib/projectMeta'
 
 const STAR_FIELDS = [
   { key: 'situation', label: 'Situation', sublabel: '상황' },
@@ -38,18 +40,19 @@ interface ExperienceDetailPanelProps {
   projectId: string
   experienceId: string
   title: string
-  /** 경험 단위 값이 없어 프로젝트 값을 공통 표시 */
-  projectMeta: ProjectMeta
   keywords: string[]
   onClose: () => void
 }
 
 /** 경험 카드를 누르면 열리는 상세 패널. STAR 상세를 조회·수정한다. (Figma: experience/detail) */
-export const ExperienceDetailPanel = ({ workspaceId, projectId, experienceId, title, projectMeta, keywords, onClose }: ExperienceDetailPanelProps) => {
+export const ExperienceDetailPanel = ({ workspaceId, projectId, experienceId, title, keywords, onClose }: ExperienceDetailPanelProps) => {
   const { experience } = useExperience(workspaceId, experienceId)
   const { mutate: updateExperience, isPending } = useUpdateExperience(workspaceId, projectId)
 
-  const [isEditOpen, setIsEditOpen] = useState(false)
+  // 역할·기간은 프로젝트 값(경험 단위 값 없음). 페이지가 이미 받아둔 프로젝트 캐시를 dedupe로 읽는다.
+  const { project } = useProject(workspaceId, projectId)
+  const projectMeta = getProjectMeta(project)
+
   const [values, setValues] = useState<Record<StarKey, string>>(EMPTY_STAR)
 
   // 단건 조회가 도착하면(비동기) STAR 입력값을 한 번 채운다. (렌더 중 상태 조정 패턴)
@@ -87,9 +90,7 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experienceId, ti
               {title}
             </Text>
             <Flex align="center" gap="2" className="hidden group-hover:flex">
-              <Button variant="tertiary" size="xs" className="bg-btn-secondary-fill" onClick={() => setIsEditOpen(true)}>
-                수정하기
-              </Button>
+              <EditExperienceDialog experienceId={experienceId} title={title} workspaceId={workspaceId} projectId={projectId} projectMeta={projectMeta} />
               <DeleteExperienceButton workspaceId={workspaceId} projectId={projectId} experienceId={experienceId} onDeleted={onClose} />
             </Flex>
           </Flex>
@@ -148,10 +149,6 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experienceId, ti
           저장
         </Button>
       </Flex>
-
-      {isEditOpen && (
-        <ExperienceFormDialog mode="edit" experienceId={experienceId} title={title} onClose={() => setIsEditOpen(false)} workspaceId={workspaceId} projectId={projectId} projectMeta={projectMeta} />
-      )}
     </Flex>
   )
 }
@@ -189,5 +186,99 @@ const DeleteExperienceButton = ({ workspaceId, projectId, experienceId, onDelete
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  )
+}
+
+interface EditExperienceDialogProps {
+  workspaceId: string
+  projectId: string
+  experienceId: string
+  title: string
+  projectMeta: ProjectMeta
+}
+export const EditExperienceDialog = ({ workspaceId, projectId, experienceId, title: initialTitle, projectMeta }: EditExperienceDialogProps) => {
+  const [title, setTitle] = useState(initialTitle)
+  const [role, setRole] = useState(projectMeta.role)
+  const [period, setPeriod] = useState(projectMeta.period)
+
+  const { mutate: updateExperience, isPending } = useUpdateExperience(workspaceId, projectId)
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) return
+    setTitle(initialTitle)
+    setRole(projectMeta.role)
+    setPeriod(projectMeta.period)
+  }
+
+  const handleSubmit = () => {
+    const trimmed = title.trim()
+    if (!trimmed) {
+      toast.warning('경험 제목을 입력해 주세요.', { id: 'experience-title-required', position: 'top-center' })
+      return
+    }
+    updateExperience(
+      { experienceId, request: { title: trimmed } },
+      {
+        onSuccess: () => toast.success('경험이 수정되었어요.', { id: 'experience-updated', position: 'top-center' }),
+        onError: () => toast.error('경험 수정에 실패했어요. 다시 시도해 주세요.', { id: 'experience-update-error', position: 'top-center' })
+      }
+    )
+  }
+
+  return (
+    <Dialog onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="tertiary" size="xs" className="bg-btn-secondary-fill">
+          수정하기
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-150 gap-6">
+        <DialogTitle>
+          <Text variant="heading2" weight="semibold" color="text-basic">
+            경험
+          </Text>
+        </DialogTitle>
+
+        <Flex direction="column" className="gap-4">
+          <Flex align="center" className="gap-4">
+            <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+              이름
+            </Text>
+            <div className="min-w-0 flex-1">
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="입력된 경험명" clearable={false} />
+            </div>
+          </Flex>
+          <Flex className="gap-5">
+            <Flex align="center" className="flex-1 gap-4">
+              <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                역할
+              </Text>
+              <div className="min-w-0 flex-1">
+                <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="입력된 역할" clearable={false} />
+              </div>
+            </Flex>
+            <Flex align="center" className="flex-1 gap-4">
+              <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                기간
+              </Text>
+              <div className="min-w-0 flex-1">
+                <Input value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="입력된 기간" clearable={false} />
+              </div>
+            </Flex>
+          </Flex>
+        </Flex>
+
+        <Flex className="gap-4">
+          <DialogClose asChild>
+            <Button variant="tertiary" size="lg" className="flex-1" disabled={isPending}>
+              취소
+            </Button>
+          </DialogClose>
+          <Button variant="primary" size="lg" className="flex-1" onClick={handleSubmit} disabled={isPending}>
+            저장
+          </Button>
+        </Flex>
+      </DialogContent>
+    </Dialog>
   )
 }

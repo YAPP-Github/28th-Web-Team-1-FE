@@ -8,7 +8,6 @@ import { useProjectExperiences } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { cn } from '@shared/lib/cn'
 import { Text } from '@shared/ui'
-import { getProjectMeta } from '../lib/projectMeta'
 import { ProjectInfoCard } from './ProjectInfoCard'
 import { ExperienceListSection } from './ExperienceListSection'
 import { ExperienceDetailPanel } from './ExperienceDetailPanel'
@@ -52,8 +51,6 @@ const ExperienceDetailContent = ({ projectId }: ExperienceDetailContentProps) =>
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selectedExperience = experiences.find((experience) => experience.experienceId === selectedId) ?? null
 
-  const projectMeta = getProjectMeta(project)
-
   const handleSelect = (experienceId: string) => {
     setSelectedId((prev) => (prev === experienceId ? null : experienceId))
   }
@@ -73,15 +70,7 @@ const ExperienceDetailContent = ({ projectId }: ExperienceDetailContentProps) =>
 
           <ProjectInfoCard workspaceId={workspaceId} project={project} />
 
-          <ExperienceListSection
-            workspaceId={workspaceId}
-            projectId={projectId}
-            experiences={experiences}
-            projectMeta={projectMeta}
-            expanded={selectedExperience !== null}
-            selectedId={selectedId}
-            onSelect={handleSelect}
-          />
+          <ExperienceListSection workspaceId={workspaceId} projectId={projectId} experiences={experiences} expanded={selectedExperience !== null} selectedId={selectedId} onSelect={handleSelect} />
         </Flex>
       </Flex>
 
@@ -92,7 +81,6 @@ const ExperienceDetailContent = ({ projectId }: ExperienceDetailContentProps) =>
           projectId={projectId}
           experienceId={selectedExperience.experienceId}
           title={selectedExperience.title}
-          projectMeta={projectMeta}
           keywords={selectedExperience.tags}
           onClose={() => setSelectedId(null)}
         />
