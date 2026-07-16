@@ -1,6 +1,7 @@
 'use client'
 import { useMutation } from '@tanstack/react-query'
-import { jdAPI, type JdRegisterInput } from '../api/jd.api'
+import { jdAPI } from '../api/jd.api'
+import { type JdRegisterInput } from './jd.types'
 
 /**
  * JD를 URL(크롤) 또는 붙여넣기(본문)로 등록한다.
