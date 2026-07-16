@@ -1,5 +1,5 @@
 export { projectAPI } from './api/project.api'
 export { projectKeys, projectQueries } from './model/project.keys'
-export { useProjectList, useProjectCount, useProjectOptions } from './model/project.queries'
-export { useCreateProject, useCreateProjectFromPdf } from './model/project.mutations'
-export type { CreateProjectInput } from './model/project.types'
+export { useProjectList, useProjectCount, useProjectOptions, useProject } from './model/project.queries'
+export { useCreateProject, useCreateProjectFromPdf, useUpdateProject, useDeleteProject } from './model/project.mutations'
+export type { CreateProjectInput, UpdateProjectInput } from './model/project.types'

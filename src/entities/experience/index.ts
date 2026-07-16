@@ -1,3 +1,5 @@
 export { experienceAPI } from './api/experience.api'
 export { experienceKeys, experienceQueries } from './model/experience.keys'
-export { useSearchExperiences } from './model/experience.queries'
+export { useSearchExperiences, useProjectExperiences, useExperience } from './model/experience.queries'
+export { useCreateExperience, useUpdateExperience, useDeleteExperience } from './model/experience.mutations'
+export type { CreateExperienceInput, UpdateExperienceInput, ExperienceContentsInput, StarContentsInput } from './model/experience.types'

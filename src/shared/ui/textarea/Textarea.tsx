@@ -91,7 +91,8 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
           'has-[textarea:disabled]:bg-element-disabled has-[textarea:disabled]:border-border-subtle',
           'has-[textarea:disabled]:pointer-events-none has-[textarea:disabled]:cursor-not-allowed',
           // error
-          'has-[textarea[aria-invalid="true"]]:border-border-error'
+          'has-[textarea[aria-invalid="true"]]:border-border-error',
+          className
         )}
       >
         <textarea
@@ -106,8 +107,7 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
             // hover
             'group-hover:not-focus:text-text-subtle group-hover:not-focus:placeholder:text-text-subtler',
             // disabled
-            'disabled:text-text-disabled disabled:cursor-not-allowed',
-            className
+            'disabled:text-text-disabled disabled:cursor-not-allowed'
           )}
           {...props}
         />

@@ -16,17 +16,33 @@ import * as types from './graphql';
  */
 type Documents = {
     "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n": typeof types.ExperiencesDocument,
+    "\n  query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, projectId: $projectId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n      }\n    }\n  }\n": typeof types.ProjectExperiencesDocument,
+    "\n  query Experience($workspaceId: ID!, $experienceId: ID!) {\n    experience(workspaceId: $workspaceId, experienceId: $experienceId) {\n      experienceId\n      title\n      tags\n      contents {\n        type\n        star {\n          situation\n          task\n          action\n          result\n        }\n        free {\n          content\n        }\n      }\n    }\n  }\n": typeof types.ExperienceDocument,
     "\n  query SearchExperiences($workspaceId: ID!, $keyword: String!, $size: Int!, $cursor: String) {\n    searchExperiences(workspaceId: $workspaceId, keyword: $keyword, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n": typeof types.SearchExperiencesDocument,
+    "\n  mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {\n    createExperience(workspaceId: $workspaceId, request: $request) {\n      experienceId\n    }\n  }\n": typeof types.CreateExperienceDocument,
+    "\n  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {\n    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {\n      experienceId\n    }\n  }\n": typeof types.UpdateExperienceDocument,
+    "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": typeof types.DeleteExperienceDocument,
     "\n  query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    projectList: experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": typeof types.ProjectsDocument,
+    "\n  query Project($workspaceId: ID!, $projectId: ID!) {\n    project: experienceProject(workspaceId: $workspaceId, projectId: $projectId) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": typeof types.ProjectDocument,
     "\n  mutation CreateProject($workspaceId: ID!, $input: CreateExperienceProjectRequest!) {\n    createProject: createExperienceProject(workspaceId: $workspaceId, input: $input) {\n      projectId\n      name\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": typeof types.CreateProjectDocument,
+    "\n  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {\n    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": typeof types.UpdateProjectDocument,
+    "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": typeof types.DeleteProjectDocument,
     "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": typeof types.MeDocument,
     "\n  query UserWorkspaces {\n    me {\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": typeof types.UserWorkspacesDocument,
 };
 const documents: Documents = {
     "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n": types.ExperiencesDocument,
+    "\n  query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, projectId: $projectId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n      }\n    }\n  }\n": types.ProjectExperiencesDocument,
+    "\n  query Experience($workspaceId: ID!, $experienceId: ID!) {\n    experience(workspaceId: $workspaceId, experienceId: $experienceId) {\n      experienceId\n      title\n      tags\n      contents {\n        type\n        star {\n          situation\n          task\n          action\n          result\n        }\n        free {\n          content\n        }\n      }\n    }\n  }\n": types.ExperienceDocument,
     "\n  query SearchExperiences($workspaceId: ID!, $keyword: String!, $size: Int!, $cursor: String) {\n    searchExperiences(workspaceId: $workspaceId, keyword: $keyword, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n": types.SearchExperiencesDocument,
+    "\n  mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {\n    createExperience(workspaceId: $workspaceId, request: $request) {\n      experienceId\n    }\n  }\n": types.CreateExperienceDocument,
+    "\n  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {\n    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {\n      experienceId\n    }\n  }\n": types.UpdateExperienceDocument,
+    "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": types.DeleteExperienceDocument,
     "\n  query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    projectList: experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": types.ProjectsDocument,
+    "\n  query Project($workspaceId: ID!, $projectId: ID!) {\n    project: experienceProject(workspaceId: $workspaceId, projectId: $projectId) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": types.ProjectDocument,
     "\n  mutation CreateProject($workspaceId: ID!, $input: CreateExperienceProjectRequest!) {\n    createProject: createExperienceProject(workspaceId: $workspaceId, input: $input) {\n      projectId\n      name\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": types.CreateProjectDocument,
+    "\n  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {\n    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": types.UpdateProjectDocument,
+    "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": types.DeleteProjectDocument,
     "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": types.MeDocument,
     "\n  query UserWorkspaces {\n    me {\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": types.UserWorkspacesDocument,
 };
@@ -38,7 +54,27 @@ export function graphql(source: "\n  query Experiences($workspaceId: ID!, $size:
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, projectId: $projectId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n      }\n    }\n  }\n"): typeof import('./graphql').ProjectExperiencesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Experience($workspaceId: ID!, $experienceId: ID!) {\n    experience(workspaceId: $workspaceId, experienceId: $experienceId) {\n      experienceId\n      title\n      tags\n      contents {\n        type\n        star {\n          situation\n          task\n          action\n          result\n        }\n        free {\n          content\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ExperienceDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query SearchExperiences($workspaceId: ID!, $keyword: String!, $size: Int!, $cursor: String) {\n    searchExperiences(workspaceId: $workspaceId, keyword: $keyword, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').SearchExperiencesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {\n    createExperience(workspaceId: $workspaceId, request: $request) {\n      experienceId\n    }\n  }\n"): typeof import('./graphql').CreateExperienceDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {\n    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {\n      experienceId\n    }\n  }\n"): typeof import('./graphql').UpdateExperienceDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n"): typeof import('./graphql').DeleteExperienceDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -46,7 +82,19 @@ export function graphql(source: "\n  query Projects($workspaceId: ID!, $size: In
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query Project($workspaceId: ID!, $projectId: ID!) {\n    project: experienceProject(workspaceId: $workspaceId, projectId: $projectId) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n"): typeof import('./graphql').ProjectDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation CreateProject($workspaceId: ID!, $input: CreateExperienceProjectRequest!) {\n    createProject: createExperienceProject(workspaceId: $workspaceId, input: $input) {\n      projectId\n      name\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n"): typeof import('./graphql').CreateProjectDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {\n    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n"): typeof import('./graphql').UpdateProjectDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n"): typeof import('./graphql').DeleteProjectDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
