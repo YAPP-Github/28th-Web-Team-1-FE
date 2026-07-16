@@ -11,18 +11,18 @@ export interface JdRegisterInput {
 export type JdCandidate = NonNullable<RegisterJdMutation['registerJd']['candidates']>[number]
 
 export const jdAPI = {
-  // getJdInsight: (variables: { workspaceId: string; jdId: string }) => execute(jdInsightDocument, variables),
+  getJdInsight: (variables: { workspaceId: string; jdId: string }) => execute(jdInsightDocument, variables),
   registerJd: (variables: { workspaceId: string; request: JdRegisterInput }) => execute(registerJdDocument, variables)
 }
 
-// const jdInsightDocument = graphql(`
-//   query JdInsight($workspaceId: ID!, $jdId: ID!) {
-//     jdInsight(workspaceId: $workspaceId, jdId: $jdId) {
-//       keyPoints
-//       strategy
-//     }
-//   }
-// `)
+const jdInsightDocument = graphql(`
+  query JdInsight($workspaceId: ID!, $jdId: ID!) {
+    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {
+      keyPoints
+      strategy
+    }
+  }
+`)
 
 const registerJdDocument = graphql(`
   mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {

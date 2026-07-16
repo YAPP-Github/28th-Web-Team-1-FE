@@ -51,6 +51,14 @@ export type SearchExperiencesQueryVariables = Exact<{
 
 export type SearchExperiencesQuery = { searchExperiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, project: { projectId: string, name: string } | null }> } };
 
+export type JdInsightQueryVariables = Exact<{
+  workspaceId: string | number;
+  jdId: string | number;
+}>;
+
+
+export type JdInsightQuery = { jdInsight: { keyPoints: string, strategy: string } | null };
+
 export type RegisterJdMutationVariables = Exact<{
   workspaceId: string | number;
   request: JdRegisterRequest;
@@ -169,6 +177,14 @@ export const SearchExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<SearchExperiencesQuery, SearchExperiencesQueryVariables>;
+export const JdInsightDocument = new TypedDocumentString(`
+    query JdInsight($workspaceId: ID!, $jdId: ID!) {
+  jdInsight(workspaceId: $workspaceId, jdId: $jdId) {
+    keyPoints
+    strategy
+  }
+}
+    `) as unknown as TypedDocumentString<JdInsightQuery, JdInsightQueryVariables>;
 export const RegisterJdDocument = new TypedDocumentString(`
     mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {
   registerJd(workspaceId: $workspaceId, request: $request) {
