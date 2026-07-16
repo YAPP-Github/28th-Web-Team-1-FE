@@ -27,12 +27,11 @@ export const ExperiencesSearchField = () => {
       direction="column"
       className="relative w-142.5"
       onFocus={() => setIsFocused(true)}
-      // 포커스가 컨테이너(입력창+드롭다운) 밖으로 나갈 때만 닫아, Tab으로 결과 링크에 접근할 수 있게 한다.
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) setIsFocused(false)
       }}
     >
-      <SearchField placeholder="경험 이름, 태그로 검색하세요" className="w-full" value={keyword} onChange={(e) => setKeyword(e.target.value)} rounded={isFocused ? 'top' : 'full'} />
+      <SearchField placeholder="경험 이름, 태그로 검색하세요" className="w-full" value={keyword} onChange={(e) => setKeyword(e.target.value)} rounded={isOpen ? 'top' : 'full'} />
       {isOpen && (
         <Flex direction="column" className="bg-element-white shadow-2 absolute top-full left-0 z-10 w-full overflow-hidden rounded-b-2xl">
           {results.length > 0 ? (
