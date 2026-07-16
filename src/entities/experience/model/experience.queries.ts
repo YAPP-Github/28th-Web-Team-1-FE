@@ -31,3 +31,17 @@ export const useExperienceList = (workspaceId: string) => {
   })
   return { experiences: data, ...rest }
 }
+
+/**
+ * JD 기준으로 매칭된 경험 목록을 Suspense로 조회한다.
+ * 각 경험에 해당 JD 기준 matchRate와 상위 5개의 recommendedReason이 함께 채워진다.
+ * @param workspaceId 라우트 `[workspaceId]`에서 온 워크스페이스 ID
+ * @param jdId 매칭 기준이 될 JD ID
+ */
+export const useMatchedExperiences = (workspaceId: string, jdId: string) => {
+  const { data, ...rest } = useSuspenseInfiniteQuery({
+    ...experienceQueries.matched(workspaceId, jdId),
+    select: (data) => data.pages.flatMap((page) => page.experiences.experiences)
+  })
+  return { experiences: data, ...rest }
+}

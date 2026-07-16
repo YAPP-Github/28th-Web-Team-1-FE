@@ -1,4 +1,6 @@
+import { Suspense } from 'react'
 import { Flex } from '@radix-ui/themes'
+import { ErrorBoundary } from '@sentry/nextjs'
 import { Heading, Spacing, Text } from '@shared/ui'
 import { JDAnalysisForm } from './JDAnalysisForm'
 
@@ -13,7 +15,19 @@ export const HomePage = () => {
 
       <Spacing size={40} />
 
-      <JDAnalysisForm />
+      <ErrorBoundary
+        fallback={
+          <Flex align="center" justify="center" className="min-h-105">
+            <Text variant="body1" color="text-subtler">
+              불러오는데 실패했습니다.
+            </Text>
+          </Flex>
+        }
+      >
+        <Suspense fallback={<div className="min-h-105 w-full" />}>
+          <JDAnalysisForm />
+        </Suspense>
+      </ErrorBoundary>
     </Flex>
   )
 }

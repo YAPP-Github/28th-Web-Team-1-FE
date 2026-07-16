@@ -1,7 +1,4 @@
-import type { ExperiencesQuery } from '@shared/lib/gql/graphql'
+import type { MatchedExperiencesQuery } from '@shared/lib/gql/graphql'
 
-/** experiences 쿼리 항목 + 매칭/추천 UI 확장 필드 */
-export type Experience = ExperiencesQuery['experiences']['experiences'][0] & {
-  recommendedReason?: string
-  matchRate?: number
-}
+/** JD 매칭 경험 항목. matchRate와 상위 5개 recommendedReason(그 외 null)이 포함된다. */
+export type Experience = MatchedExperiencesQuery['experiences']['experiences'][0]

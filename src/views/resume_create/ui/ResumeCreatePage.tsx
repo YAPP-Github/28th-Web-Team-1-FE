@@ -1,6 +1,7 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { Text } from '@shared/ui'
 import { ExperiencePickerDialog } from './ExperiencePickerDialog'
@@ -24,14 +25,34 @@ export const ResumeCreatePage = () => {
             </Text>
           }
         >
-          <ExperiencePickerDialog
-            isOpen={true}
-            onComplete={(selectedExperiences) => {
-              console.log(selectedExperiences)
-            }}
-          />
+          <ResumeCreateContent />
         </Suspense>
       </ErrorBoundary>
     </div>
+  )
+}
+
+/**
+ * jdId가 없으면(직접 URL 진입 등) 홈으로 돌려보낸다.
+ * 가드를 통과한 뒤에만 다이얼로그를 렌더해 하위 Suspense 쿼리가 빈 jdId로 발화하지 않게 한다.
+ * `useSearchParams`는 상위 `Suspense` 경계 안에서 호출된다.
+ */
+const ResumeCreateContent = () => {
+  const router = useRouter()
+  const jdId = useSearchParams().get('jdId') ?? ''
+
+  useEffect(() => {
+    if (!jdId) router.replace('/home')
+  }, [jdId, router])
+
+  if (!jdId) return null
+
+  return (
+    <ExperiencePickerDialog
+      isOpen={true}
+      onComplete={(selectedExperiences) => {
+        console.log(selectedExperiences)
+      }}
+    />
   )
 }

@@ -13,7 +13,7 @@ import { userQueries } from './user.keys'
  */
 export const useWorkspaceId = () => {
   const { data } = useSuspenseQuery({
-    ...userQueries.workspaces(),
+    ...userQueries.me(),
     select: (data) => data.me.workspaces[0]?.workspaceId ?? ''
   })
   return data

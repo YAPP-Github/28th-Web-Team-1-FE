@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { Flex } from '@radix-ui/themes'
+import { Flex, Skeleton } from '@radix-ui/themes'
 import { Button } from '@shared/ui'
 import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
 import { useWorkspaceId } from '@entities/user'
@@ -52,3 +52,12 @@ export const ProjectFilter = ({ value, onChange }: Props) => {
     </Flex>
   )
 }
+
+/** 필터 행 스켈레톤. 추천/전체/프로젝트 필터 pill들의 자리를 잡는다. */
+export const ProjectFilterLoading = () => (
+  <Flex gap={'1'} align={'center'} className={'h-8'}>
+    {[48, 48, 72, 64, 80].map((width, i) => (
+      <Skeleton key={i} height={'28px'} width={`${width}px`} style={{ borderRadius: '9999px' }} />
+    ))}
+  </Flex>
+)

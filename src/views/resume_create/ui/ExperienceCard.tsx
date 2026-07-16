@@ -1,5 +1,5 @@
-import { Flex } from '@radix-ui/themes'
-import { Divider, Text } from '@shared/ui'
+import { Flex, Skeleton } from '@radix-ui/themes'
+import { Divider, Spacing, Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
 import { cn, formatYYYYMM } from '@shared/lib'
 import type { ReactNode } from 'react'
@@ -101,4 +101,22 @@ const RecommendedReason = ({ reason }: { reason: string }) => (
       {reason}
     </Text>
   </InfoRow>
+)
+
+/** ExperienceCard 한 장의 모양(체크박스 + 제목/매칭배지 + 역할/역량 행)을 따르는 스켈레톤. */
+export const ExperienceCardSkeleton = () => (
+  <Flex direction="column" className={'border-border-subtle shrink-0 rounded-xl border p-4'}>
+    <Flex align={'center'} gap={'4'}>
+      <Skeleton height={'20px'} width={'20px'} />
+      <Flex flexGrow={'1'} justify={'between'} align={'center'}>
+        <Skeleton height={'18px'} width={'140px'} />
+        <Skeleton height={'22px'} width={'64px'} style={{ borderRadius: '9999px' }} />
+      </Flex>
+    </Flex>
+    <Spacing size={16} />
+    <Flex direction={'column'} gap={'2'}>
+      <Skeleton height={'14px'} width={'80%'} />
+      <Skeleton height={'14px'} width={'60%'} />
+    </Flex>
+  </Flex>
 )
