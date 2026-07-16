@@ -32,9 +32,7 @@ interface ProjectInfoCardProps {
     period: { startAt?: string | null; endAt?: string | null } | null
   }
 }
-
-/** 경험 상세 페이지 상단의 프로젝트 정보 카드. hover 시 수정/삭제 노출. (Figma: experience/project) */
-export const ProjectInfoCard = ({ workspaceId, project }: ProjectInfoCardProps) => {
+export const ProjectInfo = ({ workspaceId, project }: ProjectInfoCardProps) => {
   const { projectId, name, role, summary } = project
   const periodText = formatPeriod(project.period)
 

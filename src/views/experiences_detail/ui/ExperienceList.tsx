@@ -4,7 +4,7 @@ import { useProject } from '@entities/project'
 import { cn } from '@shared/lib/cn'
 import { Text } from '@shared/ui'
 import { getProjectMeta } from '../lib/projectMeta'
-import { AddExperienceDialog } from './AddExperienceDialog'
+import { AddExperienceButton } from './AddExperienceButton'
 import type { ProjectMeta } from '../lib/projectMeta'
 import { Chip } from '@shared/ui/chip'
 
@@ -13,8 +13,7 @@ interface ExperienceListItem {
   title: string
   tags: string[]
 }
-
-interface ExperienceListSectionProps {
+interface ExperienceListProps {
   workspaceId: string
   projectId: string
   experiences: ExperienceListItem[]
@@ -22,10 +21,8 @@ interface ExperienceListSectionProps {
   selectedId: string | null
   onSelect: (experienceId: string) => void
 }
-
-/** 경험 상세 페이지의 "경험 목록" 섹션 (헤더 + 추가 버튼 + 카드 그리드 / 빈 상태) */
-export const ExperienceListSection = ({ workspaceId, projectId, experiences, expanded, selectedId, onSelect }: ExperienceListSectionProps) => {
-  // 카드/모달에 표시할 역할·기간은 프로젝트 값(경험 단위 값 없음). 페이지가 이미 받아둔 프로젝트 캐시를 dedupe로 읽는다.
+export const ExperienceList = ({ workspaceId, projectId, experiences, expanded, selectedId, onSelect }: ExperienceListProps) => {
+  // TODO : 백엔드에서 경험별 프로젝트 메타데이터를 내려주게 수정 시 변경 필요
   const { project } = useProject(workspaceId, projectId)
   const projectMeta = getProjectMeta(project)
 
@@ -35,7 +32,7 @@ export const ExperienceListSection = ({ workspaceId, projectId, experiences, exp
         <Text variant="headline1" color="text-basic">
           경험 목록
         </Text>
-        <AddExperienceDialog workspaceId={workspaceId} projectId={projectId} />
+        <AddExperienceButton workspaceId={workspaceId} projectId={projectId} />
       </Flex>
       {experiences.length === 0 ? (
         <Flex direction="column" align="center" justify="center" className="border-border-subtle h-32 rounded-lg border border-dashed px-6 py-5" gap="3">
@@ -71,8 +68,7 @@ interface ExperienceListCardProps {
   selected?: boolean
   onSelect?: () => void
 }
-
-export const ExperienceListCard = ({ title, keywords, projectMeta, selected = false, onSelect }: ExperienceListCardProps) => {
+const ExperienceListCard = ({ title, keywords, projectMeta, selected = false, onSelect }: ExperienceListCardProps) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()

@@ -7,12 +7,12 @@ import { Button, Text } from '@shared/ui'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Textarea } from '@/src/shared/ui/textarea'
 
-interface AddExperienceDialogProps {
+interface AddExperienceButtonProps {
   workspaceId: string
   projectId: string
 }
 /** [경험 추가하기] 버튼을 누르면 열리는 다이얼로그 */
-export const AddExperienceDialog = ({ workspaceId, projectId }: AddExperienceDialogProps) => {
+export const AddExperienceButton = ({ workspaceId, projectId }: AddExperienceButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [content, setContent] = useState('')
   const { mutate: createExperience, isPending } = useCreateExperience(workspaceId, projectId)

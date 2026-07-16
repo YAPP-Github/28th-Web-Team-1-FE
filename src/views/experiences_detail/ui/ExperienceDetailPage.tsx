@@ -8,8 +8,8 @@ import { useProjectExperiences } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { cn } from '@shared/lib/cn'
 import { Text } from '@shared/ui'
-import { ProjectInfoCard } from './ProjectInfoCard'
-import { ExperienceListSection } from './ExperienceListSection'
+import { ProjectInfo } from './ProjectInfo'
+import { ExperienceList } from './ExperienceList'
 import { ExperienceDetailPanel } from './ExperienceDetailPanel'
 
 export const ExperienceDetailPage = () => {
@@ -40,10 +40,7 @@ export const ExperienceDetailPage = () => {
   )
 }
 
-interface ExperienceDetailContentProps {
-  projectId: string
-}
-const ExperienceDetailContent = ({ projectId }: ExperienceDetailContentProps) => {
+const ExperienceDetailContent = ({ projectId }: { projectId: string }) => {
   const workspaceId = useWorkspaceId()
   const { project } = useProject(workspaceId, projectId)
   const { experiences } = useProjectExperiences(workspaceId, projectId)
@@ -67,23 +64,13 @@ const ExperienceDetailContent = ({ projectId }: ExperienceDetailContentProps) =>
               경험을 정리해서 이력서 소재로 활용해요.
             </Text>
           </Flex>
-
-          <ProjectInfoCard workspaceId={workspaceId} project={project} />
-
-          <ExperienceListSection workspaceId={workspaceId} projectId={projectId} experiences={experiences} expanded={selectedExperience !== null} selectedId={selectedId} onSelect={handleSelect} />
+          <ProjectInfo workspaceId={workspaceId} project={project} />
+          <ExperienceList workspaceId={workspaceId} projectId={projectId} experiences={experiences} expanded={selectedExperience !== null} selectedId={selectedId} onSelect={handleSelect} />
         </Flex>
       </Flex>
 
       {selectedExperience && (
-        <ExperienceDetailPanel
-          key={selectedExperience.experienceId}
-          workspaceId={workspaceId}
-          projectId={projectId}
-          experienceId={selectedExperience.experienceId}
-          title={selectedExperience.title}
-          keywords={selectedExperience.tags}
-          onClose={() => setSelectedId(null)}
-        />
+        <ExperienceDetailPanel key={selectedExperience.experienceId} workspaceId={workspaceId} projectId={projectId} experience={selectedExperience} onClose={() => setSelectedId(null)} />
       )}
     </Flex>
   )

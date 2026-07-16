@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Flex } from '@radix-ui/themes'
-import { ChevronsLeft, Trash2 } from 'lucide-react'
+import { ChevronsRight, Trash2 } from 'lucide-react'
 import { useDeleteExperience, useExperience, useUpdateExperience } from '@entities/experience'
 import { useProject } from '@entities/project'
 import { Button, Text } from '@shared/ui'
@@ -38,15 +38,12 @@ const EMPTY_STAR: Record<StarKey, string> = { situation: '', task: '', action: '
 interface ExperienceDetailPanelProps {
   workspaceId: string
   projectId: string
-  experienceId: string
-  title: string
-  keywords: string[]
+  experience: { experienceId: string; title: string; tags: string[] }
   onClose: () => void
 }
-
-/** 경험 카드를 누르면 열리는 상세 패널. STAR 상세를 조회·수정한다. (Figma: experience/detail) */
-export const ExperienceDetailPanel = ({ workspaceId, projectId, experienceId, title, keywords, onClose }: ExperienceDetailPanelProps) => {
-  const { experience } = useExperience(workspaceId, experienceId)
+export const ExperienceDetailPanel = ({ workspaceId, projectId, experience, onClose }: ExperienceDetailPanelProps) => {
+  const { experienceId, title, tags: keywords } = experience
+  const { experience: detail } = useExperience(workspaceId, experienceId)
   const { mutate: updateExperience, isPending } = useUpdateExperience(workspaceId, projectId)
 
   // 역할·기간은 프로젝트 값(경험 단위 값 없음). 페이지가 이미 받아둔 프로젝트 캐시를 dedupe로 읽는다.
@@ -57,10 +54,10 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experienceId, ti
 
   // 단건 조회가 도착하면(비동기) STAR 입력값을 한 번 채운다. (렌더 중 상태 조정 패턴)
   const [syncedId, setSyncedId] = useState<string | null>(null)
-  if (experience && syncedId !== experience.experienceId) {
-    const star = experience.contents?.star
+  if (detail && syncedId !== detail.experienceId) {
+    const star = detail.contents?.star
     setValues(star ? { situation: star.situation ?? '', task: star.task ?? '', action: star.action ?? '', result: star.result ?? '' } : EMPTY_STAR)
-    setSyncedId(experience.experienceId)
+    setSyncedId(detail.experienceId)
   }
 
   const handleChange = (key: StarKey) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -80,7 +77,7 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experienceId, ti
   return (
     <Flex direction="column" className="border-border-subtle bg-bg-gray-subtler h-screen w-148.5 shrink-0 overflow-y-auto border-l p-8">
       <button type="button" aria-label="상세 패널 닫기" onClick={() => onClose()} className="mb-5 w-fit">
-        <ChevronsLeft size={24} className="text-icon-gray-lighter" />
+        <ChevronsRight size={24} className="text-icon-gray-lighter" />
       </button>
 
       <Flex direction="column" className="gap-8">
@@ -90,8 +87,8 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experienceId, ti
               {title}
             </Text>
             <Flex align="center" gap="2" className="hidden group-hover:flex">
-              <EditExperienceDialog experienceId={experienceId} title={title} workspaceId={workspaceId} projectId={projectId} projectMeta={projectMeta} />
-              <DeleteExperienceButton workspaceId={workspaceId} projectId={projectId} experienceId={experienceId} onDeleted={onClose} />
+              <EditExperienceButton experienceId={experienceId} title={title} workspaceId={workspaceId} projectId={projectId} projectMeta={projectMeta} />
+              <DeleteExperienceButton workspaceId={workspaceId} projectId={projectId} experienceId={experienceId} onClose={onClose} />
             </Flex>
           </Flex>
           <Flex direction="column" className="gap-2.5">
@@ -153,14 +150,14 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experienceId, ti
   )
 }
 
-const DeleteExperienceButton = ({ workspaceId, projectId, experienceId, onDeleted }: { workspaceId: string; projectId: string; experienceId: string; onDeleted: () => void }) => {
+const DeleteExperienceButton = ({ workspaceId, projectId, experienceId, onClose }: { workspaceId: string; projectId: string; experienceId: string; onClose: () => void }) => {
   const { mutate: deleteExperience } = useDeleteExperience(workspaceId, projectId)
 
   const handleDelete = () => {
     deleteExperience(experienceId, {
       onSuccess: () => {
         toast.success('경험이 삭제되었어요.', { id: 'experience-deleted', position: 'top-center' })
-        onDeleted()
+        onClose()
       },
       onError: () => toast.error('삭제에 실패했어요. 다시 시도해 주세요.', { id: 'experience-delete-error', position: 'top-center' })
     })
@@ -189,14 +186,14 @@ const DeleteExperienceButton = ({ workspaceId, projectId, experienceId, onDelete
   )
 }
 
-interface EditExperienceDialogProps {
+interface EditExperienceButtonProps {
   workspaceId: string
   projectId: string
   experienceId: string
   title: string
   projectMeta: ProjectMeta
 }
-export const EditExperienceDialog = ({ workspaceId, projectId, experienceId, title: initialTitle, projectMeta }: EditExperienceDialogProps) => {
+const EditExperienceButton = ({ workspaceId, projectId, experienceId, title: initialTitle, projectMeta }: EditExperienceButtonProps) => {
   const [title, setTitle] = useState(initialTitle)
   const [role, setRole] = useState(projectMeta.role)
   const [period, setPeriod] = useState(projectMeta.period)
