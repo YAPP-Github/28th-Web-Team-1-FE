@@ -16,6 +16,14 @@ export type CreateExperienceProjectRequest = {
   summary: string;
 };
 
+/** JD 등록 입력입니다. sourceUrl 또는 body 중 정확히 하나여야 합니다. */
+export type JdRegisterRequest = {
+  /** 붙여넣은 JD 본문입니다. (붙여넣기 등록) */
+  body?: string | null | undefined;
+  /** 등록할 JD 공고의 URL입니다. (크롤 등록) */
+  sourceUrl?: string | null | undefined;
+};
+
 /** 기간 입력입니다. */
 export type PeriodInput = {
   /** 기간 종료일입니다. */
@@ -42,6 +50,14 @@ export type SearchExperiencesQueryVariables = Exact<{
 
 
 export type SearchExperiencesQuery = { searchExperiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, project: { projectId: string, name: string } | null }> } };
+
+export type RegisterJdMutationVariables = Exact<{
+  workspaceId: string | number;
+  request: JdRegisterRequest;
+}>;
+
+
+export type RegisterJdMutation = { registerJd: { jd: { jdId: string } | null, candidates: Array<{ title: string, body: string }> | null } };
 
 export type ProjectListItemFragment = { projectId: string, name: string };
 
@@ -153,6 +169,19 @@ export const SearchExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<SearchExperiencesQuery, SearchExperiencesQueryVariables>;
+export const RegisterJdDocument = new TypedDocumentString(`
+    mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {
+  registerJd(workspaceId: $workspaceId, request: $request) {
+    jd {
+      jdId
+    }
+    candidates {
+      title
+      body
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<RegisterJdMutation, RegisterJdMutationVariables>;
 export const ProjectsDocument = new TypedDocumentString(`
     query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {
   projectList: experienceProjects(
