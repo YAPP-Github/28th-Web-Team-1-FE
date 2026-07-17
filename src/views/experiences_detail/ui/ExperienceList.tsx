@@ -7,24 +7,13 @@ import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Plus } from 'lucide-react'
-import { useCreateExperience } from '@entities/experience'
+import { useCreateExperience, type ProjectExperience } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Textarea } from '@/src/shared/ui/textarea'
 
-interface ExperiencePeriod {
-  startAt?: string | null
-  endAt?: string | null
-}
-interface ExperienceListItem {
-  experienceId: string
-  title: string
-  tags: string[]
-  role: string | null
-  period: ExperiencePeriod | null
-}
 interface ExperienceListProps {
-  experiences: ExperienceListItem[]
+  experiences: ProjectExperience[]
   expanded: boolean
   selectedId: string | null
   onSelect: (experienceId: string) => void
@@ -58,6 +47,7 @@ export const ExperienceList = ({ experiences, expanded, selectedId, onSelect }: 
   )
 }
 
+// 경험 추가 버튼 + 다이얼로그
 const AddExperienceButton = () => {
   const workspaceId = useWorkspaceId()
   const { projectId } = useParams<{ projectId: string }>()
@@ -116,7 +106,7 @@ const AddExperienceButton = () => {
 }
 
 interface ExperienceListCardProps {
-  experience: ExperienceListItem
+  experience: ProjectExperience
   selected?: boolean
   onClick?: () => void
 }

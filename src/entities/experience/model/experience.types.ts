@@ -1,3 +1,11 @@
+import type { ExperienceQuery, ProjectExperiencesQuery } from '@shared/lib/gql/graphql'
+
+/** 경험 단건 상세(제목·태그·역할·기간·STAR 포함). `Experience` 쿼리 결과에서 파생. */
+export type ExperienceDetail = NonNullable<ExperienceQuery['experience']>
+
+/** 프로젝트 경험 목록의 단일 경험(제목·태그·역할·기간). `ProjectExperiences` 쿼리 결과에서 파생. */
+export type ProjectExperience = ProjectExperiencesQuery['experiences']['experiences'][number]
+
 /** STAR 형식 경험 상세 내용 (Situation·Task·Action·Result) */
 export interface StarContentsInput {
   situation: string

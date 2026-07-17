@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Flex } from '@radix-ui/themes'
 import { Trash2 } from 'lucide-react'
-import { useDeleteProject, useUpdateProject } from '@entities/project'
+import { useDeleteProject, useUpdateProject, type Project } from '@entities/project'
 import { Button, Text } from '@shared/ui'
 import {
   AlertDialog,
@@ -25,13 +25,7 @@ import { parsePeriodInput } from '../lib/parsePeriodInput'
 
 interface ProjectInfoCardProps {
   workspaceId: string
-  project: {
-    projectId: string
-    name: string
-    role: string | null
-    summary: string
-    period: { startAt?: string | null; endAt?: string | null } | null
-  }
+  project: Project
 }
 export const ProjectInfo = ({ workspaceId, project }: ProjectInfoCardProps) => {
   const { projectId, name, role, summary } = project
@@ -44,7 +38,7 @@ export const ProjectInfo = ({ workspaceId, project }: ProjectInfoCardProps) => {
           {name}
         </Text>
         <Flex align="center" gap="2" className="hidden pr-2 group-hover:flex">
-          <EditProjectButton workspaceId={workspaceId} projectId={projectId} initial={{ name, role: role ?? '', period: periodText, summary }} />
+          <EditProjectButton workspaceId={workspaceId} project={project} />
           <DeleteProjectButton workspaceId={workspaceId} projectId={projectId} />
         </Flex>
       </Flex>
@@ -80,7 +74,7 @@ export const ProjectInfo = ({ workspaceId, project }: ProjectInfoCardProps) => {
   )
 }
 
-/** 프로젝트 삭제 버튼. */
+/** 프로젝트 삭제 모달. */
 const DeleteProjectButton = ({ workspaceId, projectId }: { workspaceId: string; projectId: string }) => {
   const router = useRouter()
   const { mutate: deleteProject } = useDeleteProject(workspaceId)
@@ -109,25 +103,36 @@ const DeleteProjectButton = ({ workspaceId, projectId }: { workspaceId: string; 
 }
 
 /** 프로젝트 수정 모달. */
-interface EditProjectButtonProps {
-  workspaceId: string
-  projectId: string
-  initial: { name: string; role: string; period: string; summary: string }
-}
-const EditProjectButton = ({ workspaceId, projectId, initial }: EditProjectButtonProps) => {
-  const [name, setName] = useState(initial.name)
-  const [role, setRole] = useState(initial.role)
-  const [period, setPeriod] = useState(initial.period)
-  const [summary, setSummary] = useState(initial.summary)
+const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; project: Project }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [form, setForm] = useState({
+    name: project.name,
+    role: project.role ?? '',
+    period: formatPeriod(project.period?.startAt, project.period?.endAt),
+    summary: project.summary
+  })
+  const { mutate: updateProject, isPending } = useUpdateProject(workspaceId, project.projectId)
 
-  const { mutate: updateProject, isPending } = useUpdateProject(workspaceId, projectId)
+  const handleOpenChange = (next: boolean) => {
+    if (next)
+      setForm({
+        name: project.name,
+        role: project.role ?? '',
+        period: formatPeriod(project.period?.startAt, project.period?.endAt),
+        summary: project.summary
+      })
+    setIsOpen(next)
+  }
+
+  const setField = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
   const handleSubmit = () => {
     updateProject(
-      { name: name.trim(), role: role.trim(), summary: summary.trim(), period: parsePeriodInput(period) },
+      { name: form.name.trim(), role: form.role.trim(), summary: form.summary.trim(), period: parsePeriodInput(form.period) },
       {
         onSuccess: () => {
           toast.success('프로젝트가 수정되었어요.', { id: 'project-updated', position: 'top-center' })
+          setIsOpen(false)
         },
         onError: () => toast.error('프로젝트 수정에 실패했어요. 다시 시도해 주세요.', { id: 'project-update-error', position: 'top-center' })
       }
@@ -135,7 +140,7 @@ const EditProjectButton = ({ workspaceId, projectId, initial }: EditProjectButto
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="tertiary" size="xs" className="bg-btn-secondary-fill">
           수정하기
@@ -154,7 +159,7 @@ const EditProjectButton = ({ workspaceId, projectId, initial }: EditProjectButto
               이름
             </Text>
             <div className="min-w-0 flex-1">
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="입력된 프로젝트 명" clearable={false} />
+              <Input value={form.name} onChange={setField('name')} placeholder="입력된 프로젝트 명" clearable={false} />
             </div>
           </Flex>
           <Flex className="gap-5">
@@ -163,7 +168,7 @@ const EditProjectButton = ({ workspaceId, projectId, initial }: EditProjectButto
                 역할
               </Text>
               <div className="min-w-0 flex-1">
-                <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="입력된 역할" clearable={false} />
+                <Input value={form.role} onChange={setField('role')} placeholder="입력된 역할" clearable={false} />
               </div>
             </Flex>
             <Flex align="center" className="flex-1 gap-4">
@@ -171,7 +176,7 @@ const EditProjectButton = ({ workspaceId, projectId, initial }: EditProjectButto
                 기간
               </Text>
               <div className="min-w-0 flex-1">
-                <Input value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="입력된 기간" clearable={false} />
+                <Input value={form.period} onChange={setField('period')} placeholder="입력된 기간" clearable={false} />
               </div>
             </Flex>
           </Flex>
@@ -180,7 +185,7 @@ const EditProjectButton = ({ workspaceId, projectId, initial }: EditProjectButto
               설명
             </Text>
             <div className="min-w-0 flex-1">
-              <Textarea maxLength={2000} placeholder="텍스트를 입력해 주세요." value={summary} onChange={(e) => setSummary(e.target.value)} className="min-h-19.25" />
+              <Textarea maxLength={2000} placeholder="텍스트를 입력해 주세요." value={form.summary} onChange={setField('summary')} className="min-h-19.25" />
             </div>
           </Flex>
         </Flex>

@@ -105,6 +105,7 @@ const ExperienceDetailPanelContent = ({ workspaceId, experienceId, onClose }: { 
   )
 }
 
+// 경험 삭제 버튼 + 다이얼로그
 const DeleteExperienceButton = ({ workspaceId, experienceId, onClose }: { workspaceId: string; experienceId: string; onClose: () => void }) => {
   const { projectId } = useParams<{ projectId: string }>()
   const { mutate: deleteExperience } = useDeleteExperience(workspaceId, projectId)
@@ -142,28 +143,37 @@ const DeleteExperienceButton = ({ workspaceId, experienceId, onClose }: { worksp
   )
 }
 
+// 경험 수정 버튼 + 다이얼로그
 const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string; experience: ExperienceDetail }) => {
   const { projectId } = useParams<{ projectId: string }>()
   const { mutate: updateExperience, isPending } = useUpdateExperience(workspaceId, projectId)
 
-  const [title, setTitle] = useState('')
-  const [role, setRole] = useState('')
-  const [period, setPeriod] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+  const [form, setForm] = useState({
+    title: experience.title,
+    role: experience.role ?? '',
+    period: formatPeriod(experience.period?.startAt, experience.period?.endAt)
+  })
 
   const handleOpenChange = (next: boolean) => {
-    if (!next) return
-    setTitle(experience.title)
-    setRole(experience.role ?? '')
-    setPeriod(formatPeriod(experience.period?.startAt, experience.period?.endAt))
+    if (next)
+      setForm({
+        title: experience.title,
+        role: experience.role ?? '',
+        period: formatPeriod(experience.period?.startAt, experience.period?.endAt)
+      })
+    setIsOpen(next)
   }
 
+  const setField = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
+
   const handleSubmit = () => {
-    const trimmed = title.trim()
+    const trimmed = form.title.trim()
     if (!trimmed) {
       toast.warning('경험 제목을 입력해 주세요.', { id: 'experience-title-required', position: 'top-center' })
       return
     }
-    const trimmedRole = role.trim()
+    const trimmedRole = form.role.trim()
     updateExperience(
       {
         experienceId: experience.experienceId,
@@ -173,18 +183,21 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
           tags: experience.tags,
           contents: experience.contents,
           role: trimmedRole || null,
-          period: parsePeriodInput(period)
+          period: parsePeriodInput(form.period)
         }
       },
       {
-        onSuccess: () => toast.success('경험이 수정되었어요.', { id: 'experience-updated', position: 'top-center' }),
+        onSuccess: () => {
+          toast.success('경험이 수정되었어요.', { id: 'experience-updated', position: 'top-center' })
+          setIsOpen(false)
+        },
         onError: () => toast.error('경험 수정에 실패했어요. 다시 시도해 주세요.', { id: 'experience-update-error', position: 'top-center' })
       }
     )
   }
 
   return (
-    <Dialog onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="tertiary" size="xs" className="bg-btn-secondary-fill">
           수정하기
@@ -203,7 +216,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
               이름
             </Text>
             <div className="min-w-0 flex-1">
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="입력된 경험명" clearable={false} />
+              <Input value={form.title} onChange={setField('title')} placeholder="입력된 경험명" clearable={false} />
             </div>
           </Flex>
           <Flex gap="5">
@@ -212,7 +225,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
                 역할
               </Text>
               <div className="min-w-0 flex-1">
-                <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="입력된 역할" clearable={false} />
+                <Input value={form.role} onChange={setField('role')} placeholder="입력된 역할" clearable={false} />
               </div>
             </Flex>
             <Flex align="center" gap="4" className="flex-1">
@@ -220,7 +233,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
                 기간
               </Text>
               <div className="min-w-0 flex-1">
-                <Input value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="입력된 기간" clearable={false} />
+                <Input value={form.period} onChange={setField('period')} placeholder="입력된 기간" clearable={false} />
               </div>
             </Flex>
           </Flex>

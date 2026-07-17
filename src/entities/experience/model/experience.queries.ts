@@ -44,9 +44,6 @@ export const useExperienceSuspense = (workspaceId: string, experienceId: string)
   return { experience: data.experience, ...rest }
 }
 
-/** 경험 단건 상세(STAR 포함). `useExperienceSuspense` 결과에서 파생한 non-null 타입. */
-export type ExperienceDetail = NonNullable<ReturnType<typeof useExperienceSuspense>['experience']>
-
 /**
  * 키워드로 경험을 검색한다. 키워드가 비어 있으면 요청하지 않는다.
  * 타이핑 중 깜빡임을 줄이려 이전 결과를 유지한다.

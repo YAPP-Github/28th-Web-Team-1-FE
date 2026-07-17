@@ -1,3 +1,7 @@
+import type { ProjectQuery } from '@shared/lib/gql/graphql'
+
+export type Project = ProjectQuery['project']
+
 export interface CreateProjectInput {
   name: string
   summary: string

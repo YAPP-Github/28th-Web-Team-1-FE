@@ -6,7 +6,7 @@ import { Flex } from '@radix-ui/themes'
 import { useUpdateExperience, type ExperienceDetail } from '@entities/experience'
 import { Text } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
-import { useAutosave } from '../../../shared/hooks/useAutosave'
+import { useAutosave } from '@shared/hooks/useAutosave'
 
 const STAR_FIELDS = [
   { key: 'situation', label: 'Situation', sublabel: '상황' },
