@@ -1,7 +1,6 @@
 'use client'
 
 import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { Dialog, DialogContent } from '@shared/ui/dialog'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Flex, Skeleton } from '@radix-ui/themes'
@@ -16,14 +15,14 @@ const MAX_SELECT = 5
 
 interface Props {
   isOpen: boolean
+  jdId: string
   //Todo:  api 요청 시 experienceID(매개변수) 만 전달할지 확인 필요
   onComplete: (experiences: Experience[]) => void
   onOpenChange?: (isOpen: boolean) => void
 }
 
-export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete }: Props) => {
+export const ExperiencePickerDialog = ({ isOpen, jdId, onOpenChange, onComplete }: Props) => {
   const workspaceId = useWorkspaceId()
-  const jdId = useSearchParams().get('jdId') ?? ''
 
   const { selectedItems, isSelected, toggle, isFull, count } = useMultiSelect((experience: Experience) => experience.experienceId, MAX_SELECT)
 

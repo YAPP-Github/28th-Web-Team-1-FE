@@ -50,6 +50,7 @@ const ResumeCreateContent = () => {
   return (
     <ExperiencePickerDialog
       isOpen={true}
+      jdId={jdId}
       onComplete={(selectedExperiences) => {
         console.log(selectedExperiences)
       }}
