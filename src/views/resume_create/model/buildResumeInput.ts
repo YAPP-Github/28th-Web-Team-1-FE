@@ -1,4 +1,4 @@
-import { type SaveResumeInput, type SaveResumeSectionItemInput } from '@shared/lib/gql/graphql'
+import { type CreateResumeInput, type SaveResumeSectionItemInput } from '@shared/lib/gql/graphql'
 import type { Experience } from './experience.types'
 
 /**
@@ -23,7 +23,7 @@ export const flattenExperienceContents = (contents: Experience['contents']): str
  * @param experiences 선택된 경험 목록(순서 = 표시 순서)
  * @param jdId 이력서가 맞춰진 대상 채용공고 ID
  */
-export const buildResumeInput = (experiences: Experience[], jdId: string): SaveResumeInput => {
+export const buildResumeInput = (experiences: Experience[], jdId: string): CreateResumeInput => {
   const items: SaveResumeSectionItemInput[] = experiences.map((experience, index) => ({
     displayOrder: index,
     visible: true,

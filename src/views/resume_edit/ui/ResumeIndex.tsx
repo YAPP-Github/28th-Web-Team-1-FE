@@ -10,27 +10,30 @@ import { getSectionItemLabels, visibleSortedItems, type ResumeSectionData } from
  * - 접힌 상태: 섹션은 긴 dash, 하위 아이템은 짧은 dash로 표시
  * - 펼친 상태(hover): 섹션 제목(displayText)과 아이템 라벨 목록
  */
-export const ResumeIndex = ({ sections }: { sections: ResumeSectionData[] }) => {
+export const ResumeIndex = ({ sections, activeSectionId }: { sections: ResumeSectionData[]; activeSectionId: string | null }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <Flex className={'relative w-16 px-4 py-20'} onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)}>
       <Flex direction="column" align={'end'} gap="2" className="w-full">
-        {sections.map((section) => (
-          <Fragment key={section.sectionId}>
-            <div className={'bg-border-subtle h-0.75 w-6 rounded-full'} />
-            {visibleSortedItems(section).map((item) => (
-              <div key={item.itemId} className={'bg-border-subtler h-0.75 w-4 rounded-full'} />
-            ))}
-          </Fragment>
-        ))}
+        {sections.map((section) => {
+          const isActive = activeSectionId === section.sectionId
+          return (
+            <Fragment key={section.sectionId}>
+              <div className={cn('h-0.75 w-6 rounded-full', isActive ? 'bg-border-primary' : 'bg-border-subtle')} />
+              {visibleSortedItems(section).map((item) => (
+                <div key={item.itemId} className={cn('h-0.75 w-4 rounded-full', isActive ? 'bg-primary-20' : 'bg-border-subtler')} />
+              ))}
+            </Fragment>
+          )
+        })}
       </Flex>
 
       {isOpen && (
         <Flex direction="column" gap="4" className={cn('bg-element-white border-border-subtler shadow-1 absolute top-16 right-4 z-10 min-w-40 rounded-lg border p-4')}>
           {sections.map((section) => (
             <Flex key={section.sectionId} direction="column" gap="1">
-              <Text variant="label2" color="text-basic" className="text-nowrap">
+              <Text variant="label2" color={activeSectionId === section.sectionId ? 'text-primary-bolder' : 'text-basic'} className="text-nowrap">
                 {section.displayText}
               </Text>
               {getSectionItemLabels(section).map((label, index) => (

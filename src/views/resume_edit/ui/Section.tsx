@@ -5,7 +5,7 @@ import { Fragment, type ReactNode } from 'react'
 
 export const Section = ({ title, children }: { title: string; children: ReactNode }) => {
   return (
-    <section className={'hover:bg-gray-5 flex gap-18 rounded-sm p-3'}>
+    <section className={'group-data-[active=true]:bg-primary-5 group-data-[active=false]:hover:bg-gray-5 flex gap-18 rounded-sm p-3 transition-colors'}>
       <Text variant={'label2'} color={'text-subtler'} className={'min-12 w-12 shrink-0 text-nowrap'}>
         {title}
       </Text>

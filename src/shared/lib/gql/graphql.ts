@@ -16,6 +16,18 @@ export type CreateExperienceProjectRequest = {
   summary: string;
 };
 
+/** 이력서 생성에 사용하는 전체 스냅샷 입력입니다. */
+export type CreateResumeInput = {
+  /** 저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다. */
+  sections: Array<SaveResumeSectionInput>;
+  /** 생성할 이력서 상태입니다. */
+  status: ResumeStatusType;
+  /** 이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다. */
+  targetJdId?: string | number | null | undefined;
+  /** 이력서 렌더링에 사용할 템플릿입니다. */
+  template: ResumeTemplate;
+};
+
 /** 경험 상세 내용 타입입니다. */
 export type ExperienceContentsType =
   /** 자유 서술 형식입니다. */
@@ -23,7 +35,10 @@ export type ExperienceContentsType =
   /** Situation, Task, Action, Result로 구성된 형식입니다. */
   | 'STAR';
 
-/** JD 등록 입력입니다. sourceUrl 또는 body 중 정확히 하나여야 합니다. */
+/**
+ * JD 등록 입력입니다. sourceUrl 또는 body 중 하나는 필요합니다.
+ * body가 있으면 크롤 없이 body로 처리하고, sourceUrl은 출처 메타로만 저장됩니다.
+ */
 export type JdRegisterRequest = {
   /** 붙여넣은 JD 본문입니다. (붙여넣기 등록) */
   body?: string | null | undefined;
@@ -186,18 +201,6 @@ export type ResumeTemplate =
   /** 기본 이력서 템플릿입니다. */
   | 'DEFAULT';
 
-/** 이력서 생성 및 수정에 사용하는 전체 스냅샷 입력입니다. */
-export type SaveResumeInput = {
-  /** 저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다. */
-  sections: Array<SaveResumeSectionInput>;
-  /** 저장할 이력서 상태입니다. */
-  status: ResumeStatusType;
-  /** 이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다. */
-  targetJdId?: string | number | null | undefined;
-  /** 이력서 렌더링에 사용할 템플릿입니다. */
-  template: ResumeTemplate;
-};
-
 /** 이력서 섹션 저장 입력입니다. */
 export type SaveResumeSectionInput = {
   /** 섹션 표시 순서입니다. */
@@ -208,6 +211,11 @@ export type SaveResumeSectionInput = {
   sectionId?: string | number | null | undefined;
   /** 섹션 타입입니다. 하위 아이템 payload 타입과 일치해야 합니다. */
   type: ResumeSectionType;
+  /**
+   * 생성 시 섹션 타입에 맞는 기본 아이템을 만들지 여부입니다. true이면 items는 비어 있어야 합니다.
+   * 수정 요청에서는 사용할 수 없습니다.
+   */
+  useDefaultItems?: boolean;
   /** 섹션 노출 여부입니다. */
   visible: boolean;
 };
@@ -299,7 +307,7 @@ export type ProjectFilterOptionsQuery = { experienceProjects: { cursor: { hasNex
 
 export type CreateResumeMutationVariables = Exact<{
   workspaceId: string | number;
-  input: SaveResumeInput;
+  input: CreateResumeInput;
 }>;
 
 
@@ -329,7 +337,7 @@ export type ResumeQueryVariables = Exact<{
 }>;
 
 
-export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string, email: string | null, phone: string | null } | null, coreSkill: { content: string } | null, career: { companyName: string, role: string | null, contents: string, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string, organization: string | null, awardedAt: string | null } | null, language: { examName: string, scoreOrGrade: string, acquiredAt: string | null } | null, certificate: { name: string, organization: string | null, acquiredAt: string | null } | null, skill: { name: string, level: string | null } | null } }> }> } };
+export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string, email: string | null, phone: string | null } | null, coreSkill: { content: string } | null, career: { companyName: string, role: string | null, contents: string, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string, organization: string | null, awardedAt: string | null } | null, language: { examName: string, scoreOrGrade: string, acquiredAt: string | null } | null, certificate: { name: string, organization: string | null, acquiredAt: string | null } | null, skill: { name: string, level: string | null } | null } }> }> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -602,7 +610,7 @@ export const ProjectFilterOptionsDocument = new TypedDocumentString(`
   name
 }`) as unknown as TypedDocumentString<ProjectFilterOptionsQuery, ProjectFilterOptionsQueryVariables>;
 export const CreateResumeDocument = new TypedDocumentString(`
-    mutation CreateResume($workspaceId: ID!, $input: SaveResumeInput!) {
+    mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {
   createResume(workspaceId: $workspaceId, input: $input) {
     resumeId
   }
@@ -613,6 +621,11 @@ export const ResumeDocument = new TypedDocumentString(`
   resume(resumeId: $resumeId, workspaceId: $workspaceId) {
     resumeId
     status
+    targetJd {
+      jdId
+      companyName
+      positionTitle
+    }
     sections {
       sectionId
       type
