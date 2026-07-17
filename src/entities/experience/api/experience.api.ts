@@ -124,6 +124,18 @@ const matchedExperiencesDocument = graphql(`
           startAt
           endAt
         }
+        contents {
+          type
+          free {
+            content
+          }
+          star {
+            situation
+            task
+            action
+            result
+          }
+        }
         project {
           projectId
           name
