@@ -159,7 +159,7 @@ export type MatchedExperiencesQueryVariables = Exact<{
 }>;
 
 
-export type MatchedExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, matchRate: number | null, role: string | null, recommendedReason: string | null, period: { startAt: string | null, endAt: string | null } | null, project: { projectId: string, name: string } | null }> } };
+export type MatchedExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, matchRate: number | null, role: string | null, recommendedReason: string | null, period: { startAt: string | null, endAt: string | null } | null, contents: { type: ExperienceContentsType, free: { content: string } | null, star: { situation: string, task: string, action: string, result: string } | null }, project: { projectId: string, name: string } | null }> } };
 
 export type CreateExperienceMutationVariables = Exact<{
   workspaceId: string | number;
@@ -410,6 +410,18 @@ export const MatchedExperiencesDocument = new TypedDocumentString(`
       period {
         startAt
         endAt
+      }
+      contents {
+        type
+        free {
+          content
+        }
+        star {
+          situation
+          task
+          action
+          result
+        }
       }
       project {
         projectId
