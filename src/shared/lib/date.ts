@@ -65,4 +65,35 @@ const formatDate = (date?: dayjs.ConfigType, format: DateFormat = 'YYYY.MM.DD'):
 const formatPeriod = (startAt?: dayjs.ConfigType, endAt?: dayjs.ConfigType, format: DateFormat = 'YYYY.MM'): string =>
   [formatDate(startAt, format), formatDate(endAt, format)].filter(Boolean).join(' - ')
 
-export { formatDate, formatPeriod }
+/**
+ * 기간 입력 텍스트(`'2025.05 - 2025.08'` / `'2025.05'`)를 API 저장용 `{ startAt, endAt }`로 변환한다.
+ * `formatPeriod`의 역변환. 각 날짜를 `YYYY-MM-DD`로 확장한다 — 월 단위(`YYYY.MM`)면 시작은 그 달 1일,
+ * 종료는 그 달 말일(윤년 반영). 이미 일(day)까지 있으면 그대로, 파싱 불가하면 `null`.
+ * @param value 역할/기간 수정 필드의 기간 텍스트
+ * @returns 저장용 기간 객체. 비어 있으면 `null`
+ * @example
+ * ```ts
+ * parsePeriodInput('2025.05 - 2025.08') // { startAt: '2025-05-01', endAt: '2025-08-31' }
+ * parsePeriodInput('2025.02')           // { startAt: '2025-02-01', endAt: null }
+ * parsePeriodInput('')                  // null
+ * ```
+ */
+const parsePeriodInput = (value: string): { startAt: string | null; endAt: string | null } | null => {
+  const trimmed = value.trim()
+  if (!trimmed) return null
+
+  // 'YYYY.MM'(월 단위) → 시작=1일 / 종료=말일로 채운 'YYYY-MM-DD'. 이미 일까지 있으면 그대로, 아니면 null.
+  const toApiDate = (v: string | undefined, boundary: 'start' | 'end'): string | null => {
+    const normalized = v?.trim().replace(/\./g, '-')
+    if (!normalized) return null
+    if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return normalized
+    if (!/^\d{4}-\d{2}$/.test(normalized)) return null
+    const first = dayjs(`${normalized}-01`)
+    return (boundary === 'start' ? first : first.endOf('month')).format('YYYY-MM-DD')
+  }
+
+  const [start, end] = trimmed.split(/\s*[-~]\s*/)
+  return { startAt: toApiDate(start, 'start'), endAt: toApiDate(end, 'end') }
+}
+
+export { formatDate, formatPeriod, parsePeriodInput }

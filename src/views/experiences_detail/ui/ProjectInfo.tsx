@@ -20,8 +20,7 @@ import {
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
-import { formatPeriod } from '@shared/lib'
-import { parsePeriodInput } from '../lib/parsePeriodInput'
+import { formatPeriod, parsePeriodInput } from '@shared/lib'
 
 interface ProjectInfoCardProps {
   workspaceId: string

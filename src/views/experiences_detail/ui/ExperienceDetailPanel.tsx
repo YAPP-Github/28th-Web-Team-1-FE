@@ -21,9 +21,8 @@ import { Chip } from '@shared/ui/chip'
 import { Divider } from '@shared/ui/divider'
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
-import { formatPeriod } from '@shared/lib'
+import { formatPeriod, parsePeriodInput } from '@shared/lib'
 import { StarEditor } from './StarEditor'
-import { parsePeriodInput } from '../lib/parsePeriodInput'
 
 interface ExperienceDetailPanelProps {
   workspaceId: string
