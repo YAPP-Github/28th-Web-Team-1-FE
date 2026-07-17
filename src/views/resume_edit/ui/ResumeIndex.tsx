@@ -2,8 +2,9 @@
 import { Fragment, useState } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
-import { Text } from '@shared/ui'
+import { Divider, Text } from '@shared/ui'
 import { getSectionItemLabels, visibleSortedItems, type ResumeSectionData } from './ResumeSectionView'
+import { Menu } from 'lucide-react'
 
 /**
  * 이력서 미리보기의 목차(minimap). 서버가 내려준 섹션·아이템 구조를 그대로 반영한다.
@@ -14,8 +15,8 @@ export const ResumeIndex = ({ sections, activeSectionId }: { sections: ResumeSec
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <Flex className={'relative w-16 px-4 py-20'} onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)}>
-      <Flex direction="column" align={'end'} gap="2" className="w-full">
+    <Flex className={'relative w-16 px-4 py-20'} onMouseLeave={() => setIsOpen(false)}>
+      <Flex direction="column" align={'end'} gap="2" className="h-fit w-full" onMouseEnter={() => setIsOpen(true)}>
         {sections.map((section) => {
           const isActive = activeSectionId === section.sectionId
           return (
@@ -30,17 +31,35 @@ export const ResumeIndex = ({ sections, activeSectionId }: { sections: ResumeSec
       </Flex>
 
       {isOpen && (
-        <Flex direction="column" gap="4" className={cn('bg-element-white border-border-subtler shadow-1 absolute top-16 right-4 z-10 min-w-40 rounded-lg border p-4')}>
+        <Flex direction="column" gap="1" className={cn('bg-element-white border-border-subtler shadow-1 absolute top-16 right-4 z-10 min-w-40 rounded-lg border px-5 py-3')}>
+          <Flex align={'center'} gap={'1'}>
+            <Text variant="label2" color={'text-basic'}>
+              기본정보
+            </Text>
+          </Flex>
+          <Divider className={'mx-auto'} />
+
           {sections.map((section) => (
             <Flex key={section.sectionId} direction="column" gap="1">
-              <Text variant="label2" color={activeSectionId === section.sectionId ? 'text-primary-bolder' : 'text-basic'} className="text-nowrap">
-                {section.displayText}
-              </Text>
-              {getSectionItemLabels(section).map((label, index) => (
-                <Text key={index} variant="caption2" color="text-subtler" className="max-w-48 truncate">
-                  {label}
+              <Flex align={'center'} className={cn('group/section relative rounded-sm', activeSectionId === section.sectionId && 'bg-element-primary-lighter px-2 py-1')}>
+                <Menu size={12} className={'text-icon-gray absolute top-1/2 right-full mr-1 -translate-y-1/2 cursor-pointer opacity-0 transition-opacity group-hover/section:opacity-100'} />
+
+                <Text variant="label2" color={activeSectionId === section.sectionId ? 'text-primary-bolder' : 'text-basic'} className={'w-40 max-w-40 truncate'}>
+                  {section.displayText}
                 </Text>
-              ))}
+              </Flex>
+
+              <Flex direction="column" gap="1" className={cn('rounded-sm', activeSectionId === section.sectionId && 'bg-element-gray-lighter px-2 py-1')}>
+                {getSectionItemLabels(section).map((label, index) => (
+                  <Flex key={index} align={'center'} className={'group/item relative mx-3'}>
+                    <Menu size={10} className={'text-icon-gray absolute top-1/2 right-full mr-1 -translate-y-1/2 cursor-pointer opacity-0 transition-opacity group-hover/item:opacity-100'} />
+
+                    <Text variant="caption2" color="text-subtler" className="w-35 max-w-35 truncate">
+                      {label}
+                    </Text>
+                  </Flex>
+                ))}
+              </Flex>
             </Flex>
           ))}
         </Flex>
