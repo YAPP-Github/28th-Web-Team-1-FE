@@ -1,6 +1,6 @@
 'use client'
 import { useMutation } from '@tanstack/react-query'
-import { type SaveResumeInput } from '@shared/lib/gql/graphql'
+import { type CreateResumeInput } from '@shared/lib/gql/graphql'
 import { resumeAPI } from '../api/resume.api'
 
 /**
@@ -15,7 +15,7 @@ import { resumeAPI } from '../api/resume.api'
  */
 export const useCreateResume = (workspaceId: string) => {
   return useMutation({
-    mutationFn: async (input: SaveResumeInput) => {
+    mutationFn: async (input: CreateResumeInput) => {
       const { createResume } = await resumeAPI.createResume({ workspaceId, input })
       return createResume
     }
