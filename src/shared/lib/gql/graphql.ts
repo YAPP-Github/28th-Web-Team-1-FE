@@ -16,6 +16,13 @@ export type CreateExperienceProjectRequest = {
   summary: string;
 };
 
+/** 경험 상세 내용 타입입니다. */
+export type ExperienceContentsType =
+  /** 자유 서술 형식입니다. */
+  | 'FREE'
+  /** Situation, Task, Action, Result로 구성된 형식입니다. */
+  | 'STAR';
+
 /** JD 등록 입력입니다. sourceUrl 또는 body 중 정확히 하나여야 합니다. */
 export type JdRegisterRequest = {
   /** 붙여넣은 JD 본문입니다. (붙여넣기 등록) */
@@ -59,7 +66,7 @@ export type MatchedExperiencesQueryVariables = Exact<{
 }>;
 
 
-export type MatchedExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, matchRate: number | null, recommendedReason: string | null, project: { projectId: string, name: string, role: string | null, period: { startAt: string | null, endAt: string | null } | null } | null }> } };
+export type MatchedExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, matchRate: number | null, recommendedReason: string | null, contents: { type: ExperienceContentsType, free: { content: string } | null, star: { situation: string, task: string, action: string, result: string } | null }, project: { projectId: string, name: string, role: string | null, period: { startAt: string | null, endAt: string | null } | null } | null }> } };
 
 export type JdInsightQueryVariables = Exact<{
   workspaceId: string | number;
@@ -205,6 +212,18 @@ export const MatchedExperiencesDocument = new TypedDocumentString(`
       tags
       matchRate
       recommendedReason: reason
+      contents {
+        type
+        free {
+          content
+        }
+        star {
+          situation
+          task
+          action
+          result
+        }
+      }
       project {
         projectId
         name

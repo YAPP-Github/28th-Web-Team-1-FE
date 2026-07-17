@@ -65,6 +65,18 @@ const matchedExperiencesDocument = graphql(`
         tags
         matchRate
         recommendedReason: reason
+        contents {
+          type
+          free {
+            content
+          }
+          star {
+            situation
+            task
+            action
+            result
+          }
+        }
         project {
           projectId
           name
