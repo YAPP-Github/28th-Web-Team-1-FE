@@ -80,6 +80,7 @@ export const ProjectInfo = ({ workspaceId, project }: ProjectInfoCardProps) => {
   )
 }
 
+/** 프로젝트 삭제 버튼. */
 const DeleteProjectButton = ({ workspaceId, projectId }: { workspaceId: string; projectId: string }) => {
   const router = useRouter()
   const { mutate: deleteProject } = useDeleteProject(workspaceId)
@@ -107,19 +108,12 @@ const DeleteProjectButton = ({ workspaceId, projectId }: { workspaceId: string; 
   )
 }
 
-interface ProjectInitialValues {
-  name: string
-  role: string
-  period: string
-  summary: string
-}
+/** 프로젝트 수정 모달. */
 interface EditProjectButtonProps {
   workspaceId: string
   projectId: string
-  initial: ProjectInitialValues
+  initial: { name: string; role: string; period: string; summary: string }
 }
-
-/** 프로젝트 수정 모달. */
 const EditProjectButton = ({ workspaceId, projectId, initial }: EditProjectButtonProps) => {
   const [name, setName] = useState(initial.name)
   const [role, setRole] = useState(initial.role)

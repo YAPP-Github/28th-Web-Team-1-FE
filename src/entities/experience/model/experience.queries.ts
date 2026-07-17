@@ -1,5 +1,5 @@
 'use client'
-import { useSuspenseInfiniteQuery, keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useSuspenseInfiniteQuery, useSuspenseQuery, keepPreviousData, useQuery } from '@tanstack/react-query'
 import { experienceQueries } from './experience.keys'
 
 /**
@@ -28,13 +28,24 @@ export const useProjectExperiences = (workspaceId: string, projectId: string) =>
  * const { experience, isPending } = useExperience(workspaceId, experienceId)
  * ```
  */
-export const useExperience = (workspaceId: string, experienceId: string | null) => {
-  const { data, ...rest } = useQuery({
-    ...experienceQueries.detail(workspaceId, experienceId ?? ''),
-    enabled: Boolean(workspaceId) && Boolean(experienceId)
-  })
-  return { experience: data?.experience ?? null, ...rest }
+/**
+ * 경험 단건(제목·태그·역할·기간·STAR 상세)을 Suspense로 조회한다.
+ * 데이터가 도착할 때까지 상위 Suspense 경계가 fallback을 보여주므로 첫 렌더부터 값이 보장된다.
+ * (상세 패널이 한 번 조회해 헤더·수정·STAR 에디터에 내려주는 용도)
+ * @param workspaceId 라우트에서 확정된 워크스페이스 ID
+ * @param experienceId 조회할 경험 ID
+ * @example
+ * ```tsx
+ * const { experience } = useExperienceSuspense(workspaceId, experienceId)
+ * ```
+ */
+export const useExperienceSuspense = (workspaceId: string, experienceId: string) => {
+  const { data, ...rest } = useSuspenseQuery(experienceQueries.detail(workspaceId, experienceId))
+  return { experience: data.experience, ...rest }
 }
+
+/** 경험 단건 상세(STAR 포함). `useExperienceSuspense` 결과에서 파생한 non-null 타입. */
+export type ExperienceDetail = NonNullable<ReturnType<typeof useExperienceSuspense>['experience']>
 
 /**
  * 키워드로 경험을 검색한다. 키워드가 비어 있으면 요청하지 않는다.
