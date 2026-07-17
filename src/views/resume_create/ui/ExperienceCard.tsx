@@ -1,7 +1,7 @@
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { Divider, Spacing, Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
-import { cn, formatYYYYMM } from '@shared/lib'
+import { cn, formatPeriod } from '@shared/lib'
 import type { ReactNode } from 'react'
 import type { Experience } from '../model/experience.types'
 import { CheckboxCard } from './CheckboxCard'
@@ -16,7 +16,7 @@ interface ExperienceCardProps {
 }
 
 export const ExperienceCard = ({ experience, checked, onCheckedChange, disabled, bordered, showReason }: ExperienceCardProps) => {
-  const { title, tags, project, matchRate, recommendedReason } = experience
+  const { title, tags, role, period, matchRate, recommendedReason } = experience
 
   return (
     <CheckboxCard
@@ -37,11 +37,11 @@ export const ExperienceCard = ({ experience, checked, onCheckedChange, disabled,
           <InfoRow label={'역할 및 기간'}>
             <Flex gap={'2'} align={'center'} minWidth={'0'}>
               <Text variant={'label2'} color={'text-bolder'} className={'min-w-0 truncate'}>
-                {project?.role}
+                {role || '-'}
               </Text>
               <Divider orientation={'vertical'} size={1} className={'h-2.5 shrink-0'} />
               <Text variant={'label2'} color={'text-bolder'} className={'shrink-0 text-nowrap'}>
-                {formatYYYYMM(project?.period?.startAt)} ~ {formatYYYYMM(project?.period?.endAt)}
+                {formatPeriod(period?.startAt, period?.endAt, 'YYYY.MM') || '-'}
               </Text>
             </Flex>
           </InfoRow>

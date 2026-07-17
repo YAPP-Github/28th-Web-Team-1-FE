@@ -41,14 +41,35 @@ input CreateExperienceRequest {
   """경험 상세 내용입니다."""
   contents: ExperienceContentsRequest!
 
+  """경험 수행 기간입니다."""
+  period: PeriodInput
+
   """연결할 경험 프로젝트 ID입니다."""
   projectId: ID!
+
+  """경험에서 맡은 역할입니다."""
+  role: String
 
   """경험에 부여할 태그 목록입니다."""
   tags: [String!] = []
 
   """경험 제목입니다."""
   title: String!
+}
+
+"""이력서 생성에 사용하는 전체 스냅샷 입력입니다."""
+input CreateResumeInput {
+  """저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다."""
+  sections: [SaveResumeSectionInput!]!
+
+  """생성할 이력서 상태입니다."""
+  status: ResumeStatusType!
+
+  """이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다."""
+  targetJdId: ID
+
+  """이력서 렌더링에 사용할 템플릿입니다."""
+  template: ResumeTemplate!
 }
 
 """커서 정보입니다."""
@@ -101,11 +122,17 @@ type Experience {
   """JD 기준 매칭률(0~100)입니다. experiences 조회에 jdId를 준 경우에만 채워집니다."""
   matchRate: Int
 
+  """경험 수행 기간입니다."""
+  period: Period
+
   """경험이 연결된 프로젝트입니다."""
   project: ExperienceProject
 
   """선정 이유입니다. 매칭률 상위 5개 경험에만 채워집니다. (그 외 null)"""
   reason: String
+
+  """경험에서 맡은 역할입니다."""
+  role: String
 
   """경험에 부여된 태그 목록입니다."""
   tags: [String!]!
@@ -129,10 +156,10 @@ type ExperienceContents {
 """경험 상세 내용 입력입니다."""
 input ExperienceContentsRequest {
   """FREE 형식의 상세 내용입니다."""
-  free: FreeExperienceContentsRequest
+  free: FreeExperienceContentsRequest = null
 
   """STAR 형식의 상세 내용입니다."""
-  star: StarExperienceContentsRequest
+  star: StarExperienceContentsRequest = null
 
   """경험 상세 내용 타입입니다."""
   type: ExperienceContentsType!
@@ -198,51 +225,6 @@ input FreeExperienceContentsRequest {
   content: String!
 }
 
-"""비로그인 JD 분석 결과(단일 공고)입니다. 저장되지 않으며 jdId가 없습니다."""
-type GuestJdAnalysis {
-  """기업/팀 소개입니다."""
-  companyIntro: String!
-
-  """기업 이름입니다. (추출 실패 시 빈 문자열)"""
-  companyName: String!
-
-  """핵심 역량 태그입니다. AI가 공고에서 추출한 상위 핵심 역량(최대 5개)."""
-  coreCompetencies: [String!]!
-
-  """전형 절차 목록입니다."""
-  hiringProcess: [String!]!
-
-  """AI 인사이트(공고 핵심/지원 전략)입니다."""
-  insight: JdInsight!
-
-  """포지션 이름입니다. (추출 실패 시 빈 문자열)"""
-  positionTitle: String!
-
-  """우대 경험 목록입니다."""
-  preferredExperiences: [String!]!
-
-  """필요 경험(자격요건) 목록입니다."""
-  requiredExperiences: [String!]!
-
-  """업무 내용 목록입니다."""
-  responsibilities: [String!]!
-
-  """분석에 사용된 공고 원문입니다."""
-  sourceBody: String
-
-  """원본 공고 URL입니다. (붙여넣기 분석이면 null)"""
-  sourceUrl: String
-}
-
-"""비로그인 JD 분석 결과입니다. 단일 공고면 analysis, 다중 공고면 candidates가 채워집니다."""
-type GuestJdAnalysisResult {
-  """분석 결과입니다. (단일 공고)"""
-  analysis: GuestJdAnalysis
-
-  """저장되지 않은 공고 후보 목록입니다. (다중 공고 - 하나를 골라 body로 재분석)"""
-  candidates: [JdCandidate!]
-}
-
 """JD입니다."""
 type Jd {
   """기업/팀 소개입니다."""
@@ -259,6 +241,9 @@ type Jd {
 
   """전형 절차 목록입니다."""
   hiringProcess: [String!]!
+
+  """등록 시 AI가 생성해 저장한 공고 핵심과 지원 전략입니다."""
+  insight: JdInsight!
 
   """JD를 식별하는 ID입니다."""
   jdId: ID!
@@ -303,13 +288,16 @@ type JdInsight {
   strategy: String!
 }
 
-"""JD 등록 입력입니다. sourceUrl 또는 body 중 정확히 하나여야 합니다."""
+"""
+JD 등록 입력입니다. sourceUrl 또는 body 중 하나는 필요합니다.
+body가 있으면 크롤 없이 body로 처리하고, sourceUrl은 출처 메타로만 저장됩니다.
+"""
 input JdRegisterRequest {
   """붙여넣은 JD 본문입니다. (붙여넣기 등록)"""
-  body: String
+  body: String = null
 
   """등록할 JD 공고의 URL입니다. (크롤 등록)"""
-  sourceUrl: String
+  sourceUrl: String = null
 }
 
 """JD 등록 결과입니다. 단일 공고면 jd, 다중 공고면 candidates가 채워집니다."""
@@ -339,33 +327,10 @@ enum JdStatus {
   IN_PROGRESS
 }
 
-"""키워드 종류입니다."""
-enum KeywordType {
-  """자격명"""
-  CERTIFICATION
-
-  """어학 시험명"""
-  LANGUAGE_TEST
-
-  """기술/도구명"""
-  SKILL
-}
-
 """64-bit signed integer"""
 scalar Long
 
 type Mutation {
-  """
-  비로그인 상태에서 JD를 분석합니다. (온보딩 유입용)
-  저장하지 않고 7필드 추출과 AI 인사이트(공고 핵심/지원 전략)를 즉시 반환합니다.
-  본문에 여러 공고가 있으면 후보 목록(candidates)을 반환하며, 하나를 골라 body로 다시 분석합니다.
-  인증이 필요 없는 공개 요청입니다.
-  """
-  analyzeGuestJd(
-    """분석 입력입니다. sourceUrl(크롤) 또는 body(붙여넣기) 중 정확히 하나를 채웁니다."""
-    request: JdRegisterRequest!
-  ): GuestJdAnalysisResult!
-
   """워크스페이스에 Notion을 연결합니다."""
   connectNotion(
     """Notion 연결 요청입니다."""
@@ -396,7 +361,7 @@ type Mutation {
   """새 이력서를 전체 스냅샷 단위로 생성합니다."""
   createResume(
     """생성할 이력서 전체 스냅샷입니다."""
-    input: SaveResumeInput!
+    input: CreateResumeInput!
 
     """이력서를 생성할 워크스페이스 ID입니다."""
     workspaceId: ID!
@@ -496,7 +461,10 @@ type Mutation {
   크롤/추출 실패 시 오류를 반환합니다.
   """
   registerJd(
-    """등록 입력입니다. sourceUrl(크롤) 또는 body(붙여넣기) 중 정확히 하나를 채웁니다."""
+    """
+    등록 입력입니다. body가 있으면 크롤 없이 body로 등록하고 sourceUrl은 출처로만 저장합니다.
+    body가 없으면 sourceUrl을 크롤해 등록합니다.
+    """
     request: JdRegisterRequest!
 
     """등록할 워크스페이스의 ID입니다."""
@@ -867,10 +835,10 @@ type Query {
   """경험 프로젝트 목록을 조회합니다."""
   experienceProjects(
     """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
-    cursor: String
+    cursor: String = null
 
     """한 번에 조회할 경험 프로젝트 개수입니다. (1 이상 30 이하)"""
-    size: Int!
+    size: Int! = 10
 
     """경험 프로젝트 목록을 조회할 워크스페이스 ID입니다."""
     workspaceId: ID!
@@ -879,16 +847,16 @@ type Query {
   """경험 목록을 조회합니다 (프로젝트 ID가 있는 경우 특정 프로젝트 내로 한정)"""
   experiences(
     """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
-    cursor: String
+    cursor: String = null
 
     """JD ID입니다. 주면 각 경험에 해당 JD 기준 matchRate와 reason(상위 5개)을 채웁니다. (선택)"""
-    jdId: ID
+    jdId: ID = null
 
     """특정 프로젝트의 경험만 조회할 때 사용하는 프로젝트 ID입니다 (선택)"""
-    projectId: ID
+    projectId: ID = null
 
     """한 번에 조회할 경험 개수입니다. (1 이상 30 이하)"""
-    size: Int!
+    size: Int! = 10
 
     """경험 목록을 조회할 워크스페이스 ID입니다."""
     workspaceId: ID!
@@ -904,8 +872,8 @@ type Query {
   ): Jd
 
   """
-  JD의 AI 인사이트(공고 핵심/지원 전략)를 조회합니다.
-  최초 조회 시 AI로 생성/저장하며, 이후에는 저장된 값을 반환합니다.
+  JD의 AI 인사이트를 조회합니다.
+  하위 호환을 위한 독립 조회 API이며, 신규 API에서는 jd.insight를 사용할 수 있습니다.
   """
   jdInsight(
     """조회할 JD의 ID입니다."""
@@ -921,7 +889,7 @@ type Query {
     sort: JdSortType! = LATEST
 
     """상태 필터입니다. 생략하면 전체, IN_PROGRESS/COMPLETED면 해당 상태만. (AR0001 진행 중/완료 섹션)"""
-    status: JdStatus
+    status: JdStatus = null
 
     """조회할 워크스페이스의 ID입니다."""
     workspaceId: ID!
@@ -933,10 +901,10 @@ type Query {
   """워크스페이스에 연결된 Notion 연결 목록을 조회합니다."""
   notionConnections(
     """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
-    cursor: String
+    cursor: String = null
 
     """한 번에 조회할 Notion 연결 개수입니다. (1 이상 30 이하)"""
-    size: Int!
+    size: Int! = 10
 
     """워크스페이스 ID입니다."""
     workspaceId: ID!
@@ -948,13 +916,13 @@ type Query {
     connectionId: ID!
 
     """다음 페이지를 조회할 때 사용하는 Notion 커서입니다. (첫 페이지는 null)"""
-    cursor: String
+    cursor: String = null
 
     """페이지 검색어입니다 (선택)"""
-    query: String
+    query: String = null
 
     """한 번에 조회할 Notion 페이지 개수입니다. (1 이상 100 이하)"""
-    size: Int!
+    size: Int! = 10
 
     """워크스페이스 ID입니다."""
     workspaceId: ID!
@@ -983,39 +951,33 @@ type Query {
 
   """워크스페이스의 이력서 목록을 조회합니다."""
   resumes(
+    """다음 페이지를 조회할 때 사용할 커서입니다."""
+    cursor: String = null
+
+    """한 번에 조회할 이력서 개수입니다. (1 이상 30 이하)"""
+    size: Int! = 10
+
     """조회할 이력서 상태 목록입니다 (생략하면 COMPLETED, DRAFT를 모두 조회)"""
-    statuses: [ResumeStatusType!]
+    statuses: [ResumeStatusType!] = null
 
     """이력서 목록을 조회할 워크스페이스 ID입니다."""
     workspaceId: ID!
-  ): [ResumeSummary!]!
+  ): Resumes!
 
   """키워드 기반으로 경험 목록을 검색합니다."""
   searchExperiences(
     """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
-    cursor: String
+    cursor: String = null
 
     """검색어입니다."""
     keyword: String!
 
     """한 번에 조회할 경험 개수입니다. (1 이상 30 이하)"""
-    size: Int!
+    size: Int! = 10
 
     """경험을 검색할 워크스페이스 ID입니다."""
     workspaceId: ID!
   ): Experiences!
-
-  """키워드 사전에서 자동완성 제안을 조회합니다. 다른 사용자가 저장한 시험명/자격명/기술명이 재사용됩니다."""
-  suggestKeywords(
-    """검색어입니다."""
-    keyword: String!
-
-    """최대 제안 개수입니다. (1 이상 20 이하)"""
-    size: Int! = 10
-
-    """키워드 종류입니다."""
-    type: KeywordType!
-  ): [String!]!
 }
 
 """이력서 상세 응답입니다."""
@@ -1031,6 +993,9 @@ type Resume {
 
   """이력서 상태입니다."""
   status: ResumeStatusType!
+
+  """이력서의 대상 JD입니다."""
+  targetJd: Jd
 
   """이력서 템플릿입니다."""
   template: ResumeTemplate!
@@ -1428,6 +1393,9 @@ type ResumeSummary {
   """이력서 상태입니다."""
   status: ResumeStatusType!
 
+  """이력서의 대상 JD입니다."""
+  targetJd: Jd
+
   """이력서 템플릿입니다."""
   template: ResumeTemplate!
 
@@ -1441,18 +1409,17 @@ enum ResumeTemplate {
   DEFAULT
 }
 
-"""이력서 생성 및 수정에 사용하는 전체 스냅샷 입력입니다."""
+"""이력서 목록과 커서 정보입니다."""
+type Resumes {
+  cursor: Cursor!
+  resumes: [ResumeSummary!]!
+}
+
+"""이력서 수정에 사용하는 전체 스냅샷 입력입니다."""
 input SaveResumeInput {
-  """저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다."""
   sections: [SaveResumeSectionInput!]!
-
-  """저장할 이력서 상태입니다."""
   status: ResumeStatusType!
-
-  """이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다."""
   targetJdId: ID
-
-  """이력서 렌더링에 사용할 템플릿입니다."""
   template: ResumeTemplate!
 }
 
@@ -1469,6 +1436,12 @@ input SaveResumeSectionInput {
 
   """섹션 타입입니다. 하위 아이템 payload 타입과 일치해야 합니다."""
   type: ResumeSectionType!
+
+  """
+  생성 시 섹션 타입에 맞는 기본 아이템을 만들지 여부입니다. true이면 items는 비어 있어야 합니다.
+  수정 요청에서는 사용할 수 없습니다.
+  """
+  useDefaultItems: Boolean! = false
 
   """섹션 노출 여부입니다."""
   visible: Boolean!
@@ -1534,7 +1507,7 @@ input StarExperienceContentsRequest {
 """경험 프로젝트 수정 입력입니다."""
 input UpdateExperienceProjectRequest {
   """변경할 경험 프로젝트 이름입니다."""
-  name: String
+  name: String!
 
   """변경할 경험 프로젝트 진행 기간입니다."""
   period: PeriodInput
@@ -1543,55 +1516,61 @@ input UpdateExperienceProjectRequest {
   role: String
 
   """변경할 경험 프로젝트 요약입니다."""
-  summary: String
+  summary: String!
 }
 
 """경험 수정 입력입니다."""
 input UpdateExperienceRequest {
   """변경할 경험 상세 내용입니다."""
-  contents: ExperienceContentsRequest
+  contents: ExperienceContentsRequest!
+
+  """변경할 경험 수행 기간입니다."""
+  period: PeriodInput
 
   """변경할 경험 프로젝트 ID입니다."""
-  projectId: ID
+  projectId: ID!
+
+  """변경할 경험 역할입니다."""
+  role: String
 
   """변경할 태그 목록입니다."""
-  tags: [String!]
+  tags: [String!]!
 
   """변경할 경험 제목입니다."""
-  title: String
+  title: String!
 }
 
 """프로필 수정 입력입니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다."""
 input UpdateProfileRequest {
   """변경할 수상 목록입니다. (전체 교체)"""
-  awards: [ProfileAwardRequest!]
+  awards: [ProfileAwardRequest!] = null
 
   """변경할 경력 목록입니다. (전체 교체)"""
-  careers: [ProfileCareerRequest!]
+  careers: [ProfileCareerRequest!] = null
 
   """변경할 자격증 목록입니다. (전체 교체)"""
-  certifications: [ProfileCertificationRequest!]
+  certifications: [ProfileCertificationRequest!] = null
 
   """변경할 핵심역량입니다. (최대 500자)"""
-  coreCompetency: String
+  coreCompetency: String = null
 
   """변경할 학력 목록입니다. (전체 교체)"""
-  educations: [ProfileEducationRequest!]
+  educations: [ProfileEducationRequest!] = null
 
   """변경할 이메일입니다."""
-  email: String
+  email: String = null
 
   """변경할 어학 목록입니다. (전체 교체)"""
-  languageTests: [ProfileLanguageTestRequest!]
+  languageTests: [ProfileLanguageTestRequest!] = null
 
   """변경할 이름입니다."""
-  name: String
+  name: String = null
 
   """변경할 전화번호입니다. (형식: 010-1234-5678, 빈 문자열 = 비우기)"""
-  phone: String
+  phone: String = null
 
   """변경할 스킬 목록입니다. (전체 교체)"""
-  skills: [ProfileSkillRequest!]
+  skills: [ProfileSkillRequest!] = null
 }
 
 """사용자 정보입니다."""
