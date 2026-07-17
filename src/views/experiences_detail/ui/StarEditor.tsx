@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Flex } from '@radix-ui/themes'
 import { useExperience, useUpdateExperience } from '@entities/experience'
@@ -22,14 +23,10 @@ const AUTOSAVE_DELAY_MS = 8000
 
 interface StarEditorProps {
   workspaceId: string
-  projectId: string
   experienceId: string
 }
-/**
- * STAR(상황·과업·행동·결과) 입력 영역. 저장 버튼 없이 입력이 멈추면(디바운스) 자동 저장한다.
- * 성공은 조용히 처리하고 실패만 토스트로 알린다.
- */
-export const StarEditor = ({ workspaceId, projectId, experienceId }: StarEditorProps) => {
+export const StarEditor = ({ workspaceId, experienceId }: StarEditorProps) => {
+  const { projectId } = useParams<{ projectId: string }>()
   const { experience } = useExperience(workspaceId, experienceId)
   const { mutate: updateExperience } = useUpdateExperience(workspaceId, projectId)
 
@@ -44,11 +41,25 @@ export const StarEditor = ({ workspaceId, projectId, experienceId }: StarEditorP
   }
 
   const valuesRef = useRef(values)
+  // 수정은 전체 스냅샷 전송이라 STAR 외 필드(제목·태그·역할·기간)는 현재 경험 값을 그대로 되돌려 보낸다.
+  const experienceRef = useRef(experience)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const save = () => {
+    const current = experienceRef.current
+    if (!current) return
     updateExperience(
-      { experienceId, request: { contents: { type: 'STAR', star: valuesRef.current } } },
+      {
+        experienceId,
+        request: {
+          projectId,
+          title: current.title,
+          tags: current.tags,
+          contents: { type: 'STAR', star: valuesRef.current },
+          role: current.role ?? null,
+          period: current.period ?? null
+        }
+      },
       { onError: () => toast.error('저장에 실패했어요. 다시 시도해 주세요.', { id: 'experience-star-save-error', position: 'top-center' }) }
     )
   }
@@ -58,6 +69,7 @@ export const StarEditor = ({ workspaceId, projectId, experienceId }: StarEditorP
   const flushRef = useRef<() => void>(() => {})
   useEffect(() => {
     valuesRef.current = values
+    experienceRef.current = experience
     flushRef.current = () => {
       if (!saveTimer.current) return
       clearTimeout(saveTimer.current)

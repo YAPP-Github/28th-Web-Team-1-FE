@@ -5,8 +5,8 @@ export interface CreateProjectInput {
 }
 
 export interface UpdateProjectInput {
-  name?: string
+  name: string
   role?: string
-  summary?: string
+  summary: string
   period?: { startAt?: string | null; endAt?: string | null } | null
 }

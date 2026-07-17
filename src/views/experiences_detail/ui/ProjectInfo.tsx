@@ -21,6 +21,7 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTr
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
 import { formatPeriod } from '@shared/lib'
+import { parsePeriodInput } from '../lib/parsePeriodInput'
 
 interface ProjectInfoCardProps {
   workspaceId: string
@@ -116,14 +117,6 @@ interface EditProjectButtonProps {
   workspaceId: string
   projectId: string
   initial: ProjectInitialValues
-}
-
-/** "2025.05 - 2025.08" / "2025.05" 텍스트를 PeriodInput으로 변환한다. 비어 있으면 null. */
-const parsePeriodInput = (value: string): { startAt: string | null; endAt: string | null } | null => {
-  const trimmed = value.trim()
-  if (!trimmed) return null
-  const [start, end] = trimmed.split(/\s*[-~]\s*/)
-  return { startAt: start || null, endAt: end || null }
 }
 
 /** 프로젝트 수정 모달. */

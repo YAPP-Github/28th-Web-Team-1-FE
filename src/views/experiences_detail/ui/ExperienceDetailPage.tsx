@@ -12,9 +12,15 @@ import { ProjectInfo } from './ProjectInfo'
 import { ExperienceList } from './ExperienceList'
 import { ExperienceDetailPanel } from './ExperienceDetailPanel'
 
-export const ExperienceDetailPage = () => {
-  const { id: projectId } = useParams<{ id: string }>()
+const LoadingScreen = () => (
+  <Flex align="center" justify="center" className="h-screen">
+    <Text variant="headline2" color="text-basic">
+      로딩중
+    </Text>
+  </Flex>
+)
 
+export const ExperienceDetailPage = () => {
   return (
     <ErrorBoundary
       fallback={
@@ -25,23 +31,26 @@ export const ExperienceDetailPage = () => {
         </Flex>
       }
     >
-      <Suspense
-        fallback={
-          <Flex align="center" justify="center" className="h-screen">
-            <Text variant="headline2" color="text-basic">
-              로딩중
-            </Text>
-          </Flex>
-        }
-      >
-        <ExperienceDetailContent projectId={projectId} />
+      <Suspense fallback={<LoadingScreen />}>
+        <WorkspaceBoundary />
       </Suspense>
     </ErrorBoundary>
   )
 }
 
-const ExperienceDetailContent = ({ projectId }: { projectId: string }) => {
+// workspaceId(me)를 바깥 경계에서 먼저 확정한다. 한 번 캐시되면 프로젝트 전환(projectId 변경) 시
+// 여기선 다시 suspend하지 않고, 안쪽 경계에서 프로젝트/경험 데이터만 다시 불러온다.
+const WorkspaceBoundary = () => {
   const workspaceId = useWorkspaceId()
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <ExperienceDetailContent workspaceId={workspaceId} />
+    </Suspense>
+  )
+}
+
+const ExperienceDetailContent = ({ workspaceId }: { workspaceId: string }) => {
+  const { projectId } = useParams<{ projectId: string }>()
   const { project } = useProject(workspaceId, projectId)
   const { experiences } = useProjectExperiences(workspaceId, projectId)
 
@@ -65,13 +74,11 @@ const ExperienceDetailContent = ({ projectId }: { projectId: string }) => {
             </Text>
           </Flex>
           <ProjectInfo workspaceId={workspaceId} project={project} />
-          <ExperienceList workspaceId={workspaceId} projectId={projectId} experiences={experiences} expanded={selectedExperience !== null} selectedId={selectedId} onSelect={handleSelect} />
+          <ExperienceList experiences={experiences} expanded={selectedExperience !== null} selectedId={selectedId} onSelect={handleSelect} />
         </Flex>
       </Flex>
 
-      {selectedExperience && (
-        <ExperienceDetailPanel key={selectedExperience.experienceId} workspaceId={workspaceId} projectId={projectId} experience={selectedExperience} onClose={() => setSelectedId(null)} />
-      )}
+      {selectedExperience && <ExperienceDetailPanel key={selectedExperience.experienceId} workspaceId={workspaceId} experience={selectedExperience} onClose={() => setSelectedId(null)} />}
     </Flex>
   )
 }

@@ -13,15 +13,30 @@ export interface ExperienceContentsInput {
   free?: { content: string } | null
 }
 
+/** 경험 수행 기간 입력. 값이 없으면 각 필드는 `null`. 저장 형식은 `"YYYY-MM-DD"`(또는 `"YYYY-MM"`) 대시 ISO. */
+export interface PeriodInput {
+  startAt: string | null
+  endAt: string | null
+}
+
 export interface CreateExperienceInput {
   projectId: string
   title: string
   tags?: string[]
   contents: ExperienceContentsInput
+  role?: string | null
+  period?: PeriodInput | null
 }
 
+/**
+ * 경험 수정 입력. 백엔드가 전체 스냅샷을 요구하므로(모든 필드 필수) 부분 수정이 아닌
+ * 현재 값 전체를 담아 보낸다. `role`/`period`는 미설정 시 `null`.
+ */
 export interface UpdateExperienceInput {
-  title?: string
-  tags?: string[]
-  contents?: ExperienceContentsInput
+  projectId: string
+  title: string
+  tags: string[]
+  contents: ExperienceContentsInput
+  role?: string | null
+  period?: PeriodInput | null
 }

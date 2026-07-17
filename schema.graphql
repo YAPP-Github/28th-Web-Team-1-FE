@@ -41,8 +41,14 @@ input CreateExperienceRequest {
   """경험 상세 내용입니다."""
   contents: ExperienceContentsRequest!
 
+  """경험 수행 기간입니다."""
+  period: PeriodInput
+
   """연결할 경험 프로젝트 ID입니다."""
   projectId: ID!
+
+  """경험에서 맡은 역할입니다."""
+  role: String
 
   """경험에 부여할 태그 목록입니다."""
   tags: [String!] = []
@@ -101,11 +107,17 @@ type Experience {
   """JD 기준 매칭률(0~100)입니다. experiences 조회에 jdId를 준 경우에만 채워집니다."""
   matchRate: Int
 
+  """경험 수행 기간입니다."""
+  period: Period
+
   """경험이 연결된 프로젝트입니다."""
   project: ExperienceProject
 
   """선정 이유입니다. 매칭률 상위 5개 경험에만 채워집니다. (그 외 null)"""
   reason: String
+
+  """경험에서 맡은 역할입니다."""
+  role: String
 
   """경험에 부여된 태그 목록입니다."""
   tags: [String!]!
@@ -303,7 +315,10 @@ type JdInsight {
   strategy: String!
 }
 
-"""JD 등록 입력입니다. sourceUrl 또는 body 중 정확히 하나여야 합니다."""
+"""
+JD 등록 입력입니다. sourceUrl 또는 body 중 하나는 필요합니다.
+body가 있으면 크롤 없이 body로 처리하고, sourceUrl은 출처 메타로만 저장됩니다.
+"""
 input JdRegisterRequest {
   """붙여넣은 JD 본문입니다. (붙여넣기 등록)"""
   body: String
@@ -496,7 +511,10 @@ type Mutation {
   크롤/추출 실패 시 오류를 반환합니다.
   """
   registerJd(
-    """등록 입력입니다. sourceUrl(크롤) 또는 body(붙여넣기) 중 정확히 하나를 채웁니다."""
+    """
+    등록 입력입니다. body가 있으면 크롤 없이 body로 등록하고 sourceUrl은 출처로만 저장합니다.
+    body가 없으면 sourceUrl을 크롤해 등록합니다.
+    """
     request: JdRegisterRequest!
 
     """등록할 워크스페이스의 ID입니다."""
@@ -983,12 +1001,18 @@ type Query {
 
   """워크스페이스의 이력서 목록을 조회합니다."""
   resumes(
+    """다음 페이지를 조회할 때 사용할 커서입니다."""
+    cursor: String
+
+    """한 번에 조회할 이력서 개수입니다. (1 이상 30 이하)"""
+    size: Int!
+
     """조회할 이력서 상태 목록입니다 (생략하면 COMPLETED, DRAFT를 모두 조회)"""
     statuses: [ResumeStatusType!]
 
     """이력서 목록을 조회할 워크스페이스 ID입니다."""
     workspaceId: ID!
-  ): [ResumeSummary!]!
+  ): Resumes!
 
   """키워드 기반으로 경험 목록을 검색합니다."""
   searchExperiences(
@@ -1023,6 +1047,9 @@ type Resume {
   """생성 시각입니다."""
   createdAt: String!
 
+  """대상 JD의 AI 인사이트입니다. 요청할 때만 조회하거나 생성합니다."""
+  jdInsight: JdInsight
+
   """이력서 ID입니다."""
   resumeId: ID!
 
@@ -1031,6 +1058,9 @@ type Resume {
 
   """이력서 상태입니다."""
   status: ResumeStatusType!
+
+  """이력서의 대상 JD입니다."""
+  targetJd: Jd
 
   """이력서 템플릿입니다."""
   template: ResumeTemplate!
@@ -1428,6 +1458,9 @@ type ResumeSummary {
   """이력서 상태입니다."""
   status: ResumeStatusType!
 
+  """이력서의 대상 JD입니다."""
+  targetJd: Jd
+
   """이력서 템플릿입니다."""
   template: ResumeTemplate!
 
@@ -1439,6 +1472,12 @@ type ResumeSummary {
 enum ResumeTemplate {
   """기본 이력서 템플릿입니다."""
   DEFAULT
+}
+
+"""이력서 목록과 커서 정보입니다."""
+type Resumes {
+  cursor: Cursor!
+  resumes: [ResumeSummary!]!
 }
 
 """이력서 생성 및 수정에 사용하는 전체 스냅샷 입력입니다."""
@@ -1534,7 +1573,7 @@ input StarExperienceContentsRequest {
 """경험 프로젝트 수정 입력입니다."""
 input UpdateExperienceProjectRequest {
   """변경할 경험 프로젝트 이름입니다."""
-  name: String
+  name: String!
 
   """변경할 경험 프로젝트 진행 기간입니다."""
   period: PeriodInput
@@ -1543,22 +1582,28 @@ input UpdateExperienceProjectRequest {
   role: String
 
   """변경할 경험 프로젝트 요약입니다."""
-  summary: String
+  summary: String!
 }
 
 """경험 수정 입력입니다."""
 input UpdateExperienceRequest {
   """변경할 경험 상세 내용입니다."""
-  contents: ExperienceContentsRequest
+  contents: ExperienceContentsRequest!
+
+  """변경할 경험 수행 기간입니다."""
+  period: PeriodInput
 
   """변경할 경험 프로젝트 ID입니다."""
-  projectId: ID
+  projectId: ID!
+
+  """변경할 경험 역할입니다."""
+  role: String
 
   """변경할 태그 목록입니다."""
-  tags: [String!]
+  tags: [String!]!
 
   """변경할 경험 제목입니다."""
-  title: String
+  title: String!
 }
 
 """프로필 수정 입력입니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다."""

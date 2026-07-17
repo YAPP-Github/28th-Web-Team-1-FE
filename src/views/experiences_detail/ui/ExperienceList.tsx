@@ -1,38 +1,35 @@
 'use client'
 import { Flex } from '@radix-ui/themes'
-import { useProject } from '@entities/project'
-import { cn } from '@shared/lib/cn'
+import { cn, formatPeriod } from '@shared/lib'
 import { Text } from '@shared/ui'
-import { getProjectMeta } from '../lib/projectMeta'
 import { AddExperienceButton } from './AddExperienceButton'
-import type { ProjectMeta } from '../lib/projectMeta'
 import { Chip } from '@shared/ui/chip'
 
+interface ExperiencePeriod {
+  startAt?: string | null
+  endAt?: string | null
+}
 interface ExperienceListItem {
   experienceId: string
   title: string
   tags: string[]
+  role: string | null
+  period: ExperiencePeriod | null
 }
 interface ExperienceListProps {
-  workspaceId: string
-  projectId: string
   experiences: ExperienceListItem[]
   expanded: boolean
   selectedId: string | null
   onSelect: (experienceId: string) => void
 }
-export const ExperienceList = ({ workspaceId, projectId, experiences, expanded, selectedId, onSelect }: ExperienceListProps) => {
-  // TODO : 백엔드에서 경험별 프로젝트 메타데이터를 내려주게 수정 시 변경 필요
-  const { project } = useProject(workspaceId, projectId)
-  const projectMeta = getProjectMeta(project)
-
+export const ExperienceList = ({ experiences, expanded, selectedId, onSelect }: ExperienceListProps) => {
   return (
     <Flex direction="column" className="gap-3">
       <Flex align="center" justify="between">
         <Text variant="headline1" color="text-basic">
           경험 목록
         </Text>
-        <AddExperienceButton workspaceId={workspaceId} projectId={projectId} />
+        <AddExperienceButton />
       </Flex>
       {experiences.length === 0 ? (
         <Flex direction="column" align="center" justify="center" className="border-border-subtle h-32 rounded-lg border border-dashed px-6 py-5" gap="3">
@@ -46,14 +43,7 @@ export const ExperienceList = ({ workspaceId, projectId, experiences, expanded, 
       ) : (
         <div className={cn('grid w-full gap-4', expanded ? 'grid-cols-1' : 'grid-cols-2')}>
           {experiences.map((experience) => (
-            <ExperienceListCard
-              key={experience.experienceId}
-              title={experience.title}
-              keywords={experience.tags}
-              projectMeta={projectMeta}
-              selected={selectedId === experience.experienceId}
-              onSelect={() => onSelect(experience.experienceId)}
-            />
+            <ExperienceListCard key={experience.experienceId} experience={experience} selected={selectedId === experience.experienceId} onClick={() => onSelect(experience.experienceId)} />
           ))}
         </div>
       )}
@@ -62,17 +52,15 @@ export const ExperienceList = ({ workspaceId, projectId, experiences, expanded, 
 }
 
 interface ExperienceListCardProps {
-  title: string
-  keywords: string[]
-  projectMeta: ProjectMeta
+  experience: ExperienceListItem
   selected?: boolean
-  onSelect?: () => void
+  onClick?: () => void
 }
-const ExperienceListCard = ({ title, keywords, projectMeta, selected = false, onSelect }: ExperienceListCardProps) => {
+const ExperienceListCard = ({ experience, selected = false, onClick }: ExperienceListCardProps) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      onSelect?.()
+      onClick?.()
     }
   }
 
@@ -81,7 +69,7 @@ const ExperienceListCard = ({ title, keywords, projectMeta, selected = false, on
       role="button"
       tabIndex={0}
       aria-pressed={selected}
-      onClick={() => onSelect?.()}
+      onClick={() => onClick?.()}
       onKeyDown={handleKeyDown}
       className={cn(
         'group flex cursor-pointer flex-col gap-3 rounded-lg p-4 text-left ring transition-colors ring-inset',
@@ -89,7 +77,7 @@ const ExperienceListCard = ({ title, keywords, projectMeta, selected = false, on
       )}
     >
       <Text variant="headline2" color="text-basic">
-        {title}
+        {experience.title}
       </Text>
       <Flex direction="column" gap="3">
         <Flex align="center" gap="4">
@@ -98,11 +86,11 @@ const ExperienceListCard = ({ title, keywords, projectMeta, selected = false, on
           </Text>
           <Flex align="center" gap="6px">
             <Text variant="label2" color="text-bolder">
-              {projectMeta.role || '-'}
+              {experience.role || '-'}
             </Text>
             <span className="bg-border-subtle h-3 w-px shrink-0 rounded-full" />
             <Text variant="label2" color="text-bolder">
-              {projectMeta.period || '-'}
+              {formatPeriod(experience.period?.startAt, experience.period?.endAt) || '-'}
             </Text>
           </Flex>
         </Flex>
@@ -111,9 +99,9 @@ const ExperienceListCard = ({ title, keywords, projectMeta, selected = false, on
             관련 역량
           </Text>
           <Flex align="center" gap="1" className="min-w-0 flex-1 flex-wrap">
-            {keywords.map((keyword, index) => (
+            {experience.tags.map((tag, index) => (
               <Chip key={index} size="sm" className={cn('group-hover:bg-element-white', selected && 'bg-element-white')}>
-                {keyword}
+                {tag}
               </Chip>
             ))}
           </Flex>

@@ -1,18 +1,18 @@
 'use client'
 import { useState } from 'react'
+import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Plus } from 'lucide-react'
 import { useCreateExperience } from '@entities/experience'
+import { useWorkspaceId } from '@entities/user'
 import { Button, Text } from '@shared/ui'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Textarea } from '@/src/shared/ui/textarea'
 
-interface AddExperienceButtonProps {
-  workspaceId: string
-  projectId: string
-}
-/** [경험 추가하기] 버튼을 누르면 열리는 다이얼로그 */
-export const AddExperienceButton = ({ workspaceId, projectId }: AddExperienceButtonProps) => {
+export const AddExperienceButton = () => {
+  const workspaceId = useWorkspaceId()
+  const { projectId } = useParams<{ projectId: string }>()
+
   const [isOpen, setIsOpen] = useState(false)
   const [content, setContent] = useState('')
   const { mutate: createExperience, isPending } = useCreateExperience(workspaceId, projectId)

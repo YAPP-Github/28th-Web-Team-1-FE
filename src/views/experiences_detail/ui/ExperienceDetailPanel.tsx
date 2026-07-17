@@ -1,10 +1,10 @@
 'use client'
 import { useState } from 'react'
+import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Flex } from '@radix-ui/themes'
 import { ChevronsRight, Trash2 } from 'lucide-react'
-import { useDeleteExperience, useUpdateExperience } from '@entities/experience'
-import { useProject } from '@entities/project'
+import { useDeleteExperience, useExperience, useUpdateExperience } from '@entities/experience'
 import { Button, Text } from '@shared/ui'
 import {
   AlertDialog,
@@ -21,22 +21,21 @@ import { Chip } from '@shared/ui/chip'
 import { Divider } from '@shared/ui/divider'
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
-import { getProjectMeta, type ProjectMeta } from '../lib/projectMeta'
-import { StarEditor } from './StarEditor'
 import { formatPeriod } from '@shared/lib'
+import { StarEditor } from './StarEditor'
+import { parsePeriodInput } from '../lib/parsePeriodInput'
 
+interface ExperiencePeriod {
+  startAt?: string | null
+  endAt?: string | null
+}
 interface ExperienceDetailPanelProps {
   workspaceId: string
-  projectId: string
-  experience: { experienceId: string; title: string; tags: string[] }
+  experience: { experienceId: string; title: string; tags: string[]; role: string | null; period: ExperiencePeriod | null }
   onClose: () => void
 }
-export const ExperienceDetailPanel = ({ workspaceId, projectId, experience, onClose }: ExperienceDetailPanelProps) => {
-  const { experienceId, title, tags: keywords } = experience
-
-  // 역할·기간은 프로젝트 값(경험 단위 값 없음). 페이지가 이미 받아둔 프로젝트 캐시를 dedupe로 읽는다.
-  const { project } = useProject(workspaceId, projectId)
-  const projectMeta = getProjectMeta(project)
+export const ExperienceDetailPanel = ({ workspaceId, experience, onClose }: ExperienceDetailPanelProps) => {
+  const { experienceId, title, tags, role, period } = experience
 
   return (
     <Flex direction="column" className="border-border-subtle bg-bg-gray-subtler h-screen w-148.5 shrink-0 overflow-y-auto border-l p-8">
@@ -51,8 +50,8 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experience, onCl
               {title}
             </Text>
             <Flex align="center" gap="2" className="hidden group-hover:flex">
-              <EditExperienceButton experienceId={experienceId} title={title} workspaceId={workspaceId} projectId={projectId} projectMeta={projectMeta} />
-              <DeleteExperienceButton workspaceId={workspaceId} projectId={projectId} experienceId={experienceId} onClose={onClose} />
+              <EditExperienceButton experienceId={experienceId} workspaceId={workspaceId} />
+              <DeleteExperienceButton workspaceId={workspaceId} experienceId={experienceId} onClose={onClose} />
             </Flex>
           </Flex>
           <Flex direction="column" className="gap-2.5">
@@ -62,11 +61,11 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experience, onCl
               </Text>
               <Flex align="center" className="h-full gap-2">
                 <Text variant="label2" color="text-bolder">
-                  {projectMeta.role || '-'}
+                  {role || '-'}
                 </Text>
                 <Divider orientation="vertical" color="gray-20" />
                 <Text variant="label2" color="text-bolder">
-                  {formatPeriod(project.period?.startAt, project.period?.endAt) || '-'}
+                  {formatPeriod(period?.startAt, period?.endAt) || '-'}
                 </Text>
               </Flex>
             </Flex>
@@ -75,9 +74,9 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experience, onCl
                 관련 역량
               </Text>
               <Flex align="center" className="min-w-0 flex-1 flex-wrap gap-1">
-                {keywords.map((keyword, index) => (
+                {tags.map((tag, index) => (
                   <Chip key={index} size="sm" variant="ghost">
-                    {keyword}
+                    {tag}
                   </Chip>
                 ))}
               </Flex>
@@ -87,13 +86,14 @@ export const ExperienceDetailPanel = ({ workspaceId, projectId, experience, onCl
 
         <Divider />
 
-        <StarEditor workspaceId={workspaceId} projectId={projectId} experienceId={experienceId} />
+        <StarEditor workspaceId={workspaceId} experienceId={experienceId} />
       </Flex>
     </Flex>
   )
 }
 
-const DeleteExperienceButton = ({ workspaceId, projectId, experienceId, onClose }: { workspaceId: string; projectId: string; experienceId: string; onClose: () => void }) => {
+const DeleteExperienceButton = ({ workspaceId, experienceId, onClose }: { workspaceId: string; experienceId: string; onClose: () => void }) => {
+  const { projectId } = useParams<{ projectId: string }>()
   const { mutate: deleteExperience } = useDeleteExperience(workspaceId, projectId)
 
   const handleDelete = () => {
@@ -131,33 +131,45 @@ const DeleteExperienceButton = ({ workspaceId, projectId, experienceId, onClose 
 
 interface EditExperienceButtonProps {
   workspaceId: string
-  projectId: string
   experienceId: string
-  title: string
-  projectMeta: ProjectMeta
 }
-const EditExperienceButton = ({ workspaceId, projectId, experienceId, title: initialTitle, projectMeta }: EditExperienceButtonProps) => {
-  const [title, setTitle] = useState(initialTitle)
-  const [role, setRole] = useState(projectMeta.role)
-  const [period, setPeriod] = useState(projectMeta.period)
-
+const EditExperienceButton = ({ workspaceId, experienceId }: EditExperienceButtonProps) => {
+  const { projectId } = useParams<{ projectId: string }>()
+  // 수정은 전체 스냅샷 전송이라 현재 경험(내용·태그 포함)을 읽어 편집한 필드와 함께 되돌려 보낸다.
+  const { experience } = useExperience(workspaceId, experienceId)
   const { mutate: updateExperience, isPending } = useUpdateExperience(workspaceId, projectId)
 
+  const [title, setTitle] = useState('')
+  const [role, setRole] = useState('')
+  const [period, setPeriod] = useState('')
+
   const handleOpenChange = (next: boolean) => {
-    if (!next) return
-    setTitle(initialTitle)
-    setRole(projectMeta.role)
-    setPeriod(projectMeta.period)
+    if (!next || !experience) return
+    setTitle(experience.title)
+    setRole(experience.role ?? '')
+    setPeriod(formatPeriod(experience.period?.startAt, experience.period?.endAt))
   }
 
   const handleSubmit = () => {
+    if (!experience) return
     const trimmed = title.trim()
     if (!trimmed) {
       toast.warning('경험 제목을 입력해 주세요.', { id: 'experience-title-required', position: 'top-center' })
       return
     }
+    const trimmedRole = role.trim()
     updateExperience(
-      { experienceId, request: { title: trimmed } },
+      {
+        experienceId,
+        request: {
+          projectId,
+          title: trimmed,
+          tags: experience.tags,
+          contents: experience.contents,
+          role: trimmedRole || null,
+          period: parsePeriodInput(period)
+        }
+      },
       {
         onSuccess: () => toast.success('경험이 수정되었어요.', { id: 'experience-updated', position: 'top-center' }),
         onError: () => toast.error('경험 수정에 실패했어요. 다시 시도해 주세요.', { id: 'experience-update-error', position: 'top-center' })

@@ -48,6 +48,11 @@ const projectExperiencesDocument = graphql(`
         experienceId
         title
         tags
+        role
+        period {
+          startAt
+          endAt
+        }
       }
     }
   }
@@ -59,6 +64,11 @@ const experienceDocument = graphql(`
       experienceId
       title
       tags
+      role
+      period {
+        startAt
+        endAt
+      }
       contents {
         type
         star {
@@ -109,14 +119,14 @@ const matchedExperiencesDocument = graphql(`
         tags
         matchRate
         recommendedReason: reason
+        role
+        period {
+          startAt
+          endAt
+        }
         project {
           projectId
           name
-          role
-          period {
-            startAt
-            endAt
-          }
         }
       }
     }
