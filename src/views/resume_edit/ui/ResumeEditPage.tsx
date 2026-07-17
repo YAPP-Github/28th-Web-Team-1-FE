@@ -37,7 +37,9 @@ const ResumeFallback = ({ children }: { children: ReactNode }) => (
 const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
-  const [activeSectionId, setActiveSectionId] = useState<string | null>(null)
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(() => {
+    return resume.sections.find((s) => s.type === 'EXPERIENCE')?.sectionId || null
+  })
 
   const sections = [...resume.sections].filter((section) => section.visible).sort((a, b) => a.displayOrder - b.displayOrder)
   const basicInfo = resume.sections.find((section) => section.type === 'BASIC_INFO')?.items[0]?.payload.basicInfo ?? null
