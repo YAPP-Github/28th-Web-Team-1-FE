@@ -16,12 +16,12 @@ const MAX_SELECT = 5
 interface Props {
   isOpen: boolean
   jdId: string
-  //Todo:  api 요청 시 experienceID(매개변수) 만 전달할지 확인 필요
+  isCompleting?: boolean
   onComplete: (experiences: Experience[]) => void
   onOpenChange?: (isOpen: boolean) => void
 }
 
-export const ExperiencePickerDialog = ({ isOpen, jdId, onOpenChange, onComplete }: Props) => {
+export const ExperiencePickerDialog = ({ isOpen, jdId, isCompleting = false, onOpenChange, onComplete }: Props) => {
   const workspaceId = useWorkspaceId()
 
   const { selectedItems, isSelected, toggle, isFull, count } = useMultiSelect((experience: Experience) => experience.experienceId, MAX_SELECT)
@@ -77,7 +77,7 @@ export const ExperiencePickerDialog = ({ isOpen, jdId, onOpenChange, onComplete 
 
           <Spacing size={16} />
 
-          <Button size={'md'} className={'mt-auto'} disabled={count === 0} onClick={() => onComplete(selectedItems)}>
+          <Button size={'md'} className={'mt-auto'} disabled={count === 0 || isCompleting} onClick={() => onComplete(selectedItems)}>
             선택 완료
           </Button>
         </Flex>

@@ -3,13 +3,16 @@
 import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ErrorBoundary } from '@sentry/nextjs'
+import { toast } from 'sonner'
 import { Text } from '@shared/ui'
+import { useWorkspaceId } from '@entities/user'
+import { useCreateResume } from '@entities/resume'
 import { ExperiencePickerDialog } from './ExperiencePickerDialog'
+import { buildResumeInput } from '../model/buildResumeInput'
 
 export const ResumeCreatePage = () => {
   return (
     <div>
-      {/* Todo: 선택된 경험으로 이력서 생성 플로우 연결 */}
       {/* Todo: Suspense fallback을 다이얼로그 모양의 스켈레톤으로 교체 (지금은 임시) */}
       <ErrorBoundary
         fallback={
@@ -40,6 +43,8 @@ export const ResumeCreatePage = () => {
 const ResumeCreateContent = () => {
   const router = useRouter()
   const jdId = useSearchParams().get('jdId') ?? ''
+  const workspaceId = useWorkspaceId()
+  const { mutate: createResume, isPending } = useCreateResume(workspaceId)
 
   useEffect(() => {
     if (!jdId) router.replace('/home')
@@ -51,8 +56,12 @@ const ResumeCreateContent = () => {
     <ExperiencePickerDialog
       isOpen={true}
       jdId={jdId}
+      isCompleting={isPending}
       onComplete={(selectedExperiences) => {
-        console.log(selectedExperiences)
+        createResume(buildResumeInput(selectedExperiences, jdId), {
+          onSuccess: ({ resumeId }) => router.push(`/home/resume/${resumeId}`),
+          onError: (error) => toast(error.message, { position: 'top-center' })
+        })
       }}
     />
   )
