@@ -69,7 +69,7 @@ const Input = ({ className, label, description, error, disabled, onChange, id, c
   }
 
   return (
-    <Flex direction="column" gap={'2'}>
+    <Flex direction="column" gap={'2'} className={className}>
       <Flex direction="row" justify="between" gap={'2'}>
         {label && (
           <Text variant="label1" as="label" htmlFor={inputId} weight="semibold" className="truncate">
@@ -110,8 +110,7 @@ const Input = ({ className, label, description, error, disabled, onChange, id, c
             'disabled:bg-element-disabled disabled:border-border-subtle disabled:text-text-disabled',
             'disabled:pointer-events-none disabled:cursor-not-allowed',
             // error
-            'aria-invalid:border-border-error',
-            className
+            'aria-invalid:border-border-error'
           )}
           {...props}
         />
