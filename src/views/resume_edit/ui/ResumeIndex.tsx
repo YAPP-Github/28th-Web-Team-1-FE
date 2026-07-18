@@ -3,7 +3,7 @@ import { Fragment, useState } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { Divider, Text } from '@shared/ui'
-import { getSectionItemLabels, visibleSortedItems, type ResumeSectionData } from './ResumeSectionView'
+import { getSectionItemLabels, visibleSortedItems, type ResumeSectionData } from '../model/section'
 import { Menu } from 'lucide-react'
 
 /**

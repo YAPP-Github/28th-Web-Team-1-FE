@@ -7,8 +7,9 @@ import { Button, Divider, Spacing, Text } from '@shared/ui'
 import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
 import { useResumeDetail } from '@entities/resume'
 import { useWorkspaceId } from '@entities/user'
+import type { ResumeSectionData } from '../model/section'
 import { ResumeIndex } from './ResumeIndex'
-import { ResumeSectionView, type ResumeSectionData } from './ResumeSectionView'
+import { ResumeSectionView } from './preview/ResumeSectionView'
 
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
   return (

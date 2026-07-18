@@ -1,4 +1,4 @@
-import type { ResumeQuery } from '@shared/lib/gql/graphql'
+import { payloadsOf, visibleSortedItems, type ResumeSectionData } from '../../model/section'
 import { AwardSection } from './AwardSection'
 import { CareerSection } from './CareerSection'
 import { CertificatesSection } from './CertificatesSection'
@@ -7,36 +7,6 @@ import { EducationSection } from './EducationSection'
 import { ExperienceSection } from './ExperienceSection'
 import { LanguageSection } from './LanguageSection'
 import { SkillSection } from './SkillSection'
-
-export type ResumeSectionData = ResumeQuery['resume']['sections'][number]
-type SectionItems = ResumeSectionData['items']
-
-/** 노출(visible) 아이템만 displayOrder 순으로 정렬해 돌려준다. (미리보기·목차 공통) */
-export const visibleSortedItems = (section: ResumeSectionData): SectionItems => [...section.items].filter((item) => item.visible).sort((a, b) => a.displayOrder - b.displayOrder)
-
-/** 섹션 아이템들에서 해당 타입의 payload만 뽑아 null을 제거한다. */
-const payloadsOf = <K extends keyof SectionItems[number]['payload']>(items: SectionItems, key: K) =>
-  items.map((item) => item.payload[key]).filter((payload): payload is NonNullable<typeof payload> => payload !== null)
-
-/** 목차(ResumeIndex)에 표시할 아이템 라벨. payload 타입과 무관하게 대표 이름 필드를 뽑는다. */
-export const getSectionItemLabels = (section: ResumeSectionData): string[] =>
-  visibleSortedItems(section)
-    .map((item) => {
-      const p = item.payload
-      return (
-        p.experience?.name ??
-        p.career?.companyName ??
-        p.education?.schoolName ??
-        p.award?.name ??
-        p.certificate?.name ??
-        p.language?.examName ??
-        p.skill?.name ??
-        p.coreSkill?.content ??
-        p.basicInfo?.name ??
-        ''
-      )
-    })
-    .filter((label) => label.trim().length > 0)
 
 /**
  * 서버가 내려준 섹션 하나를 `type`으로 분기해 알맞은 섹션 컴포넌트로 렌더한다.
