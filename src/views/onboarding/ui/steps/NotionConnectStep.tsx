@@ -1,6 +1,6 @@
 import { Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
-import { OnboardingStepHeader } from '../OnboardingLayout'
+import { OnboardingStepHeader } from '../OnboardingStepHeader'
 import { OnboardingChoiceGroup, OnboardingChoiceCard } from '../OnboardingChoiceCard'
 import { OnboardingFooter } from '../OnboardingFooter'
 

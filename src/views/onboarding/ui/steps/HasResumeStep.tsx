@@ -1,4 +1,4 @@
-import { OnboardingStepHeader } from '../OnboardingLayout'
+import { OnboardingStepHeader } from '../OnboardingStepHeader'
 import { OnboardingChoiceGroup, OnboardingChoiceCard } from '../OnboardingChoiceCard'
 import { OnboardingFooter } from '../OnboardingFooter'
 

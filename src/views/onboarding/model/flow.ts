@@ -1,4 +1,4 @@
-export type OnboardingStep = 'has-resume' | 'resume-upload' | 'notion-connect' | 'complete'
+export type OnboardingStep = 'has-resume' | 'resume-upload' | 'resume-info' | 'notion-connect' | 'complete'
 
 export const INITIAL_STEP: OnboardingStep = 'has-resume'
 
@@ -30,6 +30,9 @@ export const resolveNextStep = (step: OnboardingStep, answers: OnboardingAnswers
       // 이력서 있음 → 파일 업로드, 없음 → 노션 연동
       return answers.hasResume ? 'resume-upload' : 'notion-connect'
     case 'resume-upload':
+      // 파일 업로드 완료 → 가져온 이력서 정보 확인
+      return 'resume-info'
+    case 'resume-info':
       return 'complete'
     case 'notion-connect':
       return 'complete'
