@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ApiError } from '@/src/shared/lib'
 
@@ -24,7 +25,8 @@ export const QueryProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
-      {children}
+      {/* 서버 컴포넌트 렌더 중 발생한 useSuspenseQuery를 스트리밍으로 하이드레이션한다. */}
+      <ReactQueryStreamedHydration>{children}</ReactQueryStreamedHydration>
     </QueryClientProvider>
   )
 }
