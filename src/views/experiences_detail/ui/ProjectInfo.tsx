@@ -133,7 +133,7 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
           toast.success('프로젝트가 수정되었어요.', { id: 'project-updated', position: 'top-center' })
           setIsOpen(false)
         },
-        onError: () => toast.error('프로젝트 수정에 실패했어요. 다시 시도해 주세요.', { id: 'project-update-error', position: 'top-center' })
+        onError: (error) => toast.error(error.message, { id: 'project-update-error', position: 'top-center' })
       }
     )
   }

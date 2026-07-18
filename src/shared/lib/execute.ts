@@ -1,13 +1,16 @@
 import type { TypedDocumentString } from './gql/graphql'
 import { AUTH_ERROR } from './auth'
 import { ApiError, getServerContext, type ApiErrorDetail } from './http'
+import { GraphQLError, type GraphQLErrorObject } from './graphql-error'
 
 const isServer = typeof window === 'undefined'
 
 interface GraphQLResponse<T> {
   data?: T | null
-  error?: { code: string; details?: ApiErrorDetail[] }
-  errors?: Array<{ extensions?: { code?: string; details?: ApiErrorDetail[] } }>
+  // BFF 자체 실패(500/401 폴백) 형태
+  error?: { code: string; message?: string; details?: ApiErrorDetail[] }
+  // 원본 서버의 GraphQL 에러(그대로)
+  errors?: GraphQLErrorObject[]
 }
 
 /**
@@ -35,9 +38,12 @@ export const execute = async <TResult, TVariables>(query: TypedDocumentString<TR
 
   const body: GraphQLResponse<TResult> = await response.json().catch(() => ({}))
 
-  if (!response.ok || body.error || body.errors?.length) {
-    const error = body.error ?? body.errors?.[0]?.extensions
-    throw new ApiError(response.status, error?.code ?? AUTH_ERROR.INTERNAL, error?.details)
+  // GraphQL 에러는 서버 객체를 그대로 담아 던지고, BFF 자체 에러(폴백)는 ApiError로 던진다.
+  if (body.errors?.length) {
+    throw new GraphQLError(response.status, body.errors)
+  }
+  if (!response.ok || body.error) {
+    throw new ApiError(response.status, body.error?.code ?? AUTH_ERROR.INTERNAL, { details: body.error?.details, message: body.error?.message })
   }
 
   return body.data as TResult
