@@ -77,7 +77,7 @@ const Input = ({ className, label, description, error, disabled, onChange, id, c
           </Text>
         )}
         {description && (
-          <Text variant="label2" weight="regular" color={error ? 'red-50' : 'gray-50'} className="shrink-999 truncate">
+          <Text variant="label2" weight="regular" color={error ? 'text-danger' : 'text-subtler'} className="shrink-999 truncate">
             {description}
           </Text>
         )}
