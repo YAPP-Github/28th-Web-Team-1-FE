@@ -9,7 +9,6 @@
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
-    "test:unit": "vitest run -c vitest.unit.config.ts",
     "schema:pull": "graphql-codegen --config codegen.pull.ts && graphql-codegen",
     "codegen": "graphql-codegen",
     "codegen:watch": "graphql-codegen --watch",
