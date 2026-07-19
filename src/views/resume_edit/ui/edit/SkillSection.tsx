@@ -6,9 +6,9 @@ import { Input } from '@shared/ui/input'
 import { Chip } from '@shared/ui/chip'
 import { X } from 'lucide-react'
 
-export const SkillSection = ({ items }: { items: ResumeSkillFieldsFragment[] }) => {
+export const SkillSection = ({ title, items }: { title: string; items: ResumeSkillFieldsFragment[] }) => {
   return (
-    <Section title={'기술'}>
+    <Section title={title}>
       <Flex className={'gap-5'} direction={'column'}>
         <Flex flexBasis={'1'} gap={'1'} align={'end'}>
           <Flex className={'w-full'} gap={'1'}>

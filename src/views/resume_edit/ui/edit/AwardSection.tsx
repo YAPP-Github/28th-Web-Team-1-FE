@@ -6,12 +6,12 @@ import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
-export const AwardSection = ({ items }: { items: ResumeAwardFieldsFragment[] }) => {
+export const AwardSection = ({ title, items }: { title: string; items: ResumeAwardFieldsFragment[] }) => {
   const [awardItems, setAwardItems] = useState(items)
 
   return (
     <Section
-      title={'수상'}
+      title={title}
       actionButton={
         <Button
           variant={'text'}

@@ -6,9 +6,9 @@ import { PencilSparkles, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
 
-export const CareerSection = ({ items }: { title: string; items: ResumeCareerFieldsFragment[] }) => {
+export const CareerSection = ({ title, items }: { title: string; items: ResumeCareerFieldsFragment[] }) => {
   return (
-    <Section title={'경력'}>
+    <Section title={title}>
       {items.map((item, index) => (
         <CareerSectionItem key={index} item={item} index={index} />
       ))}

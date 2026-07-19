@@ -6,9 +6,9 @@ import { PencilSparkles } from 'lucide-react'
 import { Flex } from '@radix-ui/themes'
 import { useState } from 'react'
 
-export const CoreSkillSection = ({ items }: { items: ResumeCoreSkillFieldsFragment[] }) => {
+export const CoreSkillSection = ({ title, items }: { title: string; items: ResumeCoreSkillFieldsFragment[] }) => {
   return (
-    <Section title={'핵심 역량'}>
+    <Section title={title}>
       {items.map((item, index) => (
         <CoreSkillItem key={index} item={item} index={index} />
       ))}

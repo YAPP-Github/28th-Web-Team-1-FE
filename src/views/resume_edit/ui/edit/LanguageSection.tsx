@@ -5,9 +5,9 @@ import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 
-export const LanguageSection = ({ items }: { items: ResumeLanguageFieldsFragment[] }) => {
+export const LanguageSection = ({ title, items }: { title: string; items: ResumeLanguageFieldsFragment[] }) => {
   return (
-    <Section title={'어학'}>
+    <Section title={title}>
       {items.map((item, index) => (
         <LanguageSectionItem key={index} index={index} item={item} />
       ))}

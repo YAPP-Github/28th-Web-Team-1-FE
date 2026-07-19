@@ -5,9 +5,9 @@ import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 
-export const CertificatesSection = ({ items }: { items: ResumeCertificateFieldsFragment[] }) => {
+export const CertificatesSection = ({ title, items }: { title: string; items: ResumeCertificateFieldsFragment[] }) => {
   return (
-    <Section title={'자격증'}>
+    <Section title={title}>
       {items.map((item, index) => (
         <CertificatesSectionItem key={index} item={item} index={index} />
       ))}

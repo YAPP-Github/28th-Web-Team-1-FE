@@ -5,9 +5,9 @@ import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 
-export const EducationSection = ({ items }: { items: ResumeEducationFieldsFragment[] }) => {
+export const EducationSection = ({ title, items }: { title: string; items: ResumeEducationFieldsFragment[] }) => {
   return (
-    <Section title={'학력'}>
+    <Section title={title}>
       {items.map((item, index) => (
         <EducationSectionItem key={index} item={item} index={index} />
       ))}
