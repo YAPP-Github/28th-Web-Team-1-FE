@@ -1,21 +1,19 @@
 'use client'
 import { useState } from 'react'
+import { Flex } from '@radix-ui/themes'
 import { Check, Plus, Pencil } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Button, Text } from '@shared/ui'
+import { Input } from '@shared/ui/input'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
 import { ADDABLE_SECTION_TYPES, INITIAL_SECTION_TYPES, RESUME_SECTIONS, type ResumeField, type ResumeSectionInstance, type ResumeSectionType } from '../model/resumeSections'
+import type { OnboardingStepProps } from '../model/useOnboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 
 const createInstance = (type: ResumeSectionType): ResumeSectionInstance => ({ id: crypto.randomUUID(), type, values: {} })
 
-interface ResumeInfoStepProps {
-  onDone: () => void
-  onPrev: () => void
-}
-
 /** 온보딩 스텝: 가져온 이력서 정보 확인 (카드 그리드 + 편집/추가 모달) */
-export const ResumeInfoStep = ({ onDone, onPrev }: ResumeInfoStepProps) => {
+export const ResumeInfoStep = ({ onDone, onPrev }: OnboardingStepProps) => {
   const [sections, setSections] = useState<ResumeSectionInstance[]>(() => INITIAL_SECTION_TYPES.map(createInstance))
 
   const updateSection = (id: string, values: Record<string, string>) => {
@@ -35,7 +33,7 @@ export const ResumeInfoStep = ({ onDone, onPrev }: ResumeInfoStepProps) => {
       wide
       title="가져온 이력서 정보를 확인해 주세요."
       description="추출된 내용을 확인하고, 누락되거나 수정이 필요한 정보가 있다면 직접 편집해 주세요."
-      onNext={onDone}
+      onNext={() => onDone()}
       onPrev={onPrev}
     >
       <div className="grid w-full grid-cols-3 gap-4">
@@ -51,9 +49,7 @@ export const ResumeInfoStep = ({ onDone, onPrev }: ResumeInfoStepProps) => {
 interface AddSectionCardProps {
   onAdd: (types: ResumeSectionType[]) => void
 }
-
-/** 카드 그리드 끝의 "항목 추가하기" 카드. 누르면 추가 모달이 열린다(트리거 내장). */
-export const AddSectionCard = ({ onAdd }: AddSectionCardProps) => {
+const AddSectionCard = ({ onAdd }: AddSectionCardProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -120,9 +116,6 @@ const AddSectionDialogContent = ({ onAdd }: AddSectionCardProps) => {
   )
 }
 
-import { Input } from '@shared/ui/input'
-import { Flex } from '@radix-ui/themes'
-
 interface ResumeSectionCardProps {
   instance: ResumeSectionInstance
   onSave: (values: Record<string, string>) => void
@@ -135,7 +128,7 @@ interface ResumeSectionCardProps {
  * 제목 + 필드 목록(값이 있으면 값, 없으면 필드명)을 보여준다. 카드를 누르면 편집 모달이 열린다.
  * 자체적으로 편집 `Dialog`의 트리거를 소유한다(비제어).
  */
-export const ResumeSectionCard = ({ instance, onSave, onDelete }: ResumeSectionCardProps) => {
+const ResumeSectionCard = ({ instance, onSave, onDelete }: ResumeSectionCardProps) => {
   const config = RESUME_SECTIONS[instance.type]
   const [values, setValues] = useState<Record<string, string>>(instance.values)
   const isDirty = config.fields.some((field) => (values[field.key] ?? '') !== (instance.values[field.key] ?? ''))

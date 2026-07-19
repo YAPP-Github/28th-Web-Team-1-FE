@@ -2,21 +2,13 @@ import { useState } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
+import type { OnboardingStepProps } from '../model/useOnboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
 
-interface NotionConnectStepProps {
-  /** 뒤로가기 재진입 시 이전 선택 복원용 시드 */
-  defaultValue: boolean | null
-  /** "다음" 클릭 시 최종 선택값 보고 */
-  onDone: (hasNotion: boolean) => void
-  onPrev: () => void
-  onSkip: () => void
-}
-
 /** 온보딩 스텝: 경험 정리해 둔 Notion 페이지 보유 여부 선택 */
-export const NotionConnectStep = ({ defaultValue, onDone, onPrev, onSkip }: NotionConnectStepProps) => {
-  const [hasNotion, setHasNotion] = useState(defaultValue)
+export const NotionConnectStep = ({ onDone, onPrev, onSkip }: OnboardingStepProps) => {
+  const [hasNotion, setHasNotion] = useState<boolean | null>(null)
 
   return (
     <OnboardingStepShell

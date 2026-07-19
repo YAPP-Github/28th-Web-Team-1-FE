@@ -3,6 +3,7 @@ import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { Text, SearchField } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
+import type { OnboardingStepProps } from '../model/useOnboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 
 interface NotionPage {
@@ -21,15 +22,8 @@ const MOCK_PAGES: NotionPage[] = [
   { id: 'page-5', title: '스터디 노트', kind: '데이터베이스', editedAt: '2026.05.11' }
 ]
 
-interface NotionPageSelectStepProps {
-  /** "경험 추출하기" 클릭 시 선택한 페이지 id 목록 보고 */
-  onDone: (pageIds: string[]) => void
-  onPrev: () => void
-  onSkip: () => void
-}
-
 /** 온보딩 스텝: 연동된 Notion에서 가져온 페이지 중 이력서로 만들 페이지 검색·선택(다중) */
-export const NotionPageSelectStep = ({ onDone, onPrev, onSkip }: NotionPageSelectStepProps) => {
+export const NotionPageSelectStep = ({ onDone, onPrev, onSkip }: OnboardingStepProps) => {
   const [pageIds, setPageIds] = useState<string[]>([])
   const [keyword, setKeyword] = useState('')
   const visiblePages = MOCK_PAGES.filter((page) => page.title.includes(keyword.trim()))
@@ -42,7 +36,7 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip }: NotionPageSelec
     <OnboardingStepShell
       title="노션 페이지를 선택해주세요."
       description="SCOOP의 경험정리에 가져올 이력서/경험정리 페이지를 선택해 주세요."
-      onNext={() => onDone(pageIds)}
+      onNext={() => onDone()}
       nextDisabled={pageIds.length === 0}
       nextLabel="경험 추출하기"
       onPrev={onPrev}
