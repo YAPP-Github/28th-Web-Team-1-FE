@@ -1,4 +1,5 @@
 import { useRef, useState, type DragEvent } from 'react'
+import { Flex } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { FilePlusCorner, Trash2 } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
@@ -58,29 +59,29 @@ export const ResumeUploadStep = ({ file, onChange, onDone, onPrev, onSkip }: Res
     >
       <input ref={inputRef} type="file" accept=".pdf" className="hidden" onChange={(e) => selectFile(e.target.files?.[0])} />
       {file ? (
-        <div className="flex w-full flex-col gap-4">
-          <div className="border-border-subtle flex h-38.5 w-full flex-col items-center justify-center gap-5 rounded-xl border px-6 py-8">
-            <div className="flex flex-col items-center gap-2">
+        <Flex direction="column" gap="4" className="w-full">
+          <Flex direction="column" align="center" justify="center" className="border-border-subtle h-38.5 w-full gap-5 rounded-xl border px-6 py-8">
+            <Flex direction="column" align="center" gap="2">
               <FilePlusCorner size={24} className="text-text-basic" />
               <Text variant="headline2" color="text-basic">
                 업로드 완료
               </Text>
-            </div>
-          </div>
-          <div className="flex w-full flex-col items-start gap-2">
+            </Flex>
+          </Flex>
+          <Flex direction="column" align="start" gap="2" className="w-full">
             <Text variant="headline2" color="text-basic">
               업로드된 파일
             </Text>
-            <div className="bg-bg-gray-subtler flex w-full items-center justify-between gap-2 rounded-xl px-4 py-3">
+            <Flex align="center" justify="between" gap="2" className="bg-bg-gray-subtler w-full rounded-xl px-4 py-3">
               <Text variant="headline2" color="text-subtle" className="min-w-0 flex-1 truncate">
                 {file.name}
               </Text>
               <Button variant="danger" size="icon-xs" className="shrink-0" onClick={clearFile} aria-label="파일 삭제">
                 <Trash2 />
               </Button>
-            </div>
-          </div>
-        </div>
+            </Flex>
+          </Flex>
+        </Flex>
       ) : (
         <button
           type="button"
@@ -98,14 +99,14 @@ export const ResumeUploadStep = ({ file, onChange, onDone, onPrev, onSkip }: Res
           )}
         >
           <FilePlusCorner size={24} className="text-text-subtler" />
-          <div className="flex flex-col items-center gap-0.5">
+          <Flex direction="column" align="center" className="gap-0.5">
             <Text variant="headline2" color="text-subtler">
               파일을 드래그하거나 선택해 주세요.
             </Text>
             <Text variant="caption1" color="text-subtler">
               지원가능 파일 : pdf (최대 4.5MB까지 업로드 가능)
             </Text>
-          </div>
+          </Flex>
         </button>
       )}
     </OnboardingStepShell>

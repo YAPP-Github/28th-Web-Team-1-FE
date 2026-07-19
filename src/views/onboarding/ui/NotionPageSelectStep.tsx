@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { Text, SearchField } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
@@ -7,7 +8,6 @@ import { OnboardingStepShell } from './OnboardingStepShell'
 interface NotionPage {
   id: string
   title: string
-  /** 페이지 또는 데이터베이스 */
   kind: '페이지' | '데이터베이스'
   editedAt: string
 }
@@ -49,33 +49,33 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip }: NotionPageSelec
       prevLabel="취소"
       onSkip={onSkip}
     >
-      <div className="flex w-full flex-col items-center gap-5">
+      <Flex direction="column" align="center" className="w-full gap-5">
         <SearchField placeholder="보이지 않는 페이지 또는 데이터베이스는 제목으로 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
         {visiblePages.length > 0 ? (
-          <div className="flex w-full flex-col gap-3">
+          <Flex direction="column" gap="3" className="w-full">
             {visiblePages.map((page) => (
               <NotionPageCard key={page.id} page={page} isSelected={pageIds.includes(page.id)} onToggle={() => toggle(page.id)} />
             ))}
-          </div>
+          </Flex>
         ) : (
-          <div className="border-border-subtle flex w-full flex-col items-center justify-center gap-1 rounded-xl border border-dashed px-6 py-16">
+          <Flex direction="column" align="center" justify="center" gap="1" className="border-border-subtle w-full rounded-xl border border-dashed px-6 py-16">
             <Text variant="headline2" color="text-basic">
               검색하신 페이지가 없어요.
             </Text>
             <Text variant="caption1" color="text-subtler">
               Notion에서 페이지를 공유하면 여기에 표시됩니다.
             </Text>
-          </div>
+          </Flex>
         )}
-        <div className="flex items-center gap-1.5">
+        <Flex align="center" className="gap-1.5">
           <Chip size="sm" className="bg-element-primary-lighter text-text-primary-basic">
             TIP
           </Chip>
           <Text variant="caption1" color="text-basic">
             이력서로 만들고 싶은 실제 본문 내용이 담긴 하위 페이지를 <span className="text-text-primary-basic">직접 검색</span>해서 선택해 주세요.
           </Text>
-        </div>
-      </div>
+        </Flex>
+      </Flex>
     </OnboardingStepShell>
   )
 }
@@ -85,8 +85,6 @@ interface NotionPageCardProps {
   isSelected: boolean
   onToggle: () => void
 }
-
-/** 노션 페이지 선택 카드(다중 선택 토글): 페이지 아이콘 + 제목/메타(종류·수정일자) + 우측 선택 표시 */
 const NotionPageCard = ({ page, isSelected, onToggle }: NotionPageCardProps) => {
   return (
     <button
@@ -99,17 +97,17 @@ const NotionPageCard = ({ page, isSelected, onToggle }: NotionPageCardProps) => 
         isSelected && 'border-border-primary'
       )}
     >
-      <div className="flex min-w-0 flex-1 items-center gap-2">
+      <Flex align="center" gap="2" className="min-w-0 flex-1">
         <div className="bg-element-primary-lighter size-10 shrink-0 rounded-full" />
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <Flex direction="column" gap="1" className="min-w-0 flex-1">
           <Text variant="label1" color="text-subtler" className="w-full truncate font-semibold">
             {page.title}
           </Text>
           <Text variant="caption2" color="text-subtler">
             {page.kind} · {page.editedAt}
           </Text>
-        </div>
-      </div>
+        </Flex>
+      </Flex>
       <span className={cn('border-border-subtle relative size-4.5 shrink-0 rounded-full border bg-white', isSelected && 'border-border-primary')}>
         {isSelected && <span className="bg-element-primary absolute top-1/2 left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full" />}
       </span>

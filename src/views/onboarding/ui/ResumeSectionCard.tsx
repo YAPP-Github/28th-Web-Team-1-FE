@@ -4,6 +4,7 @@ import { Pencil } from 'lucide-react'
 import { Button, Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
+import { Flex } from '@radix-ui/themes'
 import { RESUME_SECTIONS, type ResumeField, type ResumeSectionInstance } from '../model/resumeSections'
 
 interface ResumeSectionCardProps {
@@ -31,19 +32,19 @@ export const ResumeSectionCard = ({ instance, onSave, onDelete }: ResumeSectionC
           type="button"
           className="border-border-subtle bg-element-white hover:border-border-primary flex h-full min-h-48.75 w-full flex-col items-start gap-3 rounded-xl border px-5 py-4 text-left transition-colors outline-none"
         >
-          <div className="flex w-full items-center justify-between">
+          <Flex align="center" justify="between" className="w-full">
             <Text variant="headline2" color="text-bolder">
               {config.title}
             </Text>
             <Pencil size={16} className="text-text-subtle" />
-          </div>
-          <div className="flex w-full flex-col gap-1.5">
+          </Flex>
+          <Flex direction="column" className="w-full gap-1.5">
             {config.fields.map((field) => (
               <Text key={field.key} variant="label1" color="text-subtle" className="w-full truncate">
                 {instance.values[field.key] || field.label}
               </Text>
             ))}
-          </div>
+          </Flex>
         </button>
       </DialogTrigger>
       <DialogContent className="w-150 gap-6">

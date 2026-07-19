@@ -18,10 +18,12 @@ export const OnboardingPage = () => {
     case 'has-resume':
       return (
         <HasResumeStep
-          defaultValue={hasResume}
-          onDone={(answer) => {
-            setHasResume(answer)
-            go(answer ? 'resume-upload' : 'notion-connect')
+          value={hasResume}
+          onChange={setHasResume}
+          onNext={() => {
+            if (hasResume !== null) {
+              go(hasResume ? 'resume-upload' : 'notion-connect')
+            }
           }}
         />
       )
