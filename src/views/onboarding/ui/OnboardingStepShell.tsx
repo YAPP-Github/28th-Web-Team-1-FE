@@ -38,7 +38,7 @@ export const OnboardingStepShell = ({ title, description, wide = false, onNext, 
         <Heading variant="title3" color="text-basic">
           {title}
         </Heading>
-        <Text variant="body1" color="text-subtle">
+        <Text variant="body1" color="text-subtle" className="whitespace-nowrap">
           {description}
         </Text>
       </Flex>

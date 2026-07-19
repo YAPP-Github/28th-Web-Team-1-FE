@@ -6,8 +6,8 @@ export type OnboardingStep = 'has-resume' | 'resume-upload' | 'resume-info' | 'n
 export const INITIAL_STEP: OnboardingStep = 'has-resume'
 
 /** 모든 온보딩 스텝 컴포넌트가 공유하는 props. 스텝별 입력값은 각 스텝의 로컬 상태로 관리한다. */
+/** 스텝 완료. 분기가 답변에 따라 갈리는 스텝(이력서/Notion 보유 여부)만 answer를 넘긴다. */
 export interface OnboardingStepProps {
-  /** 스텝 완료. 분기가 답변에 따라 갈리는 스텝(이력서/Notion 보유 여부)만 answer를 넘긴다. */
   onDone: (answer?: boolean) => void
   onPrev?: () => void
   onSkip?: () => void
@@ -32,10 +32,7 @@ const ONBOARDING_FLOW: Record<OnboardingStep, FlowNode> = {
 /**
  * 온보딩 스텝 네비게이션 훅.
  *
- * 스텝 전환 그래프(`ONBOARDING_FLOW`)와 이동 방식(현재는 로컬 히스토리 상태)을
- * 캡슐화하는 **유일한 지점**이다. 추후 스텝별 URL 라우팅(`/onboarding/[step]`)으로
- * 전환할 때 이 훅 내부만 `useRouter`/`usePathname` 기반으로 교체하면 되고,
- * 스텝 컴포넌트는 건드리지 않는다.
+ * 스텝 전환 그래프(`ONBOARDING_FLOW`)와 이동 방식(현재는 로컬 히스토리 상태)을 캡슐화함
  *
  * @example
  * ```tsx
@@ -47,24 +44,42 @@ const ONBOARDING_FLOW: Record<OnboardingStep, FlowNode> = {
  */
 export const useOnboardingFlow = () => {
   const [history, setHistory] = useState<OnboardingStep[]>([INITIAL_STEP])
+  // "다음"으로 통과한 스텝 기록. 스킵은 기록하지 않아 완료 여부(연동 여부)를 구분한다.
+  const [completed, setCompleted] = useState<OnboardingStep[]>([])
   const step = history[history.length - 1]
 
-  const next = useCallback((answer?: boolean) => {
-    setHistory((prev) => {
-      const target = ONBOARDING_FLOW[prev[prev.length - 1]].next
+  const next = useCallback(
+    (answer?: boolean) => {
+      const target = ONBOARDING_FLOW[step].next
       const resolved = typeof target === 'function' ? target(answer ?? false) : target
-      return resolved ? [...prev, resolved] : prev
-    })
-  }, [])
+      if (!resolved) return
+      setCompleted((prev) => (prev.includes(step) ? prev : [...prev, step]))
+      setHistory((prev) => [...prev, resolved])
+    },
+    [step]
+  )
 
   const skip = useCallback(() => {
-    setHistory((prev) => {
-      const target = ONBOARDING_FLOW[prev[prev.length - 1]].skip
-      return target ? [...prev, target] : prev
-    })
-  }, [])
+    const target = ONBOARDING_FLOW[step].skip
+    if (target) setHistory((prev) => [...prev, target])
+  }, [step])
 
-  const back = useCallback(() => setHistory((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev)), [])
+  const back = useCallback(() => {
+    if (history.length <= 1) return
+    // 되돌아간 스텝은 다시 진행해야 하므로 완료 기록에서 제거
+    const returnTo = history[history.length - 2]
+    setCompleted((prev) => prev.filter((completedStep) => completedStep !== returnTo))
+    setHistory((prev) => prev.slice(0, -1))
+  }, [history])
 
-  return { step, next, skip, back, hasPrev: history.length > 1, hasSkip: ONBOARDING_FLOW[step].skip !== undefined }
+  return {
+    step,
+    next,
+    skip,
+    back,
+    hasPrev: history.length > 1,
+    hasSkip: ONBOARDING_FLOW[step].skip !== undefined,
+    /** 이력서(정보 확인까지) 또는 Notion(페이지 선택까지) 연동을 완료했는지 — 완료 화면 CTA 분기용 */
+    hasConnected: completed.includes('resume-info') || completed.includes('notion-page-select')
+  }
 }
