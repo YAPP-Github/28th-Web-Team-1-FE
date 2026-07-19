@@ -43,7 +43,7 @@ const ExperienceSectionItem = ({ item, index }: { item: ResumeExperienceFieldsFr
       <Spacing size={16} />
 
       <Flex direction={'column'} className={'gap-5 py-1'}>
-        <Textarea label={'세부내용 *'} />
+        <Textarea label={'세부내용 *'} value={item.contents || ''} />
 
         <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'}>
           <PencilSparkles size={16} data-icon="inline-start" />
