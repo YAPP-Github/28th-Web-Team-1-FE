@@ -3,9 +3,6 @@ import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import { Check } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 
-type OnboardingChoiceGroupProps = ComponentProps<typeof RadioGroupPrimitive.Root>
-type OnboardingChoiceCardProps = PropsWithChildren<ComponentProps<typeof RadioGroupPrimitive.Item>>
-
 /**
  * 온보딩 세로 선택 카드 그룹
  *
@@ -20,18 +17,17 @@ type OnboardingChoiceCardProps = PropsWithChildren<ComponentProps<typeof RadioGr
  * </OnboardingChoiceGroup>
  * ```
  */
-export const OnboardingChoiceGroup = ({ className, ...props }: OnboardingChoiceGroupProps) => {
+export const OnboardingChoiceGroup = ({ className, ...props }: ComponentProps<typeof RadioGroupPrimitive.Root>) => {
   return <RadioGroupPrimitive.Root data-slot="onboarding-choice-group" className={cn('flex w-full flex-col gap-3', className)} {...props} />
 }
 
-export const OnboardingChoiceCard = ({ children, className, ...props }: OnboardingChoiceCardProps) => {
+export const OnboardingChoiceCard = ({ children, className, ...props }: PropsWithChildren<ComponentProps<typeof RadioGroupPrimitive.Item>>) => {
   return (
     <RadioGroupPrimitive.Item
       data-slot="onboarding-choice-card"
       className={cn(
         // Base
         'group/choice flex w-full items-center justify-between rounded-xl border border-transparent px-5 py-4 text-left transition-all outline-none',
-        // Default (unselected)
         'bg-btn-tertiary-fill text-text-basic',
         // Focus
         'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3',

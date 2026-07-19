@@ -4,21 +4,21 @@ import { FilePlusCorner, Trash2 } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Button, Text } from '@shared/ui'
 import { isPdfFile } from '@shared/lib/isPdfFile'
-import { OnboardingStepHeader } from '../OnboardingStepHeader'
-import { OnboardingFooter } from '../OnboardingFooter'
+import { OnboardingStepShell } from './OnboardingStepShell'
 
 const MAX_FILE_SIZE = 4.5 * 1024 * 1024
 
 interface ResumeUploadStepProps {
+  /** 파일은 "이전 갔다 와도 보존" UX 때문에 페이지가 소유한다(컨트롤드). */
   file: File | null
   onChange: (file: File | null) => void
-  onNext: () => void
+  onDone: () => void
   onPrev: () => void
   onSkip: () => void
 }
 
 /** 온보딩 스텝2: 작성해 둔 이력서 파일(pdf) 업로드 */
-export const ResumeUploadStep = ({ file, onChange, onNext, onPrev, onSkip }: ResumeUploadStepProps) => {
+export const ResumeUploadStep = ({ file, onChange, onDone, onPrev, onSkip }: ResumeUploadStepProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
 
@@ -48,8 +48,14 @@ export const ResumeUploadStep = ({ file, onChange, onNext, onPrev, onSkip }: Res
   }
 
   return (
-    <>
-      <OnboardingStepHeader title="작성해 둔 이력서 파일을 업로드해주세요." description="기존 이력서를 분석해 필요한 정보만 추출하고, JD에 맞게 이력서를 개선할 수 있어요." />
+    <OnboardingStepShell
+      title="작성해 둔 이력서 파일을 업로드해주세요."
+      description="기존 이력서를 분석해 필요한 정보만 추출하고, JD에 맞게 이력서를 개선할 수 있어요."
+      onNext={onDone}
+      nextDisabled={!file}
+      onPrev={onPrev}
+      onSkip={onSkip}
+    >
       <input ref={inputRef} type="file" accept=".pdf" className="hidden" onChange={(e) => selectFile(e.target.files?.[0])} />
       {file ? (
         <div className="flex w-full flex-col gap-4">
@@ -102,7 +108,6 @@ export const ResumeUploadStep = ({ file, onChange, onNext, onPrev, onSkip }: Res
           </div>
         </button>
       )}
-      <OnboardingFooter onPrev={onPrev} onNext={onNext} nextDisabled={!file} onSkip={onSkip} />
-    </>
+    </OnboardingStepShell>
   )
 }

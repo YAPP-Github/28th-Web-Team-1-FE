@@ -1,6 +1,9 @@
 'use client'
 import { useCallback, useState } from 'react'
-import { INITIAL_STEP, type OnboardingStep } from './flow'
+
+export type OnboardingStep = 'has-resume' | 'resume-upload' | 'resume-info' | 'notion-connect' | 'notion-page-select' | 'complete'
+
+export const INITIAL_STEP: OnboardingStep = 'has-resume'
 
 /**
  * 온보딩 스텝 네비게이션 훅.
