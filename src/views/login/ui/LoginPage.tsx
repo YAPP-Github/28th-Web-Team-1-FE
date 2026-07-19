@@ -34,6 +34,9 @@ export const LoginPage = () => {
         </Flex>
         <Flex direction="column" gap="4" align="center" className="w-100">
           <GoogleLoginButton />
+          {/* TODO : 온보딩으로 가는 로그인버튼은 임시로 추가. 추후 온보딩 플로우가 완성되면 제거 필요 */}
+          아래는 온보딩 으로 가는 로그인버튼 (테스트용)
+          <GoogleLoginButton redirectTo="/onboarding" />
           <Text variant="label1" color="text-disabled-on" className="text-center">
             계속 진행함에 따라{' '}
             <Button asChild variant="text" size="sm">
