@@ -15,7 +15,7 @@ export const ResumeIndex = ({ sections, activeSectionId }: { sections: ResumeSec
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <Flex className={'relative w-16 px-4 py-20'} onMouseLeave={() => setIsOpen(false)}>
+    <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'} onMouseLeave={() => setIsOpen(false)}>
       <Flex direction="column" align={'end'} gap="2" className="h-fit w-full" onMouseEnter={() => setIsOpen(true)}>
         {sections.map((section) => {
           const isActive = activeSectionId === section.sectionId

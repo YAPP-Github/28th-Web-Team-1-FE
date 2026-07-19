@@ -10,6 +10,7 @@ import { useWorkspaceId } from '@entities/user'
 import type { ResumeSectionData } from '../model/section'
 import { ResumeIndex } from './ResumeIndex'
 import { ResumeSectionView } from './preview/ResumeSectionView'
+import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
 
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
   return (
@@ -45,14 +46,15 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const sections = [...resume.sections].filter((section) => section.visible).sort((a, b) => a.displayOrder - b.displayOrder)
   const basicInfo = resume.sections.find((section) => section.type === 'BASIC_INFO')?.items[0]?.payload.basicInfo ?? null
   const bodySections = sections.filter((section) => section.type !== 'BASIC_INFO')
+  const activeSection = bodySections.find((section) => section.sectionId === activeSectionId) ?? null
 
   return (
     <>
       <ResumeToolbar targetJd={resume.targetJd} />
-      <main className="bg-bg-gray-subtler flex min-h-0 flex-1">
+      <main className="flex min-h-0 flex-1">
         <ResumePreview basicInfo={basicInfo} sections={bodySections} activeSectionId={activeSectionId} onSelectSection={setActiveSectionId} />
         <ResumeIndex sections={bodySections} activeSectionId={activeSectionId} />
-        <ResumeEdit />
+        <ResumeEdit section={activeSection} />
       </main>
     </>
   )
@@ -98,32 +100,34 @@ const ResumePreview = ({
   onSelectSection: (sectionId: string) => void
 }) => {
   return (
-    <Flex direction={'column'} className={'bg-bg-white m-4 h-[calc(100%-2rem)] w-149 min-w-149 overflow-y-auto p-7'}>
-      <ResumeBasicInfoHeader basicInfo={basicInfo} />
+    <Flex align={'center'} className={'bg-bg-gray-subtler flex-1'}>
+      <Flex direction={'column'} className={'bg-bg-white mx-auto h-[calc(100%-2rem)] w-149 min-w-149 overflow-y-auto p-7'}>
+        <ResumeBasicInfoHeader basicInfo={basicInfo} />
 
-      <Spacing size={12} />
-      <Divider color={'gray-10'} />
-      <Spacing size={12} />
+        <Spacing size={12} />
+        <Divider color={'gray-10'} />
+        <Spacing size={12} />
 
-      <Flex direction={'column'} gap="5">
-        {sections.map((section) => (
-          <div
-            key={section.sectionId}
-            role="button"
-            tabIndex={0}
-            data-active={activeSectionId === section.sectionId}
-            onClick={() => onSelectSection(section.sectionId)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                onSelectSection(section.sectionId)
-              }
-            }}
-            className={'group cursor-pointer rounded-sm outline-none'}
-          >
-            <ResumeSectionView section={section} />
-          </div>
-        ))}
+        <Flex direction={'column'} gap="5">
+          {sections.map((section) => (
+            <div
+              key={section.sectionId}
+              role="button"
+              tabIndex={0}
+              data-active={activeSectionId === section.sectionId}
+              onClick={() => onSelectSection(section.sectionId)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  onSelectSection(section.sectionId)
+                }
+              }}
+              className={'group cursor-pointer rounded-sm outline-none'}
+            >
+              <ResumeSectionView section={section} />
+            </div>
+          ))}
+        </Flex>
       </Flex>
     </Flex>
   )
@@ -150,6 +154,10 @@ const ResumeBasicInfoHeader = ({ basicInfo }: { basicInfo: ResumeBasicInfoFields
   )
 }
 
-const ResumeEdit = () => {
-  return <Flex className={'bg-bg-white w-full'}>이력서 편집</Flex>
+const ResumeEdit = ({ section }: { section: ResumeSectionData | null }) => {
+  return (
+    <Flex className={'flex-1'}>
+      <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} /> : null}</Flex>
+    </Flex>
+  )
 }
