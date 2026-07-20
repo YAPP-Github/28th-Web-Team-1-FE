@@ -250,8 +250,8 @@ export default tseslint.config(
         // 문자열 연결(+) 금지 — 템플릿 리터럴 사용 유도
         {
           selector:
-            'BinaryExpression[operator="+"][left.type="Literal"][left.regex=undefined][right.type!="Literal"], BinaryExpression[operator="+"][right.type="Literal"][right.regex=undefined][left.type!="Literal"]',
-          message: '문자열 연결에 + 연산자 대신 템플릿 리터럴을 사용해주세요. (예: `안녕 ${name}`)'
+            'BinaryExpression[operator="+"][left.type="Literal"][left.value=type(string)][right.type!="Literal"], BinaryExpression[operator="+"][right.type="Literal"][right.value=type(string)][left.type!="Literal"]',
+          message: '문자열 연결에 + 연산자 대신 템플릿 리터럴을 사용해주세요. (예: 안녕 ${name})'
         },
         // window.xxx 전역변수 할당 금지
         {

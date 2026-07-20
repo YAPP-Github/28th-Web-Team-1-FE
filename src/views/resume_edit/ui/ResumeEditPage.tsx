@@ -1,0 +1,184 @@
+'use client'
+import { Suspense, useState, type ReactNode } from 'react'
+import { Flex } from '@radix-ui/themes'
+import { ErrorBoundary } from '@sentry/nextjs'
+import { FileCheckCorner, RefreshCcw } from 'lucide-react'
+import { Button, Divider, Spacing, Text } from '@shared/ui'
+import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
+import { useResumeDetail } from '@entities/resume'
+import { useWorkspaceId } from '@entities/user'
+import type { ResumeSectionData } from '../model/section'
+import { ResumeIndex } from './ResumeIndex'
+import { ResumeSectionView } from './preview/ResumeSectionView'
+import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
+
+export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
+  return (
+    <Flex direction="column" className="h-full flex-1 overflow-hidden">
+      <ErrorBoundary fallback={<ResumeFallback>이력서를 불러오는 데 실패했습니다.</ResumeFallback>}>
+        <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
+          <ResumeWorkspace resumeId={resumeId} />
+        </Suspense>
+      </ErrorBoundary>
+    </Flex>
+  )
+}
+
+// Todo: 로딩 스피너 교체
+const ResumeFallback = ({ children }: { children: ReactNode }) => (
+  <Flex align="center" justify="center" className="flex-1">
+    <Text variant={'label1'} color={'text-subtle'}>
+      {children}
+    </Text>
+  </Flex>
+)
+
+/**
+ * 이력서 상세를 한 번 조회해 헤더·미리보기·목차·편집 영역이 같은 데이터를 공유하게 한다.
+ * `BASIC_INFO`는 미리보기 헤더 전용이라 본문 섹션(`bodySections`)에서 분리한다.
+ */
+const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
+  const workspaceId = useWorkspaceId()
+  const { resume } = useResumeDetail(workspaceId, resumeId)
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(() => {
+    return resume.sections.find((s) => s.type === 'EXPERIENCE')?.sectionId || null
+  })
+
+  const sections = [...resume.sections].filter((section) => section.visible).sort((a, b) => a.displayOrder - b.displayOrder)
+  const basicInfoSection = resume.sections.find((section) => section.type === 'BASIC_INFO') ?? null
+  const bodySections = sections.filter((section) => section.type !== 'BASIC_INFO')
+  const activeSection = sections.find((section) => section.sectionId === activeSectionId) ?? null
+
+  return (
+    <>
+      <ResumeToolbar targetJd={resume.targetJd} />
+      <main className="flex min-h-0 flex-1">
+        <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} onSelectSection={setActiveSectionId} />
+        <ResumeIndex basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} />
+        <ResumeEdit section={activeSection} />
+      </main>
+    </>
+  )
+}
+
+/** 편집 화면 상단 도구바. 이력서가 맞춤 대상으로 삼은 채용공고(targetJd)의 회사명·포지션과 저장 액션을 보여준다. */
+const ResumeToolbar = ({ targetJd }: { targetJd: ResumeQuery['resume']['targetJd'] }) => {
+  return (
+    <header className={'flex justify-between px-8 py-5'}>
+      <Flex direction="column" justify="center" className={'gap-0.5'}>
+        <Text variant="heading2">{targetJd?.companyName ?? '이력서'}</Text>
+        {targetJd?.positionTitle && (
+          <Text variant="body2" color="text-subtle">
+            {targetJd.positionTitle}
+          </Text>
+        )}
+      </Flex>
+
+      <Flex align={'center'} gap="4">
+        <Text variant="label2" color="text-subtler">
+          <RefreshCcw className="mr-2.5 inline-block" size={16} />
+          19:53:30 자동 저장되었습니다.
+        </Text>
+
+        <Button variant="primary" size={'md'} className={'leading-0'}>
+          <FileCheckCorner size={18} className="inline-block" />
+          이력서 저장
+        </Button>
+      </Flex>
+    </header>
+  )
+}
+
+interface ResumePreviewProps {
+  basicInfoSection: ResumeSectionData | null
+  sections: ResumeSectionData[]
+  activeSectionId: string | null
+  onSelectSection: (sectionId: string) => void
+}
+
+const ResumePreview = ({ basicInfoSection, sections, activeSectionId, onSelectSection }: ResumePreviewProps) => {
+  const basicInfo = basicInfoSection?.items[0]?.payload.basicInfo ?? null
+
+  return (
+    <Flex align={'center'} className={'bg-bg-gray-subtler flex-1'}>
+      <Flex direction={'column'} className={'bg-bg-white mx-auto h-[calc(100%-2rem)] w-149 min-w-149 overflow-y-auto p-7'}>
+        {basicInfoSection ? (
+          <SelectableArea sectionId={basicInfoSection.sectionId} activeSectionId={activeSectionId} onSelect={onSelectSection}>
+            <ResumeBasicInfoHeader basicInfo={basicInfo} />
+          </SelectableArea>
+        ) : (
+          <ResumeBasicInfoHeader basicInfo={basicInfo} />
+        )}
+
+        <Spacing size={12} />
+        <Divider color={'gray-10'} />
+        <Spacing size={12} />
+
+        <Flex direction={'column'} gap="5">
+          {sections.map((section) => (
+            <SelectableArea key={section.sectionId} sectionId={section.sectionId} activeSectionId={activeSectionId} onSelect={onSelectSection}>
+              <ResumeSectionView section={section} />
+            </SelectableArea>
+          ))}
+        </Flex>
+      </Flex>
+    </Flex>
+  )
+}
+
+interface SelectableAreaProps {
+  sectionId: string
+  activeSectionId: string | null
+  onSelect: (sectionId: string) => void
+  children: ReactNode
+}
+
+/** 미리보기에서 클릭·키보드로 활성 섹션을 선택할 수 있게 감싸는 래퍼. `data-active`를 자식(Section)의 group-data 스타일이 읽는다. */
+const SelectableArea = ({ sectionId, activeSectionId, onSelect, children }: SelectableAreaProps) => {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      data-active={activeSectionId === sectionId}
+      onClick={() => onSelect(sectionId)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onSelect(sectionId)
+        }
+      }}
+      className={'group cursor-pointer rounded-sm outline-none'}
+    >
+      {children}
+    </div>
+  )
+}
+
+const ResumeBasicInfoHeader = ({ basicInfo }: { basicInfo: ResumeBasicInfoFieldsFragment | null }) => {
+  return (
+    <section className={'group-data-[active=true]:bg-primary-5 group-data-[active=false]:hover:bg-gray-5 flex w-full justify-between rounded-sm p-3 transition-colors'}>
+      <Text variant={'title1'}>{basicInfo?.name}</Text>
+
+      <Flex direction="column" gap="2">
+        {basicInfo?.phone && (
+          <Text size={'1'} color={'gray-40'}>
+            {basicInfo.phone}
+          </Text>
+        )}
+        {basicInfo?.email && (
+          <Text size={'1'} color={'gray-40'}>
+            {basicInfo.email}
+          </Text>
+        )}
+      </Flex>
+    </section>
+  )
+}
+
+const ResumeEdit = ({ section }: { section: ResumeSectionData | null }) => {
+  return (
+    <Flex className={'flex-1'}>
+      <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} /> : null}</Flex>
+    </Flex>
+  )
+}

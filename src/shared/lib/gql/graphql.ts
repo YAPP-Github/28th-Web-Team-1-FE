@@ -453,6 +453,32 @@ export type CreateResumeMutationVariables = Exact<{
 
 export type CreateResumeMutation = { createResume: { resumeId: string } };
 
+export type ResumeBasicInfoFieldsFragment = { name: string, email: string | null, phone: string | null };
+
+export type ResumeCoreSkillFieldsFragment = { content: string };
+
+export type ResumeCareerFieldsFragment = { companyName: string, role: string | null, contents: string, period: { startAt: string | null, endAt: string | null } | null };
+
+export type ResumeExperienceFieldsFragment = { name: string, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null };
+
+export type ResumeEducationFieldsFragment = { schoolName: string, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null };
+
+export type ResumeAwardFieldsFragment = { name: string, organization: string | null, awardedAt: string | null };
+
+export type ResumeLanguageFieldsFragment = { examName: string, scoreOrGrade: string, acquiredAt: string | null };
+
+export type ResumeCertificateFieldsFragment = { name: string, organization: string | null, acquiredAt: string | null };
+
+export type ResumeSkillFieldsFragment = { name: string, level: string | null };
+
+export type ResumeQueryVariables = Exact<{
+  resumeId: string | number;
+  workspaceId: string | number;
+}>;
+
+
+export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string, email: string | null, phone: string | null } | null, coreSkill: { content: string } | null, career: { companyName: string, role: string | null, contents: string, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string, organization: string | null, awardedAt: string | null } | null, language: { examName: string, scoreOrGrade: string, acquiredAt: string | null } | null, certificate: { name: string, organization: string | null, acquiredAt: string | null } | null, skill: { name: string, level: string | null } | null } }> }> } };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -487,6 +513,79 @@ export const ProjectListItemFragmentDoc = new TypedDocumentString(`
   name
 }
     `, {"fragmentName":"ProjectListItem"}) as unknown as TypedDocumentString<ProjectListItemFragment, unknown>;
+export const ResumeBasicInfoFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {
+  name
+  email
+  phone
+}
+    `, {"fragmentName":"ResumeBasicInfoFields"}) as unknown as TypedDocumentString<ResumeBasicInfoFieldsFragment, unknown>;
+export const ResumeCoreSkillFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {
+  content
+}
+    `, {"fragmentName":"ResumeCoreSkillFields"}) as unknown as TypedDocumentString<ResumeCoreSkillFieldsFragment, unknown>;
+export const ResumeCareerFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ResumeCareerFields on ResumeCareerPayload {
+  companyName
+  role
+  contents
+  period {
+    startAt
+    endAt
+  }
+}
+    `, {"fragmentName":"ResumeCareerFields"}) as unknown as TypedDocumentString<ResumeCareerFieldsFragment, unknown>;
+export const ResumeExperienceFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ResumeExperienceFields on ResumeExperiencePayload {
+  name
+  role
+  contents
+  period {
+    startAt
+    endAt
+  }
+}
+    `, {"fragmentName":"ResumeExperienceFields"}) as unknown as TypedDocumentString<ResumeExperienceFieldsFragment, unknown>;
+export const ResumeEducationFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ResumeEducationFields on ResumeEducationPayload {
+  schoolName
+  major
+  degree
+  status
+  period {
+    startAt
+    endAt
+  }
+}
+    `, {"fragmentName":"ResumeEducationFields"}) as unknown as TypedDocumentString<ResumeEducationFieldsFragment, unknown>;
+export const ResumeAwardFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ResumeAwardFields on ResumeAwardPayload {
+  name
+  organization
+  awardedAt
+}
+    `, {"fragmentName":"ResumeAwardFields"}) as unknown as TypedDocumentString<ResumeAwardFieldsFragment, unknown>;
+export const ResumeLanguageFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ResumeLanguageFields on ResumeLanguagePayload {
+  examName
+  scoreOrGrade
+  acquiredAt
+}
+    `, {"fragmentName":"ResumeLanguageFields"}) as unknown as TypedDocumentString<ResumeLanguageFieldsFragment, unknown>;
+export const ResumeCertificateFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ResumeCertificateFields on ResumeCertificatePayload {
+  name
+  organization
+  acquiredAt
+}
+    `, {"fragmentName":"ResumeCertificateFields"}) as unknown as TypedDocumentString<ResumeCertificateFieldsFragment, unknown>;
+export const ResumeSkillFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ResumeSkillFields on ResumeSkillPayload {
+  name
+  level
+}
+    `, {"fragmentName":"ResumeSkillFields"}) as unknown as TypedDocumentString<ResumeSkillFieldsFragment, unknown>;
 export const ExperiencesDocument = new TypedDocumentString(`
     query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {
   experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {
@@ -768,6 +867,114 @@ export const CreateResumeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<CreateResumeMutation, CreateResumeMutationVariables>;
+export const ResumeDocument = new TypedDocumentString(`
+    query Resume($resumeId: ID!, $workspaceId: ID!) {
+  resume(resumeId: $resumeId, workspaceId: $workspaceId) {
+    resumeId
+    status
+    targetJd {
+      jdId
+      companyName
+      positionTitle
+    }
+    sections {
+      sectionId
+      type
+      displayText
+      displayOrder
+      visible
+      items {
+        itemId
+        displayOrder
+        visible
+        payload {
+          basicInfo {
+            ...ResumeBasicInfoFields
+          }
+          coreSkill {
+            ...ResumeCoreSkillFields
+          }
+          career {
+            ...ResumeCareerFields
+          }
+          experience {
+            ...ResumeExperienceFields
+          }
+          education {
+            ...ResumeEducationFields
+          }
+          award {
+            ...ResumeAwardFields
+          }
+          language {
+            ...ResumeLanguageFields
+          }
+          certificate {
+            ...ResumeCertificateFields
+          }
+          skill {
+            ...ResumeSkillFields
+          }
+        }
+      }
+    }
+  }
+}
+    fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {
+  name
+  email
+  phone
+}
+fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {
+  content
+}
+fragment ResumeCareerFields on ResumeCareerPayload {
+  companyName
+  role
+  contents
+  period {
+    startAt
+    endAt
+  }
+}
+fragment ResumeExperienceFields on ResumeExperiencePayload {
+  name
+  role
+  contents
+  period {
+    startAt
+    endAt
+  }
+}
+fragment ResumeEducationFields on ResumeEducationPayload {
+  schoolName
+  major
+  degree
+  status
+  period {
+    startAt
+    endAt
+  }
+}
+fragment ResumeAwardFields on ResumeAwardPayload {
+  name
+  organization
+  awardedAt
+}
+fragment ResumeLanguageFields on ResumeLanguagePayload {
+  examName
+  scoreOrGrade
+  acquiredAt
+}
+fragment ResumeCertificateFields on ResumeCertificatePayload {
+  name
+  organization
+  acquiredAt
+}
+fragment ResumeSkillFields on ResumeSkillPayload {
+  name
+  level
+}`) as unknown as TypedDocumentString<ResumeQuery, ResumeQueryVariables>;
 export const MeDocument = new TypedDocumentString(`
     query Me {
   me {

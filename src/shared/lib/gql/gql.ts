@@ -33,6 +33,16 @@ type Documents = {
     "\n  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {\n    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": typeof types.UpdateProjectDocument,
     "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": typeof types.DeleteProjectDocument,
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": typeof types.CreateResumeDocument,
+    "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n  }\n": typeof types.ResumeBasicInfoFieldsFragmentDoc,
+    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n": typeof types.ResumeCoreSkillFieldsFragmentDoc,
+    "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeCareerFieldsFragmentDoc,
+    "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeExperienceFieldsFragmentDoc,
+    "\n  fragment ResumeEducationFields on ResumeEducationPayload {\n    schoolName\n    major\n    degree\n    status\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeEducationFieldsFragmentDoc,
+    "\n  fragment ResumeAwardFields on ResumeAwardPayload {\n    name\n    organization\n    awardedAt\n  }\n": typeof types.ResumeAwardFieldsFragmentDoc,
+    "\n  fragment ResumeLanguageFields on ResumeLanguagePayload {\n    examName\n    scoreOrGrade\n    acquiredAt\n  }\n": typeof types.ResumeLanguageFieldsFragmentDoc,
+    "\n  fragment ResumeCertificateFields on ResumeCertificatePayload {\n    name\n    organization\n    acquiredAt\n  }\n": typeof types.ResumeCertificateFieldsFragmentDoc,
+    "\n  fragment ResumeSkillFields on ResumeSkillPayload {\n    name\n    level\n  }\n": typeof types.ResumeSkillFieldsFragmentDoc,
+    "\n  query Resume($resumeId: ID!, $workspaceId: ID!) {\n    resume(resumeId: $resumeId, workspaceId: $workspaceId) {\n      resumeId\n      status\n      targetJd {\n        jdId\n        companyName\n        positionTitle\n      }\n      sections {\n        sectionId\n        type\n        displayText\n        displayOrder\n        visible\n        items {\n          itemId\n          displayOrder\n          visible\n          payload {\n            basicInfo {\n              ...ResumeBasicInfoFields\n            }\n            coreSkill {\n              ...ResumeCoreSkillFields\n            }\n            career {\n              ...ResumeCareerFields\n            }\n            experience {\n              ...ResumeExperienceFields\n            }\n            education {\n              ...ResumeEducationFields\n            }\n            award {\n              ...ResumeAwardFields\n            }\n            language {\n              ...ResumeLanguageFields\n            }\n            certificate {\n              ...ResumeCertificateFields\n            }\n            skill {\n              ...ResumeSkillFields\n            }\n          }\n        }\n      }\n    }\n  }\n": typeof types.ResumeDocument,
     "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": typeof types.MeDocument,
     "\n  query UserWorkspaces {\n    me {\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": typeof types.UserWorkspacesDocument,
 };
@@ -55,6 +65,16 @@ const documents: Documents = {
     "\n  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {\n    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": types.UpdateProjectDocument,
     "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": types.DeleteProjectDocument,
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": types.CreateResumeDocument,
+    "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n  }\n": types.ResumeBasicInfoFieldsFragmentDoc,
+    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n": types.ResumeCoreSkillFieldsFragmentDoc,
+    "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeCareerFieldsFragmentDoc,
+    "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeExperienceFieldsFragmentDoc,
+    "\n  fragment ResumeEducationFields on ResumeEducationPayload {\n    schoolName\n    major\n    degree\n    status\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeEducationFieldsFragmentDoc,
+    "\n  fragment ResumeAwardFields on ResumeAwardPayload {\n    name\n    organization\n    awardedAt\n  }\n": types.ResumeAwardFieldsFragmentDoc,
+    "\n  fragment ResumeLanguageFields on ResumeLanguagePayload {\n    examName\n    scoreOrGrade\n    acquiredAt\n  }\n": types.ResumeLanguageFieldsFragmentDoc,
+    "\n  fragment ResumeCertificateFields on ResumeCertificatePayload {\n    name\n    organization\n    acquiredAt\n  }\n": types.ResumeCertificateFieldsFragmentDoc,
+    "\n  fragment ResumeSkillFields on ResumeSkillPayload {\n    name\n    level\n  }\n": types.ResumeSkillFieldsFragmentDoc,
+    "\n  query Resume($resumeId: ID!, $workspaceId: ID!) {\n    resume(resumeId: $resumeId, workspaceId: $workspaceId) {\n      resumeId\n      status\n      targetJd {\n        jdId\n        companyName\n        positionTitle\n      }\n      sections {\n        sectionId\n        type\n        displayText\n        displayOrder\n        visible\n        items {\n          itemId\n          displayOrder\n          visible\n          payload {\n            basicInfo {\n              ...ResumeBasicInfoFields\n            }\n            coreSkill {\n              ...ResumeCoreSkillFields\n            }\n            career {\n              ...ResumeCareerFields\n            }\n            experience {\n              ...ResumeExperienceFields\n            }\n            education {\n              ...ResumeEducationFields\n            }\n            award {\n              ...ResumeAwardFields\n            }\n            language {\n              ...ResumeLanguageFields\n            }\n            certificate {\n              ...ResumeCertificateFields\n            }\n            skill {\n              ...ResumeSkillFields\n            }\n          }\n        }\n      }\n    }\n  }\n": types.ResumeDocument,
     "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": types.MeDocument,
     "\n  query UserWorkspaces {\n    me {\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": types.UserWorkspacesDocument,
 };
@@ -131,6 +151,46 @@ export function graphql(source: "\n  mutation DeleteProject($workspaceId: ID!, $
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n"): typeof import('./graphql').CreateResumeDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n  }\n"): typeof import('./graphql').ResumeBasicInfoFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n"): typeof import('./graphql').ResumeCoreSkillFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n"): typeof import('./graphql').ResumeCareerFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n"): typeof import('./graphql').ResumeExperienceFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ResumeEducationFields on ResumeEducationPayload {\n    schoolName\n    major\n    degree\n    status\n    period {\n      startAt\n      endAt\n    }\n  }\n"): typeof import('./graphql').ResumeEducationFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ResumeAwardFields on ResumeAwardPayload {\n    name\n    organization\n    awardedAt\n  }\n"): typeof import('./graphql').ResumeAwardFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ResumeLanguageFields on ResumeLanguagePayload {\n    examName\n    scoreOrGrade\n    acquiredAt\n  }\n"): typeof import('./graphql').ResumeLanguageFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ResumeCertificateFields on ResumeCertificatePayload {\n    name\n    organization\n    acquiredAt\n  }\n"): typeof import('./graphql').ResumeCertificateFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment ResumeSkillFields on ResumeSkillPayload {\n    name\n    level\n  }\n"): typeof import('./graphql').ResumeSkillFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Resume($resumeId: ID!, $workspaceId: ID!) {\n    resume(resumeId: $resumeId, workspaceId: $workspaceId) {\n      resumeId\n      status\n      targetJd {\n        jdId\n        companyName\n        positionTitle\n      }\n      sections {\n        sectionId\n        type\n        displayText\n        displayOrder\n        visible\n        items {\n          itemId\n          displayOrder\n          visible\n          payload {\n            basicInfo {\n              ...ResumeBasicInfoFields\n            }\n            coreSkill {\n              ...ResumeCoreSkillFields\n            }\n            career {\n              ...ResumeCareerFields\n            }\n            experience {\n              ...ResumeExperienceFields\n            }\n            education {\n              ...ResumeEducationFields\n            }\n            award {\n              ...ResumeAwardFields\n            }\n            language {\n              ...ResumeLanguageFields\n            }\n            certificate {\n              ...ResumeCertificateFields\n            }\n            skill {\n              ...ResumeSkillFields\n            }\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ResumeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
