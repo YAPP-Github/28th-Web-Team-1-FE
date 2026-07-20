@@ -1,14 +1,23 @@
 import { execute, graphql } from '@shared/lib'
-import { type CreateResumeInput } from '@shared/lib/gql/graphql'
+import { type CreateResumeInput, type SaveResumeInput } from '@shared/lib/gql/graphql'
 
 export const resumeAPI = {
   createResume: (variables: { workspaceId: string; input: CreateResumeInput }) => execute(createResumeDocument, variables),
+  updateResume: (variables: { workspaceId: string; resumeId: string; input: SaveResumeInput }) => execute(updateResumeDocument, variables),
   getResume: (variables: { resumeId: string; workspaceId: string }) => execute(resumeDocument, variables)
 }
 
 const createResumeDocument = graphql(`
   mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {
     createResume(workspaceId: $workspaceId, input: $input) {
+      resumeId
+    }
+  }
+`)
+
+const updateResumeDocument = graphql(`
+  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {
+    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {
       resumeId
     }
   }
@@ -102,6 +111,7 @@ const resumeDocument = graphql(`
     resume(resumeId: $resumeId, workspaceId: $workspaceId) {
       resumeId
       status
+      template
       targetJd {
         jdId
         companyName

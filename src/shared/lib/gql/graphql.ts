@@ -233,6 +233,14 @@ export type ResumeTemplate =
   /** 기본 이력서 템플릿입니다. */
   | 'DEFAULT';
 
+/** 이력서 수정에 사용하는 전체 스냅샷 입력입니다. */
+export type SaveResumeInput = {
+  sections: Array<SaveResumeSectionInput>;
+  status: ResumeStatusType;
+  targetJdId?: string | number | null | undefined;
+  template: ResumeTemplate;
+};
+
 /** 이력서 섹션 저장 입력입니다. */
 export type SaveResumeSectionInput = {
   /** 섹션 표시 순서입니다. */
@@ -453,6 +461,15 @@ export type CreateResumeMutationVariables = Exact<{
 
 export type CreateResumeMutation = { createResume: { resumeId: string } };
 
+export type UpdateResumeMutationVariables = Exact<{
+  workspaceId: string | number;
+  resumeId: string | number;
+  input: SaveResumeInput;
+}>;
+
+
+export type UpdateResumeMutation = { updateResume: { resumeId: string } };
+
 export type ResumeBasicInfoFieldsFragment = { name: string, email: string | null, phone: string | null };
 
 export type ResumeCoreSkillFieldsFragment = { content: string };
@@ -477,7 +494,7 @@ export type ResumeQueryVariables = Exact<{
 }>;
 
 
-export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string, email: string | null, phone: string | null } | null, coreSkill: { content: string } | null, career: { companyName: string, role: string | null, contents: string, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string, organization: string | null, awardedAt: string | null } | null, language: { examName: string, scoreOrGrade: string, acquiredAt: string | null } | null, certificate: { name: string, organization: string | null, acquiredAt: string | null } | null, skill: { name: string, level: string | null } | null } }> }> } };
+export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string, email: string | null, phone: string | null } | null, coreSkill: { content: string } | null, career: { companyName: string, role: string | null, contents: string, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string, organization: string | null, awardedAt: string | null } | null, language: { examName: string, scoreOrGrade: string, acquiredAt: string | null } | null, certificate: { name: string, organization: string | null, acquiredAt: string | null } | null, skill: { name: string, level: string | null } | null } }> }> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -867,11 +884,19 @@ export const CreateResumeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<CreateResumeMutation, CreateResumeMutationVariables>;
+export const UpdateResumeDocument = new TypedDocumentString(`
+    mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {
+  updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {
+    resumeId
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateResumeMutation, UpdateResumeMutationVariables>;
 export const ResumeDocument = new TypedDocumentString(`
     query Resume($resumeId: ID!, $workspaceId: ID!) {
   resume(resumeId: $resumeId, workspaceId: $workspaceId) {
     resumeId
     status
+    template
     targetJd {
       jdId
       companyName
