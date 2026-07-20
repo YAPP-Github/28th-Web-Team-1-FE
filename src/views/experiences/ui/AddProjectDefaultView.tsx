@@ -1,39 +1,14 @@
-import { useRef, useState, type DragEvent } from 'react'
-import { toast } from 'sonner'
+import { useState } from 'react'
 import { Flex } from '@radix-ui/themes'
-import { FilePlusCorner, Pencil, Trash2 } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { NotionIcon } from '@shared/icon'
 import { cn } from '@shared/lib/cn'
 import { Button, Text } from '@shared/ui'
 import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@shared/ui/dialog'
-import { isPdfFile } from '@shared/lib/isPdfFile'
-
-const MAX_FILE_SIZE = 4.5 * 1024 * 1024
+import { PdfUpload } from '@features/pdf_upload'
 
 export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualClick: () => void; onExtract: (file: File) => void }) => {
-  const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-
-  const selectFile = async (selected: File | undefined) => {
-    if (!selected) return
-    const isPdf = await isPdfFile(selected)
-    if (isPdf === false) {
-      toast.warning('PDF 파일만 업로드할 수 있어요.', { id: 'pdf-type', position: 'top-center' })
-      return
-    }
-    if (selected.size > MAX_FILE_SIZE) {
-      toast.warning('파일 크기는 최대 4.5MB까지 업로드할 수 있어요.', { id: 'pdf-size', position: 'top-center' })
-      return
-    }
-    setFile(selected)
-  }
-
-  const handleDrop = (e: DragEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    setIsDragging(false)
-    selectFile(e.dataTransfer.files[0])
-  }
 
   return (
     <>
@@ -41,67 +16,20 @@ export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualCl
         <DialogTitle className="text-title3 text-text-basic font-bold">프로젝트 추가하기</DialogTitle>
         <DialogDescription className="text-body1 text-text-subtler">한 번 정리해 두면 언제든 이력서에 불러와 사용할 수 있어요.</DialogDescription>
       </DialogHeader>
-      <Flex direction="column" className="h-100 gap-4">
-        <input ref={inputRef} type="file" accept=".pdf" className="hidden" onChange={(e) => selectFile(e.target.files?.[0])} />
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          onDragOver={(e) => {
-            e.preventDefault()
-            setIsDragging(true)
-          }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleDrop}
-          className={cn(
-            'border-btn-outline-border bg-element-gray-lighter flex w-full flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed',
-            // TODO : 인터렉션 추가 시 변경 필요
-            isDragging ? 'border-btn-secondary-border' : '',
-            'hover:border-btn-secondary-border hover:bg-element-primary-lighter'
-          )}
-        >
-          <FilePlusCorner size={24} className="text-text-subtler" />
-          <Flex direction="column" align="center" className="gap-0.5">
-            <Text variant="headline2" color="text-subtler">
-              이력서 파일을 드래그하거나 선택해 주세요.
-            </Text>
-            <Text variant="caption1" color="text-subtler">
-              지원가능 파일 : pdf (최대 4.5MB까지 업로드 가능)
-            </Text>
-          </Flex>
-        </button>
+      <Flex direction="column" className="gap-4">
+        <PdfUpload file={file} onChange={setFile} className="h-100" />
         {file ? (
-          <Flex direction="column" align="start" className="gap-2">
-            <Text variant="headline2" color="text-basic">
-              업로드된 파일
-            </Text>
-            <Flex direction="row" align="center" justify="between" className="bg-bg-gray-subtler w-full rounded-lg px-4 py-3">
-              <Text variant="headline2" color="text-basic">
-                {file.name}
-              </Text>
-              <Button
-                variant="danger"
-                size="xs"
-                onClick={() => {
-                  setFile(null)
-                  if (inputRef.current) inputRef.current.value = ''
-                }}
-                className="w-7.5"
-              >
-                <Trash2 size={12} />
-              </Button>
-            </Flex>
-            <Button
-              variant="primary"
-              size="xl"
-              className="mt-6 w-full"
-              onClick={() => {
-                if (!file) return
-                onExtract(file)
-              }}
-            >
-              경험 추출하기
-            </Button>
-          </Flex>
+          <Button
+            variant="primary"
+            size="xl"
+            className="mt-4 w-full"
+            onClick={() => {
+              if (!file) return
+              onExtract(file)
+            }}
+          >
+            경험 추출하기
+          </Button>
         ) : (
           <DialogFooter>
             <AddProjectExperienceButton title="직접 정리" description="STAR 방식으로 직접 정리하기" icon={<Pencil size={18} />} onClick={() => onManualClick()} />
