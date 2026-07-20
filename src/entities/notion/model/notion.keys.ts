@@ -1,8 +1,9 @@
 import { queryOptions } from '@tanstack/react-query'
 import { notionAPI } from '../api/notion.api'
 
-/** 온보딩 페이지 선택은 한 번에 보여주고, 커서 페이지네이션은 후속 과제로 미룬다(스키마 상한 100). */
-const PAGE_FETCH_SIZE = 100
+/** 온보딩 페이지 선택은 한 번에 보여주고, 커서 페이지네이션은 후속 과제로 미룬다.
+ * 스키마 문서상 상한은 100이지만 실제 서버 검증은 30까지만 허용한다. */
+const PAGE_FETCH_SIZE = 30
 
 export const notionKeys = {
   all: ['notion'] as const,
