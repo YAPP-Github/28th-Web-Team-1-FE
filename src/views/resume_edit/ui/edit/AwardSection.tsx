@@ -6,7 +6,7 @@ import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
-export const AwardSection = ({ title, items }: { title: string; items: ResumeAwardFieldsFragment[] }) => {
+export const AwardSection = ({ title, items }: { title: string; items: Array<ResumeAwardFieldsFragment & { itemId: string }> }) => {
   const [awardItems, setAwardItems] = useState(items)
 
   return (
@@ -17,7 +17,7 @@ export const AwardSection = ({ title, items }: { title: string; items: ResumeAwa
           variant={'text'}
           size={'sm'}
           onClick={() => {
-            setAwardItems((prev) => [...prev, { name: '', organization: '', awardedAt: '' }])
+            setAwardItems((prev) => [...prev, { name: '', organization: '', awardedAt: '', itemId: crypto.randomUUID() }])
           }}
         >
           수상 추가
@@ -26,7 +26,7 @@ export const AwardSection = ({ title, items }: { title: string; items: ResumeAwa
       }
     >
       {awardItems.map((item, index) => (
-        <AwardItem key={item.name} item={item} index={index} />
+        <AwardItem key={item.itemId} item={item} index={index} />
       ))}
     </Section>
   )
@@ -52,7 +52,7 @@ const AwardItem = ({ item, index }: { item: ResumeAwardFieldsFragment; index: nu
       <Spacing size={16} />
 
       <Flex className={'w-full gap-4'}>
-        <Input label="기관" value={item.organization || ''} clearable={false} placeholder={'수상명을 입력해주세요.'} className={'w-full'} />
+        <Input label="기관" value={item.organization || ''} clearable={false} placeholder={'기관명을 입력해주세요.'} className={'w-full'} />
         <Input label="수상일" value={item.awardedAt || ''} clearable={false} placeholder={'2025.05.09'} className={'w-full'} />
       </Flex>
     </Flex>

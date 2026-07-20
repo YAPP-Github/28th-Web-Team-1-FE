@@ -6,7 +6,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 import { useState } from 'react'
 
-export const CertificatesSection = ({ title, items }: { title: string; items: ResumeCertificateFieldsFragment[] }) => {
+export const CertificatesSection = ({ title, items }: { title: string; items: Array<ResumeCertificateFieldsFragment & { itemId: string }> }) => {
   const [certificateItems, setCertificateItems] = useState(items)
 
   return (
@@ -17,7 +17,7 @@ export const CertificatesSection = ({ title, items }: { title: string; items: Re
           variant={'text'}
           size={'sm'}
           onClick={() => {
-            setCertificateItems((prev) => [...prev, { name: '', organization: '', acquiredAt: '' }])
+            setCertificateItems((prev) => [...prev, { name: '', organization: '', acquiredAt: '', itemId: crypto.randomUUID() }])
           }}
         >
           자격증 추가
@@ -26,7 +26,7 @@ export const CertificatesSection = ({ title, items }: { title: string; items: Re
       }
     >
       {certificateItems.map((item, index) => (
-        <CertificatesSectionItem key={index} item={item} index={index} />
+        <CertificatesSectionItem key={item.itemId} item={item} index={index} />
       ))}
     </Section>
   )

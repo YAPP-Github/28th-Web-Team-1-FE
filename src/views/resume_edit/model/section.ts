@@ -5,7 +5,10 @@ type SectionItems = ResumeSectionData['items']
 
 /** 섹션 아이템들에서 해당 타입의 payload만 뽑아 null을 제거한다. (미리보기·편집 switch 공통) */
 export const payloadsOf = <K extends keyof SectionItems[number]['payload']>(items: SectionItems, key: K) =>
-  items.map((item) => item.payload[key]).filter((payload): payload is NonNullable<typeof payload> => payload !== null)
+  items.flatMap((item) => {
+    const payload = item.payload[key]
+    return payload === null ? [] : [{ ...payload, itemId: item.itemId }]
+  })
 
 /** 노출(visible) 아이템만 displayOrder 순으로 정렬해 돌려준다. (미리보기·목차·편집 공통) */
 export const visibleSortedItems = (section: ResumeSectionData): ResumeSectionData['items'] => [...section.items].filter((item) => item.visible).sort((a, b) => a.displayOrder - b.displayOrder)

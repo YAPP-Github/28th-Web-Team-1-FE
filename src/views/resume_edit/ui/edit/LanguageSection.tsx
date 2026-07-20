@@ -6,7 +6,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 import { useState } from 'react'
 
-export const LanguageSection = ({ title, items }: { title: string; items: ResumeLanguageFieldsFragment[] }) => {
+export const LanguageSection = ({ title, items }: { title: string; items: Array<ResumeLanguageFieldsFragment & { itemId: string }> }) => {
   const [languageItems, setLanguageItems] = useState(items)
 
   return (
@@ -17,7 +17,7 @@ export const LanguageSection = ({ title, items }: { title: string; items: Resume
           variant={'text'}
           size={'sm'}
           onClick={() => {
-            setLanguageItems((prev) => [...prev, { examName: '', scoreOrGrade: '', acquiredAt: '' }])
+            setLanguageItems((prev) => [...prev, { examName: '', scoreOrGrade: '', acquiredAt: '', itemId: crypto.randomUUID() }])
           }}
         >
           어학 추가
@@ -26,7 +26,7 @@ export const LanguageSection = ({ title, items }: { title: string; items: Resume
       }
     >
       {languageItems.map((item, index) => (
-        <LanguageSectionItem key={index} index={index} item={item} />
+        <LanguageSectionItem key={item.itemId} index={index} item={item} />
       ))}
     </Section>
   )

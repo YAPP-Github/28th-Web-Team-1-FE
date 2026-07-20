@@ -7,7 +7,7 @@ import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
 import { useState } from 'react'
 
-export const CareerSection = ({ title, items }: { title: string; items: ResumeCareerFieldsFragment[] }) => {
+export const CareerSection = ({ title, items }: { title: string; items: Array<ResumeCareerFieldsFragment & { itemId: string }> }) => {
   const [careerItems, setCareerItems] = useState(items)
 
   return (
@@ -18,7 +18,7 @@ export const CareerSection = ({ title, items }: { title: string; items: ResumeCa
           variant={'text'}
           size={'sm'}
           onClick={() => {
-            setCareerItems((prev) => [...prev, { companyName: '', role: '', period: null, contents: '' }])
+            setCareerItems((prev) => [...prev, { companyName: '', role: '', period: null, contents: '', itemId: crypto.randomUUID() }])
           }}
         >
           경력추가
@@ -27,7 +27,7 @@ export const CareerSection = ({ title, items }: { title: string; items: ResumeCa
       }
     >
       {careerItems.map((item, index) => (
-        <CareerSectionItem key={index} item={item} index={index} />
+        <CareerSectionItem key={item.itemId} item={item} index={index} />
       ))}
     </Section>
   )
@@ -48,7 +48,7 @@ const CareerSectionItem = ({ item, index }: { item: ResumeCareerFieldsFragment; 
       <Divider />
       <Spacing size={20} />
 
-      <Input label="회사명 *" value={item.companyName} clearable={false} placeholder={'회력명을 입력해주세요.'} />
+      <Input label="회사명 *" value={item.companyName} clearable={false} placeholder={'회사명을 입력해주세요.'} />
 
       <Spacing size={16} />
 

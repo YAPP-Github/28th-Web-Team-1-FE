@@ -6,7 +6,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 import { useState } from 'react'
 
-export const EducationSection = ({ title, items }: { title: string; items: ResumeEducationFieldsFragment[] }) => {
+export const EducationSection = ({ title, items }: { title: string; items: Array<ResumeEducationFieldsFragment & { itemId: string }> }) => {
   const [educationItems, setEducationItems] = useState(items)
 
   return (
@@ -17,7 +17,7 @@ export const EducationSection = ({ title, items }: { title: string; items: Resum
           variant={'text'}
           size={'sm'}
           onClick={() => {
-            setEducationItems((prev) => [...prev, { schoolName: '', status: '', period: null, major: '', degree: '' }])
+            setEducationItems((prev) => [...prev, { schoolName: '', status: '', period: null, major: '', degree: '', itemId: crypto.randomUUID() }])
           }}
         >
           학력 추가
@@ -26,7 +26,7 @@ export const EducationSection = ({ title, items }: { title: string; items: Resum
       }
     >
       {educationItems.map((item, index) => (
-        <EducationSectionItem key={index} item={item} index={index} />
+        <EducationSectionItem key={item.itemId} item={item} index={index} />
       ))}
     </Section>
   )
