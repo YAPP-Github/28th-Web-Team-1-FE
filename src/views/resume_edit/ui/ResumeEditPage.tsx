@@ -24,6 +24,7 @@ export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
   )
 }
 
+// Todo: 로딩 스피너 교체
 const ResumeFallback = ({ children }: { children: ReactNode }) => (
   <Flex align="center" justify="center" className="flex-1">
     <Text variant={'label1'} color={'text-subtle'}>
@@ -88,17 +89,14 @@ const ResumeToolbar = ({ targetJd }: { targetJd: ResumeQuery['resume']['targetJd
   )
 }
 
-const ResumePreview = ({
-  basicInfoSection,
-  sections,
-  activeSectionId,
-  onSelectSection
-}: {
+interface ResumePreviewProps {
   basicInfoSection: ResumeSectionData | null
   sections: ResumeSectionData[]
   activeSectionId: string | null
   onSelectSection: (sectionId: string) => void
-}) => {
+}
+
+const ResumePreview = ({ basicInfoSection, sections, activeSectionId, onSelectSection }: ResumePreviewProps) => {
   const basicInfo = basicInfoSection?.items[0]?.payload.basicInfo ?? null
 
   return (
@@ -128,8 +126,15 @@ const ResumePreview = ({
   )
 }
 
+interface SelectableAreaProps {
+  sectionId: string
+  activeSectionId: string | null
+  onSelect: (sectionId: string) => void
+  children: ReactNode
+}
+
 /** 미리보기에서 클릭·키보드로 활성 섹션을 선택할 수 있게 감싸는 래퍼. `data-active`를 자식(Section)의 group-data 스타일이 읽는다. */
-const SelectableArea = ({ sectionId, activeSectionId, onSelect, children }: { sectionId: string; activeSectionId: string | null; onSelect: (sectionId: string) => void; children: ReactNode }) => {
+const SelectableArea = ({ sectionId, activeSectionId, onSelect, children }: SelectableAreaProps) => {
   return (
     <div
       role="button"

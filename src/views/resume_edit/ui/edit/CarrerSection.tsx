@@ -1,5 +1,3 @@
-'use client'
-
 import type { ResumeCareerFieldsFragment } from '@shared/lib/gql/graphql'
 import { Section } from './Section'
 import { Flex } from '@radix-ui/themes'
