@@ -438,6 +438,7 @@ export type NotionPagesQueryVariables = Exact<{
   connectionId: string | number;
   query?: string | null | undefined;
   size: number;
+  cursor?: string | null | undefined;
 }>;
 
 
@@ -757,12 +758,13 @@ export const NotionConnectionsDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<NotionConnectionsQuery, NotionConnectionsQueryVariables>;
 export const NotionPagesDocument = new TypedDocumentString(`
-    query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!) {
+    query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {
   notionPages(
     workspaceId: $workspaceId
     connectionId: $connectionId
     query: $query
     size: $size
+    cursor: $cursor
   ) {
     pages {
       pageId

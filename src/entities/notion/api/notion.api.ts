@@ -3,8 +3,8 @@ import { execute, graphql } from '@shared/lib'
 export const notionAPI = {
   connectNotion: (variables: { workspaceId: string; request: { authorizationCode: string; redirectUri: string } }) => execute(connectNotionDocument, variables),
   getConnections: ({ workspaceId, size = 10 }: { workspaceId: string; size?: number }) => execute(notionConnectionsDocument, { workspaceId, size }),
-  getPages: ({ workspaceId, connectionId, query = null, size = 10 }: { workspaceId: string; connectionId: string; query?: string | null; size?: number }) =>
-    execute(notionPagesDocument, { workspaceId, connectionId, query, size }),
+  getPages: ({ workspaceId, connectionId, query = null, size = 10, cursor = null }: { workspaceId: string; connectionId: string; query?: string | null; size?: number; cursor?: string | null }) =>
+    execute(notionPagesDocument, { workspaceId, connectionId, query, size, cursor }),
   importExperience: (variables: { workspaceId: string; request: { connectionId: string; pageId: string } }) => execute(importNotionExperiencesDocument, variables)
 }
 
@@ -35,8 +35,8 @@ const notionConnectionsDocument = graphql(`
 `)
 
 const notionPagesDocument = graphql(`
-  query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!) {
-    notionPages(workspaceId: $workspaceId, connectionId: $connectionId, query: $query, size: $size) {
+  query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {
+    notionPages(workspaceId: $workspaceId, connectionId: $connectionId, query: $query, size: $size, cursor: $cursor) {
       pages {
         pageId
         title

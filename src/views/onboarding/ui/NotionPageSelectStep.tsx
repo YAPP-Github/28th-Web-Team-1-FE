@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { toast } from 'sonner'
-import { cn } from '@shared/lib/cn'
-import { formatDate } from '@shared/lib'
 import { Text, SearchField } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
 import { useDebounce } from '@shared/hooks/useDebounce'
+import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
 import { useWorkspaceId } from '@entities/user'
 import { useNotionPages, useNotionConnectionId, useImportNotionExperiences } from '@entities/notion'
+import { NotionPageCard } from '@features/notion_connect'
 import type { OnboardingStepProps } from '../model/useOnboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 
@@ -23,12 +23,17 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
   const workspaceId = useWorkspaceId()
   const connectionId = useNotionConnectionId(workspaceId, connectionIdFromUrl)
   const debouncedKeyword = useDebounce(keyword.trim(), 300)
-  const { pages, isLoading } = useNotionPages(workspaceId, connectionId, debouncedKeyword)
+  const { pages, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useNotionPages(workspaceId, connectionId, debouncedKeyword)
   const { mutate: importPages, isPending } = useImportNotionExperiences(workspaceId)
 
-  const toggle = (id: string) => {
+  const sentinelRef = useIntersectionObserver<HTMLDivElement>({
+    enabled: hasNextPage && !isFetchingNextPage,
+    onIntersect: fetchNextPage
+  })
+
+  const toggle = useCallback((id: string) => {
     setPageIds((prev) => (prev.includes(id) ? prev.filter((pageId) => pageId !== id) : [...prev, id]))
-  }
+  }, [])
 
   const handleImport = () => {
     if (!connectionId || pageIds.length === 0) return
@@ -61,8 +66,9 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
         {pages.length > 0 ? (
           <Flex direction="column" gap="3" className="w-full">
             {pages.map((page) => (
-              <NotionPageCard key={page.pageId} title={page.title} lastEditedTime={page.lastEditedTime} isSelected={pageIds.includes(page.pageId)} onToggle={() => toggle(page.pageId)} />
+              <NotionPageCard key={page.pageId} id={page.pageId} title={page.title} lastEditedTime={page.lastEditedTime} isSelected={pageIds.includes(page.pageId)} onToggle={toggle} />
             ))}
+            {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-px shrink-0" />}
           </Flex>
         ) : (
           <Flex direction="column" align="center" justify="center" gap="1" className="border-border-subtle w-full rounded-xl border border-dashed px-6 py-16">
@@ -84,44 +90,5 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
         </Flex>
       </Flex>
     </OnboardingStepShell>
-  )
-}
-
-interface NotionPageCardProps {
-  title: string
-  lastEditedTime?: string | null
-  isSelected: boolean
-  onToggle: () => void
-}
-const NotionPageCard = ({ title, lastEditedTime, isSelected, onToggle }: NotionPageCardProps) => {
-  const editedAt = formatDate(lastEditedTime)
-  return (
-    <button
-      type="button"
-      aria-pressed={isSelected}
-      onClick={onToggle}
-      className={cn(
-        'bg-element-white border-border-subtle flex w-full items-center gap-3 rounded-xl border py-3 pr-5 pl-4 text-left transition-all outline-none',
-        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3',
-        isSelected && 'border-border-primary'
-      )}
-    >
-      <Flex align="center" gap="2" className="min-w-0 flex-1">
-        <div className="bg-element-primary-lighter size-10 shrink-0 rounded-full" />
-        <Flex direction="column" gap="1" className="min-w-0 flex-1">
-          <Text variant="label1" color="text-subtler" className="w-full truncate font-semibold">
-            {title}
-          </Text>
-          {editedAt && (
-            <Text variant="caption2" color="text-subtler">
-              {editedAt} 수정
-            </Text>
-          )}
-        </Flex>
-      </Flex>
-      <span className={cn('border-border-subtle relative size-4.5 shrink-0 rounded-full border bg-white', isSelected && 'border-border-primary')}>
-        {isSelected && <span className="bg-element-primary absolute top-1/2 left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full" />}
-      </span>
-    </button>
   )
 }

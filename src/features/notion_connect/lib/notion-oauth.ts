@@ -7,7 +7,7 @@ export const NOTION_CALLBACK_PATH = '/auth/notion/callback'
 /** OAuth 시작 직전 저장하고 콜백에서 state의 nonce와 대조하는 CSRF 방어용 쿠키 이름 */
 export const NOTION_OAUTH_NONCE_COOKIE = 'notion_oauth_nonce'
 
-/** 연동 실패 시 콜백이 복귀 URL에 붙이는 `?error=` 값. 온보딩 페이지가 토스트 표시에 사용한다. */
+/** 연동 실패 시 콜백이 복귀 URL에 붙이는 `?error=` 값. 온보딩·경험정리 페이지가 토스트 표시에 사용한다. */
 export const NOTION_CONNECT_ERROR = 'notion'
 
 /**
@@ -24,19 +24,15 @@ export interface NotionOAuthState {
 }
 
 /**
- * OAuth state 객체를 URL-safe base64 문자열로 인코딩한다. (`decodeNotionState`의 역변환)
+ * OAuth state 객체를 JSON 문자열로 인코딩한다. (`decodeNotionState`의 역변환)
+ * URL에 실릴 때의 퍼센트 인코딩은 `URLSearchParams`가 알아서 처리하므로 별도 base64 인코딩은 불필요하다.
  * @param state 노션 왕복 간 유지할 값
  * @example
  * ```ts
- * encodeNotionState({ workspaceId: 'w1', returnTo: '/onboarding', nonce: 'n' }) // 'eyJ3Ijoid...'
+ * encodeNotionState({ workspaceId: 'w1', returnTo: '/onboarding', nonce: 'n' }) // '{"w":"w1","r":"/onboarding","n":"n"}'
  * ```
  */
-export const encodeNotionState = (state: NotionOAuthState): string => {
-  const json = JSON.stringify({ w: state.workspaceId, r: state.returnTo, n: state.nonce })
-  const bytes = new TextEncoder().encode(json)
-  const base64 = btoa(String.fromCharCode(...bytes))
-  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
+export const encodeNotionState = (state: NotionOAuthState): string => JSON.stringify({ w: state.workspaceId, r: state.returnTo, n: state.nonce })
 
 /**
  * 노션이 echo한 `state` 문자열을 디코딩한다. 변조·손상으로 파싱에 실패하면 `null`.
@@ -49,9 +45,7 @@ export const encodeNotionState = (state: NotionOAuthState): string => {
 export const decodeNotionState = (raw: string | null): NotionOAuthState | null => {
   if (!raw) return null
   try {
-    const base64 = raw.replace(/-/g, '+').replace(/_/g, '/')
-    const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0))
-    const parsed: unknown = JSON.parse(new TextDecoder().decode(bytes))
+    const parsed: unknown = JSON.parse(raw)
     if (typeof parsed !== 'object' || parsed === null) return null
     const { w, r, n } = parsed as Record<string, unknown>
     if (typeof w !== 'string' || typeof r !== 'string' || typeof n !== 'string') return null
@@ -79,4 +73,28 @@ export const buildNotionAuthorizeUrl = ({ clientId, redirectUri, state }: { clie
   url.searchParams.set('redirect_uri', redirectUri)
   url.searchParams.set('state', state)
   return url.toString()
+}
+
+/**
+ * Notion OAuth 동의 화면으로 이탈한다. CSRF 방어용 nonce를 쿠키에 심고 `state`에 실어 보낸 뒤,
+ * 승인이 끝나면 `${NOTION_CALLBACK_PATH}` 콜백이 코드를 교환하고 `returnTo`로 복귀시킨다.
+ * @param workspaceId Notion을 연결할 워크스페이스 ID
+ * @param returnTo 연동 완료(혹은 실패) 후 복귀할 내부 경로
+ * @example
+ * ```ts
+ * startNotionOAuth({ workspaceId, returnTo: '/experiences' })
+ * ```
+ */
+export const startNotionOAuth = ({ workspaceId, returnTo }: { workspaceId: string; returnTo: string }) => {
+  const nonce = crypto.randomUUID()
+  // 콜백에서 state의 nonce와 대조하는 CSRF 방어용 1회성 쿠키 (10분 내 왕복 전제)
+  document.cookie = `${NOTION_OAUTH_NONCE_COOKIE}=${nonce}; path=/; max-age=600; samesite=lax`
+  const state = encodeNotionState({ workspaceId, returnTo, nonce })
+  window.location.assign(
+    buildNotionAuthorizeUrl({
+      clientId: process.env.NEXT_PUBLIC_NOTION_CLIENT_ID ?? '',
+      redirectUri: `${window.location.origin}${NOTION_CALLBACK_PATH}`,
+      state
+    })
+  )
 }

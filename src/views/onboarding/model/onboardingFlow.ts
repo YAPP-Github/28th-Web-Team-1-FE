@@ -26,9 +26,6 @@ export const ONBOARDING_FLOW: Record<OnboardingStep, FlowNode> = {
   complete: { next: null }
 }
 
-/** URL 쿼리 등 외부에서 온 문자열이 유효한 온보딩 스텝인지 검증하는 타입 가드 */
-export const isOnboardingStep = (value: string | undefined): value is OnboardingStep => value !== undefined && value in ONBOARDING_FLOW
-
 /**
  * 초기 스텝에 맞는 히스토리 스택을 구성한다.
  * OAuth 콜백 복귀처럼 중간 스텝에서 시작할 때, "이전" 버튼이 자연스러운 스텝으로 가도록

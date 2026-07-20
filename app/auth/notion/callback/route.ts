@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { ApiError, authFailureRedirect, safeRedirectPath } from '@/src/shared/lib'
-import { notionAPI, decodeNotionState, NOTION_OAUTH_NONCE_COOKIE, NOTION_CONNECT_ERROR } from '@entities/notion'
+import { ApiError, authFailureRedirect, safeRedirectPath } from '@shared/lib'
+import { notionAPI } from '@entities/notion'
+import { decodeNotionState, NOTION_OAUTH_NONCE_COOKIE, NOTION_CONNECT_ERROR } from '@features/notion_connect'
 
 /**
  * Notion이 인가 코드를 붙여 리다이렉트하는 콜백을 서버에서 처리하는 라우트 핸들러이다.
@@ -45,7 +46,6 @@ export const GET = async (request: NextRequest) => {
     return redirectWith({ step: 'notion-page-select', connectionId: connectNotion.connectionId })
   } catch (error) {
     // 서비스 인증 자체가 만료된 경우는 재로그인으로, 그 외(교환 실패 등)는 온보딩 재시도로 보낸다
-    console.error('Notion OAuth callback error', error)
     if (error instanceof ApiError && error.status === 401) return authFailureRedirect(origin)
     return redirectWith({ error: NOTION_CONNECT_ERROR })
   }
