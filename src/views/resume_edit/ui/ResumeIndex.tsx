@@ -11,12 +11,14 @@ import { Menu } from 'lucide-react'
  * - 접힌 상태: 섹션은 긴 dash, 하위 아이템은 짧은 dash로 표시
  * - 펼친 상태(hover): 섹션 제목(displayText)과 아이템 라벨 목록
  */
-export const ResumeIndex = ({ sections, activeSectionId }: { sections: ResumeSectionData[]; activeSectionId: string | null }) => {
+export const ResumeIndex = ({ sections, basicInfoSection, activeSectionId }: { sections: ResumeSectionData[]; basicInfoSection: ResumeSectionData | null; activeSectionId: string | null }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const basicInfoSectionId = basicInfoSection?.sectionId ?? null
 
   return (
-    <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'}>
+    <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'} onMouseLeave={() => setIsOpen(false)}>
       <Flex direction="column" align={'end'} gap="2" className="h-fit w-full" onMouseEnter={() => setIsOpen(true)}>
+        {basicInfoSectionId && <div className={cn('h-0.75 w-6 rounded-full', activeSectionId === basicInfoSectionId ? 'bg-border-primary' : 'bg-border-subtle')} />}
         {sections.map((section) => {
           const isActive = activeSectionId === section.sectionId
           return (
@@ -32,8 +34,8 @@ export const ResumeIndex = ({ sections, activeSectionId }: { sections: ResumeSec
 
       {isOpen && (
         <Flex direction="column" gap="1" className={cn('bg-element-white border-border-subtler shadow-1 absolute top-16 right-4 z-10 w-55.5 min-w-40 rounded-lg border px-5 py-3')}>
-          <Flex align={'center'} gap={'1'}>
-            <Text variant="label2" color={'text-basic'}>
+          <Flex align={'center'} gap={'1'} className={cn('rounded-sm px-1.5 py-1', activeSectionId === basicInfoSectionId && 'bg-element-primary-lighter')}>
+            <Text variant="label2" color={'text-subtler'}>
               기본정보
             </Text>
           </Flex>

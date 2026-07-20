@@ -44,16 +44,16 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   })
 
   const sections = [...resume.sections].filter((section) => section.visible).sort((a, b) => a.displayOrder - b.displayOrder)
-  const basicInfo = resume.sections.find((section) => section.type === 'BASIC_INFO')?.items[0]?.payload.basicInfo ?? null
+  const basicInfoSection = resume.sections.find((section) => section.type === 'BASIC_INFO') ?? null
   const bodySections = sections.filter((section) => section.type !== 'BASIC_INFO')
-  const activeSection = bodySections.find((section) => section.sectionId === activeSectionId) ?? null
+  const activeSection = sections.find((section) => section.sectionId === activeSectionId) ?? null
 
   return (
     <>
       <ResumeToolbar targetJd={resume.targetJd} />
       <main className="flex min-h-0 flex-1">
-        <ResumePreview basicInfo={basicInfo} sections={bodySections} activeSectionId={activeSectionId} onSelectSection={setActiveSectionId} />
-        <ResumeIndex sections={bodySections} activeSectionId={activeSectionId} />
+        <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} onSelectSection={setActiveSectionId} />
+        <ResumeIndex basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} />
         <ResumeEdit section={activeSection} />
       </main>
     </>
@@ -89,20 +89,28 @@ const ResumeToolbar = ({ targetJd }: { targetJd: ResumeQuery['resume']['targetJd
 }
 
 const ResumePreview = ({
-  basicInfo,
+  basicInfoSection,
   sections,
   activeSectionId,
   onSelectSection
 }: {
-  basicInfo: ResumeBasicInfoFieldsFragment | null
+  basicInfoSection: ResumeSectionData | null
   sections: ResumeSectionData[]
   activeSectionId: string | null
   onSelectSection: (sectionId: string) => void
 }) => {
+  const basicInfo = basicInfoSection?.items[0]?.payload.basicInfo ?? null
+
   return (
     <Flex align={'center'} className={'bg-bg-gray-subtler flex-1'}>
       <Flex direction={'column'} className={'bg-bg-white mx-auto h-[calc(100%-2rem)] w-149 min-w-149 overflow-y-auto p-7'}>
-        <ResumeBasicInfoHeader basicInfo={basicInfo} />
+        {basicInfoSection ? (
+          <SelectableArea sectionId={basicInfoSection.sectionId} activeSectionId={activeSectionId} onSelect={onSelectSection}>
+            <ResumeBasicInfoHeader basicInfo={basicInfo} />
+          </SelectableArea>
+        ) : (
+          <ResumeBasicInfoHeader basicInfo={basicInfo} />
+        )}
 
         <Spacing size={12} />
         <Divider color={'gray-10'} />
@@ -110,22 +118,9 @@ const ResumePreview = ({
 
         <Flex direction={'column'} gap="5">
           {sections.map((section) => (
-            <div
-              key={section.sectionId}
-              role="button"
-              tabIndex={0}
-              data-active={activeSectionId === section.sectionId}
-              onClick={() => onSelectSection(section.sectionId)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  onSelectSection(section.sectionId)
-                }
-              }}
-              className={'group cursor-pointer rounded-sm outline-none'}
-            >
+            <SelectableArea key={section.sectionId} sectionId={section.sectionId} activeSectionId={activeSectionId} onSelect={onSelectSection}>
               <ResumeSectionView section={section} />
-            </div>
+            </SelectableArea>
           ))}
         </Flex>
       </Flex>
@@ -133,9 +128,30 @@ const ResumePreview = ({
   )
 }
 
+/** 미리보기에서 클릭·키보드로 활성 섹션을 선택할 수 있게 감싸는 래퍼. `data-active`를 자식(Section)의 group-data 스타일이 읽는다. */
+const SelectableArea = ({ sectionId, activeSectionId, onSelect, children }: { sectionId: string; activeSectionId: string | null; onSelect: (sectionId: string) => void; children: ReactNode }) => {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      data-active={activeSectionId === sectionId}
+      onClick={() => onSelect(sectionId)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onSelect(sectionId)
+        }
+      }}
+      className={'group cursor-pointer rounded-sm outline-none'}
+    >
+      {children}
+    </div>
+  )
+}
+
 const ResumeBasicInfoHeader = ({ basicInfo }: { basicInfo: ResumeBasicInfoFieldsFragment | null }) => {
   return (
-    <section className={'flex w-full justify-between'}>
+    <section className={'group-data-[active=true]:bg-primary-5 group-data-[active=false]:hover:bg-gray-5 flex w-full justify-between rounded-sm p-3 transition-colors'}>
       <Text variant={'title1'}>{basicInfo?.name}</Text>
 
       <Flex direction="column" gap="2">
