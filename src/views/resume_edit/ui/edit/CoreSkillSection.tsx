@@ -21,7 +21,7 @@ const CoreSkillItem = ({ item, index }: { item: ResumeCoreSkillFieldsFragment; i
 
   return (
     <Flex direction={'column'} className={'gap-5 py-1'}>
-      <Textarea key={index} label={'내용'} value={value} onChange={(e) => setValue(e.target.value)} />
+      <Textarea key={index} label={'내용 *'} value={value} onChange={(e) => setValue(e.target.value)} />
       <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'}>
         <PencilSparkles size={16} data-icon="inline-start" />
         AI 첨삭

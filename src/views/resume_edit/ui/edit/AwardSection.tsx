@@ -47,7 +47,7 @@ const AwardItem = ({ item, index }: { item: ResumeAwardFieldsFragment; index: nu
       <Divider />
       <Spacing size={20} />
 
-      <Input label="수상명" value={item.name} clearable={false} placeholder={'수상명을 입력해주세요.'} />
+      <Input label="수상명 *" value={item.name} clearable={false} placeholder={'수상명을 입력해주세요.'} />
 
       <Spacing size={16} />
 
