@@ -2,13 +2,21 @@ import type { ResumeExperienceFieldsFragment } from '@shared/lib/gql/graphql'
 import { Section } from './Section'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { PencilSparkles, Trash2 } from 'lucide-react'
+import { PencilSparkles, RotateCcw, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
 
 export const ExperienceSection = ({ title, items }: { title: string; items: ResumeExperienceFieldsFragment[] }) => {
   return (
-    <Section title={title}>
+    <Section
+      title={title}
+      actionButton={
+        <Button variant={'text'} size={'sm'} onClick={() => {}}>
+          경험 재선택
+          <RotateCcw size={16} data-icon="inline-end" />
+        </Button>
+      }
+    >
       {items.map((item, index) => (
         <ExperienceSectionItem key={index} item={item} index={index} />
       ))}

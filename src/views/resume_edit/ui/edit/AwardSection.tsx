@@ -20,7 +20,7 @@ export const AwardSection = ({ title, items }: { title: string; items: ResumeAwa
             setAwardItems((prev) => [...prev, { name: '', organization: '', awardedAt: '' }])
           }}
         >
-          수상추가
+          수상 추가
           <Plus size={16} data-icon="inline-end" />
         </Button>
       }

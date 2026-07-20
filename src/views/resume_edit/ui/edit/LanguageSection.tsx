@@ -2,13 +2,30 @@ import type { ResumeLanguageFieldsFragment } from '@shared/lib/gql/graphql'
 import { Section } from './Section'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
+import { useState } from 'react'
 
 export const LanguageSection = ({ title, items }: { title: string; items: ResumeLanguageFieldsFragment[] }) => {
+  const [languageItems, setLanguageItems] = useState(items)
+
   return (
-    <Section title={title}>
-      {items.map((item, index) => (
+    <Section
+      title={title}
+      actionButton={
+        <Button
+          variant={'text'}
+          size={'sm'}
+          onClick={() => {
+            setLanguageItems((prev) => [...prev, { examName: '', scoreOrGrade: '', acquiredAt: '' }])
+          }}
+        >
+          어학 추가
+          <Plus size={16} data-icon="inline-end" />
+        </Button>
+      }
+    >
+      {languageItems.map((item, index) => (
         <LanguageSectionItem key={index} index={index} item={item} />
       ))}
     </Section>

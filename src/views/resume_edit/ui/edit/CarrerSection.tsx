@@ -1,15 +1,34 @@
+'use client'
+
 import type { ResumeCareerFieldsFragment } from '@shared/lib/gql/graphql'
 import { Section } from './Section'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { PencilSparkles, Trash2 } from 'lucide-react'
+import { PencilSparkles, Plus, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
+import { useState } from 'react'
 
 export const CareerSection = ({ title, items }: { title: string; items: ResumeCareerFieldsFragment[] }) => {
+  const [careerItems, setCareerItems] = useState(items)
+
   return (
-    <Section title={title}>
-      {items.map((item, index) => (
+    <Section
+      title={title}
+      actionButton={
+        <Button
+          variant={'text'}
+          size={'sm'}
+          onClick={() => {
+            setCareerItems((prev) => [...prev, { companyName: '', role: '', period: null, contents: '' }])
+          }}
+        >
+          경력추가
+          <Plus size={16} data-icon="inline-end" />
+        </Button>
+      }
+    >
+      {careerItems.map((item, index) => (
         <CareerSectionItem key={index} item={item} index={index} />
       ))}
     </Section>
