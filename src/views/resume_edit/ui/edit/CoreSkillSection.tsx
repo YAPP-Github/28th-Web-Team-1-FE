@@ -1,27 +1,28 @@
-import type { ResumeCoreSkillFieldsFragment } from '@shared/lib/gql/graphql'
-import { Section } from './Section'
-import { Textarea } from '@shared/ui/textarea'
+import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
+import { Flex } from '@radix-ui/themes'
 import { Button } from '@shared/ui'
 import { PencilSparkles } from 'lucide-react'
-import { Flex } from '@radix-ui/themes'
-import { useState } from 'react'
+import { Section } from './Section'
+import { FormTextarea } from '../form/FormTextarea'
+import type { ResumeFormValues } from '../../model/resume-form.types'
 
-export const CoreSkillSection = ({ title, items }: { title: string; items: ResumeCoreSkillFieldsFragment[] }) => {
+export const CoreSkillSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
+  const { control } = useFormContext<ResumeFormValues>()
+  const { fields } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
+
   return (
     <Section title={title}>
-      {items.map((item, index) => (
-        <CoreSkillItem key={index} item={item} index={index} />
+      {fields.map((field, index) => (
+        <CoreSkillItem key={field.id} sectionIndex={sectionIndex} index={index} />
       ))}
     </Section>
   )
 }
 
-const CoreSkillItem = ({ item, index }: { item: ResumeCoreSkillFieldsFragment; index: number }) => {
-  const [value, setValue] = useState(item.content)
-
+const CoreSkillItem = ({ sectionIndex, index }: { sectionIndex: number; index: number }) => {
   return (
     <Flex direction={'column'} className={'gap-5 py-1'}>
-      <Textarea key={index} label={'내용 *'} value={value} onChange={(e) => setValue(e.target.value)} />
+      <FormTextarea name={`sections.${sectionIndex}.items.${index}.payload.coreSkill.content`} label={'내용'} />
       <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'}>
         <PencilSparkles size={16} data-icon="inline-start" />
         AI 첨삭

@@ -1,13 +1,18 @@
 'use client'
-import { Suspense, useState, type ReactNode } from 'react'
+import { Suspense, useMemo, useState, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
+import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
 import { FileCheckCorner, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
-import { useResumeDetail } from '@entities/resume'
+import { useResumeDetail, useUpdateResume } from '@entities/resume'
 import { useWorkspaceId } from '@entities/user'
 import type { ResumeSectionData } from '../model/section'
+import type { ResumeFormValues } from '../model/resume-form.types'
+import { resumeToFormValues } from '../model/resumeToFormValues'
+import { formToSaveInput } from '../model/formToSaveInput'
 import { ResumeIndex } from './ResumeIndex'
 import { ResumeSectionView } from './preview/ResumeSectionView'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
@@ -34,35 +39,70 @@ const ResumeFallback = ({ children }: { children: ReactNode }) => (
 )
 
 /**
- * 이력서 상세를 한 번 조회해 헤더·미리보기·목차·편집 영역이 같은 데이터를 공유하게 한다.
- * `BASIC_INFO`는 미리보기 헤더 전용이라 본문 섹션(`bodySections`)에서 분리한다.
+ * 이력서 상세를 폼 초기값으로 삼아 편집 화면 전체를 하나의 react-hook-form으로 묶는다.
+ * 미리보기·목차·편집이 모두 같은 폼 상태를 공유하므로, 편집이 폼 값에 반영되는 즉시 미리보기가 갱신된다.
+ * 저장 액션은 폼 값을 전체 스냅샷(`SaveResumeInput`)으로 변환해 `updateResume`로 보낸다.
  */
 const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
+
+  const defaultValues = useMemo(() => resumeToFormValues(resume), [resume])
+  const form = useForm<ResumeFormValues>({ defaultValues })
+  const { mutate: updateResume, isPending } = useUpdateResume(workspaceId, resumeId)
+
   const [activeSectionId, setActiveSectionId] = useState<string | null>(() => {
-    return resume.sections.find((s) => s.type === 'EXPERIENCE')?.sectionId || null
+    return resume.sections.find((s) => s.type === 'EXPERIENCE')?.sectionId ?? null
   })
 
-  const sections = [...resume.sections].filter((section) => section.visible).sort((a, b) => a.displayOrder - b.displayOrder)
-  const basicInfoSection = resume.sections.find((section) => section.type === 'BASIC_INFO') ?? null
-  const bodySections = sections.filter((section) => section.type !== 'BASIC_INFO')
-  const activeSection = sections.find((section) => section.sectionId === activeSectionId) ?? null
+  const handleSave = form.handleSubmit((values) => {
+    updateResume(formToSaveInput(values, { status: resume.status, template: resume.template, targetJdId: resume.targetJd?.jdId ?? null }), {
+      onSuccess: () => toast.success('이력서가 저장되었습니다.', { position: 'top-center' }),
+      onError: (error) => toast.error(error.message, { position: 'top-center' })
+    })
+  })
+
+  return (
+    <FormProvider {...form}>
+      <ResumeToolbar targetJd={resume.targetJd} onSave={() => void handleSave()} isSaving={isPending} />
+      <main className="flex min-h-0 flex-1">
+        <ResumeBoard activeSectionId={activeSectionId} onSelectSection={setActiveSectionId} />
+      </main>
+    </FormProvider>
+  )
+}
+
+/**
+ * 폼 값(`sections`)을 구독해 미리보기·목차·편집 영역에 실시간으로 흘려보낸다.
+ * `BASIC_INFO`는 미리보기 헤더 전용이라 본문 섹션(`bodySections`)에서 분리한다.
+ */
+const ResumeBoard = ({ activeSectionId, onSelectSection }: { activeSectionId: string | null; onSelectSection: (sectionId: string) => void }) => {
+  const { control } = useFormContext<ResumeFormValues>()
+  const sections = useWatch({ control, name: 'sections' }) ?? []
+
+  const basicInfoSection = sections.find((section) => section.type === 'BASIC_INFO') ?? null
+  const bodySections = [...sections].filter((section) => section.visible && section.type !== 'BASIC_INFO').sort((a, b) => a.displayOrder - b.displayOrder)
+
+  const activeSectionIndex = sections.findIndex((section) => section.sectionId === activeSectionId)
+  const activeSection = activeSectionIndex >= 0 ? sections[activeSectionIndex] : null
 
   return (
     <>
-      <ResumeToolbar targetJd={resume.targetJd} />
-      <main className="flex min-h-0 flex-1">
-        <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} onSelectSection={setActiveSectionId} />
-        <ResumeIndex basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} />
-        <ResumeEdit section={activeSection} />
-      </main>
+      <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} onSelectSection={onSelectSection} />
+      <ResumeIndex basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} />
+      <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} />
     </>
   )
 }
 
+interface ResumeToolbarProps {
+  targetJd: ResumeQuery['resume']['targetJd']
+  onSave: () => void
+  isSaving: boolean
+}
+
 /** 편집 화면 상단 도구바. 이력서가 맞춤 대상으로 삼은 채용공고(targetJd)의 회사명·포지션과 저장 액션을 보여준다. */
-const ResumeToolbar = ({ targetJd }: { targetJd: ResumeQuery['resume']['targetJd'] }) => {
+const ResumeToolbar = ({ targetJd, onSave, isSaving }: ResumeToolbarProps) => {
   return (
     <header className={'flex justify-between px-8 py-5'}>
       <Flex direction="column" justify="center" className={'gap-0.5'}>
@@ -80,7 +120,7 @@ const ResumeToolbar = ({ targetJd }: { targetJd: ResumeQuery['resume']['targetJd
           19:53:30 자동 저장되었습니다.
         </Text>
 
-        <Button variant="primary" size={'md'} className={'leading-0'}>
+        <Button variant="primary" size={'md'} className={'leading-0'} onClick={onSave} disabled={isSaving}>
           <FileCheckCorner size={18} className="inline-block" />
           이력서 저장
         </Button>
@@ -116,7 +156,7 @@ const ResumePreview = ({ basicInfoSection, sections, activeSectionId, onSelectSe
 
         <Flex direction={'column'} gap="5">
           {sections.map((section) => (
-            <SelectableArea key={section.sectionId} sectionId={section.sectionId} activeSectionId={activeSectionId} onSelect={onSelectSection}>
+            <SelectableArea key={section.sectionId ?? section.type} sectionId={section.sectionId} activeSectionId={activeSectionId} onSelect={onSelectSection}>
               <ResumeSectionView section={section} />
             </SelectableArea>
           ))}
@@ -127,7 +167,7 @@ const ResumePreview = ({ basicInfoSection, sections, activeSectionId, onSelectSe
 }
 
 interface SelectableAreaProps {
-  sectionId: string
+  sectionId: string | null
   activeSectionId: string | null
   onSelect: (sectionId: string) => void
   children: ReactNode
@@ -135,16 +175,18 @@ interface SelectableAreaProps {
 
 /** 미리보기에서 클릭·키보드로 활성 섹션을 선택할 수 있게 감싸는 래퍼. `data-active`를 자식(Section)의 group-data 스타일이 읽는다. */
 const SelectableArea = ({ sectionId, activeSectionId, onSelect, children }: SelectableAreaProps) => {
+  const select = () => sectionId && onSelect(sectionId)
+
   return (
     <div
       role="button"
       tabIndex={0}
       data-active={activeSectionId === sectionId}
-      onClick={() => onSelect(sectionId)}
+      onClick={select}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
-          onSelect(sectionId)
+          select()
         }
       }}
       className={'group cursor-pointer rounded-sm outline-none'}
@@ -175,10 +217,6 @@ const ResumeBasicInfoHeader = ({ basicInfo }: { basicInfo: ResumeBasicInfoFields
   )
 }
 
-const ResumeEdit = ({ section }: { section: ResumeSectionData | null }) => {
-  return (
-    <Flex className={'flex-1'}>
-      <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} /> : null}</Flex>
-    </Flex>
-  )
+const ResumeEdit = ({ section, sectionIndex }: { section: ResumeSectionData | null; sectionIndex: number }) => {
+  return <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} sectionIndex={sectionIndex} /> : null}</Flex>
 }

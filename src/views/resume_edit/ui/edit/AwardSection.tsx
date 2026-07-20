@@ -1,13 +1,14 @@
-import type { ResumeAwardFieldsFragment } from '@shared/lib/gql/graphql'
-import { Section } from './Section'
-import { Input } from '@shared/ui/input'
+import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { Section } from './Section'
+import { FormInput } from '../form/FormInput'
+import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
 
-export const AwardSection = ({ title, items }: { title: string; items: Array<ResumeAwardFieldsFragment & { itemId: string }> }) => {
-  const [awardItems, setAwardItems] = useState(items)
+export const AwardSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
+  const { control } = useFormContext<ResumeFormValues>()
+  const { fields, append, remove } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
 
   return (
     <Section
@@ -16,29 +17,29 @@ export const AwardSection = ({ title, items }: { title: string; items: Array<Res
         <Button
           variant={'text'}
           size={'sm'}
-          onClick={() => {
-            setAwardItems((prev) => [...prev, { name: '', organization: '', awardedAt: '', itemId: crypto.randomUUID() }])
-          }}
+          onClick={() => append({ itemId: null, displayOrder: nextDisplayOrder(fields), visible: true, payload: { ...emptyItemPayload, award: { name: '', organization: null, awardedAt: null } } })}
         >
           수상 추가
           <Plus size={16} data-icon="inline-end" />
         </Button>
       }
     >
-      {awardItems.map((item, index) => (
-        <AwardItem key={item.itemId} item={item} index={index} />
+      {fields.map((field, index) => (
+        <AwardItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} />
       ))}
     </Section>
   )
 }
 
-const AwardItem = ({ item, index }: { item: ResumeAwardFieldsFragment; index: number }) => {
+const AwardItem = ({ sectionIndex, index, onRemove }: { sectionIndex: number; index: number; onRemove: () => void }) => {
+  const base = `sections.${sectionIndex}.items.${index}.payload.award`
+
   return (
     <Flex direction={'column'}>
       <Flex justify={'between'}>
         <Text variant={'headline2'}>수상 {index + 1}</Text>
 
-        <Button variant={'tertiary'} size={'icon-xs'}>
+        <Button variant={'tertiary'} size={'icon-xs'} onClick={onRemove}>
           <Trash2 />
         </Button>
       </Flex>
@@ -47,13 +48,13 @@ const AwardItem = ({ item, index }: { item: ResumeAwardFieldsFragment; index: nu
       <Divider />
       <Spacing size={20} />
 
-      <Input label="수상명 *" value={item.name} clearable={false} placeholder={'수상명을 입력해주세요.'} />
+      <FormInput name={`${base}.name`} label="수상명" clearable={false} placeholder={'수상명을 입력해주세요.'} />
 
       <Spacing size={16} />
 
       <Flex className={'w-full gap-4'}>
-        <Input label="기관" value={item.organization || ''} clearable={false} placeholder={'기관명을 입력해주세요.'} className={'w-full'} />
-        <Input label="수상일" value={item.awardedAt || ''} clearable={false} placeholder={'2025.05.09'} className={'w-full'} />
+        <FormInput name={`${base}.organization`} label="기관" clearable={false} placeholder={'기관명을 입력해주세요.'} className={'w-full'} />
+        <FormInput name={`${base}.awardedAt`} label="수상일" clearable={false} placeholder={'2025.05.09'} className={'w-full'} />
       </Flex>
     </Flex>
   )

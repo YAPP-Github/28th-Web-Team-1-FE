@@ -1,6 +1,6 @@
-import type { ResumeQuery } from '@shared/lib/gql/graphql'
+import type { ResumeFormSection } from './resume-form.types'
 
-export type ResumeSectionData = ResumeQuery['resume']['sections'][number]
+export type ResumeSectionData = ResumeFormSection
 type SectionItems = ResumeSectionData['items']
 
 /** 섹션 아이템들에서 해당 타입의 payload만 뽑아 null을 제거한다. (미리보기·편집 switch 공통) */

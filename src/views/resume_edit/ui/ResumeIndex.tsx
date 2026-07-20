@@ -22,10 +22,10 @@ export const ResumeIndex = ({ sections, basicInfoSection, activeSectionId }: { s
         {sections.map((section) => {
           const isActive = activeSectionId === section.sectionId
           return (
-            <Fragment key={section.sectionId}>
+            <Fragment key={section.sectionId ?? section.type}>
               <div className={cn('h-0.75 w-6 rounded-full', isActive ? 'bg-border-primary' : 'bg-border-subtle')} />
-              {visibleSortedItems(section).map((item) => (
-                <div key={item.itemId} className={cn('h-0.75 w-4 rounded-full', isActive ? 'bg-border-primary' : 'bg-border-subtle')} />
+              {visibleSortedItems(section).map((item, itemIndex) => (
+                <div key={item.itemId ?? itemIndex} className={cn('h-0.75 w-4 rounded-full', isActive ? 'bg-border-primary' : 'bg-border-subtle')} />
               ))}
             </Fragment>
           )
@@ -47,7 +47,7 @@ export const ResumeIndex = ({ sections, basicInfoSection, activeSectionId }: { s
               const isActive = activeSectionId === section.sectionId
               return (
                 <Flex
-                  key={section.sectionId}
+                  key={section.sectionId ?? section.type}
                   direction="column"
                   className={cn(
                     'active:border-border-primary-light active:bg-element-white rounded-sm border border-transparent has-[[data-item]:active]:border-transparent',

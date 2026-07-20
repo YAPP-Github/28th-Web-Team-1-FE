@@ -1,4 +1,4 @@
-import { payloadsOf, visibleSortedItems, type ResumeSectionData } from '../../model/section'
+import type { ResumeSectionData } from '../../model/section'
 import { AwardSection } from './AwardSection'
 import { BasicInfoSection } from './BasicInfoSection'
 import { CareerSection } from './CarrerSection'
@@ -11,31 +11,31 @@ import { SkillSection } from './SkillSection'
 
 /**
  * 활성 섹션 하나를 `type`으로 분기해 알맞은 편집 섹션 컴포넌트로 렌더한다.
- * 미리보기(`preview/ResumeSectionView`)와 같은 유틸(`visibleSortedItems`·`payloadsOf`)을 공유한다.
+ * 각 섹션은 폼 필드 경로 조립에 쓸 `sectionIndex`(폼 `sections` 배열 내 위치)를 받아
+ * `useFormContext`/`useFieldArray`로 공유 폼에 직접 연결된다.
  */
-export const ResumeSectionEdit = ({ section }: { section: ResumeSectionData }) => {
+export const ResumeSectionEdit = ({ section, sectionIndex }: { section: ResumeSectionData; sectionIndex: number }) => {
   const { type, displayText } = section
-  const items = visibleSortedItems(section)
 
   switch (type) {
-    case 'CORE_SKILL':
-      return <CoreSkillSection title={displayText} items={payloadsOf(items, 'coreSkill')} />
-    case 'CAREER':
-      return <CareerSection title={displayText} items={payloadsOf(items, 'career')} />
-    case 'EXPERIENCE':
-      return <ExperienceSection title={displayText} items={payloadsOf(items, 'experience')} />
-    case 'EDUCATION':
-      return <EducationSection title={displayText} items={payloadsOf(items, 'education')} />
-    case 'CERTIFICATE':
-      return <CertificatesSection title={displayText} items={payloadsOf(items, 'certificate')} />
-    case 'AWARD':
-      return <AwardSection title={displayText} items={payloadsOf(items, 'award')} />
-    case 'LANGUAGE':
-      return <LanguageSection title={displayText} items={payloadsOf(items, 'language')} />
-    case 'SKILL':
-      return <SkillSection title={displayText} items={payloadsOf(items, 'skill')} />
     case 'BASIC_INFO':
-      return <BasicInfoSection title={displayText} items={payloadsOf(items, 'basicInfo')} />
+      return <BasicInfoSection title={displayText} sectionIndex={sectionIndex} />
+    case 'CAREER':
+      return <CareerSection title={displayText} sectionIndex={sectionIndex} />
+    case 'CORE_SKILL':
+      return <CoreSkillSection title={displayText} sectionIndex={sectionIndex} />
+    case 'EXPERIENCE':
+      return <ExperienceSection title={displayText} sectionIndex={sectionIndex} />
+    case 'EDUCATION':
+      return <EducationSection title={displayText} sectionIndex={sectionIndex} />
+    case 'CERTIFICATE':
+      return <CertificatesSection title={displayText} sectionIndex={sectionIndex} />
+    case 'AWARD':
+      return <AwardSection title={displayText} sectionIndex={sectionIndex} />
+    case 'LANGUAGE':
+      return <LanguageSection title={displayText} sectionIndex={sectionIndex} />
+    case 'SKILL':
+      return <SkillSection title={displayText} sectionIndex={sectionIndex} />
     default:
       return null
   }

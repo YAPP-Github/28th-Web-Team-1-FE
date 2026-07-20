@@ -1,13 +1,15 @@
-import type { ResumeEducationFieldsFragment } from '@shared/lib/gql/graphql'
-import { Section } from './Section'
+import { useFieldArray, useFormContext, useWatch, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Plus, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
-import { useState } from 'react'
+import { Section } from './Section'
+import { FormInput } from '../form/FormInput'
+import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
 
-export const EducationSection = ({ title, items }: { title: string; items: Array<ResumeEducationFieldsFragment & { itemId: string }> }) => {
-  const [educationItems, setEducationItems] = useState(items)
+export const EducationSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
+  const { control } = useFormContext<ResumeFormValues>()
+  const { fields, append, remove } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
 
   return (
     <Section
@@ -16,29 +18,39 @@ export const EducationSection = ({ title, items }: { title: string; items: Array
         <Button
           variant={'text'}
           size={'sm'}
-          onClick={() => {
-            setEducationItems((prev) => [...prev, { schoolName: '', status: '', period: null, major: '', degree: '', itemId: crypto.randomUUID() }])
-          }}
+          onClick={() =>
+            append({
+              itemId: null,
+              displayOrder: nextDisplayOrder(fields),
+              visible: true,
+              payload: { ...emptyItemPayload, education: { schoolName: '', major: null, degree: null, status: null, period: null } }
+            })
+          }
         >
           학력 추가
           <Plus size={16} data-icon="inline-end" />
         </Button>
       }
     >
-      {educationItems.map((item, index) => (
-        <EducationSectionItem key={item.itemId} item={item} index={index} />
+      {fields.map((field, index) => (
+        <EducationSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} />
       ))}
     </Section>
   )
 }
 
-const EducationSectionItem = ({ item, index }: { item: ResumeEducationFieldsFragment; index: number }) => {
+const EducationSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: number; index: number; onRemove: () => void }) => {
+  const { control } = useFormContext<ResumeFormValues>()
+  const base = `sections.${sectionIndex}.items.${index}.payload.education`
+  // 기간(period)은 {startAt, endAt} 객체라 단일 텍스트 입력에 그대로 바인딩할 수 없어 지금은 읽기 전용으로 표시한다.
+  const period = useWatch({ control, name: `sections.${sectionIndex}.items.${index}.payload.education.period` }) as { startAt?: string | null; endAt?: string | null } | null | undefined
+
   return (
     <Flex direction={'column'}>
       <Flex justify={'between'}>
         <Text variant={'headline2'}>학력 {index + 1}</Text>
 
-        <Button variant={'tertiary'} size={'icon-xs'}>
+        <Button variant={'tertiary'} size={'icon-xs'} onClick={onRemove}>
           <Trash2 />
         </Button>
       </Flex>
@@ -47,20 +59,20 @@ const EducationSectionItem = ({ item, index }: { item: ResumeEducationFieldsFrag
       <Divider />
       <Spacing size={20} />
 
-      <Input label="학력명 *" value={item.schoolName} clearable={false} placeholder={'학교명을 입력해주세요.'} />
+      <FormInput name={`${base}.schoolName`} label="학력명" clearable={false} placeholder={'학교명을 입력해주세요.'} />
 
       <Spacing size={16} />
 
       <Flex className={'w-full gap-4'}>
-        <Input label="상태" value={item.status || ''} clearable={false} placeholder={'졸업예정'} className={'w-full'} />
-        <Input label="기간" value={item.period ? `${item.period.startAt}-${item.period.endAt}` : ''} clearable={false} placeholder={'2025.05.09'} className={'w-full'} />
+        <FormInput name={`${base}.status`} label="상태" clearable={false} placeholder={'졸업예정'} className={'w-full'} />
+        <Input label="기간" value={period ? `${period.startAt ?? ''}-${period.endAt ?? ''}` : ''} clearable={false} placeholder={'2025.05.09'} className={'w-full'} />
       </Flex>
 
       <Spacing size={16} />
 
       <Flex className={'w-full gap-4'}>
-        <Input label="전공" value={item.major || ''} clearable={false} placeholder={'전공을 입력해주세요.'} className={'w-full'} />
-        <Input label="학위" value={item.degree || ''} clearable={false} placeholder={'학위를 입력해주세요.'} className={'w-full'} />
+        <FormInput name={`${base}.major`} label="전공" clearable={false} placeholder={'전공을 입력해주세요.'} className={'w-full'} />
+        <FormInput name={`${base}.degree`} label="학위" clearable={false} placeholder={'학위를 입력해주세요.'} className={'w-full'} />
       </Flex>
     </Flex>
   )
