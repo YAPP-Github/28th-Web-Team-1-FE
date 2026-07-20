@@ -1,5 +1,5 @@
 export { cn } from './cn'
-export { formatDate, formatPeriod, parsePeriodInput } from './date'
+export { formatDate, formatPeriod, parsePeriodInput, formatYYYYMM } from './date'
 export { http, ApiError } from './http'
 export { execute } from './execute'
 export { GraphQLError } from './graphql-error'
