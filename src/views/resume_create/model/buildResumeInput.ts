@@ -30,8 +30,8 @@ export const buildResumeInput = (experiences: Experience[], jdId: string): Creat
     payload: {
       experience: {
         name: experience.title,
-        role: experience.project?.role ?? null,
-        period: experience.project?.period ?? null,
+        role: experience.role ?? null,
+        period: experience.period ?? null,
         contents: flattenExperienceContents(experience.contents)
       }
     }

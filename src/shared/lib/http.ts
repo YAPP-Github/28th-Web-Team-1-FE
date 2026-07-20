@@ -36,12 +36,13 @@ export class ApiError extends Error {
   code: string
   details?: ApiErrorDetail[]
 
-  constructor(status: number, code: string, details?: ApiErrorDetail[]) {
-    super(code)
+  constructor(status: number, code: string, options?: { details?: ApiErrorDetail[]; message?: string }) {
+    // 서버가 준 사람이 읽을 메시지를 우선 쓰고, 없으면 코드를 message로 둔다.
+    super(options?.message ?? code)
     this.name = 'ApiError'
     this.status = status
     this.code = code
-    this.details = details
+    this.details = options?.details
   }
 }
 
@@ -113,7 +114,7 @@ const request = async <T = unknown>(path: string, options: RequestOptions = {}):
   const data = await response.json().catch(() => ({}))
 
   if (!response.ok || data?.ok === false) {
-    throw new ApiError(response.status, data?.error?.code ?? AUTH_ERROR.INTERNAL, data?.error?.details)
+    throw new ApiError(response.status, data?.error?.code ?? AUTH_ERROR.INTERNAL, { details: data?.error?.details, message: data?.error?.message })
   }
 
   return data?.result

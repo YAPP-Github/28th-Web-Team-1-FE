@@ -1,9 +1,15 @@
 import { execute, graphql } from '@shared/lib'
+import type { CreateExperienceInput, UpdateExperienceInput } from '../model/experience.types'
 
 export const experienceAPI = {
   getExperiences: (variables: { workspaceId: string; size: number; cursor?: string | null }) => execute(experiencesDocument, variables),
+  getMatchedExperiences: (variables: { workspaceId: string; jdId: string; size: number; cursor?: string | null }) => execute(matchedExperiencesDocument, variables),
+  getProjectExperiences: (variables: { workspaceId: string; projectId: string; size: number; cursor?: string | null }) => execute(projectExperiencesDocument, variables),
+  getExperience: (variables: { workspaceId: string; experienceId: string }) => execute(experienceDocument, variables),
   getSearchExperiences: (variables: { workspaceId: string; keyword: string; size: number; cursor?: string | null }) => execute(searchExperiencesDocument, variables),
-  getMatchedExperiences: (variables: { workspaceId: string; jdId: string; size: number; cursor?: string | null }) => execute(matchedExperiencesDocument, variables)
+  createExperience: (variables: { workspaceId: string; request: CreateExperienceInput }) => execute(createExperienceDocument, variables),
+  updateExperience: (variables: { workspaceId: string; experienceId: string; request: UpdateExperienceInput }) => execute(updateExperienceDocument, variables),
+  deleteExperience: (variables: { workspaceId: string; experienceId: string }) => execute(deleteExperienceDocument, variables)
 }
 
 const experiencesDocument = graphql(`
@@ -25,6 +31,54 @@ const experiencesDocument = graphql(`
             startAt
             endAt
           }
+        }
+      }
+    }
+  }
+`)
+
+const projectExperiencesDocument = graphql(`
+  query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String) {
+    experiences(workspaceId: $workspaceId, projectId: $projectId, size: $size, cursor: $cursor) {
+      cursor {
+        hasNext
+        nextCursor
+      }
+      experiences {
+        experienceId
+        title
+        tags
+        role
+        period {
+          startAt
+          endAt
+        }
+      }
+    }
+  }
+`)
+
+const experienceDocument = graphql(`
+  query Experience($workspaceId: ID!, $experienceId: ID!) {
+    experience(workspaceId: $workspaceId, experienceId: $experienceId) {
+      experienceId
+      title
+      tags
+      role
+      period {
+        startAt
+        endAt
+      }
+      contents {
+        type
+        star {
+          situation
+          task
+          action
+          result
+        }
+        free {
+          content
         }
       }
     }
@@ -65,6 +119,11 @@ const matchedExperiencesDocument = graphql(`
         tags
         matchRate
         recommendedReason: reason
+        role
+        period {
+          startAt
+          endAt
+        }
         contents {
           type
           free {
@@ -80,13 +139,29 @@ const matchedExperiencesDocument = graphql(`
         project {
           projectId
           name
-          role
-          period {
-            startAt
-            endAt
-          }
         }
       }
     }
+  }
+`)
+const createExperienceDocument = graphql(`
+  mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {
+    createExperience(workspaceId: $workspaceId, request: $request) {
+      experienceId
+    }
+  }
+`)
+
+const updateExperienceDocument = graphql(`
+  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {
+    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {
+      experienceId
+    }
+  }
+`)
+
+const deleteExperienceDocument = graphql(`
+  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {
+    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)
   }
 `)
