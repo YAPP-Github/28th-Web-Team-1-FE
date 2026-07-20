@@ -81,7 +81,7 @@ const ResumeBoard = ({ activeSectionId, onSelectSection }: { activeSectionId: st
   const sections = useWatch({ control, name: 'sections' }) ?? []
 
   const basicInfoSection = sections.find((section) => section.type === 'BASIC_INFO') ?? null
-  const bodySections = [...sections].filter((section) => section.visible && section.type !== 'BASIC_INFO').sort((a, b) => a.displayOrder - b.displayOrder)
+  const bodySections = sections.filter((section) => section.visible && section.type !== 'BASIC_INFO')
 
   const activeSectionIndex = sections.findIndex((section) => section.sectionId === activeSectionId)
   const activeSection = activeSectionIndex >= 0 ? sections[activeSectionIndex] : null
@@ -89,7 +89,7 @@ const ResumeBoard = ({ activeSectionId, onSelectSection }: { activeSectionId: st
   return (
     <>
       <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} onSelectSection={onSelectSection} />
-      <ResumeIndex basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} />
+      <ResumeIndex activeSectionId={activeSectionId} />
       <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} />
     </>
   )

@@ -13,20 +13,21 @@ interface SaveMeta {
  *
  * - `sectionId`/`itemId`가 `null`(신규)이면 생략해 서버가 새로 생성하게 한다.
  * - `displayText`는 서버가 섹션 타입 기준으로 관리하므로 보내지 않는다.
+ * - `displayOrder`는 배열 index로 정규화해 보낸다. 폼 배열 순서가 곧 표시 순서이다.
  * - payload는 응답=입력 형태가 같아 그대로 전달한다.
  */
 export const formToSaveInput = (values: ResumeFormValues, meta: SaveMeta): SaveResumeInput => ({
   status: meta.status,
   template: meta.template,
   targetJdId: meta.targetJdId,
-  sections: values.sections.map((section) => ({
+  sections: values.sections.map((section, sectionIndex) => ({
     sectionId: section.sectionId ?? undefined,
     type: section.type,
-    displayOrder: section.displayOrder,
+    displayOrder: sectionIndex,
     visible: section.visible,
-    items: section.items.map((item) => ({
+    items: section.items.map((item, itemIndex) => ({
       itemId: item.itemId ?? undefined,
-      displayOrder: item.displayOrder,
+      displayOrder: itemIndex,
       visible: item.visible,
       payload: item.payload
     }))

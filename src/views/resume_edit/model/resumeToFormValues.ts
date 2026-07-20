@@ -8,14 +8,17 @@ import type { ResumeFormValues } from './resume-form.types'
  * 그대로 담아야 한다. (미리보기·목차의 visible 필터는 표시 단계에서만 적용)
  * payload는 응답=입력 형태가 같아 그대로 전달한다.
  */
+const byDisplayOrder = <T extends { displayOrder: number }>(a: T, b: T) => a.displayOrder - b.displayOrder
+
 export const resumeToFormValues = (resume: ResumeQuery['resume']): ResumeFormValues => ({
-  sections: resume.sections.map((section) => ({
+  // 로드 시점에 한 번만 displayOrder로 정렬한다. 이후로는 폼 배열 순서가 곧 표시 순서다.
+  sections: [...resume.sections].sort(byDisplayOrder).map((section) => ({
     sectionId: section.sectionId,
     type: section.type,
     displayText: section.displayText,
     displayOrder: section.displayOrder,
     visible: section.visible,
-    items: section.items.map((item) => ({
+    items: [...section.items].sort(byDisplayOrder).map((item) => ({
       itemId: item.itemId,
       displayOrder: item.displayOrder,
       visible: item.visible,

@@ -10,25 +10,28 @@ export const payloadsOf = <K extends keyof SectionItems[number]['payload']>(item
     return payload === null ? [] : [{ ...payload, itemId: item.itemId }]
   })
 
-/** 노출(visible) 아이템만 displayOrder 순으로 정렬해 돌려준다. (미리보기·목차·편집 공통) */
-export const visibleSortedItems = (section: ResumeSectionData): ResumeSectionData['items'] => [...section.items].filter((item) => item.visible).sort((a, b) => a.displayOrder - b.displayOrder)
+/** 순서는 폼 배열 순서가 곧 표시 순서다(정렬 안 함). displayOrder는 저장 시 index로 부여된다.*/
+export const visibleItems = (section: ResumeSectionData): ResumeSectionData['items'] => section.items.filter((item) => item.visible)
 
-/** 목차(ResumeIndex)에 표시할 아이템 라벨. payload 타입과 무관하게 대표 이름 필드를 뽑는다. */
+/** 아이템 하나의 대표 라벨. payload 타입과 무관하게 대표 이름 필드를 뽑는다. (목차·미니맵 공통) */
+export const getItemLabel = (item: ResumeSectionData['items'][number]): string => {
+  const p = item.payload
+  return (
+    p.experience?.name ??
+    p.career?.companyName ??
+    p.education?.schoolName ??
+    p.award?.name ??
+    p.certificate?.name ??
+    p.language?.examName ??
+    p.skill?.name ??
+    p.coreSkill?.content ??
+    p.basicInfo?.name ??
+    ''
+  )
+}
+
+/** 목차(ResumeIndex)에 표시할 아이템 라벨 목록. 빈 라벨은 제외한다. */
 export const getSectionItemLabels = (section: ResumeSectionData): string[] =>
-  visibleSortedItems(section)
-    .map((item) => {
-      const p = item.payload
-      return (
-        p.experience?.name ??
-        p.career?.companyName ??
-        p.education?.schoolName ??
-        p.award?.name ??
-        p.certificate?.name ??
-        p.language?.examName ??
-        p.skill?.name ??
-        p.coreSkill?.content ??
-        p.basicInfo?.name ??
-        ''
-      )
-    })
+  visibleItems(section)
+    .map(getItemLabel)
     .filter((label) => label.trim().length > 0)
