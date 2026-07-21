@@ -48,7 +48,7 @@ export const ResumeIndex = ({ activeSectionUid }: { activeSectionUid: string | n
     (from, to) => moveSection(bodyEntries[from].index, bodyEntries[to].index)
   )
 
-  // onMouseLeave={() => setIsOpen(false)}
+  //onMouseLeave={() => setIsOpen(false)}
 
   return (
     <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'}>
@@ -141,7 +141,9 @@ const SortableSectionRow = ({ id, sectionIndex, section, isActive }: { id: strin
           ref={setActivatorNodeRef}
           {...attributes}
           {...listeners}
-          className={'text-icon-gray absolute top-1.75 right-full mr-0.5 cursor-grab opacity-0 transition-opacity group-hover/section:opacity-100'}
+          className={
+            'active:bg-element-gray-lighter hover:bg-element-gray-lighter text-icon-gray absolute top-1.25 right-full -translate-x-0.5 cursor-grab rounded-xs p-0.5 opacity-0 transition-opacity outline-none group-hover/section:opacity-100'
+          }
         >
           <Menu size={12} />
         </button>
@@ -167,17 +169,22 @@ const SortableSectionRow = ({ id, sectionIndex, section, isActive }: { id: strin
 /** DragOverlay용 섹션 미리보기(정적). 실제 크기 그대로 떠서 이동하므로 높이 차와 무관하게 깔끔하다. */
 const SectionDragOverlay = ({ section }: { section: ResumeFormSection }) => {
   return (
-    <Flex direction="column" className={'bg-element-white border-border-subtler shadow-1 w-full rounded-sm border'}>
+    <Flex direction="column" className={'bg-element-white border-border-primary-light shadow-1 w-full rounded-sm border'}>
       <Flex align={'center'} className={'relative'}>
-        <Menu size={12} className={'text-icon-gray absolute top-1.75 right-full mr-0.5'} />
+        <div className={'bg-element-gray-light text-icon-gray absolute top-1.25 right-full -translate-x-0.5 rounded-xs p-0.5'}>
+          <Menu size={12} />
+        </div>
+
         <Text variant="label2" color={'text-subtler'} className={'w-full truncate px-1.5 py-1'}>
           {section.displayText}
         </Text>
       </Flex>
       <Flex direction="column" gap="1">
         {visibleItems(section).map((item, index) => (
-          <Flex key={index} align={'center'} gap={'1'} className={'p-1'}>
-            <Menu size={12} className={'text-icon-gray shrink-0'} />
+          <Flex key={index} align={'center'} gap={'1'} className={cn('group/item active:border-border-primary-light active:bg-element-white rounded-sm border border-transparent p-1')}>
+            <div className={'shrink-0 p-0.5 opacity-0'}>
+              <Menu size={12} />
+            </div>
             <Text variant="caption2" color="text-subtler" className="w-full truncate">
               {getItemLabel(item)}
             </Text>
@@ -202,10 +209,15 @@ const SortableItemRow = ({ id, label }: { id: string; label: string }) => {
       gap={'1'}
       className={cn('group/item active:border-border-primary-light active:bg-element-white rounded-sm border border-transparent p-1')}
     >
-      <button type="button" ref={setActivatorNodeRef} {...attributes} {...listeners} className={'text-icon-gray shrink-0 cursor-grab opacity-0 transition-opacity group-hover/item:opacity-100'}>
+      <button
+        type="button"
+        ref={setActivatorNodeRef}
+        {...attributes}
+        {...listeners}
+        className={'hover:bg-element-gray-lighter text-icon-gray shrink-0 cursor-grab rounded-xs p-0.5 opacity-0 transition-opacity group-hover/item:opacity-100'}
+      >
         <Menu size={12} />
       </button>
-
       <Text variant="caption2" color="text-subtler" className="w-full truncate">
         {label}
       </Text>
@@ -222,7 +234,7 @@ const SortableItemRow = ({ id, label }: { id: string; label: string }) => {
  */
 /**
  * "카테고리 추가/삭제" 모달. 어떤 섹션 카테고리를 이력서에 노출할지 관리한다.
- * 삭제는 실제 제거가 아니라 **visible 토글**이라 데이터가 보존된다.
+ * 삭제는 실제 제거가 아니라 visible 토글이라 데이터가 보존된다.
  * - X(삭제): 기존 섹션은 `visible:false`(숨김·보존), 이번 세션에 새로 만든 미저장 섹션은 완전 제거
  * - ＋(추가): 숨겨둔 기존 섹션은 `visible:true`, 이력서에 없던 타입은 새 섹션 생성
  * 변경은 로컬에 스테이징되고 **저장**을 눌러야 폼에 반영된다(닫으면 취소).
@@ -235,7 +247,6 @@ const SetCategoryModal = () => {
   const [staged, setStaged] = useState<ResumeFormSection[]>([])
 
   const openModal = () => {
-    // 숨긴 섹션까지 모두 담는다(visible 무관). 노출 여부만 토글한다.
     setStaged(getValues('sections').filter((section) => section.type !== 'BASIC_INFO'))
     setIsOpen(true)
   }
@@ -303,8 +314,9 @@ const SetCategoryModal = () => {
               </Flex>
             ))}
           </Flex>
+
           <Divider orientation="vertical" />
-          {/* 우측: 숨겨진 기존 섹션 + 이력서에 없는 타입 (＋로 추가) */}
+
           <Flex direction="column" gap="2" className="min-h-0 w-1/2 overflow-y-auto">
             {hiddenSections.map((section) => (
               <Flex key={section.uid} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
@@ -316,6 +328,7 @@ const SetCategoryModal = () => {
                 </button>
               </Flex>
             ))}
+
             {missingTypes.map((type) => (
               <Flex key={type} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
                 <button type="button" onClick={() => addNewType(type)}>
