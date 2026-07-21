@@ -1,7 +1,7 @@
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import { notionAPI } from '../api/notion.api'
 
-export const notionKeys = {
+const notionKeys = {
   all: ['notion'] as const,
   connections: (workspaceId: string) => [...notionKeys.all, 'connections', workspaceId] as const,
   pages: (workspaceId: string, connectionId: string, query: string) => [...notionKeys.all, 'pages', workspaceId, connectionId, query] as const

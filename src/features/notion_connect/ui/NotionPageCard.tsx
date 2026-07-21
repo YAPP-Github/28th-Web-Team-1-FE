@@ -46,8 +46,8 @@ export const NotionPageCard = memo(({ id, title, lastEditedTime, isSelected, onT
           )}
         </Flex>
       </Flex>
-      <span className={cn('border-border-subtle relative size-4.5 shrink-0 rounded-full border bg-white', isSelected && 'border-border-primary')}>
-        {isSelected && <span className="bg-element-primary absolute top-1/2 left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full" />}
+      <span className={cn('border-border-subtle relative size-4.5 shrink-0 rounded-full border bg-white transition-colors', isSelected && 'border-element-primary bg-element-primary')}>
+        {isSelected && <span className="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />}
       </span>
     </button>
   )

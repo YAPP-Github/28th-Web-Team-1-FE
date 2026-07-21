@@ -7,7 +7,7 @@ interface ImportNotionExperiencesInput {
   pageIds: string[]
 }
 
-export interface ImportNotionExperiencesResult {
+interface ImportNotionExperiencesResult {
   succeeded: string[]
   failed: string[]
 }

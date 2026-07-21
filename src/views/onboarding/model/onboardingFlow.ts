@@ -2,7 +2,7 @@ export type OnboardingStep = 'has-resume' | 'resume-upload' | 'resume-info' | 'n
 
 export const INITIAL_STEP: OnboardingStep = 'has-resume'
 
-/** 모든 온보딩 스텝 컴포넌트가 공유하는 props. 스텝별 입력값은 각 스텝의 로컬 상태로 관리한다. */
+/** 모든 온보딩 스텝 컴포넌트가 공유하는 props */
 /** 스텝 완료. 분기가 답변에 따라 갈리는 스텝(이력서/Notion 보유 여부)만 answer를 넘긴다. */
 export interface OnboardingStepProps {
   onDone: (answer?: boolean) => void

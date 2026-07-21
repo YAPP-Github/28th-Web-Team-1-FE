@@ -1,13 +1,33 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { ApiError, authFailureRedirect, safeRedirectPath } from '@shared/lib'
 import { notionAPI } from '@entities/notion'
-import { decodeNotionState, NOTION_OAUTH_NONCE_COOKIE, NOTION_CONNECT_ERROR } from '@features/notion_connect'
+import { NOTION_OAUTH_NONCE_COOKIE, NOTION_CONNECT_ERROR, NOTION_PAGE_SELECT_STEP } from '@features/notion_connect'
+
+/**
+ * 노션이 echo한 `state` 문자열을 디코딩한다. 변조·손상으로 파싱에 실패하면 `null`.
+ * @param raw 콜백 URL의 `state` 쿼리 파라미터 값(신뢰 불가)
+ * @example
+ * ```ts
+ * decodeNotionState(searchParams.get('state')) // { workspaceId, returnTo, nonce } | null
+ * ```
+ */
+const decodeNotionState = (raw: string | null) => {
+  if (!raw) return null
+  try {
+    const parsed: unknown = JSON.parse(raw)
+    if (typeof parsed !== 'object' || parsed === null) return null
+    const { w, r, n } = parsed as Record<string, unknown>
+    if (typeof w !== 'string' || typeof r !== 'string' || typeof n !== 'string') return null
+    return { workspaceId: w, returnTo: r, nonce: n }
+  } catch {
+    return null
+  }
+}
 
 /**
  * Notion이 인가 코드를 붙여 리다이렉트하는 콜백을 서버에서 처리하는 라우트 핸들러이다.
  * `state`(워크스페이스 ID·복귀 경로·nonce)를 복원하고 nonce를 쿠키와 대조(CSRF 방어)한 뒤,
  * `connectNotion` 뮤테이션으로 코드를 교환해 연결을 만들고 온보딩의 페이지 선택 스텝으로 복귀시킨다.
- * 코드는 1회용이라 클라이언트가 아닌 서버에서 즉시 소모한다(구글 콜백과 동일 구조).
  * @param request Notion이 보낸 GET 요청(`?code=...&state=...` 또는 `?error=...`)
  * @returns 성공 시 `{returnTo}?step=notion-page-select&connectionId=...`, 실패 시 `{returnTo}?error=notion` 리다이렉트
  * @example
@@ -43,7 +63,7 @@ export const GET = async (request: NextRequest) => {
       workspaceId: state.workspaceId,
       request: { authorizationCode: code, redirectUri: `${origin}${pathname}` }
     })
-    return redirectWith({ step: 'notion-page-select', connectionId: connectNotion.connectionId })
+    return redirectWith({ step: NOTION_PAGE_SELECT_STEP, connectionId: connectNotion.connectionId })
   } catch (error) {
     // 서비스 인증 자체가 만료된 경우는 재로그인으로, 그 외(교환 실패 등)는 온보딩 재시도로 보낸다
     if (error instanceof ApiError && error.status === 401) return authFailureRedirect(origin)

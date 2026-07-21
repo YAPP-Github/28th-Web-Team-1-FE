@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
+
 import { useWorkspaceId } from '@entities/user'
 import { startNotionOAuth } from '@features/notion_connect'
-import type { OnboardingStepProps } from '../model/useOnboardingFlow'
+
+import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
 

@@ -1,6 +1,5 @@
 import type { ComponentProps, PropsWithChildren } from 'react'
 import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
-import { Check } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 
 /**
@@ -38,7 +37,14 @@ export const OnboardingRadioItem = ({ children, className, ...props }: PropsWith
       {...props}
     >
       <span className="text-label1 font-semibold">{children}</span>
-      <Check size={24} className="text-text-disabled group-data-[state=checked]/radio-item:text-text-primary-basic" />
+      <span
+        className={cn(
+          'border-border-subtle relative size-4.5 shrink-0 rounded-full border bg-white transition-colors',
+          'group-data-[state=checked]/radio-item:border-element-primary group-data-[state=checked]/radio-item:bg-element-primary'
+        )}
+      >
+        <span className="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
+      </span>
     </RadioGroupPrimitive.Item>
   )
 }

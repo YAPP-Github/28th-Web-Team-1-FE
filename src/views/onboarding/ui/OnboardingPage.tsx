@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, type FC } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { useNotionReturn } from '@features/notion_connect'
 import { HasResumeStep } from './HasResumeStep'
 import { ResumeUploadStep } from './ResumeUploadStep'
@@ -7,13 +7,23 @@ import { ResumeInfoStep } from './ResumeInfoStep'
 import { NotionConnectStep } from './NotionConnectStep'
 import { NotionPageSelectStep } from './NotionPageSelectStep'
 import { CompleteStep } from './CompleteStep'
-import { useOnboardingFlow, type OnboardingStep, type OnboardingStepProps } from '../model/useOnboardingFlow'
+import { useOnboardingFlow } from '../model/useOnboardingFlow'
+import type { OnboardingStep, OnboardingStepProps } from '../model/onboardingFlow'
 
-const STEP_COMPONENTS: Record<Exclude<OnboardingStep, 'complete' | 'notion-page-select'>, FC<OnboardingStepProps>> = {
-  'has-resume': HasResumeStep,
-  'resume-upload': ResumeUploadStep,
-  'resume-info': ResumeInfoStep,
-  'notion-connect': NotionConnectStep
+/** 대부분의 스텝엔 필요 없고, `notion-page-select`·`complete`만 공통 props 밖의 값을 쓴다. */
+interface StepContext {
+  connectionId?: string
+  hasConnected: boolean
+}
+
+/** 스텝 → 렌더러 단일 테이블. 모든 스텝을 같은 방식(스텝 props + 공용 컨텍스트)으로 그려 분기를 없앤다. */
+const STEP_RENDERERS: Record<OnboardingStep, (props: OnboardingStepProps, ctx: StepContext) => ReactNode> = {
+  'has-resume': (props) => <HasResumeStep {...props} />,
+  'resume-upload': (props) => <ResumeUploadStep {...props} />,
+  'resume-info': (props) => <ResumeInfoStep {...props} />,
+  'notion-connect': (props) => <NotionConnectStep {...props} />,
+  'notion-page-select': (props, ctx) => <NotionPageSelectStep {...props} connectionId={ctx.connectionId} />,
+  complete: (_props, ctx) => <CompleteStep hasConnected={ctx.hasConnected} />
 }
 
 export const OnboardingPage = () => (
@@ -26,12 +36,7 @@ const OnboardingFlow = () => {
   const { connectionId } = useNotionReturn('/onboarding')
   const { step, next, skip, back, hasPrev, hasSkip, hasConnected } = useOnboardingFlow(connectionId ? 'notion-page-select' : undefined)
 
-  if (step === 'complete') return <CompleteStep hasConnected={hasConnected} />
-
   const stepProps: OnboardingStepProps = { onDone: next, onPrev: hasPrev ? back : undefined, onSkip: hasSkip ? skip : undefined }
 
-  if (step === 'notion-page-select') return <NotionPageSelectStep {...stepProps} connectionId={connectionId ?? undefined} />
-
-  const Step = STEP_COMPONENTS[step]
-  return <Step {...stepProps} />
+  return STEP_RENDERERS[step](stepProps, { connectionId: connectionId ?? undefined, hasConnected })
 }

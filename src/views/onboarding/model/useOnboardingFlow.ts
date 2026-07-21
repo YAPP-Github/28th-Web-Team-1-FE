@@ -2,12 +2,8 @@
 import { useCallback, useState } from 'react'
 import { ONBOARDING_FLOW, buildInitialHistory, type OnboardingStep } from './onboardingFlow'
 
-export type { OnboardingStep, OnboardingStepProps } from './onboardingFlow'
-
 /**
  * 온보딩 스텝 네비게이션 훅.
- *
- * 스텝 전환 그래프(`ONBOARDING_FLOW`)와 이동 방식(현재는 로컬 히스토리 상태)을 캡슐화함
  *
  * @param initialStep 시작 스텝. Notion OAuth 콜백 복귀(`?step=`)처럼 중간 스텝에서 재진입할 때 지정한다.
  * @example

@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react'
-import { Flex } from '@radix-ui/themes'
+import { useCallback, useRef, useState } from 'react'
+import { Flex, Grid } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { Text, SearchField } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
@@ -8,7 +8,7 @@ import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
 import { useWorkspaceId } from '@entities/user'
 import { useNotionPages, useNotionConnectionId, useImportNotionExperiences } from '@entities/notion'
 import { NotionPageCard } from '@features/notion_connect'
-import type { OnboardingStepProps } from '../model/useOnboardingFlow'
+import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 
 interface NotionPageSelectStepProps extends OnboardingStepProps {
@@ -26,7 +26,9 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
   const { pages, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useNotionPages(workspaceId, connectionId, debouncedKeyword)
   const { mutate: importPages, isPending } = useImportNotionExperiences(workspaceId)
 
+  const scrollRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useIntersectionObserver<HTMLDivElement>({
+    root: scrollRef,
     enabled: hasNextPage && !isFetchingNextPage,
     onIntersect: fetchNextPage
   })
@@ -40,11 +42,7 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
     importPages(
       { connectionId, pageIds },
       {
-        onSuccess: ({ failed }) => {
-          // 온보딩은 일회성 플로우라 부분 실패여도 진행을 막지 않고 안내만 한다
-          if (failed.length > 0) toast.warning(`${pageIds.length}개 중 ${failed.length}개 페이지는 가져오지 못했어요.`, { id: 'notion-import-partial', position: 'top-center' })
-          onDone()
-        },
+        onSuccess: () => onDone(),
         onError: () => toast.error('경험 가져오기에 실패했어요. 다시 시도해 주세요.', { id: 'notion-import-error', position: 'top-center' })
       }
     )
@@ -61,17 +59,19 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
       prevLabel="취소"
       onSkip={onSkip}
     >
-      <Flex direction="column" align="center" className="w-full gap-5">
-        <SearchField placeholder="보이지 않는 페이지 또는 데이터베이스는 제목으로 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+      <Flex direction="column" align="center" gap="5" className="min-h-0 w-full flex-1">
+        <SearchField placeholder="보이지 않는 페이지 또는 데이터베이스는 제목으로 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} className="shrink-0" />
         {pages.length > 0 ? (
-          <Flex direction="column" gap="3" className="w-full">
-            {pages.map((page) => (
-              <NotionPageCard key={page.pageId} id={page.pageId} title={page.title} lastEditedTime={page.lastEditedTime} isSelected={pageIds.includes(page.pageId)} onToggle={toggle} />
-            ))}
+          <Flex ref={scrollRef} direction="column" className="min-h-0 w-full flex-1 overflow-y-auto pr-2">
+            <Grid columns={pages.length > 20 ? '2' : '1'} gap="3">
+              {pages.map((page) => (
+                <NotionPageCard key={page.pageId} id={page.pageId} title={page.title} lastEditedTime={page.lastEditedTime} isSelected={pageIds.includes(page.pageId)} onToggle={toggle} />
+              ))}
+            </Grid>
             {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-px shrink-0" />}
           </Flex>
         ) : (
-          <Flex direction="column" align="center" justify="center" gap="1" className="border-border-subtle w-full rounded-xl border border-dashed px-6 py-16">
+          <Flex direction="column" align="center" justify="center" gap="1" className="border-border-subtle w-full shrink-0 rounded-xl border border-dashed px-6 py-16">
             <Text variant="headline2" color="text-basic">
               {isLoading ? '페이지를 불러오는 중이에요.' : '검색하신 페이지가 없어요.'}
             </Text>
@@ -80,7 +80,7 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
             </Text>
           </Flex>
         )}
-        <Flex align="center" className="gap-1.5">
+        <Flex align="center" className="shrink-0 gap-1.5">
           <Chip size="sm" className="bg-element-primary-lighter text-text-primary-basic">
             TIP
           </Chip>

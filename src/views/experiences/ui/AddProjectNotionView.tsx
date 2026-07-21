@@ -41,8 +41,8 @@ export const AddProjectNotionView = ({ workspaceId, connectionId, onExtract }: A
       <Flex direction="column" className="gap-5">
         <SearchField placeholder="보이지 않는 페이지 또는 데이터베이스는 제목으로 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
         {pages.length > 0 ? (
-          <Flex ref={scrollRef} direction="column" className="max-h-[60vh] gap-3 overflow-y-auto">
-            <Grid columns="2" gapX="3" gapY="3">
+          <Flex ref={scrollRef} direction="column" className="max-h-[60vh] gap-3 overflow-y-auto pr-2">
+            <Grid columns={pages.length > 20 ? '2' : '1'} gapX="3" gapY="3">
               {pages.map((page) => (
                 <NotionPageCard key={page.pageId} id={page.pageId} title={page.title} lastEditedTime={page.lastEditedTime} isSelected={pageIds.includes(page.pageId)} onToggle={toggle} />
               ))}
