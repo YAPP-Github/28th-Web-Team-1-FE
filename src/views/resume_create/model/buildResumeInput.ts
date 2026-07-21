@@ -14,7 +14,7 @@ export const flattenExperienceContents = (contents: Experience['contents']): str
   const star = contents.star
   if (!star) return ''
 
-  return [`상황: ${star.situation}`, `과제: ${star.task}`, `행동: ${star.action}`, `결과: ${star.result}`].join('\n')
+  return [`- ${star.situation}`, `- ${star.task}`, `- ${star.action}`, `- ${star.result}`].join('\n')
 }
 
 /**
