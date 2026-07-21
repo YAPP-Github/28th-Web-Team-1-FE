@@ -6,10 +6,10 @@ import { Section } from './Section'
 export const SkillSection = ({ title, items }: { title: string; items: ResumeSkillFieldsFragment[] }) => {
   return (
     <Section title={title}>
-      <Grid columns={'2'} gap="2" className={'w-full'}>
+      <Grid columns={'2'} className={'w-full gap-15'}>
         {items.map((item, index) => (
           <Flex key={index} gap="2">
-            <Text variant="caption1" color={'text-bolder'}>
+            <Text variant="caption1" color={'text-bolder'} className={'min-w-0 truncate'}>
               {item.name}
             </Text>
             {item.level && (
