@@ -1,11 +1,11 @@
-import { useFieldArray, useFormContext, useWatch, type FieldArrayPath } from 'react-hook-form'
+import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Plus, Trash2 } from 'lucide-react'
-import { Input } from '@shared/ui/input'
 import { Section } from './Section'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
+import { FormPeriodPicker } from '../form/FormPeriodPicker'
 import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
 
 export const EducationSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
@@ -41,10 +41,7 @@ export const EducationSection = ({ title, sectionIndex }: { title: string; secti
 }
 
 const EducationSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: number; index: number; onRemove: () => void }) => {
-  const { control } = useFormContext<ResumeFormValues>()
   const base = `sections.${sectionIndex}.items.${index}.payload.education`
-  // 기간(period)은 {startAt, endAt} 객체라 단일 텍스트 입력에 그대로 바인딩할 수 없어 지금은 읽기 전용으로 표시한다.
-  const period = useWatch({ control, name: `sections.${sectionIndex}.items.${index}.payload.education.period` }) as { startAt?: string | null; endAt?: string | null } | null | undefined
 
   return (
     <Flex direction={'column'}>
@@ -68,7 +65,7 @@ const EducationSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex:
 
       <Flex className={'w-full gap-4'}>
         <FormInput name={`${base}.status`} label="상태" clearable={false} placeholder={'졸업예정'} className={'w-full'} />
-        <Input label="기간" value={period ? `${period.startAt ?? ''}-${period.endAt ?? ''}` : ''} clearable={false} placeholder={'2025.05.09'} className={'w-full'} />
+        <FormPeriodPicker name={`${base}.period`} label="기간" className={'w-full'} />
       </Flex>
 
       <Spacing size={16} />

@@ -5,6 +5,7 @@ import { Plus, Trash2 } from 'lucide-react'
 import { Section } from './Section'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
+import { FormDatePicker } from '../form/FormDatePicker'
 import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
 
 export const LanguageSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
@@ -59,7 +60,7 @@ const LanguageSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: 
 
       <Flex className={'w-full gap-4'}>
         <FormInput name={`${base}.scoreOrGrade`} label="점수/등급" clearable={false} placeholder={'점수 또는 등급'} className={'w-full'} />
-        <FormInput name={`${base}.acquiredAt`} label="취득일" clearable={false} placeholder={'2025.11.04'} className={'w-full'} />
+        <FormDatePicker name={`${base}.acquiredAt`} label="취득일" className={'w-full'} />
       </Flex>
     </Flex>
   )
