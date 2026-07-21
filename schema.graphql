@@ -1012,6 +1012,9 @@ type ResumeBasicInfoPayload {
   """이메일 주소입니다."""
   email: String
 
+  """연락처 숨김 여부입니다."""
+  hideContact: Boolean!
+
   """이름입니다."""
   name: String
 
@@ -1023,6 +1026,9 @@ type ResumeBasicInfoPayload {
 input ResumeBasicInfoPayloadInput {
   """이메일 주소입니다."""
   email: String
+
+  """연락처 숨김 여부입니다."""
+  hideContact: Boolean! = false
 
   """이름입니다."""
   name: String

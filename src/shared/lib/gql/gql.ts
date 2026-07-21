@@ -34,7 +34,7 @@ type Documents = {
     "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": typeof types.DeleteProjectDocument,
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": typeof types.CreateResumeDocument,
     "\n  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {\n    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {\n      resumeId\n    }\n  }\n": typeof types.UpdateResumeDocument,
-    "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n  }\n": typeof types.ResumeBasicInfoFieldsFragmentDoc,
+    "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": typeof types.ResumeBasicInfoFieldsFragmentDoc,
     "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n": typeof types.ResumeCoreSkillFieldsFragmentDoc,
     "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeCareerFieldsFragmentDoc,
     "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeExperienceFieldsFragmentDoc,
@@ -67,7 +67,7 @@ const documents: Documents = {
     "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": types.DeleteProjectDocument,
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": types.CreateResumeDocument,
     "\n  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {\n    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {\n      resumeId\n    }\n  }\n": types.UpdateResumeDocument,
-    "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n  }\n": types.ResumeBasicInfoFieldsFragmentDoc,
+    "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": types.ResumeBasicInfoFieldsFragmentDoc,
     "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n": types.ResumeCoreSkillFieldsFragmentDoc,
     "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeCareerFieldsFragmentDoc,
     "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeExperienceFieldsFragmentDoc,
@@ -160,7 +160,7 @@ export function graphql(source: "\n  mutation UpdateResume($workspaceId: ID!, $r
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n  }\n"): typeof import('./graphql').ResumeBasicInfoFieldsFragmentDoc;
+export function graphql(source: "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n"): typeof import('./graphql').ResumeBasicInfoFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

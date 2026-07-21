@@ -102,6 +102,8 @@ export type ResumeAwardPayloadInput = {
 export type ResumeBasicInfoPayloadInput = {
   /** 이메일 주소입니다. */
   email?: string | null | undefined;
+  /** 연락처 숨김 여부입니다. */
+  hideContact?: boolean;
   /** 이름입니다. */
   name?: string | null | undefined;
   /** 전화번호입니다. */
@@ -485,7 +487,7 @@ export type UpdateResumeMutationVariables = Exact<{
 
 export type UpdateResumeMutation = { updateResume: { resumeId: string } };
 
-export type ResumeBasicInfoFieldsFragment = { name: string | null, email: string | null, phone: string | null };
+export type ResumeBasicInfoFieldsFragment = { name: string | null, email: string | null, phone: string | null, hideContact: boolean };
 
 export type ResumeCoreSkillFieldsFragment = { content: string | null };
 
@@ -509,7 +511,7 @@ export type ResumeQueryVariables = Exact<{
 }>;
 
 
-export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string | null, email: string | null, phone: string | null } | null, coreSkill: { content: string | null } | null, career: { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string | null, organization: string | null, awardedAt: string | null } | null, language: { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null } | null, certificate: { name: string | null, organization: string | null, acquiredAt: string | null } | null, skill: { name: string | null, level: string | null } | null } }> }> } };
+export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string | null, email: string | null, phone: string | null, hideContact: boolean } | null, coreSkill: { content: string | null } | null, career: { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string | null, organization: string | null, awardedAt: string | null } | null, language: { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null } | null, certificate: { name: string | null, organization: string | null, acquiredAt: string | null } | null, skill: { name: string | null, level: string | null } | null } }> }> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -550,6 +552,7 @@ export const ResumeBasicInfoFieldsFragmentDoc = new TypedDocumentString(`
   name
   email
   phone
+  hideContact
 }
     `, {"fragmentName":"ResumeBasicInfoFields"}) as unknown as TypedDocumentString<ResumeBasicInfoFieldsFragment, unknown>;
 export const ResumeCoreSkillFieldsFragmentDoc = new TypedDocumentString(`
@@ -964,6 +967,7 @@ export const ResumeDocument = new TypedDocumentString(`
   name
   email
   phone
+  hideContact
 }
 fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {
   content

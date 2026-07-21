@@ -29,6 +29,7 @@ export const resumeBasicInfoFields = graphql(`
     name
     email
     phone
+    hideContact
   }
 `)
 
