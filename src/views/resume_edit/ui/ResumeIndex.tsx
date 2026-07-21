@@ -317,29 +317,35 @@ const SetCategoryModal = () => {
 
           <Divider orientation="vertical" />
 
-          <Flex direction="column" gap="2" className="min-h-0 w-1/2 overflow-y-auto">
-            {hiddenSections.map((section) => (
-              <Flex key={section.uid} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
-                <button type="button" onClick={() => setVisible(section.uid, true)}>
-                  <Text variant="label1" color={'text-subtler'}>
-                    {SECTION_CATEGORY_LABELS[section.type]}
-                  </Text>
-                  <Plus size={16} className={'text-icon-gray-light'} />
-                </button>
-              </Flex>
-            ))}
+          {hiddenSections.length === 0 && missingTypes.length === 0 ? (
+            <Text as={'p'} variant={'label1'} color={'text-subtler'} className="m-auto w-1/2 text-center whitespace-pre-line">
+              {` 모든 항목이 \n  추가되어 있어요`}
+            </Text>
+          ) : (
+            <Flex direction="column" gap="2" className="min-h-0 w-1/2 overflow-y-auto">
+              {hiddenSections.map((section) => (
+                <Flex key={section.uid} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
+                  <button type="button" onClick={() => setVisible(section.uid, true)}>
+                    <Text variant="label1" color={'text-subtler'}>
+                      {SECTION_CATEGORY_LABELS[section.type]}
+                    </Text>
+                    <Plus size={16} className={'text-icon-gray-light'} />
+                  </button>
+                </Flex>
+              ))}
 
-            {missingTypes.map((type) => (
-              <Flex key={type} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
-                <button type="button" onClick={() => addNewType(type)}>
-                  <Text variant="label1" color={'text-subtler'}>
-                    {SECTION_CATEGORY_LABELS[type]}
-                  </Text>
-                  <Plus size={16} className={'text-icon-gray-light'} />
-                </button>
-              </Flex>
-            ))}
-          </Flex>
+              {missingTypes.map((type) => (
+                <Flex key={type} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
+                  <button type="button" onClick={() => addNewType(type)}>
+                    <Text variant="label1" color={'text-subtler'}>
+                      {SECTION_CATEGORY_LABELS[type]}
+                    </Text>
+                    <Plus size={16} className={'text-icon-gray-light'} />
+                  </button>
+                </Flex>
+              ))}
+            </Flex>
+          )}
         </Flex>
 
         <Spacing size={24} />
