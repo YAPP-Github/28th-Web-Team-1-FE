@@ -59,6 +59,9 @@ input CreateExperienceRequest {
 
 """이력서 생성에 사용하는 전체 스냅샷 입력입니다."""
 input CreateResumeInput {
+  """이력서 최적화 모드입니다. JOB_SPECIFIC은 대상 채용공고를 기준으로 경험 내용을 첨삭합니다."""
+  optimizationMode: ResumeOptimizationMode! = JOB_SPECIFIC
+
   """저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다."""
   sections: [SaveResumeSectionInput!]!
 
@@ -430,12 +433,6 @@ type Mutation {
     workspaceId: ID!
   ): Jd!
 
-  """Free Style 경험 내용을 STAR 형식으로 다듬습니다."""
-  polishExperienceContents(
-    """STAR 형식으로 변환할 Free Style 경험 내용입니다."""
-    request: PolishExperienceContentsRequest!
-  ): StarExperienceContents!
-
   """프로필 텍스트(핵심역량/경력 세부/경험명/STAR 설명)를 AI로 다듬습니다. 결과만 반환하고 저장하지 않습니다."""
   polishProfileText(
     """텍스트 다듬기 입력입니다."""
@@ -577,12 +574,6 @@ input PeriodInput {
 
   """기간 시작일입니다."""
   startAt: String
-}
-
-"""경험 내용 AI 다듬기 입력입니다."""
-input PolishExperienceContentsRequest {
-  """STAR 형식으로 변환할 자유 서술 경험 내용입니다."""
-  content: String!
 }
 
 """프로필 텍스트 AI 다듬기 입력입니다."""
@@ -1196,6 +1187,15 @@ input ResumeLanguagePayloadInput {
   scoreOrGrade: String!
 }
 
+"""이력서 저장 시 경험 내용을 처리하는 방식입니다."""
+enum ResumeOptimizationMode {
+  """대상 채용공고를 기준으로 경험 내용을 첨삭하여 저장합니다."""
+  JOB_SPECIFIC
+
+  """입력한 내용을 그대로 저장합니다."""
+  NONE
+}
+
 """이력서 섹션 응답입니다."""
 type ResumeSection {
   """생성 시각입니다."""
@@ -1405,9 +1405,19 @@ type Resumes {
 
 """이력서 수정에 사용하는 전체 스냅샷 입력입니다."""
 input SaveResumeInput {
+  """이력서 최적화 모드입니다. JOB_SPECIFIC은 대상 채용공고를 기준으로 경험 내용을 첨삭합니다."""
+  optimizationMode: ResumeOptimizationMode! = NONE
+
+  """저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다."""
   sections: [SaveResumeSectionInput!]!
+
+  """생성할 이력서 상태입니다."""
   status: ResumeStatusType!
+
+  """이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다."""
   targetJdId: ID
+
+  """이력서 렌더링에 사용할 템플릿입니다."""
   template: ResumeTemplate!
 }
 

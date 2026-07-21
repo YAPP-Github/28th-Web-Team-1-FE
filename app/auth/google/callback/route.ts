@@ -1,18 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, cookieOptions, authFailureRedirect } from '@/src/shared/lib'
+import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, cookieOptions, authFailureRedirect, safeRedirectPath } from '@/src/shared/lib'
 
 const API_URL = process.env.API_URL
-
-/**
- * `state`로 넘어온 리다이렉트 목적지가 안전한 내부 경로인지 검증한다.
- * 외부 URL(`//evil.com`, `https://...`)로의 오픈 리다이렉트를 막기 위해 단일 슬래시로 시작하는 경로만 허용한다.
- * @param state 구글이 echo한 `state` 값(신뢰 불가, 변조 가능)
- * @returns 안전하면 해당 경로, 아니면 `/`
- */
-const safeRedirectPath = (state: string | null) => {
-  if (!state || !state.startsWith('/') || state.startsWith('//')) return '/'
-  return state
-}
 
 interface LoginApiResult {
   accessToken: string

@@ -7,7 +7,7 @@ import { Button, Text } from '@shared/ui'
 import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@shared/ui/dialog'
 import { PdfUpload } from '@features/pdf_upload'
 
-export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualClick: () => void; onExtract: (file: File) => void }) => {
+export const AddProjectDefaultView = ({ onManualClick, onNotionClick, onExtract }: { onManualClick: () => void; onNotionClick: () => void; onExtract: (file: File) => void }) => {
   const [file, setFile] = useState<File | null>(null)
 
   return (
@@ -33,7 +33,7 @@ export const AddProjectDefaultView = ({ onManualClick, onExtract }: { onManualCl
         ) : (
           <DialogFooter>
             <AddProjectExperienceButton title="직접 정리" description="STAR 방식으로 직접 정리하기" icon={<Pencil size={18} />} onClick={() => onManualClick()} />
-            <AddProjectExperienceButton title="Notion" description="페이지, 워크스페이스 가져오기" icon={<NotionIcon size={20} />} />
+            <AddProjectExperienceButton title="Notion" description="페이지, 워크스페이스 가져오기" icon={<NotionIcon size={20} />} onClick={() => onNotionClick()} />
           </DialogFooter>
         )}
       </Flex>

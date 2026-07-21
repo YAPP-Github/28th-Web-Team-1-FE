@@ -82,6 +82,22 @@ export const authFailureRedirect = (origin: string) => {
 }
 
 /**
+ * OAuth `state` 등으로 넘어온 리다이렉트 목적지가 안전한 내부 경로인지 검증한다.
+ * 외부 URL(`//evil.com`, `https://...`)로의 오픈 리다이렉트를 막기 위해 단일 슬래시로 시작하는 경로만 허용한다.
+ * @param path 외부(OAuth 공급자 echo 등)에서 온 경로 값(신뢰 불가, 변조 가능)
+ * @returns 안전하면 해당 경로, 아니면 `/`
+ * @example
+ * ```ts
+ * safeRedirectPath('/onboarding')     // '/onboarding'
+ * safeRedirectPath('//evil.com')      // '/'
+ * ```
+ */
+export const safeRedirectPath = (path: string | null) => {
+  if (!path || !path.startsWith('/') || path.startsWith('//')) return '/'
+  return path
+}
+
+/**
  * 인증 토큰 쿠키에 사용할 공통 옵션을 생성하는 함수이다.
  * `httpOnly`·`secure`·`sameSite: 'lax'`로 고정하고 만료 시간만 인자로 받는다.
  * `lax`인 이유: OAuth 콜백(cross-site)에서 `/`로 리다이렉트하는 첫 진입에 쿠키가 실려야 하기 때문이다.

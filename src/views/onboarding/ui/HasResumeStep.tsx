@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { OnboardingStepProps } from '../model/useOnboardingFlow'
+import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
 

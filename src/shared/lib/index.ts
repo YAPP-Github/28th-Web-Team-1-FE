@@ -7,4 +7,4 @@ export type { GraphQLErrorObject, GraphQLErrorExtensions } from './graphql-error
 export { graphql } from './gql/gql'
 export type { TypedDocumentString } from './gql/graphql'
 export type { ApiErrorDetail, RequestOptions } from './http'
-export { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, cookieOptions, clearAuthCookies, authFailureRedirect, getAuthErrorMessage } from './auth'
+export { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, cookieOptions, clearAuthCookies, authFailureRedirect, getAuthErrorMessage, safeRedirectPath } from './auth'
