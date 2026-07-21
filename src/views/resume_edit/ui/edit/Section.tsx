@@ -21,7 +21,7 @@ export const Section = ({ title, actionButton, children }: SectionProps) => {
       <Divider color={'gray-60'} />
       <Spacing size={32} />
 
-      <Flex direction={'column'} className={'gap-12 overflow-y-auto px-1'}>
+      <Flex direction={'column'} className={'flex-1 gap-12 overflow-y-auto px-1'}>
         {isEmpty ? <SectionEmpty /> : children}
       </Flex>
     </Flex>
