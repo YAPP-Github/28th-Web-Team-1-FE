@@ -207,7 +207,7 @@ const SelectableArea = ({ sectionUid, activeSectionUid, onSelect, children }: Se
 
 const ResumeBasicInfoHeader = ({ basicInfo }: { basicInfo: ResumeBasicInfoFieldsFragment | null }) => {
   return (
-    <section className={'group-data-[active=true]:bg-primary-5 group-data-[active=false]:hover:bg-gray-5 flex w-full justify-between rounded-sm p-3 transition-colors'}>
+    <section className={'group-data-[active=true]:bg-primary-5/50 group-data-[active=false]:hover:bg-gray-5/50 flex w-full justify-between rounded-sm p-3 transition-colors'}>
       <Text variant={'title1'}>{basicInfo?.name}</Text>
 
       <Flex direction="column" gap="2">
