@@ -1,23 +1,31 @@
+import { useState } from 'react'
 import { useFieldArray, useFormContext, useWatch, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { PencilSparkles, RotateCcw, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
+import { ExperiencePickerDialog } from '@views/resume_create'
 import { Section } from './Section'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormTextarea } from '../form/FormTextarea'
+import { experiencesToFormItems } from '../../model/experiencesToFormItems'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 
-export const ExperienceSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
+/**
+ * 경험(EXPERIENCE) 편집 섹션. '경험 재선택'으로 `ExperiencePickerDialog`를 열어 선택한 경험들로 아이템을 통째로 교체한다.
+ * 다이얼로그는 대상 채용공고(JD) 기준 매칭 경험을 보여준다(`targetJdId`가 없으면 빈 문자열로 넘긴다).
+ */
+export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: string; sectionIndex: number; targetJdId: string | null }) => {
   const { control } = useFormContext<ResumeFormValues>()
-  const { fields, remove } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
+  const { fields, remove, replace } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
+  const [isPickerOpen, setIsPickerOpen] = useState(false)
 
   return (
     <Section
       title={title}
       actionButton={
-        <Button variant={'text'} size={'sm'} onClick={() => {}}>
+        <Button variant={'text'} size={'sm'} onClick={() => setIsPickerOpen(true)}>
           경험 재선택
           <RotateCcw size={16} data-icon="inline-end" />
         </Button>
@@ -26,6 +34,16 @@ export const ExperienceSection = ({ title, sectionIndex }: { title: string; sect
       {fields.map((field, index) => (
         <ExperienceSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} />
       ))}
+
+      <ExperiencePickerDialog
+        isOpen={isPickerOpen}
+        jdId={targetJdId ?? ''}
+        onOpenChange={setIsPickerOpen}
+        onComplete={(experiences) => {
+          replace(experiencesToFormItems(experiences))
+          setIsPickerOpen(false)
+        }}
+      />
     </Section>
   )
 }

@@ -14,7 +14,7 @@ import { SkillSection } from './SkillSection'
  * 각 섹션은 폼 필드 경로 조립에 쓸 `sectionIndex`(폼 `sections` 배열 내 위치)를 받아
  * `useFormContext`/`useFieldArray`로 공유 폼에 직접 연결된다.
  */
-export const ResumeSectionEdit = ({ section, sectionIndex }: { section: ResumeSectionData; sectionIndex: number }) => {
+export const ResumeSectionEdit = ({ section, sectionIndex, targetJdId }: { section: ResumeSectionData; sectionIndex: number; targetJdId: string | null }) => {
   const { type, displayText } = section
 
   switch (type) {
@@ -25,7 +25,7 @@ export const ResumeSectionEdit = ({ section, sectionIndex }: { section: ResumeSe
     case 'CORE_SKILL':
       return <CoreSkillSection title={displayText} sectionIndex={sectionIndex} />
     case 'EXPERIENCE':
-      return <ExperienceSection title={displayText} sectionIndex={sectionIndex} />
+      return <ExperienceSection title={displayText} sectionIndex={sectionIndex} targetJdId={targetJdId} />
     case 'EDUCATION':
       return <EducationSection title={displayText} sectionIndex={sectionIndex} />
     case 'CERTIFICATE':

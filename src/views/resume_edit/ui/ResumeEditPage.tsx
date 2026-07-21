@@ -90,7 +90,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
     <FormProvider {...form}>
       <ResumeToolbar targetJd={resume.targetJd} onSave={() => void handleSave()} isSaving={isPending} lastSavedAt={lastSavedAt} />
       <main className="flex min-h-0 flex-1">
-        <ResumeBoard activeSectionUid={activeSectionUid} onSelectSection={setActiveSectionUid} />
+        <ResumeBoard activeSectionUid={activeSectionUid} onSelectSection={setActiveSectionUid} targetJdId={resume.targetJd?.jdId ?? null} />
       </main>
     </FormProvider>
   )
@@ -100,7 +100,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
  * 폼 값(`sections`)을 구독해 미리보기·목차·편집 영역에 실시간으로 흘려보낸다.
  * `BASIC_INFO`는 미리보기 헤더 전용이라 본문 섹션(`bodySections`)에서 분리한다.
  */
-const ResumeBoard = ({ activeSectionUid, onSelectSection }: { activeSectionUid: string | null; onSelectSection: (sectionUid: string | null) => void }) => {
+const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { activeSectionUid: string | null; onSelectSection: (sectionUid: string | null) => void; targetJdId: string | null }) => {
   const { control } = useFormContext<ResumeFormValues>()
   const sections = useWatch({ control, name: 'sections' }) ?? []
 
@@ -122,7 +122,7 @@ const ResumeBoard = ({ activeSectionUid, onSelectSection }: { activeSectionUid: 
     <>
       <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionUid={activeSectionUid} onSelectSection={onSelectSection} />
       <ResumeIndex activeSectionUid={activeSectionUid} />
-      <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} />
+      <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} targetJdId={targetJdId} />
     </>
   )
 }
@@ -253,6 +253,6 @@ const ResumeBasicInfoHeader = ({ basicInfo }: { basicInfo: ResumeBasicInfoFields
   )
 }
 
-const ResumeEdit = ({ section, sectionIndex }: { section: ResumeSectionData | null; sectionIndex: number }) => {
-  return <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} sectionIndex={sectionIndex} /> : null}</Flex>
+const ResumeEdit = ({ section, sectionIndex, targetJdId }: { section: ResumeSectionData | null; sectionIndex: number; targetJdId: string | null }) => {
+  return <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} sectionIndex={sectionIndex} targetJdId={targetJdId} /> : null}</Flex>
 }
