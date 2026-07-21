@@ -7,10 +7,13 @@ import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalList
 import { CSS } from '@dnd-kit/utilities'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
-import { Button, Divider, Text } from '@shared/ui'
-import { Menu, Settings } from 'lucide-react'
+import { Button, Divider, Spacing, Text } from '@shared/ui'
+import { Menu, Plus, Settings, X } from 'lucide-react'
+import type { ResumeSectionType } from '@shared/lib/gql/graphql'
 import { getItemLabel, visibleItems } from '../model/section'
+import { ADDABLE_CATEGORY_TYPES, createCategorySection, SECTION_CATEGORY_LABELS } from '../model/category'
 import type { ResumeFormSection, ResumeFormValues } from '../model/resume-form.types'
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 
 /** 섹션·아이템 이동 종료 이벤트를 fieldArray move 인덱스로 옮기는 공통 핸들러 생성기. */
 const makeDragEndHandler = (fieldIds: string[], move: (from: number, to: number) => void) => (event: DragEndEvent) => {
@@ -25,7 +28,7 @@ const makeDragEndHandler = (fieldIds: string[], move: (from: number, to: number)
  * 이력서 미리보기의 목차(minimap). 폼 `sections` 배열 순서를 그대로 반영하고, 펼친 패널에서
  * 드래그앤드롭으로 순서를 바꾼다. (섹션은 섹션끼리, 아이템은 같은 섹션 안에서)
  */
-export const ResumeIndex = ({ activeSectionId }: { activeSectionId: string | null }) => {
+export const ResumeIndex = ({ activeSectionUid }: { activeSectionUid: string | null }) => {
   const { control } = useFormContext<ResumeFormValues>()
   const { fields: sectionFields, move: moveSection } = useFieldArray({ control, name: 'sections' })
   const sections = useWatch({ control, name: 'sections' }) ?? []
@@ -38,19 +41,21 @@ export const ResumeIndex = ({ activeSectionId }: { activeSectionId: string | nul
     .map((field, index) => ({ id: field.id, index, section: sections[index] }))
     .filter((e): e is { id: string; index: number; section: ResumeFormSection } => Boolean(e.section) && e.section.visible && e.section.type !== 'BASIC_INFO')
 
-  const basicInfoSectionId = sections.find((section) => section?.type === 'BASIC_INFO')?.sectionId ?? null
+  const basicInfoSectionUid = sections.find((section) => section?.type === 'BASIC_INFO')?.uid ?? null
   const activeEntry = activeId ? (bodyEntries.find((e) => e.id === activeId) ?? null) : null
   const handleSectionDragEnd = makeDragEndHandler(
     bodyEntries.map((e) => e.id),
     (from, to) => moveSection(bodyEntries[from].index, bodyEntries[to].index)
   )
 
+  // onMouseLeave={() => setIsOpen(false)}
+
   return (
-    <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'} onMouseLeave={() => setIsOpen(false)}>
+    <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'}>
       <Flex direction="column" align={'end'} gap="2" className="h-fit w-full" onMouseEnter={() => setIsOpen(true)}>
-        {basicInfoSectionId && <div className={cn('h-0.75 w-6 rounded-full', activeSectionId === basicInfoSectionId ? 'bg-border-primary' : 'bg-border-subtle')} />}
+        {basicInfoSectionUid && <div className={cn('h-0.75 w-6 rounded-full', activeSectionUid === basicInfoSectionUid ? 'bg-border-primary' : 'bg-border-subtle')} />}
         {bodyEntries.map(({ id, section }) => {
-          const isActive = activeSectionId === section.sectionId
+          const isActive = activeSectionUid === section.uid
           return (
             <Fragment key={id}>
               <div className={cn('h-0.75 w-6 rounded-full', isActive ? 'bg-border-primary' : 'bg-border-subtle')} />
@@ -64,7 +69,7 @@ export const ResumeIndex = ({ activeSectionId }: { activeSectionId: string | nul
 
       {isOpen && (
         <Flex direction="column" className={cn('bg-element-white border-border-subtler shadow-1 absolute top-16 right-4 z-10 w-55.5 gap-1.5 rounded-lg border px-5 py-3')}>
-          <Flex align={'center'} className={cn('rounded-sm px-1.5 py-1', activeSectionId === basicInfoSectionId && 'bg-element-primary-lighter')}>
+          <Flex align={'center'} className={cn('rounded-sm px-1.5 py-1', activeSectionUid === basicInfoSectionUid && 'bg-element-primary-lighter')}>
             <Text variant="label2" color={'text-subtler'}>
               기본정보
             </Text>
@@ -86,7 +91,7 @@ export const ResumeIndex = ({ activeSectionId }: { activeSectionId: string | nul
             <SortableContext items={bodyEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
               <Flex direction="column" className={'-ml-4 max-h-130 gap-1.5 overflow-y-auto pl-4'}>
                 {bodyEntries.map(({ id, index, section }) => (
-                  <SortableSectionRow key={id} id={id} sectionIndex={index} section={section} isActive={activeSectionId === section.sectionId} />
+                  <SortableSectionRow key={id} id={id} sectionIndex={index} section={section} isActive={activeSectionUid === section.uid} />
                 ))}
               </Flex>
             </SortableContext>
@@ -97,16 +102,7 @@ export const ResumeIndex = ({ activeSectionId }: { activeSectionId: string | nul
 
           <Divider />
 
-          <Button
-            variant={'text'}
-            size={'xs'}
-            className={'ml-auto'}
-            onClick={() => {
-              // Todo: 카테고리 추가/삭제 모달 열기
-            }}
-          >
-            카테고리 추가/삭제 <Settings />
-          </Button>
+          <SetCategoryModal />
         </Flex>
       )}
     </Flex>
@@ -214,5 +210,129 @@ const SortableItemRow = ({ id, label }: { id: string; label: string }) => {
         {label}
       </Text>
     </Flex>
+  )
+}
+
+/**
+ * "카테고리 추가/삭제" 모달. 어떤 섹션 카테고리를 이력서에 둘지 관리한다.
+ * - 좌측: 현재 추가된 카테고리(X로 삭제). 기본정보는 필수라 삭제 불가.
+ * - 우측: 빠져 있는(추가 가능한) 카테고리(＋로 추가).
+ * 변경은 로컬에 스테이징되고 **저장**을 눌러야 폼에 반영된다(닫으면 취소).
+ * 삭제한 기존 섹션은 세션 내 pool에 보관해 재추가 시 데이터를 그대로 복원한다.
+ */
+/**
+ * "카테고리 추가/삭제" 모달. 어떤 섹션 카테고리를 이력서에 노출할지 관리한다.
+ * 삭제는 실제 제거가 아니라 **visible 토글**이라 데이터가 보존된다.
+ * - X(삭제): 기존 섹션은 `visible:false`(숨김·보존), 이번 세션에 새로 만든 미저장 섹션은 완전 제거
+ * - ＋(추가): 숨겨둔 기존 섹션은 `visible:true`, 이력서에 없던 타입은 새 섹션 생성
+ * 변경은 로컬에 스테이징되고 **저장**을 눌러야 폼에 반영된다(닫으면 취소).
+ */
+const SetCategoryModal = () => {
+  const { control, getValues } = useFormContext<ResumeFormValues>()
+  const { replace } = useFieldArray({ control, name: 'sections' })
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [staged, setStaged] = useState<ResumeFormSection[]>([])
+
+  const openModal = () => {
+    // 숨긴 섹션까지 모두 담는다(visible 무관). 노출 여부만 토글한다.
+    setStaged(getValues('sections').filter((section) => section.type !== 'BASIC_INFO'))
+    setIsOpen(true)
+  }
+
+  const setVisible = (uid: string, visible: boolean) => {
+    setStaged((prev) => prev.map((section) => (section.uid === uid ? { ...section, visible } : section)))
+  }
+
+  const removeCategory = (uid: string) => {
+    setStaged((prev) => {
+      const target = prev.find((section) => section.uid === uid)
+      // 미저장 신규 섹션은 숨겨봐야 빈 섹션만 생기므로 완전 제거, 기존 섹션은 숨김으로 보존.
+      if (target && target.sectionId === null) return prev.filter((section) => section.uid !== uid)
+      return prev.map((section) => (section.uid === uid ? { ...section, visible: false } : section))
+    })
+  }
+
+  const addNewType = (type: ResumeSectionType) => {
+    setStaged((prev) => [...prev, createCategorySection(type, prev)])
+  }
+
+  const handleSave = () => {
+    const fixed = getValues('sections').filter((section) => section.type === 'BASIC_INFO')
+    replace([...fixed, ...staged])
+    setIsOpen(false)
+  }
+
+  const visibleSections = staged.filter((section) => section.visible)
+  const hiddenSections = staged.filter((section) => !section.visible)
+  const missingTypes = ADDABLE_CATEGORY_TYPES.filter((type) => !staged.some((section) => section.type === type))
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant={'text'} size={'xs'} className={'ml-auto'} onClick={openModal}>
+          카테고리 추가/삭제 <Settings />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="flex h-155 w-110 flex-col gap-0">
+        <DialogTitle asChild>
+          <Text variant="headline2">이력서 카테고리 추가/삭제</Text>
+        </DialogTitle>
+        <DialogDescription asChild>
+          <Text variant="body2" color={'text-subtler'}>
+            이력서에 포함할 항목을 관리할 수 있어요.
+          </Text>
+        </DialogDescription>
+
+        <Spacing size={20} />
+
+        <Flex gap="4" className="min-h-0 flex-1">
+          <Flex direction="column" gap="2" className="min-h-0 w-1/2 overflow-y-auto">
+            <Flex justify={'between'} gap="2" className={'bg-element-gray-lighter shrink-0 rounded-sm px-3 py-2.5'}>
+              <Text variant="label1">기본정보</Text>
+              <Text variant="label2" color={'text-primary-basic'}>
+                필수
+              </Text>
+            </Flex>
+            {visibleSections.map((section) => (
+              <Flex key={section.uid} asChild justify={'between'} gap="2" className={'bg-element-gray-lighter shrink-0 cursor-pointer rounded-sm px-3 py-2.5'}>
+                <button type="button" onClick={() => removeCategory(section.uid)}>
+                  <Text variant="label1">{SECTION_CATEGORY_LABELS[section.type]}</Text>
+                  <X size={16} className={'text-icon-gray-light'} />
+                </button>
+              </Flex>
+            ))}
+          </Flex>
+          <Divider orientation="vertical" />
+          {/* 우측: 숨겨진 기존 섹션 + 이력서에 없는 타입 (＋로 추가) */}
+          <Flex direction="column" gap="2" className="min-h-0 w-1/2 overflow-y-auto">
+            {hiddenSections.map((section) => (
+              <Flex key={section.uid} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
+                <button type="button" onClick={() => setVisible(section.uid, true)}>
+                  <Text variant="label1" color={'text-subtler'}>
+                    {SECTION_CATEGORY_LABELS[section.type]}
+                  </Text>
+                  <Plus size={16} className={'text-icon-gray-light'} />
+                </button>
+              </Flex>
+            ))}
+            {missingTypes.map((type) => (
+              <Flex key={type} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
+                <button type="button" onClick={() => addNewType(type)}>
+                  <Text variant="label1" color={'text-subtler'}>
+                    {SECTION_CATEGORY_LABELS[type]}
+                  </Text>
+                  <Plus size={16} className={'text-icon-gray-light'} />
+                </button>
+              </Flex>
+            ))}
+          </Flex>
+        </Flex>
+
+        <Spacing size={24} />
+
+        <Button onClick={handleSave}>저장</Button>
+      </DialogContent>
+    </Dialog>
   )
 }

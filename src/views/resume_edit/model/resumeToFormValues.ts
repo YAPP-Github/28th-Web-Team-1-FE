@@ -13,6 +13,7 @@ const byDisplayOrder = <T extends { displayOrder: number }>(a: T, b: T) => a.dis
 export const resumeToFormValues = (resume: ResumeQuery['resume']): ResumeFormValues => ({
   // 로드 시점에 한 번만 displayOrder로 정렬한다. 이후로는 폼 배열 순서가 곧 표시 순서다.
   sections: [...resume.sections].sort(byDisplayOrder).map((section) => ({
+    uid: section.sectionId,
     sectionId: section.sectionId,
     type: section.type,
     displayText: section.displayText,

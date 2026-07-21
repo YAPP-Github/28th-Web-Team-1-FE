@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useMemo, useState, type ReactNode } from 'react'
+import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form'
@@ -51,7 +51,8 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const form = useForm<ResumeFormValues>({ defaultValues })
   const { mutate: updateResume, isPending } = useUpdateResume(workspaceId, resumeId)
 
-  const [activeSectionId, setActiveSectionId] = useState<string | null>(() => {
+  // 활성 섹션은 uid로 추적한다. 기존 섹션은 uid === sectionId라 초기값은 sectionId로 잡아도 된다.
+  const [activeSectionUid, setActiveSectionUid] = useState<string | null>(() => {
     return resume.sections.find((s) => s.type === 'EXPERIENCE')?.sectionId ?? null
   })
 
@@ -66,7 +67,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
     <FormProvider {...form}>
       <ResumeToolbar targetJd={resume.targetJd} onSave={() => void handleSave()} isSaving={isPending} />
       <main className="flex min-h-0 flex-1">
-        <ResumeBoard activeSectionId={activeSectionId} onSelectSection={setActiveSectionId} />
+        <ResumeBoard activeSectionUid={activeSectionUid} onSelectSection={setActiveSectionUid} />
       </main>
     </FormProvider>
   )
@@ -76,20 +77,28 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
  * 폼 값(`sections`)을 구독해 미리보기·목차·편집 영역에 실시간으로 흘려보낸다.
  * `BASIC_INFO`는 미리보기 헤더 전용이라 본문 섹션(`bodySections`)에서 분리한다.
  */
-const ResumeBoard = ({ activeSectionId, onSelectSection }: { activeSectionId: string | null; onSelectSection: (sectionId: string) => void }) => {
+const ResumeBoard = ({ activeSectionUid, onSelectSection }: { activeSectionUid: string | null; onSelectSection: (sectionUid: string | null) => void }) => {
   const { control } = useFormContext<ResumeFormValues>()
   const sections = useWatch({ control, name: 'sections' }) ?? []
 
   const basicInfoSection = sections.find((section) => section.type === 'BASIC_INFO') ?? null
   const bodySections = sections.filter((section) => section.visible && section.type !== 'BASIC_INFO')
 
-  const activeSectionIndex = sections.findIndex((section) => section.sectionId === activeSectionId)
+  // 활성 섹션은 '노출된' 섹션 중에서만 찾는다. 카테고리 삭제(숨김/제거)로 사라지면 활성에서 빠진다.
+  const activeSectionIndex = sections.findIndex((section) => section.uid === activeSectionUid && section.visible)
   const activeSection = activeSectionIndex >= 0 ? sections[activeSectionIndex] : null
+
+  // 포커스 중이던 카테고리가 삭제되면 남은 첫 노출 섹션으로 포커스를 옮긴다(없으면 해제).
+  useEffect(() => {
+    if (activeSectionUid !== null && activeSectionIndex < 0) {
+      onSelectSection(bodySections[0]?.uid ?? null)
+    }
+  }, [activeSectionUid, activeSectionIndex, bodySections, onSelectSection])
 
   return (
     <>
-      <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionId={activeSectionId} onSelectSection={onSelectSection} />
-      <ResumeIndex activeSectionId={activeSectionId} />
+      <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionUid={activeSectionUid} onSelectSection={onSelectSection} />
+      <ResumeIndex activeSectionUid={activeSectionUid} />
       <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} />
     </>
   )
@@ -132,18 +141,18 @@ const ResumeToolbar = ({ targetJd, onSave, isSaving }: ResumeToolbarProps) => {
 interface ResumePreviewProps {
   basicInfoSection: ResumeSectionData | null
   sections: ResumeSectionData[]
-  activeSectionId: string | null
-  onSelectSection: (sectionId: string) => void
+  activeSectionUid: string | null
+  onSelectSection: (sectionUid: string) => void
 }
 
-const ResumePreview = ({ basicInfoSection, sections, activeSectionId, onSelectSection }: ResumePreviewProps) => {
+const ResumePreview = ({ basicInfoSection, sections, activeSectionUid, onSelectSection }: ResumePreviewProps) => {
   const basicInfo = basicInfoSection?.items[0]?.payload.basicInfo ?? null
 
   return (
     <Flex align={'center'} className={'bg-bg-gray-subtler flex-1'}>
       <Flex direction={'column'} className={'bg-bg-white mx-auto h-[calc(100%-2rem)] w-149 min-w-149 overflow-y-auto p-7'}>
         {basicInfoSection ? (
-          <SelectableArea sectionId={basicInfoSection.sectionId} activeSectionId={activeSectionId} onSelect={onSelectSection}>
+          <SelectableArea sectionUid={basicInfoSection.uid} activeSectionUid={activeSectionUid} onSelect={onSelectSection}>
             <ResumeBasicInfoHeader basicInfo={basicInfo} />
           </SelectableArea>
         ) : (
@@ -156,7 +165,7 @@ const ResumePreview = ({ basicInfoSection, sections, activeSectionId, onSelectSe
 
         <Flex direction={'column'} gap="5">
           {sections.map((section) => (
-            <SelectableArea key={section.sectionId ?? section.type} sectionId={section.sectionId} activeSectionId={activeSectionId} onSelect={onSelectSection}>
+            <SelectableArea key={section.uid} sectionUid={section.uid} activeSectionUid={activeSectionUid} onSelect={onSelectSection}>
               <ResumeSectionView section={section} />
             </SelectableArea>
           ))}
@@ -167,21 +176,21 @@ const ResumePreview = ({ basicInfoSection, sections, activeSectionId, onSelectSe
 }
 
 interface SelectableAreaProps {
-  sectionId: string | null
-  activeSectionId: string | null
-  onSelect: (sectionId: string) => void
+  sectionUid: string
+  activeSectionUid: string | null
+  onSelect: (sectionUid: string) => void
   children: ReactNode
 }
 
 /** 미리보기에서 클릭·키보드로 활성 섹션을 선택할 수 있게 감싸는 래퍼. `data-active`를 자식(Section)의 group-data 스타일이 읽는다. */
-const SelectableArea = ({ sectionId, activeSectionId, onSelect, children }: SelectableAreaProps) => {
-  const select = () => sectionId && onSelect(sectionId)
+const SelectableArea = ({ sectionUid, activeSectionUid, onSelect, children }: SelectableAreaProps) => {
+  const select = () => onSelect(sectionUid)
 
   return (
     <div
       role="button"
       tabIndex={0}
-      data-active={activeSectionId === sectionId}
+      data-active={activeSectionUid === sectionUid}
       onClick={select}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {

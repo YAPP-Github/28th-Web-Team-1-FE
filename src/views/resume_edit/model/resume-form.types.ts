@@ -13,6 +13,12 @@ type QueryItem = QuerySection['items'][number]
 export type ResumeFormItem = Omit<QueryItem, 'itemId'> & { itemId: string | null }
 
 export type ResumeFormSection = Omit<QuerySection, 'sectionId' | 'items'> & {
+  /**
+   * 클라이언트 전용 안정 식별자. 섹션 선택/활성 추적에 쓴다.
+   * 서버 `sectionId`는 신규(미저장) 섹션에서 null이라 식별자로 부적합해 별도로 둔다. 저장 시엔 전송하지 않는다.
+   * (기존 섹션은 `uid = sectionId`, 신규 섹션은 새 UUID)
+   */
+  uid: string
   sectionId: string | null
   items: ResumeFormItem[]
 }
