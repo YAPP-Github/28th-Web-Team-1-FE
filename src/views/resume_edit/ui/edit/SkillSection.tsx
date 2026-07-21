@@ -6,6 +6,7 @@ import { Input } from '@shared/ui/input'
 import { Chip } from '@shared/ui/chip'
 import { X } from 'lucide-react'
 import { Section } from './Section'
+import { DeleteItemAlert } from './DeleteItemAlert'
 import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
 
 export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
@@ -55,9 +56,11 @@ const SkillSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: num
     <Chip asChild={true} variant={'tertiary'} size={'sm'} className={'rounded-full px-4 py-2'}>
       <Flex className={'gap-1.5'}>
         <Text variant={'body2'}>{label}</Text>
-        <button type={'button'} onClick={onRemove}>
-          <X size={16} />
-        </button>
+        <DeleteItemAlert onConfirm={onRemove}>
+          <button type={'button'}>
+            <X size={16} />
+          </button>
+        </DeleteItemAlert>
       </Flex>
     </Chip>
   )

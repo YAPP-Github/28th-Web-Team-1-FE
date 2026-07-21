@@ -4,6 +4,7 @@ import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { PencilSparkles, Plus, Trash2 } from 'lucide-react'
 import { Input } from '@shared/ui/input'
 import { Section } from './Section'
+import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormTextarea } from '../form/FormTextarea'
 import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
@@ -50,9 +51,11 @@ const CareerSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: nu
       <Flex justify={'between'}>
         <Text variant={'headline2'}>경력 / 활동 {index + 1}</Text>
 
-        <Button variant={'tertiary'} size={'icon-xs'} onClick={onRemove}>
-          <Trash2 />
-        </Button>
+        <DeleteItemAlert onConfirm={onRemove}>
+          <Button variant={'tertiary'} size={'icon-xs'}>
+            <Trash2 />
+          </Button>
+        </DeleteItemAlert>
       </Flex>
 
       <Spacing size={16} />
