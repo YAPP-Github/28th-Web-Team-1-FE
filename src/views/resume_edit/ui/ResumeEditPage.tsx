@@ -8,7 +8,7 @@ import { FileCheckCorner, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { formatDate } from '@shared/lib'
 import { useIntervalAutosave } from '@shared/hooks/useIntervalAutosave'
-import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
+import type { ResumeBasicInfoFieldsFragment, ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
 import { useResumeDetail, useUpdateResume } from '@entities/resume'
 import { useWorkspaceId } from '@entities/user'
 import type { ResumeSectionData } from '../model/section'
@@ -63,23 +63,25 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
     return resume.sections.find((s) => s.type === 'EXPERIENCE')?.sectionId ?? null
   })
 
+  // 수동 저장은 '완료'(COMPLETED), 30초 자동저장은 '임시저장'(DRAFT)으로 상태를 구분해 보낸다.
   const buildSaveInput = useCallback(
-    (values: ResumeFormValues) => formToSaveInput(values, { status: resume.status, template: resume.template, targetJdId: resume.targetJd?.jdId ?? null }),
-    [resume.status, resume.template, resume.targetJd?.jdId]
+    (values: ResumeFormValues, status: ResumeStatusType) => formToSaveInput(values, { status, template: resume.template, targetJdId: resume.targetJd?.jdId ?? null }),
+    [resume.template, resume.targetJd?.jdId]
   )
 
   const handleSave = form.handleSubmit((values) => {
-    updateResume(buildSaveInput(values), {
+    updateResume(buildSaveInput(values, 'COMPLETED'), {
       onSuccess: () => {
         setLastSavedAt(new Date())
         toast.success('이력서가 저장되었습니다.', { position: 'top-center' })
+        // TODO: 저장 완료 후 페이지 이동 추가 (예: router.push('/home'))
       },
       onError: (error) => toast.error(error.message, { position: 'top-center' })
     })
   })
 
   // 30초(AUTOSAVE_INTERVAL_MS)마다 변경분이 있으면 조용히 저장하고 저장 성공 시점의 시간으로 갱신한다(실패 시 다음 주기에 재시도).
-  const markDirty = useIntervalAutosave(() => updateResumeAsync(buildSaveInput(form.getValues())).then(() => setLastSavedAt(new Date())), {
+  const markDirty = useIntervalAutosave(() => updateResumeAsync(buildSaveInput(form.getValues(), 'DRAFT')).then(() => setLastSavedAt(new Date())), {
     intervalMs: AUTOSAVE_INTERVAL_MS
   })
 
