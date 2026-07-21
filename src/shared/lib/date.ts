@@ -26,7 +26,7 @@ export const formatYYYYMM = (value?: string | Date | null): string => {
 }
 
 // TODO : 날짜 형식이 늘어날 경우 추가 필요
-type DateFormat = 'YYYY.MM.DD' | 'YYYY.MM'
+type DateFormat = 'YYYY.MM.DD' | 'YYYY.MM' | 'HH:mm:ss'
 
 /**
  * 날짜 값을 지정한 포맷 문자열로 변환한다. 값이 없거나(`null`/`undefined`) 유효하지 않으면 빈 문자열.
@@ -38,6 +38,7 @@ type DateFormat = 'YYYY.MM.DD' | 'YYYY.MM'
  * ```ts
  * formatDate('2025-07-01')             // '2025.07.01'
  * formatDate('2025-07-01', 'YYYY.MM')  // '2025.07'
+ * formatDate(new Date(), 'HH:mm:ss')   // '19:53:30' (로컬 시간 기준)
  * formatDate(null)                     // ''
  * ```
  */

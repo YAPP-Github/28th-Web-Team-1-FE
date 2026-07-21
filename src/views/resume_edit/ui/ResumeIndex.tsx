@@ -48,10 +48,8 @@ export const ResumeIndex = ({ activeSectionUid }: { activeSectionUid: string | n
     (from, to) => moveSection(bodyEntries[from].index, bodyEntries[to].index)
   )
 
-  //onMouseLeave={() => setIsOpen(false)}
-
   return (
-    <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'}>
+    <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'} onMouseLeave={() => setIsOpen(false)}>
       <Flex direction="column" align={'end'} gap="2" className="h-fit w-full" onMouseEnter={() => setIsOpen(true)}>
         {basicInfoSectionUid && <div className={cn('h-0.75 w-6 rounded-full', activeSectionUid === basicInfoSectionUid ? 'bg-border-primary' : 'bg-border-subtle')} />}
         {bodyEntries.map(({ id, section }) => {

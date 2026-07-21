@@ -1,11 +1,13 @@
 'use client'
-import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { FileCheckCorner, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
+import { formatDate } from '@shared/lib'
+import { useIntervalAutosave } from '@shared/hooks/useIntervalAutosave'
 import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
 import { useResumeDetail, useUpdateResume } from '@entities/resume'
 import { useWorkspaceId } from '@entities/user'
@@ -43,29 +45,50 @@ const ResumeFallback = ({ children }: { children: ReactNode }) => (
  * 미리보기·목차·편집이 모두 같은 폼 상태를 공유하므로, 편집이 폼 값에 반영되는 즉시 미리보기가 갱신된다.
  * 저장 액션은 폼 값을 전체 스냅샷(`SaveResumeInput`)으로 변환해 `updateResume`로 보낸다.
  */
+const AUTOSAVE_INTERVAL_MS = 30_000
+
 const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
 
   const defaultValues = useMemo(() => resumeToFormValues(resume), [resume])
   const form = useForm<ResumeFormValues>({ defaultValues })
-  const { mutate: updateResume, isPending } = useUpdateResume(workspaceId, resumeId)
+  const { mutate: updateResume, mutateAsync: updateResumeAsync, isPending } = useUpdateResume(workspaceId, resumeId)
+
+  // 마지막으로 저장에 성공한 시각(서버가 200 OK로 응답한 시점의 클라 시간). 수동·자동 저장 모두 갱신하며 툴바에 표시한다.
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
 
   // 활성 섹션은 uid로 추적한다. 기존 섹션은 uid === sectionId라 초기값은 sectionId로 잡아도 된다.
   const [activeSectionUid, setActiveSectionUid] = useState<string | null>(() => {
     return resume.sections.find((s) => s.type === 'EXPERIENCE')?.sectionId ?? null
   })
 
+  const buildSaveInput = useCallback(
+    (values: ResumeFormValues) => formToSaveInput(values, { status: resume.status, template: resume.template, targetJdId: resume.targetJd?.jdId ?? null }),
+    [resume.status, resume.template, resume.targetJd?.jdId]
+  )
+
   const handleSave = form.handleSubmit((values) => {
-    updateResume(formToSaveInput(values, { status: resume.status, template: resume.template, targetJdId: resume.targetJd?.jdId ?? null }), {
-      onSuccess: () => toast.success('이력서가 저장되었습니다.', { position: 'top-center' }),
+    updateResume(buildSaveInput(values), {
+      onSuccess: () => {
+        setLastSavedAt(new Date())
+        toast.success('이력서가 저장되었습니다.', { position: 'top-center' })
+      },
       onError: (error) => toast.error(error.message, { position: 'top-center' })
     })
   })
 
+  // 30초(AUTOSAVE_INTERVAL_MS)마다 변경분이 있으면 조용히 저장하고 저장 성공 시점의 시간으로 갱신한다(실패 시 다음 주기에 재시도).
+  const markDirty = useIntervalAutosave(() => updateResumeAsync(buildSaveInput(form.getValues())).then(() => setLastSavedAt(new Date())), {
+    intervalMs: AUTOSAVE_INTERVAL_MS
+  })
+
+  // 폼 값이 바뀌면 '저장할 변경분 있음'으로 표시한다. 마운트 시에는 호출되지 않으므로 초기 저장은 발생하지 않는다.
+  useEffect(() => form.subscribe({ formState: { values: true }, callback: () => markDirty() }), [form, markDirty])
+
   return (
     <FormProvider {...form}>
-      <ResumeToolbar targetJd={resume.targetJd} onSave={() => void handleSave()} isSaving={isPending} />
+      <ResumeToolbar targetJd={resume.targetJd} onSave={() => void handleSave()} isSaving={isPending} lastSavedAt={lastSavedAt} />
       <main className="flex min-h-0 flex-1">
         <ResumeBoard activeSectionUid={activeSectionUid} onSelectSection={setActiveSectionUid} />
       </main>
@@ -108,10 +131,11 @@ interface ResumeToolbarProps {
   targetJd: ResumeQuery['resume']['targetJd']
   onSave: () => void
   isSaving: boolean
+  lastSavedAt: Date | null
 }
 
-/** 편집 화면 상단 도구바. 이력서가 맞춤 대상으로 삼은 채용공고(targetJd)의 회사명·포지션과 저장 액션을 보여준다. */
-const ResumeToolbar = ({ targetJd, onSave, isSaving }: ResumeToolbarProps) => {
+/** 편집 화면 상단 도구바. 이력서가 맞춤 대상으로 삼은 채용공고(targetJd)의 회사명·포지션과 저장 상태·액션을 보여준다. */
+const ResumeToolbar = ({ targetJd, onSave, isSaving, lastSavedAt }: ResumeToolbarProps) => {
   return (
     <header className={'flex justify-between px-8 py-5'}>
       <Flex direction="column" justify="center" className={'gap-0.5'}>
@@ -126,7 +150,7 @@ const ResumeToolbar = ({ targetJd, onSave, isSaving }: ResumeToolbarProps) => {
       <Flex align={'center'} gap="4">
         <Text variant="label2" color="text-subtler">
           <RefreshCcw className="mr-2.5 inline-block" size={16} />
-          19:53:30 자동 저장되었습니다.
+          {lastSavedAt ? `${formatDate(lastSavedAt, 'HH:mm:ss')} 저장되었습니다.` : '변경 사항은 자동으로 저장됩니다.'}
         </Text>
 
         <Button variant="primary" size={'md'} className={'leading-0'} onClick={onSave} disabled={isSaving}>
