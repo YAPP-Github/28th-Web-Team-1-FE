@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { toast } from 'sonner'
@@ -41,6 +41,8 @@ export const ResumeCreatePage = () => {
  * `useSearchParams`는 상위 `Suspense` 경계 안에서 호출된다.
  */
 const ResumeCreateContent = () => {
+  const [isOpen, setIsOpen] = useState(true)
+
   const router = useRouter()
   const jdId = useSearchParams().get('jdId') ?? ''
   const workspaceId = useWorkspaceId()
@@ -54,7 +56,11 @@ const ResumeCreateContent = () => {
 
   return (
     <ExperiencePickerDialog
-      isOpen={true}
+      isOpen={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open)
+        if (!open) router.push('/home')
+      }}
       jdId={jdId}
       isCompleting={isPending}
       onComplete={(selectedExperiences) => {
