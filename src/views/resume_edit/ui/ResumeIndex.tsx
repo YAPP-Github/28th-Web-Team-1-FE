@@ -285,7 +285,7 @@ const SetCategoryModal = () => {
           카테고리 추가/삭제 <Settings />
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex h-155 w-110 flex-col gap-0">
+      <DialogContent className="flex h-157 w-110 flex-col gap-0">
         <DialogTitle asChild>
           <Text variant="headline2">이력서 카테고리 추가/삭제</Text>
         </DialogTitle>
@@ -306,10 +306,19 @@ const SetCategoryModal = () => {
               </Text>
             </Flex>
             {visibleSections.map((section) => (
-              <Flex key={section.uid} asChild justify={'between'} gap="2" className={'bg-element-gray-lighter shrink-0 cursor-pointer rounded-sm px-3 py-2.5'}>
+              <Flex
+                key={section.uid}
+                asChild
+                align={'center'}
+                justify={'between'}
+                gap={'2'}
+                className={cn('group bg-element-gray-lighter shrink-0 cursor-pointer rounded-sm border border-transparent px-3 py-2.5', 'hover:border-border-subtler hover:shadow-1')}
+              >
                 <button type="button" onClick={() => removeCategory(section.uid)}>
-                  <Text variant="label1">{SECTION_CATEGORY_LABELS[section.type]}</Text>
-                  <X size={16} className={'text-icon-gray-light'} />
+                  <Text variant="label1" className={'text-text-subtle group-hover:text-text-basic'}>
+                    {SECTION_CATEGORY_LABELS[section.type]}
+                  </Text>
+                  <X size={16} className={'text-icon-gray-light group-hover:text-icon-gray'} />
                 </button>
               </Flex>
             ))}
@@ -324,23 +333,23 @@ const SetCategoryModal = () => {
           ) : (
             <Flex direction="column" gap="2" className="min-h-0 w-1/2 overflow-y-auto">
               {hiddenSections.map((section) => (
-                <Flex key={section.uid} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
+                <Flex key={section.uid} asChild justify={'between'} align={'center'} gap="2" className={'group shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
                   <button type="button" onClick={() => setVisible(section.uid, true)}>
-                    <Text variant="label1" color={'text-subtler'}>
+                    <Text variant="label1" className={'text-text-subtler group-hover:text-text-basic'}>
                       {SECTION_CATEGORY_LABELS[section.type]}
                     </Text>
-                    <Plus size={16} className={'text-icon-gray-light'} />
+                    <Plus size={16} className={'text-icon-gray-light group-hover:text-icon-gray'} />
                   </button>
                 </Flex>
               ))}
 
               {missingTypes.map((type) => (
-                <Flex key={type} asChild justify={'between'} gap="2" className={'shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
+                <Flex key={type} asChild justify={'between'} align={'center'} gap="2" className={'group shrink-0 cursor-pointer rounded-sm border border-dashed px-3 py-2.5'}>
                   <button type="button" onClick={() => addNewType(type)}>
-                    <Text variant="label1" color={'text-subtler'}>
+                    <Text variant="label1" className={'text-text-subtler group-hover:text-text-basic'}>
                       {SECTION_CATEGORY_LABELS[type]}
                     </Text>
-                    <Plus size={16} className={'text-icon-gray-light'} />
+                    <Plus size={16} className={'text-icon-gray-light group-hover:text-icon-gray'} />
                   </button>
                 </Flex>
               ))}
