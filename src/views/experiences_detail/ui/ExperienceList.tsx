@@ -96,7 +96,9 @@ const AddExperienceButton = () => {
           </DialogTitle>
           <DialogDescription className="text-body1 text-text-subtler">떠오르는 경험을 자유롭게 작성해 주세요. AI가 이력서에 적합한 STAR 구조로 정리해 드려요.</DialogDescription>
         </DialogHeader>
-        <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />
+        <div className="min-w-0">
+          <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />
+        </div>
         <Button variant="primary" size="xl" className="w-full" onClick={handleSubmit} disabled={isPending}>
           경험 추출하기
         </Button>
