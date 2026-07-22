@@ -39,7 +39,7 @@ export const ResumeUploadStep = ({ onDone, onPrev, onSkip }: OnboardingStepProps
       description="기존 이력서를 분석해 필요한 정보만 추출하고, JD에 맞게 이력서를 개선할 수 있어요."
       // TODO : handleNext 및 !file || isPending으로 변경 필요
       onNext={handleNext}
-      nextDisabled={false}
+      nextDisabled={!file || isPending}
       nextLabel={isPending ? '분석 중...' : '다음'}
       onPrev={onPrev}
       onSkip={onSkip}

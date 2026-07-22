@@ -20,7 +20,10 @@ export const OnboardingLayout = ({ children }: PropsWithChildren) => {
       <header className="border-border-subtle flex shrink-0 items-center justify-center border-b py-3">
         <Logo />
       </header>
-      <div className="flex min-h-0 flex-1 items-center justify-center px-6 py-10">{children}</div>
+      {/* 콘텐츠가 화면보다 커지면 이 영역 전체가 스크롤된다(min-h-full이라 넘치는 순간부터 상단 정렬로 자연스럽게 전환). */}
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="flex min-h-full items-center justify-center px-6 py-10">{children}</div>
+      </div>
     </main>
   )
 }

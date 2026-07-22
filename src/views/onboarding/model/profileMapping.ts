@@ -1,7 +1,7 @@
 import { formatPeriod, parsePeriodInput } from '@shared/lib'
 import type { Profile } from '@entities/profile'
 import type { Degree, EducationStatus, SkillLevel, UpdateProfileRequest } from '@shared/lib/gql/graphql'
-import { INITIAL_SECTION_TYPES, type ResumeSectionInstance, type ResumeSectionType } from './resumeSections'
+import { INITIAL_SECTION_TYPES, type ResumeSectionInstance, type ResumeSectionType, type SkillItem } from './resumeSections'
 
 /**
  * 이력서 기본 정보 프로필(GraphQL) ↔ 정보 확인 카드 매핑.
@@ -18,9 +18,10 @@ const codeOf = <T extends string>(labels: Record<T, string>, label?: string): T 
 const nullIfBlank = (value?: string): string | null => value?.trim() || null
 const card = (type: ResumeSectionType, values: Record<string, string>): ResumeSectionInstance => ({ id: crypto.randomUUID(), type, values })
 
-/** 조회한 프로필을 카드 목록으로. 각 섹션은 항목당 1장, 항목이 없으면 빈 카드 1장(직접 채우도록). */
+/** 조회한 프로필을 카드 목록으로. 각 섹션은 항목당 1장, 항목이 없으면 빈 카드 1장(직접 채우도록).
+ * 기술은 예외로, 항목 전부를 태그로 담는 카드 1장이 된다. */
 export const profileToSections = (profile: Profile): ResumeSectionInstance[] => {
-  const rows: Record<ResumeSectionType, Array<Record<string, string>>> = {
+  const rows: Record<Exclude<ResumeSectionType, 'skill'>, Array<Record<string, string>>> = {
     basic: [{ name: profile.name ?? '', phone: profile.phone ?? '', email: profile.email ?? '' }],
     education: profile.educations.map((e) => ({
       school: e.school ?? '',
@@ -32,16 +33,25 @@ export const profileToSections = (profile: Profile): ResumeSectionInstance[] => 
     career: profile.careers.map((c) => ({ company: c.company ?? '', position: c.position ?? '', period: formatPeriod(c.period?.startAt, c.period?.endAt) })),
     award: profile.awards.map((a) => ({ title: a.title ?? '', organization: a.organization ?? '', awardedAt: a.awardedAt ?? '' })),
     language: profile.languageTests.map((l) => ({ testName: l.testName ?? '', score: l.score ?? '', acquiredAt: l.acquiredAt ?? '' })),
-    certificate: profile.certifications.map((c) => ({ name: c.name ?? '', issuer: c.issuer ?? '', acquiredAt: c.acquiredAt ?? '' })),
-    skill: profile.skills.map((k) => ({ name: k.name ?? '', level: k.level ? LEVEL[k.level] : '' }))
+    certificate: profile.certifications.map((c) => ({ name: c.name ?? '', issuer: c.issuer ?? '', acquiredAt: c.acquiredAt ?? '' }))
   }
-  return INITIAL_SECTION_TYPES.flatMap((type) => (rows[type].length ? rows[type].map((values) => card(type, values)) : [card(type, {})]))
+  const fieldTypes = INITIAL_SECTION_TYPES.filter((type): type is Exclude<ResumeSectionType, 'skill'> => type !== 'skill')
+  const fieldCards = fieldTypes.flatMap((type) => (rows[type].length ? rows[type].map((values) => card(type, values)) : [card(type, {})]))
+  const skillCard: ResumeSectionInstance = {
+    id: crypto.randomUUID(),
+    type: 'skill',
+    values: {},
+    items: profile.skills.map((k) => ({ id: crypto.randomUUID(), name: k.name ?? '', level: k.level ? LEVEL[k.level] : '' }))
+  }
+  return [...fieldCards, skillCard]
 }
 
 /** 카드 목록을 프로필 수정 요청으로. 빈 카드는 제외하고, coreCompetency는 미포함(=미변경)해 기존 값을 보존한다. */
 export const sectionsToUpdateRequest = (sections: ResumeSectionInstance[]): UpdateProfileRequest => {
   const basic = sections.find((section) => section.type === 'basic')?.values ?? {}
-  const pick = (type: ResumeSectionType) => sections.filter((section) => section.type === type && Object.values(section.values).some((v) => v?.trim())).map((section) => section.values)
+  const pick = (type: Exclude<ResumeSectionType, 'skill'>) =>
+    sections.filter((section) => section.type === type && Object.values(section.values).some((v) => v?.trim())).map((section) => section.values)
+  const skillItems: SkillItem[] = sections.filter((section) => section.type === 'skill').flatMap((section) => section.items ?? [])
   return {
     name: nullIfBlank(basic.name),
     email: nullIfBlank(basic.email),
@@ -57,6 +67,6 @@ export const sectionsToUpdateRequest = (sections: ResumeSectionInstance[]): Upda
     awards: pick('award').map((v) => ({ title: nullIfBlank(v.title), organization: nullIfBlank(v.organization), awardedAt: nullIfBlank(v.awardedAt) })),
     languageTests: pick('language').map((v) => ({ testName: nullIfBlank(v.testName), score: nullIfBlank(v.score), acquiredAt: nullIfBlank(v.acquiredAt) })),
     certifications: pick('certificate').map((v) => ({ name: nullIfBlank(v.name), issuer: nullIfBlank(v.issuer), acquiredAt: nullIfBlank(v.acquiredAt) })),
-    skills: pick('skill').map((v) => ({ name: nullIfBlank(v.name), level: codeOf(LEVEL, v.level) }))
+    skills: skillItems.filter((item) => item.name.trim()).map((item) => ({ name: nullIfBlank(item.name), level: codeOf(LEVEL, item.level) }))
   }
 }
