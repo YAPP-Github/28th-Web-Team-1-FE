@@ -50,7 +50,16 @@ const ResumeBackdrop = ({ jdId }: { jdId: string }) => (
   <Flex direction={'column'} className={'absolute inset-0 -z-10'}>
     <header className={'flex px-8 py-5'}>
       <Flex direction={'column'} justify={'center'} className={'gap-0.5'}>
-        <Suspense fallback={<Text variant={'heading2'}>이력서</Text>}>
+        <Suspense
+          fallback={
+            <Flex direction={'column'}>
+              <Text variant={'heading2'}>기업명</Text>
+              <Text variant={'body2'} color={'text-subtle'}>
+                포지션
+              </Text>
+            </Flex>
+          }
+        >
           <ResumeBackdropHeaderText jdId={jdId} />
         </Suspense>
       </Flex>
