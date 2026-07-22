@@ -99,7 +99,7 @@ const ExperienceDetailPanelContent = ({ workspaceId, experienceId, onClose }: { 
 
       <Divider />
 
-      <StarEditor workspaceId={workspaceId} experience={experience} />
+      <StarEditor key={experience.experienceId} workspaceId={workspaceId} experience={experience} />
     </Flex>
   )
 }
