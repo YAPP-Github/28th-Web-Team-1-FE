@@ -5,7 +5,6 @@ import { Logo } from '@shared/icon'
  * 온보딩 공통 레이아웃 (Next route segment `layout.tsx`에서 사용)
  *
  * 상단 Scoop 로고 헤더 + 화면 중앙 정렬 영역으로 구성된 온보딩 셸이다.
- * 콘텐츠 폭(narrow 500px / wide 992px)은 스텝별로 다르므로 각 스텝 컴포넌트가 자체 폭 컨테이너를 소유한다.
  *
  * @example
  * ```tsx
@@ -16,11 +15,14 @@ import { Logo } from '@shared/icon'
  */
 export const OnboardingLayout = ({ children }: PropsWithChildren) => {
   return (
-    <main className="bg-element-white flex h-screen flex-col">
-      <header className="border-border-subtle flex shrink-0 items-center justify-center border-b py-3">
+    <main className="bg-element-white h-screen">
+      <header className="border-border-subtle bg-element-white fixed inset-x-0 top-0 z-10 flex h-16 items-center justify-center border-b">
         <Logo />
       </header>
-      <div className="flex min-h-0 flex-1 items-center justify-center px-6 py-10">{children}</div>
+      {/* 헤더가 fixed라 그만큼(h-16) 상단 패딩으로 밀어내고, 콘텐츠가 화면보다 커지면 이 영역 전체가 스크롤된다(min-h-full이라 넘치는 순간부터 상단 정렬로 자연스럽게 전환). */}
+      <div className="h-full overflow-y-auto pt-16">
+        <div className="flex min-h-full items-center justify-center px-6 py-10">{children}</div>
+      </div>
     </main>
   )
 }

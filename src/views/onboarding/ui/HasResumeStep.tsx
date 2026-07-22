@@ -14,7 +14,7 @@ export const HasResumeStep = ({ onDone }: OnboardingStepProps) => {
       onNext={() => hasResume !== null && onDone(hasResume)}
       nextDisabled={hasResume === null}
     >
-      <OnboardingRadioGroup value={hasResume === null ? undefined : hasResume ? 'yes' : 'no'} onValueChange={(v) => setHasResume(v === 'yes')}>
+      <OnboardingRadioGroup type="single" value={hasResume === null ? undefined : hasResume ? 'yes' : 'no'} onValueChange={(v) => setHasResume(v === 'yes')}>
         <OnboardingRadioItem value="yes">네, 있어요.</OnboardingRadioItem>
         <OnboardingRadioItem value="no">아니오, 없어요.</OnboardingRadioItem>
       </OnboardingRadioGroup>

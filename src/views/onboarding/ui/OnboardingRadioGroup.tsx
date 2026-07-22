@@ -1,44 +1,33 @@
-import type { ComponentProps, PropsWithChildren } from 'react'
-import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
+import type { ComponentProps } from 'react'
+import { ToggleGroup as ToggleGroupPrimitive } from 'radix-ui'
 import { Check } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 
 /**
- * 온보딩 세로 선택 카드 그룹
- *
- * RadioGroup을 기반으로 한 단일 선택 목록입니다.
- * `OnboardingRadioGroup`(root) + `OnboardingRadioItem`(각 옵션)의 조합으로 사용합니다.
- *
- * @example
- * ```tsx
- * <OnboardingRadioGroup value={value} onValueChange={setValue}>
- *   <OnboardingRadioItem value="yes">네, 있어요.</OnboardingRadioItem>
- *   <OnboardingRadioItem value="no">아니오, 없어요.</OnboardingRadioItem>
- * </OnboardingRadioGroup>
- * ```
+ * 온보딩 카드 선택 그룹 (단일/다중 선택 지원)
+ * type="single" | "multiple" 옵션으로 선택 방식을 지정할 수 있습니다.
  */
-export const OnboardingRadioGroup = ({ className, ...props }: ComponentProps<typeof RadioGroupPrimitive.Root>) => {
-  return <RadioGroupPrimitive.Root data-slot="onboarding-radio-group" className={cn('flex w-full flex-col gap-3', className)} {...props} />
+export const OnboardingRadioGroup = ({ className, ...props }: ComponentProps<typeof ToggleGroupPrimitive.Root>) => {
+  return <ToggleGroupPrimitive.Root className={cn('flex w-full flex-col gap-3', className)} {...props} />
 }
 
-export const OnboardingRadioItem = ({ children, className, ...props }: PropsWithChildren<ComponentProps<typeof RadioGroupPrimitive.Item>>) => {
+export const OnboardingRadioItem = ({ children, className, ...props }: ComponentProps<typeof ToggleGroupPrimitive.Item>) => {
   return (
-    <RadioGroupPrimitive.Item
-      data-slot="onboarding-radio-item"
+    <ToggleGroupPrimitive.Item
       className={cn(
         // Base
-        'group/radio-item flex w-full items-center justify-between rounded-xl border border-transparent px-5 py-4 text-left transition-all outline-none',
+        'group/select-item flex w-full items-center justify-between rounded-xl border border-transparent px-5 py-4 text-left transition-all outline-none',
         'bg-btn-tertiary-fill text-text-basic',
         // Focus
         'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3',
-        // Checked
-        'data-checked:bg-element-white data-checked:border-btn-secondary-border data-checked:text-text-primary-basic',
+        // Selected (Radix ToggleGroup state)
+        'data-[state=on]:bg-element-white data-[state=on]:border-btn-secondary-border data-[state=on]:text-text-primary-basic',
         className
       )}
       {...props}
     >
       <span className="text-label1 font-semibold">{children}</span>
-      <Check size={24} className="text-text-disabled group-data-[state=checked]/radio-item:text-text-primary-basic" />
-    </RadioGroupPrimitive.Item>
+      <Check size={24} className="text-icon-gray group-data-[state=on]/select-item:text-icon-primary-basic transition-colors" />
+    </ToggleGroupPrimitive.Item>
   )
 }

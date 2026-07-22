@@ -1,6 +1,6 @@
 export type ResumeSectionType = 'basic' | 'education' | 'career' | 'award' | 'language' | 'certificate' | 'skill'
 
-export interface ResumeField {
+interface ResumeField {
   key: string
   label: string
   placeholder: string
@@ -8,7 +8,7 @@ export interface ResumeField {
   half?: boolean
 }
 
-export interface ResumeSectionConfig {
+interface ResumeSectionConfig {
   type: ResumeSectionType
   title: string
   fields: ResumeField[]
@@ -38,32 +38,39 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
   education: {
     type: 'education',
     title: '학력',
-    fields: [input('school', '학교'), input('major', '전공'), input('degree', '학위'), input('status', '상태'), input('period', '기간')]
+    fields: [
+      input('school', '학교', { placeholder: '학교명을 입력해주세요.' }),
+      input('status', '상태', { placeholder: '졸업 예정', half: true }),
+      input('period', '기간', { placeholder: 'YYYY-MM ~ YYYY-MM', half: true }),
+      input('major', '전공', { placeholder: '전공명', half: true }),
+      input('degree', '학위', { placeholder: '학사/석사/박사', half: true })
+    ]
   },
   career: {
     type: 'career',
     title: '경력',
-    fields: [input('company', '회사명'), input('position', '직책'), input('period', '기간')]
+    fields: [input('company', '회사명'), input('position', '직책', { placeholder: '직책을 입력해주세요.', half: true }), input('period', '기간', { placeholder: 'YYYY-MM ~ YYYY-MM', half: true })]
   },
   award: {
     type: 'award',
     title: '수상',
-    fields: [input('name', '수상명'), input('organization', '기관'), input('date', '수상일')]
+    fields: [input('title', '수상명'), input('organization', '기관', { placeholder: '기관명', half: true }), input('awardedAt', '수상일', { placeholder: 'YYYY-MM-DD', half: true })]
   },
   language: {
     type: 'language',
     title: '어학',
-    fields: [input('exam', '시험명'), input('score', '점수/등급'), input('date', '취득일')]
+    fields: [input('testName', '시험명'), input('score', '점수/등급', { placeholder: '점수 또는 등급', half: true }), input('acquiredAt', '취득일', { placeholder: 'YYYY-MM-DD', half: true })]
   },
   certificate: {
     type: 'certificate',
     title: '자격증',
-    fields: [input('name', '자격증명'), input('issuer', '발급기관'), input('date', '취득일')]
+    fields: [input('name', '자격증명'), input('issuer', '발급기관', { placeholder: '발급기관명', half: true }), input('acquiredAt', '취득일', { placeholder: 'YYYY-MM-DD', half: true })]
   },
   skill: {
     type: 'skill',
     title: '기술',
-    fields: [input('name', '기술명 또는 도구명'), input('level', '상/중/하')]
+    // 기술 카드는 항목(name/level) 목록을 태그로 보여주는 전용 UI를 쓰므로 fields는 사용하지 않는다.
+    fields: []
   }
 }
 
@@ -73,9 +80,22 @@ export const INITIAL_SECTION_TYPES: ResumeSectionType[] = ['basic', 'education',
 /** "항목 추가하기"로 추가할 수 있는 섹션 타입(기본 정보 제외). */
 export const ADDABLE_SECTION_TYPES: ResumeSectionType[] = ['education', 'career', 'award', 'language', 'certificate', 'skill']
 
+/** 기술 숙련도 드롭다운 선택지(한글 라벨). */
+export const SKILL_LEVELS = ['상', '중', '하'] as const
+
+/** 기술 카드에 담기는 태그 한 개(기술명 + 숙련도). */
+export interface SkillItem {
+  id: string
+  name: string
+  /** '상' | '중' | '하' | '' (미선택) */
+  level: string
+}
+
 /** 화면에 놓인 카드 한 장(섹션 인스턴스). 같은 타입을 여러 개 가질 수 있다. */
 export interface ResumeSectionInstance {
   id: string
   type: ResumeSectionType
   values: Record<string, string>
+  /** type이 'skill'일 때만 사용하는 태그 목록. */
+  items?: SkillItem[]
 }
