@@ -28,7 +28,7 @@ const makeDragEndHandler = (fieldIds: string[], move: (from: number, to: number)
  * 이력서 미리보기의 목차(minimap). 폼 `sections` 배열 순서를 그대로 반영하고, 펼친 패널에서
  * 드래그앤드롭으로 순서를 바꾼다. (섹션은 섹션끼리, 아이템은 같은 섹션 안에서)
  */
-export const ResumeIndex = ({ activeSectionUid }: { activeSectionUid: string | null }) => {
+export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSectionUid: string | null; onSelectSection: (sectionUid: string) => void }) => {
   const { control } = useFormContext<ResumeFormValues>()
   const { fields: sectionFields, move: moveSection } = useFieldArray({ control, name: 'sections' })
   const sections = useWatch({ control, name: 'sections' }) ?? []
@@ -67,11 +67,15 @@ export const ResumeIndex = ({ activeSectionUid }: { activeSectionUid: string | n
 
       {isOpen && (
         <Flex direction="column" className={cn('bg-element-white border-border-subtler shadow-1 absolute top-16 right-4 z-10 w-55.5 gap-1.5 rounded-lg border px-5 py-3')}>
-          <Flex align={'center'} className={cn('rounded-sm px-1.5 py-1', activeSectionUid === basicInfoSectionUid && 'bg-element-primary-lighter')}>
+          <button
+            type="button"
+            onClick={() => basicInfoSectionUid && onSelectSection(basicInfoSectionUid)}
+            className={cn('flex w-full cursor-pointer items-center rounded-sm px-1.5 py-1 text-left', activeSectionUid === basicInfoSectionUid && 'bg-element-primary-lighter')}
+          >
             <Text variant="label2" color={'text-subtler'}>
               기본정보
             </Text>
-          </Flex>
+          </button>
 
           <Divider />
 
@@ -89,7 +93,7 @@ export const ResumeIndex = ({ activeSectionUid }: { activeSectionUid: string | n
             <SortableContext items={bodyEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
               <Flex direction="column" className={'-ml-4 max-h-130 gap-1.5 overflow-y-auto pl-4'}>
                 {bodyEntries.map(({ id, index, section }) => (
-                  <SortableSectionRow key={id} id={id} sectionIndex={index} section={section} isActive={activeSectionUid === section.uid} />
+                  <SortableSectionRow key={id} id={id} sectionIndex={index} section={section} isActive={activeSectionUid === section.uid} onSelect={() => onSelectSection(section.uid)} />
                 ))}
               </Flex>
             </SortableContext>
@@ -108,7 +112,7 @@ export const ResumeIndex = ({ activeSectionUid }: { activeSectionUid: string | n
 }
 
 /** 정렬 가능한 섹션 행. grip을 드래그 핸들로 쓰고, 내부에 같은 섹션 아이템용 중첩 DnD를 둔다. */
-const SortableSectionRow = ({ id, sectionIndex, section, isActive }: { id: string; sectionIndex: number; section: ResumeFormSection; isActive: boolean }) => {
+const SortableSectionRow = ({ id, sectionIndex, section, isActive, onSelect }: { id: string; sectionIndex: number; section: ResumeFormSection; isActive: boolean; onSelect: () => void }) => {
   const { control } = useFormContext<ResumeFormValues>()
   const { fields: itemFields, move: moveItem } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
@@ -133,7 +137,7 @@ const SortableSectionRow = ({ id, sectionIndex, section, isActive }: { id: strin
         isActive ? 'bg-element-primary-lighter has-[[data-item]:active]:bg-element-primary-lighter' : 'has-[[data-item]:active]:bg-transparent'
       )}
     >
-      <Flex align={'center'} className={'group/section relative'}>
+      <Flex align={'center'} className={'group/section relative cursor-pointer'} onClick={onSelect}>
         <button
           type="button"
           ref={setActivatorNodeRef}
@@ -155,7 +159,7 @@ const SortableSectionRow = ({ id, sectionIndex, section, isActive }: { id: strin
         <SortableContext items={itemEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
           <Flex direction="column" gap="1" className={'rounded-sm'}>
             {itemEntries.map((e) => (
-              <SortableItemRow key={e.id} id={e.id} label={getItemLabel(e.item)} />
+              <SortableItemRow key={e.id} id={e.id} label={getItemLabel(e.item)} onSelect={onSelect} />
             ))}
           </Flex>
         </SortableContext>
@@ -193,8 +197,8 @@ const SectionDragOverlay = ({ section }: { section: ResumeFormSection }) => {
   )
 }
 
-/** 정렬 가능한 아이템 행. grip을 드래그 핸들로 쓴다. */
-const SortableItemRow = ({ id, label }: { id: string; label: string }) => {
+/** 정렬 가능한 아이템 행. grip을 드래그 핸들로 쓰고, 행을 클릭하면 부모 섹션으로 포커스를 옮긴다. */
+const SortableItemRow = ({ id, label, onSelect }: { id: string; label: string; onSelect: () => void }) => {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id })
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : undefined }
 
@@ -205,7 +209,8 @@ const SortableItemRow = ({ id, label }: { id: string; label: string }) => {
       data-item
       align={'center'}
       gap={'1'}
-      className={cn('group/item active:border-border-primary-light active:bg-element-white rounded-sm border border-transparent p-1')}
+      onClick={onSelect}
+      className={cn('group/item active:border-border-primary-light active:bg-element-white cursor-pointer rounded-sm border border-transparent p-1')}
     >
       <button
         type="button"
