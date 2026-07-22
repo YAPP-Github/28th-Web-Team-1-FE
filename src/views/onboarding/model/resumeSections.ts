@@ -41,7 +41,7 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
     fields: [
       input('school', '학교', { placeholder: '학교명을 입력해주세요.' }),
       input('status', '상태', { placeholder: '졸업 예정', half: true }),
-      input('period', '기간', { placeholder: 'YYYY.MM ~ YYYY.MM', half: true }),
+      input('period', '기간', { placeholder: 'YYYY-MM ~ YYYY-MM', half: true }),
       input('major', '전공', { placeholder: '전공명', half: true }),
       input('degree', '학위', { placeholder: '학사/석사/박사', half: true })
     ]
@@ -49,22 +49,22 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
   career: {
     type: 'career',
     title: '경력',
-    fields: [input('company', '회사명'), input('position', '직책', { placeholder: '직책을 입력해주세요.', half: true }), input('period', '기간', { placeholder: 'YYYY.MM ~ YYYY.MM', half: true })]
+    fields: [input('company', '회사명'), input('position', '직책', { placeholder: '직책을 입력해주세요.', half: true }), input('period', '기간', { placeholder: 'YYYY-MM ~ YYYY-MM', half: true })]
   },
   award: {
     type: 'award',
     title: '수상',
-    fields: [input('title', '수상명'), input('organization', '기관', { placeholder: '기관명', half: true }), input('awardedAt', '수상일', { placeholder: 'YYYY.MM.DD', half: true })]
+    fields: [input('title', '수상명'), input('organization', '기관', { placeholder: '기관명', half: true }), input('awardedAt', '수상일', { placeholder: 'YYYY-MM-DD', half: true })]
   },
   language: {
     type: 'language',
     title: '어학',
-    fields: [input('testName', '시험명'), input('score', '점수/등급', { placeholder: '점수 또는 등급', half: true }), input('acquiredAt', '취득일', { placeholder: 'YYYY.MM.DD', half: true })]
+    fields: [input('testName', '시험명'), input('score', '점수/등급', { placeholder: '점수 또는 등급', half: true }), input('acquiredAt', '취득일', { placeholder: 'YYYY-MM-DD', half: true })]
   },
   certificate: {
     type: 'certificate',
     title: '자격증',
-    fields: [input('name', '자격증명'), input('issuer', '발급기관', { placeholder: '발급기관명', half: true }), input('acquiredAt', '취득일', { placeholder: 'YYYY.MM.DD', half: true })]
+    fields: [input('name', '자격증명'), input('issuer', '발급기관', { placeholder: '발급기관명', half: true }), input('acquiredAt', '취득일', { placeholder: 'YYYY-MM-DD', half: true })]
   },
   skill: {
     type: 'skill',
