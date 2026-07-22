@@ -1,4 +1,4 @@
-import { payloadsOf, visibleSortedItems, type ResumeSectionData } from '../../model/section'
+import { payloadsOf, visibleItems, type ResumeSectionData } from '../../model/section'
 import { AwardSection } from './AwardSection'
 import { CareerSection } from './CareerSection'
 import { CertificatesSection } from './CertificatesSection'
@@ -15,13 +15,13 @@ import { SkillSection } from './SkillSection'
  */
 export const ResumeSectionView = ({ section }: { section: ResumeSectionData }) => {
   const { type, displayText } = section
-  const items = visibleSortedItems(section)
+  const items = visibleItems(section)
 
   switch (type) {
     case 'CORE_SKILL':
       return <CoreSkillSection title={displayText} items={payloadsOf(items, 'coreSkill')} />
     case 'CAREER':
-      return <CareerSection title={displayText} items={payloadsOf(items, 'career')} />
+      return <CareerSection title={`${displayText} / 활동`} items={payloadsOf(items, 'career')} />
     case 'EXPERIENCE':
       return <ExperienceSection title={displayText} items={payloadsOf(items, 'experience')} />
     case 'EDUCATION':

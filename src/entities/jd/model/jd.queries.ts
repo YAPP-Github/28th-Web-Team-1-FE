@@ -21,3 +21,23 @@ export const useJdInsight = (workspaceId: string, jdId: string) => {
   })
   return { insight: data, ...rest }
 }
+
+/**
+ * 등록된 JD의 기본 메타(기업명/포지션)를 Suspense로 조회한다.
+ * 로딩은 상위 `Suspense`, 실패는 상위 `ErrorBoundary`가 처리한다.
+ * @param workspaceId 라우트 `[workspaceId]`에서 온 워크스페이스 ID
+ * @param jdId `registerJd` 결과로 받은 JD ID(`?jdId=`)
+ * @example
+ * ```tsx
+ * const { jd } = useJdMeta(workspaceId, jdId)
+ * jd?.companyName    // 기업명
+ * jd?.positionTitle  // 포지션
+ * ```
+ */
+export const useJdMeta = (workspaceId: string, jdId: string) => {
+  const { data, ...rest } = useSuspenseQuery({
+    ...jdQueries.meta(workspaceId, jdId),
+    select: (data) => data.jd
+  })
+  return { jd: data, ...rest }
+}

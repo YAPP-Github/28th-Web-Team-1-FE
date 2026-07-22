@@ -1,7 +1,8 @@
 'use client'
-import { useMutation } from '@tanstack/react-query'
-import { type CreateResumeInput } from '@shared/lib/gql/graphql'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { type CreateResumeInput, type SaveResumeInput } from '@shared/lib/gql/graphql'
 import { resumeAPI } from '../api/resume.api'
+import { resumeKeys } from './resume.keys'
 
 /**
  * 이력서를 전체 스냅샷 단위로 생성한다.
@@ -18,6 +19,32 @@ export const useCreateResume = (workspaceId: string) => {
     mutationFn: async (input: CreateResumeInput) => {
       const { createResume } = await resumeAPI.createResume({ workspaceId, input })
       return createResume
+    }
+  })
+}
+
+/**
+ * 기존 이력서를 전체 스냅샷 단위로 수정한다.
+ * 요청에 없는 기존 섹션·아이템은 서버에서 삭제되므로, 편집 화면의 전체 상태를 그대로 담아 보낸다.
+ * 성공 시 해당 이력서 상세 캐시를 무효화해 최신 스냅샷을 다시 불러온다.
+ * @param workspaceId 현재 워크스페이스 ID
+ * @param resumeId 수정할 이력서 ID
+ * @example
+ * ```tsx
+ * const { mutate } = useUpdateResume(workspaceId, resumeId)
+ * mutate(input, { onSuccess: () => toast.success('저장되었습니다') })
+ * ```
+ */
+export const useUpdateResume = (workspaceId: string, resumeId: string) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (input: SaveResumeInput) => {
+      const { updateResume } = await resumeAPI.updateResume({ workspaceId, resumeId, input })
+      return updateResume
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: resumeKeys.detail(workspaceId, resumeId) })
     }
   })
 }

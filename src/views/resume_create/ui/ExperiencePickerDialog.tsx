@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
+import { Loader2Icon } from 'lucide-react'
 import { Dialog, DialogContent } from '@shared/ui/dialog'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Flex, Skeleton } from '@radix-ui/themes'
@@ -78,7 +79,7 @@ export const ExperiencePickerDialog = ({ isOpen, jdId, isCompleting = false, onO
           <Spacing size={16} />
 
           <Button size={'md'} className={'mt-auto'} disabled={count === 0 || isCompleting} onClick={() => onComplete(selectedItems)}>
-            선택 완료
+            {isCompleting ? <Loader2Icon className={'animate-spin'} strokeWidth={1.5} /> : '선택 완료'}
           </Button>
         </Flex>
 

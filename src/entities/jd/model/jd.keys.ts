@@ -3,7 +3,8 @@ import { jdAPI } from '../api/jd.api'
 
 export const jdKeys = {
   all: ['jd'] as const,
-  insight: (workspaceId: string, jdId: string) => [...jdKeys.all, 'insight', workspaceId, jdId] as const
+  insight: (workspaceId: string, jdId: string) => [...jdKeys.all, 'insight', workspaceId, jdId] as const,
+  meta: (workspaceId: string, jdId: string) => [...jdKeys.all, 'meta', workspaceId, jdId] as const
 }
 
 /**
@@ -21,5 +22,11 @@ export const jdQueries = {
     queryOptions({
       queryKey: jdKeys.insight(workspaceId, jdId),
       queryFn: () => jdAPI.getJdInsight({ workspaceId, jdId })
+    }),
+  /** JD의 기본 메타(기업명/포지션)를 조회한다. 이력서 헤더 등 공고 식별 표시에 쓴다. */
+  meta: (workspaceId: string, jdId: string) =>
+    queryOptions({
+      queryKey: jdKeys.meta(workspaceId, jdId),
+      queryFn: () => jdAPI.getJdMeta({ workspaceId, jdId })
     })
 }

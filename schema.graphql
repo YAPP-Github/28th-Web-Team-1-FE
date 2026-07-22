@@ -989,7 +989,7 @@ type ResumeAwardPayload {
   awardedAt: String
 
   """수상명입니다."""
-  name: String!
+  name: String
 
   """수상 기관명입니다."""
   organization: String
@@ -1001,7 +1001,7 @@ input ResumeAwardPayloadInput {
   awardedAt: String
 
   """수상명입니다."""
-  name: String!
+  name: String
 
   """수상 기관명입니다."""
   organization: String
@@ -1012,8 +1012,11 @@ type ResumeBasicInfoPayload {
   """이메일 주소입니다."""
   email: String
 
+  """연락처 숨김 여부입니다."""
+  hideContact: Boolean!
+
   """이름입니다."""
-  name: String!
+  name: String
 
   """전화번호입니다."""
   phone: String
@@ -1024,8 +1027,11 @@ input ResumeBasicInfoPayloadInput {
   """이메일 주소입니다."""
   email: String
 
+  """연락처 숨김 여부입니다."""
+  hideContact: Boolean! = false
+
   """이름입니다."""
-  name: String!
+  name: String
 
   """전화번호입니다."""
   phone: String
@@ -1034,10 +1040,10 @@ input ResumeBasicInfoPayloadInput {
 """경력 payload 응답입니다."""
 type ResumeCareerPayload {
   """회사명입니다."""
-  companyName: String!
+  companyName: String
 
   """경력 상세 내용입니다."""
-  contents: String!
+  contents: String
 
   """재직 기간입니다."""
   period: Period
@@ -1049,10 +1055,10 @@ type ResumeCareerPayload {
 """경력 payload 입력입니다."""
 input ResumeCareerPayloadInput {
   """회사명입니다."""
-  companyName: String!
+  companyName: String
 
   """경력 상세 내용입니다."""
-  contents: String!
+  contents: String
 
   """재직 기간입니다."""
   period: PeriodInput
@@ -1067,7 +1073,7 @@ type ResumeCertificatePayload {
   acquiredAt: String
 
   """자격증명입니다."""
-  name: String!
+  name: String
 
   """발급 기관입니다."""
   organization: String
@@ -1079,7 +1085,7 @@ input ResumeCertificatePayloadInput {
   acquiredAt: String
 
   """자격증명입니다."""
-  name: String!
+  name: String
 
   """발급 기관입니다."""
   organization: String
@@ -1088,13 +1094,13 @@ input ResumeCertificatePayloadInput {
 """핵심 역량 payload 응답입니다."""
 type ResumeCoreSkillPayload {
   """핵심 역량 내용입니다."""
-  content: String!
+  content: String
 }
 
 """핵심 역량 payload 입력입니다."""
 input ResumeCoreSkillPayloadInput {
   """핵심 역량 내용입니다."""
-  content: String!
+  content: String
 }
 
 """학력 payload 응답입니다."""
@@ -1109,7 +1115,7 @@ type ResumeEducationPayload {
   period: Period
 
   """학교명입니다."""
-  schoolName: String!
+  schoolName: String
 
   """학력 상태입니다. 예: 졸업 예정"""
   status: String
@@ -1127,7 +1133,7 @@ input ResumeEducationPayloadInput {
   period: PeriodInput
 
   """학교명입니다."""
-  schoolName: String!
+  schoolName: String
 
   """학력 상태입니다. 예: 졸업 예정"""
   status: String
@@ -1139,7 +1145,7 @@ type ResumeExperiencePayload {
   contents: String
 
   """경험 이름입니다."""
-  name: String!
+  name: String
 
   """경험 수행 기간입니다."""
   period: Period
@@ -1154,7 +1160,7 @@ input ResumeExperiencePayloadInput {
   contents: String
 
   """경험 이름입니다."""
-  name: String!
+  name: String
 
   """경험 수행 기간입니다."""
   period: PeriodInput
@@ -1169,10 +1175,10 @@ type ResumeLanguagePayload {
   acquiredAt: String
 
   """어학 시험명입니다."""
-  examName: String!
+  examName: String
 
   """어학 점수 또는 등급입니다."""
-  scoreOrGrade: String!
+  scoreOrGrade: String
 }
 
 """어학 payload 입력입니다."""
@@ -1181,10 +1187,19 @@ input ResumeLanguagePayloadInput {
   acquiredAt: String
 
   """어학 시험명입니다."""
-  examName: String!
+  examName: String
 
   """어학 점수 또는 등급입니다."""
-  scoreOrGrade: String!
+  scoreOrGrade: String
+}
+
+"""이력서 저장 시 경험 내용을 처리하는 방식입니다."""
+enum ResumeOptimizationMode {
+  """대상 채용공고를 기준으로 경험 내용을 첨삭하여 저장합니다."""
+  JOB_SPECIFIC
+
+  """입력한 내용을 그대로 저장합니다."""
+  NONE
 }
 
 """이력서 저장 시 경험 내용을 처리하는 방식입니다."""
@@ -1340,7 +1355,7 @@ type ResumeSkillPayload {
   level: String
 
   """기술명입니다."""
-  name: String!
+  name: String
 }
 
 """기술 payload 입력입니다."""
@@ -1349,7 +1364,7 @@ input ResumeSkillPayloadInput {
   level: String
 
   """기술명입니다."""
-  name: String!
+  name: String
 }
 
 """이력서 상태별 개수 응답입니다."""

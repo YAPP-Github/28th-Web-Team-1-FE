@@ -109,7 +109,7 @@ export type ResumeAwardPayloadInput = {
   /** 수상일입니다. */
   awardedAt?: string | null | undefined;
   /** 수상명입니다. */
-  name: string;
+  name?: string | null | undefined;
   /** 수상 기관명입니다. */
   organization?: string | null | undefined;
 };
@@ -118,8 +118,10 @@ export type ResumeAwardPayloadInput = {
 export type ResumeBasicInfoPayloadInput = {
   /** 이메일 주소입니다. */
   email?: string | null | undefined;
+  /** 연락처 숨김 여부입니다. */
+  hideContact?: boolean;
   /** 이름입니다. */
-  name: string;
+  name?: string | null | undefined;
   /** 전화번호입니다. */
   phone?: string | null | undefined;
 };
@@ -127,9 +129,9 @@ export type ResumeBasicInfoPayloadInput = {
 /** 경력 payload 입력입니다. */
 export type ResumeCareerPayloadInput = {
   /** 회사명입니다. */
-  companyName: string;
+  companyName?: string | null | undefined;
   /** 경력 상세 내용입니다. */
-  contents: string;
+  contents?: string | null | undefined;
   /** 재직 기간입니다. */
   period?: PeriodInput | null | undefined;
   /** 직무 또는 역할입니다. */
@@ -141,7 +143,7 @@ export type ResumeCertificatePayloadInput = {
   /** 취득일입니다. */
   acquiredAt?: string | null | undefined;
   /** 자격증명입니다. */
-  name: string;
+  name?: string | null | undefined;
   /** 발급 기관입니다. */
   organization?: string | null | undefined;
 };
@@ -149,7 +151,7 @@ export type ResumeCertificatePayloadInput = {
 /** 핵심 역량 payload 입력입니다. */
 export type ResumeCoreSkillPayloadInput = {
   /** 핵심 역량 내용입니다. */
-  content: string;
+  content?: string | null | undefined;
 };
 
 /** 학력 payload 입력입니다. */
@@ -161,7 +163,7 @@ export type ResumeEducationPayloadInput = {
   /** 재학 기간입니다. */
   period?: PeriodInput | null | undefined;
   /** 학교명입니다. */
-  schoolName: string;
+  schoolName?: string | null | undefined;
   /** 학력 상태입니다. 예: 졸업 예정 */
   status?: string | null | undefined;
 };
@@ -171,7 +173,7 @@ export type ResumeExperiencePayloadInput = {
   /** 경험 상세 내용 목록입니다. */
   contents?: string | null | undefined;
   /** 경험 이름입니다. */
-  name: string;
+  name?: string | null | undefined;
   /** 경험 수행 기간입니다. */
   period?: PeriodInput | null | undefined;
   /** 경험에서 맡은 역할입니다. */
@@ -183,9 +185,9 @@ export type ResumeLanguagePayloadInput = {
   /** 어학 취득일입니다. */
   acquiredAt?: string | null | undefined;
   /** 어학 시험명입니다. */
-  examName: string;
+  examName?: string | null | undefined;
   /** 어학 점수 또는 등급입니다. */
-  scoreOrGrade: string;
+  scoreOrGrade?: string | null | undefined;
 };
 
 /** 이력서 저장 시 경험 내용을 처리하는 방식입니다. */
@@ -243,7 +245,7 @@ export type ResumeSkillPayloadInput = {
   /** 숙련도 또는 수준입니다. */
   level?: string | null | undefined;
   /** 기술명입니다. */
-  name: string;
+  name?: string | null | undefined;
 };
 
 /** 이력서 상태입니다. */
@@ -257,6 +259,20 @@ export type ResumeStatusType =
 export type ResumeTemplate =
   /** 기본 이력서 템플릿입니다. */
   | 'DEFAULT';
+
+/** 이력서 수정에 사용하는 전체 스냅샷 입력입니다. */
+export type SaveResumeInput = {
+  /** 이력서 최적화 모드입니다. JOB_SPECIFIC은 대상 채용공고를 기준으로 경험 내용을 첨삭합니다. */
+  optimizationMode?: ResumeOptimizationMode;
+  /** 저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다. */
+  sections: Array<SaveResumeSectionInput>;
+  /** 생성할 이력서 상태입니다. */
+  status: ResumeStatusType;
+  /** 이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다. */
+  targetJdId?: string | number | null | undefined;
+  /** 이력서 렌더링에 사용할 템플릿입니다. */
+  template: ResumeTemplate;
+};
 
 /** 이력서 섹션 저장 입력입니다. */
 export type SaveResumeSectionInput = {
@@ -409,6 +425,14 @@ export type JdInsightQueryVariables = Exact<{
 
 export type JdInsightQuery = { jdInsight: { keyPoints: string, strategy: string } | null };
 
+export type JdMetaQueryVariables = Exact<{
+  workspaceId: string | number;
+  jdId: string | number;
+}>;
+
+
+export type JdMetaQuery = { jd: { companyName: string, positionTitle: string } | null };
+
 export type RegisterJdMutationVariables = Exact<{
   workspaceId: string | number;
   request: JdRegisterRequest;
@@ -513,23 +537,32 @@ export type CreateResumeMutationVariables = Exact<{
 
 export type CreateResumeMutation = { createResume: { resumeId: string } };
 
-export type ResumeBasicInfoFieldsFragment = { name: string, email: string | null, phone: string | null };
+export type UpdateResumeMutationVariables = Exact<{
+  workspaceId: string | number;
+  resumeId: string | number;
+  input: SaveResumeInput;
+}>;
 
-export type ResumeCoreSkillFieldsFragment = { content: string };
 
-export type ResumeCareerFieldsFragment = { companyName: string, role: string | null, contents: string, period: { startAt: string | null, endAt: string | null } | null };
+export type UpdateResumeMutation = { updateResume: { resumeId: string } };
 
-export type ResumeExperienceFieldsFragment = { name: string, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null };
+export type ResumeBasicInfoFieldsFragment = { name: string | null, email: string | null, phone: string | null, hideContact: boolean };
 
-export type ResumeEducationFieldsFragment = { schoolName: string, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null };
+export type ResumeCoreSkillFieldsFragment = { content: string | null };
 
-export type ResumeAwardFieldsFragment = { name: string, organization: string | null, awardedAt: string | null };
+export type ResumeCareerFieldsFragment = { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
-export type ResumeLanguageFieldsFragment = { examName: string, scoreOrGrade: string, acquiredAt: string | null };
+export type ResumeExperienceFieldsFragment = { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
-export type ResumeCertificateFieldsFragment = { name: string, organization: string | null, acquiredAt: string | null };
+export type ResumeEducationFieldsFragment = { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
-export type ResumeSkillFieldsFragment = { name: string, level: string | null };
+export type ResumeAwardFieldsFragment = { name: string | null, organization: string | null, awardedAt: string | null };
+
+export type ResumeLanguageFieldsFragment = { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null };
+
+export type ResumeCertificateFieldsFragment = { name: string | null, organization: string | null, acquiredAt: string | null };
+
+export type ResumeSkillFieldsFragment = { name: string | null, level: string | null };
 
 export type ResumeQueryVariables = Exact<{
   resumeId: string | number;
@@ -537,7 +570,7 @@ export type ResumeQueryVariables = Exact<{
 }>;
 
 
-export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string, email: string | null, phone: string | null } | null, coreSkill: { content: string } | null, career: { companyName: string, role: string | null, contents: string, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string, organization: string | null, awardedAt: string | null } | null, language: { examName: string, scoreOrGrade: string, acquiredAt: string | null } | null, certificate: { name: string, organization: string | null, acquiredAt: string | null } | null, skill: { name: string, level: string | null } | null } }> }> } };
+export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string | null, email: string | null, phone: string | null, hideContact: boolean } | null, coreSkill: { content: string | null } | null, career: { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string | null, organization: string | null, awardedAt: string | null } | null, language: { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null } | null, certificate: { name: string | null, organization: string | null, acquiredAt: string | null } | null, skill: { name: string | null, level: string | null } | null } }> }> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -578,6 +611,7 @@ export const ResumeBasicInfoFieldsFragmentDoc = new TypedDocumentString(`
   name
   email
   phone
+  hideContact
 }
     `, {"fragmentName":"ResumeBasicInfoFields"}) as unknown as TypedDocumentString<ResumeBasicInfoFieldsFragment, unknown>;
 export const ResumeCoreSkillFieldsFragmentDoc = new TypedDocumentString(`
@@ -819,6 +853,14 @@ export const JdInsightDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<JdInsightQuery, JdInsightQueryVariables>;
+export const JdMetaDocument = new TypedDocumentString(`
+    query JdMeta($workspaceId: ID!, $jdId: ID!) {
+  jd(workspaceId: $workspaceId, id: $jdId) {
+    companyName
+    positionTitle
+  }
+}
+    `) as unknown as TypedDocumentString<JdMetaQuery, JdMetaQueryVariables>;
 export const RegisterJdDocument = new TypedDocumentString(`
     mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {
   registerJd(workspaceId: $workspaceId, request: $request) {
@@ -978,11 +1020,19 @@ export const CreateResumeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<CreateResumeMutation, CreateResumeMutationVariables>;
+export const UpdateResumeDocument = new TypedDocumentString(`
+    mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {
+  updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {
+    resumeId
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateResumeMutation, UpdateResumeMutationVariables>;
 export const ResumeDocument = new TypedDocumentString(`
     query Resume($resumeId: ID!, $workspaceId: ID!) {
   resume(resumeId: $resumeId, workspaceId: $workspaceId) {
     resumeId
     status
+    template
     targetJd {
       jdId
       companyName
@@ -1035,6 +1085,7 @@ export const ResumeDocument = new TypedDocumentString(`
   name
   email
   phone
+  hideContact
 }
 fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {
   content

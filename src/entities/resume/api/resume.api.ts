@@ -1,8 +1,9 @@
 import { execute, graphql } from '@shared/lib'
-import { type CreateResumeInput } from '@shared/lib/gql/graphql'
+import { type CreateResumeInput, type SaveResumeInput } from '@shared/lib/gql/graphql'
 
 export const resumeAPI = {
   createResume: (variables: { workspaceId: string; input: CreateResumeInput }) => execute(createResumeDocument, variables),
+  updateResume: (variables: { workspaceId: string; resumeId: string; input: SaveResumeInput }) => execute(updateResumeDocument, variables),
   getResume: (variables: { resumeId: string; workspaceId: string }) => execute(resumeDocument, variables)
 }
 
@@ -14,12 +15,21 @@ const createResumeDocument = graphql(`
   }
 `)
 
+const updateResumeDocument = graphql(`
+  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {
+    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {
+      resumeId
+    }
+  }
+`)
+
 /** 이력서 미리보기에 필요한 섹션별 payload 필드. 섹션 컴포넌트 props 타입이 이 fragment에서 1:1로 파생된다. */
 export const resumeBasicInfoFields = graphql(`
   fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {
     name
     email
     phone
+    hideContact
   }
 `)
 
@@ -102,6 +112,7 @@ const resumeDocument = graphql(`
     resume(resumeId: $resumeId, workspaceId: $workspaceId) {
       resumeId
       status
+      template
       targetJd {
         jdId
         companyName

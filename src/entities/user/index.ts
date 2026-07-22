@@ -1,5 +1,5 @@
 export { userAPI } from './api/user.api'
 export { userKeys, userQueries } from './model/user.keys'
-export { useWorkspaceId } from './model/user.queries'
+export { useWorkspaceId, useMe } from './model/user.queries'
 export { useWithdraw } from './model/user.mutations'
 export { UserProfile, UserAvatar } from './ui/UserProfile'
