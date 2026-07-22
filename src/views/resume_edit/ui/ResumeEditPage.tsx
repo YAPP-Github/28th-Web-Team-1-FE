@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form'
@@ -113,6 +113,22 @@ const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { active
   const activeSectionIndex = sections.findIndex((section) => section.uid === activeSectionUid && section.visible)
   const activeSection = activeSectionIndex >= 0 ? sections[activeSectionIndex] : null
 
+  // 미리보기 섹션 DOM을 uid로 등록해 두고, 선택 시 해당 섹션으로 스크롤한다.
+  const sectionRefs = useRef(new Map<string, HTMLElement>())
+  const registerSectionRef = useCallback((uid: string, el: HTMLElement | null) => {
+    if (el) sectionRefs.current.set(uid, el)
+    else sectionRefs.current.delete(uid)
+  }, [])
+
+  // 미리보기·미니맵에서 섹션을 선택하면 활성 상태를 바꾸고 해당 미리보기 섹션을 화면 안으로 스크롤한다.
+  const selectSection = useCallback(
+    (sectionUid: string) => {
+      onSelectSection(sectionUid)
+      sectionRefs.current.get(sectionUid)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    },
+    [onSelectSection]
+  )
+
   // 포커스 중이던 카테고리가 삭제되면 남은 첫 노출 섹션으로 포커스를 옮긴다(없으면 해제).
   useEffect(() => {
     if (activeSectionUid !== null && activeSectionIndex < 0) {
@@ -122,8 +138,8 @@ const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { active
 
   return (
     <>
-      <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionUid={activeSectionUid} onSelectSection={onSelectSection} />
-      <ResumeIndex activeSectionUid={activeSectionUid} />
+      <ResumePreview basicInfoSection={basicInfoSection} sections={bodySections} activeSectionUid={activeSectionUid} onSelectSection={selectSection} registerSectionRef={registerSectionRef} />
+      <ResumeIndex activeSectionUid={activeSectionUid} onSelectSection={selectSection} />
       <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} targetJdId={targetJdId} />
     </>
   )
@@ -169,16 +185,17 @@ interface ResumePreviewProps {
   sections: ResumeSectionData[]
   activeSectionUid: string | null
   onSelectSection: (sectionUid: string) => void
+  registerSectionRef: (uid: string, el: HTMLElement | null) => void
 }
 
-const ResumePreview = ({ basicInfoSection, sections, activeSectionUid, onSelectSection }: ResumePreviewProps) => {
+const ResumePreview = ({ basicInfoSection, sections, activeSectionUid, onSelectSection, registerSectionRef }: ResumePreviewProps) => {
   const basicInfo = basicInfoSection?.items[0]?.payload.basicInfo ?? null
 
   return (
     <Flex align={'center'} className={'bg-bg-gray-subtler flex-1'}>
       <Flex direction={'column'} className={'bg-bg-white mx-auto h-[calc(100%-2rem)] w-149 min-w-149 overflow-y-auto p-7'}>
         {basicInfoSection ? (
-          <SelectableArea sectionUid={basicInfoSection.uid} activeSectionUid={activeSectionUid} onSelect={onSelectSection}>
+          <SelectableArea sectionUid={basicInfoSection.uid} activeSectionUid={activeSectionUid} onSelect={onSelectSection} registerRef={registerSectionRef}>
             <ResumeBasicInfoHeader basicInfo={basicInfo} />
           </SelectableArea>
         ) : (
@@ -191,7 +208,7 @@ const ResumePreview = ({ basicInfoSection, sections, activeSectionUid, onSelectS
 
         <Flex direction={'column'} gap="5">
           {sections.map((section) => (
-            <SelectableArea key={section.uid} sectionUid={section.uid} activeSectionUid={activeSectionUid} onSelect={onSelectSection}>
+            <SelectableArea key={section.uid} sectionUid={section.uid} activeSectionUid={activeSectionUid} onSelect={onSelectSection} registerRef={registerSectionRef}>
               <ResumeSectionView section={section} />
             </SelectableArea>
           ))}
@@ -205,15 +222,17 @@ interface SelectableAreaProps {
   sectionUid: string
   activeSectionUid: string | null
   onSelect: (sectionUid: string) => void
+  registerRef: (uid: string, el: HTMLElement | null) => void
   children: ReactNode
 }
 
-/** 미리보기에서 클릭·키보드로 활성 섹션을 선택할 수 있게 감싸는 래퍼. `data-active`를 자식(Section)의 group-data 스타일이 읽는다. */
-const SelectableArea = ({ sectionUid, activeSectionUid, onSelect, children }: SelectableAreaProps) => {
+/** 미리보기에서 클릭·키보드로 활성 섹션을 선택할 수 있게 감싸는 래퍼. `data-active`를 자식(Section)의 group-data 스타일이 읽는다. 미니맵 스크롤 이동을 위해 자기 DOM을 uid로 등록한다. */
+const SelectableArea = ({ sectionUid, activeSectionUid, onSelect, registerRef, children }: SelectableAreaProps) => {
   const select = () => onSelect(sectionUid)
 
   return (
     <div
+      ref={(el) => registerRef(sectionUid, el)}
       role="button"
       tabIndex={0}
       data-active={activeSectionUid === sectionUid}
