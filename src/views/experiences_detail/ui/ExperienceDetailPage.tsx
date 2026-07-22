@@ -48,7 +48,7 @@ const ExperienceDetailContent = () => {
   const selectedExperience = experiences.find((experience) => experience.experienceId === selectedId) ?? null
 
   const handleSelect = (experienceId: string) => {
-    setSelectedId((prev) => (prev === experienceId ? null : experienceId))
+    setSelectedId(experienceId)
   }
 
   return (
