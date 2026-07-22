@@ -1,20 +1,30 @@
 'use client'
 import { useState } from 'react'
 import { Flex } from '@radix-ui/themes'
-import { Check, Plus, Pencil } from 'lucide-react'
-import { cn } from '@shared/lib/cn'
+import { Plus, Pencil } from 'lucide-react'
 import { Button, Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
-import { ADDABLE_SECTION_TYPES, INITIAL_SECTION_TYPES, RESUME_SECTIONS, type ResumeField, type ResumeSectionInstance, type ResumeSectionType } from '../model/resumeSections'
+import { useProfile, useUpdateProfile } from '@entities/profile'
+import { useWorkspaceId } from '@entities/user'
+import { ADDABLE_SECTION_TYPES, RESUME_SECTIONS, type ResumeField, type ResumeSectionInstance, type ResumeSectionType } from '../model/resumeSections'
+import { profileToSections, sectionsToUpdateRequest } from '../model/profileMapping'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
+import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
 
 const createInstance = (type: ResumeSectionType): ResumeSectionInstance => ({ id: crypto.randomUUID(), type, values: {} })
 
-/** 온보딩 스텝: 가져온 이력서 정보 확인 (카드 그리드 + 편집/추가 모달) */
+/** 온보딩 스텝: 가져온 이력서 정보 확인 (카드 그리드 + 편집/추가 모달). 업로드로 파싱된 프로필을 시드하고, 확인/편집 후 저장한다. */
 export const ResumeInfoStep = ({ onDone, onPrev }: OnboardingStepProps) => {
-  const [sections, setSections] = useState<ResumeSectionInstance[]>(() => INITIAL_SECTION_TYPES.map(createInstance))
+  const workspaceId = useWorkspaceId()
+  const profile = useProfile(workspaceId)
+  const { mutate: updateProfile, isPending } = useUpdateProfile(workspaceId)
+  const [sections, setSections] = useState<ResumeSectionInstance[]>(() => profileToSections(profile))
+
+  const handleNext = () => {
+    updateProfile(sectionsToUpdateRequest(sections), { onSuccess: () => onDone() })
+  }
 
   const updateSection = (id: string, values: Record<string, string>) => {
     setSections((prev) => prev.map((section) => (section.id === id ? { ...section, values } : section)))
@@ -33,7 +43,9 @@ export const ResumeInfoStep = ({ onDone, onPrev }: OnboardingStepProps) => {
       wide
       title="가져온 이력서 정보를 확인해 주세요."
       description="추출된 내용을 확인하고, 누락되거나 수정이 필요한 정보가 있다면 직접 편집해 주세요."
-      onNext={() => onDone()}
+      onNext={handleNext}
+      nextDisabled={isPending}
+      nextLabel={isPending ? '저장 중...' : '다음'}
       onPrev={onPrev}
     >
       <div className="grid w-full grid-cols-3 gap-4">
@@ -68,45 +80,19 @@ const AddSectionCard = ({ onAdd }: AddSectionCardProps) => {
   )
 }
 
-/**
- * "항목 추가하기" 모달 본문
- *
- * 추가 가능한 섹션 타입을 다중 선택(토글)하고 "추가하기"로 카드를 늘린다.
- * 같은 타입도 여러 번 추가할 수 있다(선택할 때마다 새 인스턴스).
- * 선택 state를 여기 두는 이유: 모달이 닫히면 언마운트되어 선택이 초기화된다.
- */
 const AddSectionDialogContent = ({ onAdd }: AddSectionCardProps) => {
   const [selected, setSelected] = useState<ResumeSectionType[]>([])
-
-  const toggle = (type: ResumeSectionType) => {
-    setSelected((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]))
-  }
 
   return (
     <DialogContent className="w-150 gap-6">
       <DialogTitle className="text-heading2 text-text-basic font-semibold">항목 추가하기</DialogTitle>
-      <div className="grid w-full grid-cols-2 gap-3">
-        {ADDABLE_SECTION_TYPES.map((type) => {
-          const isSelected = selected.includes(type)
-          return (
-            <button
-              key={type}
-              type="button"
-              aria-pressed={isSelected}
-              onClick={() => toggle(type)}
-              className={cn(
-                'flex w-full items-center justify-between rounded-xl border border-transparent px-5 py-4 text-left transition-all outline-none',
-                'bg-btn-tertiary-fill text-text-basic',
-                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3',
-                isSelected && 'bg-element-white border-btn-secondary-border text-text-primary-basic'
-              )}
-            >
-              <span className="text-label1 font-semibold">{RESUME_SECTIONS[type].title}</span>
-              <Check size={24} className={isSelected ? 'text-text-primary-basic' : 'text-text-disabled'} />
-            </button>
-          )
-        })}
-      </div>
+      <OnboardingRadioGroup type="multiple" value={selected} onValueChange={(val) => setSelected(val as ResumeSectionType[])} className="grid w-full grid-cols-2 gap-3">
+        {ADDABLE_SECTION_TYPES.map((type) => (
+          <OnboardingRadioItem key={type} value={type}>
+            {RESUME_SECTIONS[type].title}
+          </OnboardingRadioItem>
+        ))}
+      </OnboardingRadioGroup>
       <DialogClose asChild>
         <Button variant="primary" size="lg" fullWidth disabled={selected.length === 0} onClick={() => onAdd(selected)}>
           추가하기

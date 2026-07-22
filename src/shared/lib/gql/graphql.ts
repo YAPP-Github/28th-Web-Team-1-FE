@@ -54,6 +54,28 @@ export type CreateResumeInput = {
   template: ResumeTemplate;
 };
 
+/** 학위입니다. */
+export type Degree =
+  /** 학사 */
+  | 'BACHELOR'
+  /** 박사 */
+  | 'DOCTOR'
+  /** 석사 */
+  | 'MASTER';
+
+/** 학적 상태입니다. */
+export type EducationStatus =
+  /** 수료 */
+  | 'COMPLETED'
+  /** 재학 */
+  | 'ENROLLED'
+  /** 졸업예정 */
+  | 'EXPECTED_GRADUATION'
+  /** 졸업 */
+  | 'GRADUATED'
+  /** 휴학 */
+  | 'ON_LEAVE';
+
 /** 경험 상세 내용 입력입니다. */
 export type ExperienceContentsRequest = {
   /** FREE 형식의 상세 내용입니다. */
@@ -102,6 +124,70 @@ export type PeriodInput = {
   endAt?: string | null | undefined;
   /** 기간 시작일입니다. */
   startAt?: string | null | undefined;
+};
+
+/** 수상 입력입니다. */
+export type ProfileAwardRequest = {
+  /** 수상일입니다. (YYYY-MM-DD) */
+  awardedAt?: string | null | undefined;
+  /** 수여 기관명입니다. */
+  organization?: string | null | undefined;
+  /** 수상명입니다. */
+  title?: string | null | undefined;
+};
+
+/** 경력 입력입니다. */
+export type ProfileCareerRequest = {
+  /** 회사명입니다. */
+  company?: string | null | undefined;
+  /** 세부 내용입니다. (최대 500자) */
+  description?: string | null | undefined;
+  /** 기간입니다. */
+  period?: PeriodInput | null | undefined;
+  /** 직책입니다. */
+  position?: string | null | undefined;
+};
+
+/** 자격증 입력입니다. */
+export type ProfileCertificationRequest = {
+  /** 취득일입니다. (YYYY-MM-DD) */
+  acquiredAt?: string | null | undefined;
+  /** 발급 기관명입니다. */
+  issuer?: string | null | undefined;
+  /** 자격명입니다. */
+  name?: string | null | undefined;
+};
+
+/** 학력 입력입니다. */
+export type ProfileEducationRequest = {
+  /** 학위입니다. (학사/석사/박사) */
+  degree?: Degree | null | undefined;
+  /** 전공명입니다. */
+  major?: string | null | undefined;
+  /** 기간입니다. */
+  period?: PeriodInput | null | undefined;
+  /** 학교 또는 기관명입니다. */
+  school?: string | null | undefined;
+  /** 학적 상태입니다. (재학/휴학/졸업/졸업예정/수료) */
+  status?: EducationStatus | null | undefined;
+};
+
+/** 어학 입력입니다. */
+export type ProfileLanguageTestRequest = {
+  /** 취득일입니다. (YYYY-MM-DD) */
+  acquiredAt?: string | null | undefined;
+  /** 점수 또는 등급입니다. */
+  score?: string | null | undefined;
+  /** 시험명입니다. */
+  testName?: string | null | undefined;
+};
+
+/** 스킬 입력입니다. */
+export type ProfileSkillRequest = {
+  /** 숙련도입니다. (상/중/하) */
+  level?: SkillLevel | null | undefined;
+  /** 기술 또는 도구명입니다. */
+  name?: string | null | undefined;
 };
 
 /** 수상 payload 입력입니다. */
@@ -289,6 +375,15 @@ export type SaveResumeSectionItemInput = {
   visible: boolean;
 };
 
+/** 스킬 숙련도입니다. */
+export type SkillLevel =
+  /** 상 */
+  | 'HIGH'
+  /** 하 */
+  | 'LOW'
+  /** 중 */
+  | 'MEDIUM';
+
 /** STAR 형식의 경험 상세 내용 입력입니다. */
 export type StarExperienceContentsRequest = {
   /** A */
@@ -327,6 +422,30 @@ export type UpdateExperienceRequest = {
   tags: Array<string>;
   /** 변경할 경험 제목입니다. */
   title: string;
+};
+
+/** 프로필 수정 입력입니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다. */
+export type UpdateProfileRequest = {
+  /** 변경할 수상 목록입니다. (전체 교체) */
+  awards?: Array<ProfileAwardRequest> | null | undefined;
+  /** 변경할 경력 목록입니다. (전체 교체) */
+  careers?: Array<ProfileCareerRequest> | null | undefined;
+  /** 변경할 자격증 목록입니다. (전체 교체) */
+  certifications?: Array<ProfileCertificationRequest> | null | undefined;
+  /** 변경할 핵심역량입니다. (최대 500자) */
+  coreCompetency?: string | null | undefined;
+  /** 변경할 학력 목록입니다. (전체 교체) */
+  educations?: Array<ProfileEducationRequest> | null | undefined;
+  /** 변경할 이메일입니다. */
+  email?: string | null | undefined;
+  /** 변경할 어학 목록입니다. (전체 교체) */
+  languageTests?: Array<ProfileLanguageTestRequest> | null | undefined;
+  /** 변경할 이름입니다. */
+  name?: string | null | undefined;
+  /** 변경할 전화번호입니다. (형식: 010-1234-5678, 빈 문자열 = 비우기) */
+  phone?: string | null | undefined;
+  /** 변경할 스킬 목록입니다. (전체 교체) */
+  skills?: Array<ProfileSkillRequest> | null | undefined;
 };
 
 export type ExperiencesQueryVariables = Exact<{
@@ -451,6 +570,21 @@ export type ImportNotionExperiencesMutationVariables = Exact<{
 
 
 export type ImportNotionExperiencesMutation = { importNotionExperiences: boolean };
+
+export type ProfileQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type ProfileQuery = { profile: { profileId: string, name: string | null, email: string | null, phone: string | null, educations: Array<{ school: string | null, major: string | null, degree: Degree | null, status: EducationStatus | null, period: { startAt: string | null, endAt: string | null } | null }>, careers: Array<{ company: string | null, position: string | null, period: { startAt: string | null, endAt: string | null } | null }>, awards: Array<{ title: string | null, organization: string | null, awardedAt: string | null }>, languageTests: Array<{ testName: string | null, score: string | null, acquiredAt: string | null }>, certifications: Array<{ name: string | null, issuer: string | null, acquiredAt: string | null }>, skills: Array<{ name: string | null, level: SkillLevel | null }> } };
+
+export type UpdateProfileMutationVariables = Exact<{
+  workspaceId: string | number;
+  request: UpdateProfileRequest;
+}>;
+
+
+export type UpdateProfileMutation = { updateProfile: { profileId: string } };
 
 export type ProjectListItemFragment = { projectId: string, name: string };
 
@@ -883,6 +1017,60 @@ export const ImportNotionExperiencesDocument = new TypedDocumentString(`
   importNotionExperiences(workspaceId: $workspaceId, request: $request)
 }
     `) as unknown as TypedDocumentString<ImportNotionExperiencesMutation, ImportNotionExperiencesMutationVariables>;
+export const ProfileDocument = new TypedDocumentString(`
+    query Profile($workspaceId: ID!) {
+  profile(workspaceId: $workspaceId) {
+    profileId
+    name
+    email
+    phone
+    educations {
+      school
+      major
+      degree
+      status
+      period {
+        startAt
+        endAt
+      }
+    }
+    careers {
+      company
+      position
+      period {
+        startAt
+        endAt
+      }
+    }
+    awards {
+      title
+      organization
+      awardedAt
+    }
+    languageTests {
+      testName
+      score
+      acquiredAt
+    }
+    certifications {
+      name
+      issuer
+      acquiredAt
+    }
+    skills {
+      name
+      level
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ProfileQuery, ProfileQueryVariables>;
+export const UpdateProfileDocument = new TypedDocumentString(`
+    mutation UpdateProfile($workspaceId: ID!, $request: UpdateProfileRequest!) {
+  updateProfile(workspaceId: $workspaceId, request: $request) {
+    profileId
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateProfileMutation, UpdateProfileMutationVariables>;
 export const ProjectsDocument = new TypedDocumentString(`
     query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {
   projectList: experienceProjects(

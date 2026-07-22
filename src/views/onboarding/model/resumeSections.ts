@@ -48,17 +48,17 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
   award: {
     type: 'award',
     title: '수상',
-    fields: [input('name', '수상명'), input('organization', '기관'), input('date', '수상일')]
+    fields: [input('title', '수상명'), input('organization', '기관'), input('awardedAt', '수상일')]
   },
   language: {
     type: 'language',
     title: '어학',
-    fields: [input('exam', '시험명'), input('score', '점수/등급'), input('date', '취득일')]
+    fields: [input('testName', '시험명'), input('score', '점수/등급'), input('acquiredAt', '취득일')]
   },
   certificate: {
     type: 'certificate',
     title: '자격증',
-    fields: [input('name', '자격증명'), input('issuer', '발급기관'), input('date', '취득일')]
+    fields: [input('name', '자격증명'), input('issuer', '발급기관'), input('acquiredAt', '취득일')]
   },
   skill: {
     type: 'skill',

@@ -38,7 +38,7 @@ export const NotionConnectStep = ({ onDone, onPrev, onSkip }: OnboardingStepProp
             이력서로 만들고 싶은 실제 본문 내용이 담긴 하위 페이지를 <span className="text-text-primary-basic">직접 검색</span>해서 선택해 주세요.
           </Text>
         </Flex>
-        <OnboardingRadioGroup value={hasNotion === null ? undefined : hasNotion ? 'yes' : 'no'} onValueChange={(v) => setHasNotion(v === 'yes')}>
+        <OnboardingRadioGroup type="single" value={hasNotion === null ? undefined : hasNotion ? 'yes' : 'no'} onValueChange={(v) => setHasNotion(v === 'yes')}>
           <OnboardingRadioItem value="yes">네, 있어요.</OnboardingRadioItem>
           <OnboardingRadioItem value="no">아니오, 없어요.</OnboardingRadioItem>
         </OnboardingRadioGroup>
