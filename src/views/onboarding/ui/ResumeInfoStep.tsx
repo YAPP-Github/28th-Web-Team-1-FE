@@ -132,11 +132,21 @@ const ResumeSectionCard = ({ instance, onSave, onDelete }: ResumeSectionCardProp
             <Pencil size={16} className="text-icon-gray-lighter" />
           </Flex>
           <Flex direction="column" className="w-full gap-1.5">
-            {config.fields.map((field) => (
-              <Text key={field.key} variant="label1" color="text-subtle" className="w-full truncate">
-                {instance.values[field.key] || field.label}
-              </Text>
-            ))}
+            {config.fields.map((field) => {
+              const value = instance.values[field.key]
+              return (
+                <Flex key={field.key} className="w-full gap-1">
+                  <Text variant="label1" color="text-subtler" className="shrink-0">
+                    {field.label}:
+                  </Text>
+                  {value && (
+                    <Text variant="label1" color="text-basic" className="min-w-0 truncate">
+                      {value}
+                    </Text>
+                  )}
+                </Flex>
+              )
+            })}
           </Flex>
         </button>
       </DialogTrigger>
@@ -214,15 +224,19 @@ const SkillSectionCard = ({ instance, onSave, onDelete }: SkillSectionCardProps)
             </Text>
             <Pencil size={16} className="text-icon-gray-lighter" />
           </Flex>
-          <Text variant="label1" color="text-subtle" className="w-full truncate">
-            {(instance.items ?? []).map((item) => item.name).join(', ') || '기술명 또는 도구명'}
-          </Text>
-          <Text variant="label1" color="text-subtle" className="w-full truncate">
-            {(instance.items ?? [])
-              .map((item) => item.level)
-              .filter(Boolean)
-              .join(', ') || '상/중/하'}
-          </Text>
+          {(instance.items ?? []).length > 0 ? (
+            <Flex wrap="wrap" className="w-full gap-1.5">
+              {(instance.items ?? []).map((item) => (
+                <Chip key={item.id} variant="tertiary" size="sm" className="rounded-full">
+                  {item.level ? `${item.name} · ${item.level}` : item.name}
+                </Chip>
+              ))}
+            </Flex>
+          ) : (
+            <Text variant="label1" color="text-subtle" className="w-full truncate">
+              기술명 또는 도구명
+            </Text>
+          )}
         </button>
       </DialogTrigger>
       <DialogContent className="w-150 gap-6">
@@ -230,7 +244,19 @@ const SkillSectionCard = ({ instance, onSave, onDelete }: SkillSectionCardProps)
         <Flex direction="column" className="w-full gap-5">
           <Flex align="end" className="w-full gap-2">
             <Flex className="min-w-0 flex-1 items-start gap-2">
-              <Input label="기술/도구" placeholder="기술명 또는 도구명" clearable={false} className="flex-1" value={name} onChange={(e) => setName(e.target.value)} />
+              <Input
+                label="기술/도구"
+                placeholder="기술명 또는 도구명"
+                clearable={false}
+                className="flex-1"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter') return
+                  e.preventDefault()
+                  addItem()
+                }}
+              />
               <Flex direction="column" className="w-45 shrink-0 gap-2">
                 <Text variant="label1" weight="semibold" color="text-basic">
                   숙련도

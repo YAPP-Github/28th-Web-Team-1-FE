@@ -16,20 +16,19 @@ export const ResumeUploadStep = ({ onDone, onPrev, onSkip }: OnboardingStepProps
   const [file, setFile] = useState<File | null>(null)
   const workspaceId = useWorkspaceId()
   const queryClient = useQueryClient()
-  const { mutateAsync: uploadPdfAsync, isPending } = useCreateProjectFromPdf(workspaceId)
+  const { mutate: uploadPdf, isPending } = useCreateProjectFromPdf(workspaceId)
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (!file) return
 
-    toast.promise(uploadPdfAsync(file), {
-      loading: '이력서를 분석하고 있어요...',
-      success: () => {
+    const toastId = toast.loading('이력서를 분석하고 있어요...', { position: 'top-center' })
+    uploadPdf(file, {
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: profileKeys.detail(workspaceId) })
+        toast.dismiss(toastId)
         onDone()
-        return undefined
       },
-      error: '요청에 실패했어요. 다시 시도해 주세요.',
-      position: 'top-center'
+      onError: () => toast.error('요청에 실패했어요. 다시 시도해 주세요.', { id: toastId, position: 'top-center' })
     })
   }
 
@@ -37,7 +36,6 @@ export const ResumeUploadStep = ({ onDone, onPrev, onSkip }: OnboardingStepProps
     <OnboardingStepShell
       title="작성해 둔 이력서 파일을 업로드해주세요."
       description="기존 이력서를 분석해 필요한 정보만 추출하고, JD에 맞게 이력서를 개선할 수 있어요."
-      // TODO : handleNext 및 !file || isPending으로 변경 필요
       onNext={handleNext}
       nextDisabled={!file || isPending}
       nextLabel={isPending ? '분석 중...' : '다음'}

@@ -39,11 +39,15 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
 
   const handleImport = () => {
     if (!connectionId || pageIds.length === 0) return
+    const toastId = toast.loading('경험을 가져오고 있어요...', { position: 'top-center' })
     importPages(
       { connectionId, pageIds },
       {
-        onSuccess: () => onDone(),
-        onError: () => toast.error('경험 가져오기에 실패했어요. 다시 시도해 주세요.', { id: 'notion-import-error', position: 'top-center' })
+        onSuccess: () => {
+          toast.dismiss(toastId)
+          onDone()
+        },
+        onError: () => toast.error('경험 가져오기에 실패했어요. 다시 시도해 주세요.', { id: toastId, position: 'top-center' })
       }
     )
   }
