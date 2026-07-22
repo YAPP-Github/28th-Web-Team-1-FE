@@ -39,6 +39,8 @@ type Documents = {
     "\n  query ProjectFilterOptions($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        ...ProjectListItem\n      }\n    }\n  }\n": typeof types.ProjectFilterOptionsDocument,
     "\n  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {\n    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": typeof types.UpdateProjectDocument,
     "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": typeof types.DeleteProjectDocument,
+    "\n  query Resumes($workspaceId: ID!, $size: Int!, $cursor: String, $statuses: [ResumeStatusType!]) {\n    resumes(workspaceId: $workspaceId, size: $size, cursor: $cursor, statuses: $statuses) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      resumes {\n        resumeId\n        status\n        createdAt\n        targetJd {\n          jdId\n          companyName\n          positionTitle\n          coreCompetencies\n        }\n      }\n    }\n  }\n": typeof types.ResumesDocument,
+    "\n  query ResumeCounts($workspaceId: ID!) {\n    resumeCounts(workspaceId: $workspaceId) {\n      status\n      count\n    }\n  }\n": typeof types.ResumeCountsDocument,
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": typeof types.CreateResumeDocument,
     "\n  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {\n    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {\n      resumeId\n    }\n  }\n": typeof types.UpdateResumeDocument,
     "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": typeof types.ResumeBasicInfoFieldsFragmentDoc,
@@ -79,6 +81,8 @@ const documents: Documents = {
     "\n  query ProjectFilterOptions($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        ...ProjectListItem\n      }\n    }\n  }\n": types.ProjectFilterOptionsDocument,
     "\n  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {\n    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": types.UpdateProjectDocument,
     "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": types.DeleteProjectDocument,
+    "\n  query Resumes($workspaceId: ID!, $size: Int!, $cursor: String, $statuses: [ResumeStatusType!]) {\n    resumes(workspaceId: $workspaceId, size: $size, cursor: $cursor, statuses: $statuses) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      resumes {\n        resumeId\n        status\n        createdAt\n        targetJd {\n          jdId\n          companyName\n          positionTitle\n          coreCompetencies\n        }\n      }\n    }\n  }\n": types.ResumesDocument,
+    "\n  query ResumeCounts($workspaceId: ID!) {\n    resumeCounts(workspaceId: $workspaceId) {\n      status\n      count\n    }\n  }\n": types.ResumeCountsDocument,
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": types.CreateResumeDocument,
     "\n  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {\n    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {\n      resumeId\n    }\n  }\n": types.UpdateResumeDocument,
     "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": types.ResumeBasicInfoFieldsFragmentDoc,
@@ -191,6 +195,14 @@ export function graphql(source: "\n  mutation UpdateProject($workspaceId: ID!, $
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n"): typeof import('./graphql').DeleteProjectDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Resumes($workspaceId: ID!, $size: Int!, $cursor: String, $statuses: [ResumeStatusType!]) {\n    resumes(workspaceId: $workspaceId, size: $size, cursor: $cursor, statuses: $statuses) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      resumes {\n        resumeId\n        status\n        createdAt\n        targetJd {\n          jdId\n          companyName\n          positionTitle\n          coreCompetencies\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ResumesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ResumeCounts($workspaceId: ID!) {\n    resumeCounts(workspaceId: $workspaceId) {\n      status\n      count\n    }\n  }\n"): typeof import('./graphql').ResumeCountsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
