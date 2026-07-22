@@ -24,6 +24,7 @@ type Documents = {
     "\n  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {\n    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {\n      experienceId\n    }\n  }\n": typeof types.UpdateExperienceDocument,
     "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": typeof types.DeleteExperienceDocument,
     "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": typeof types.JdInsightDocument,
+    "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": typeof types.JdMetaDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": typeof types.RegisterJdDocument,
     "\n  fragment ProjectListItem on ExperienceProject {\n    projectId\n    name\n  }\n": typeof types.ProjectListItemFragmentDoc,
     "\n  query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    projectList: experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": typeof types.ProjectsDocument,
@@ -57,6 +58,7 @@ const documents: Documents = {
     "\n  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {\n    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {\n      experienceId\n    }\n  }\n": types.UpdateExperienceDocument,
     "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": types.DeleteExperienceDocument,
     "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": types.JdInsightDocument,
+    "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": types.JdMetaDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": types.RegisterJdDocument,
     "\n  fragment ProjectListItem on ExperienceProject {\n    projectId\n    name\n  }\n": types.ProjectListItemFragmentDoc,
     "\n  query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    projectList: experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": types.ProjectsDocument,
@@ -117,6 +119,10 @@ export function graphql(source: "\n  mutation DeleteExperience($workspaceId: ID!
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n"): typeof import('./graphql').JdInsightDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n"): typeof import('./graphql').JdMetaDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

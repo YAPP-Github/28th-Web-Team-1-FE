@@ -409,6 +409,14 @@ export type JdInsightQueryVariables = Exact<{
 
 export type JdInsightQuery = { jdInsight: { keyPoints: string, strategy: string } | null };
 
+export type JdMetaQueryVariables = Exact<{
+  workspaceId: string | number;
+  jdId: string | number;
+}>;
+
+
+export type JdMetaQuery = { jd: { companyName: string, positionTitle: string } | null };
+
 export type RegisterJdMutationVariables = Exact<{
   workspaceId: string | number;
   request: JdRegisterRequest;
@@ -794,6 +802,14 @@ export const JdInsightDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<JdInsightQuery, JdInsightQueryVariables>;
+export const JdMetaDocument = new TypedDocumentString(`
+    query JdMeta($workspaceId: ID!, $jdId: ID!) {
+  jd(workspaceId: $workspaceId, id: $jdId) {
+    companyName
+    positionTitle
+  }
+}
+    `) as unknown as TypedDocumentString<JdMetaQuery, JdMetaQueryVariables>;
 export const RegisterJdDocument = new TypedDocumentString(`
     mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {
   registerJd(workspaceId: $workspaceId, request: $request) {
