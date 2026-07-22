@@ -1,4 +1,4 @@
-import { AUTH_ERROR } from './auth'
+import { AUTH_ERROR } from './auth-error'
 
 /**
  * BFF 라우트(`/api/[...path]`)를 거쳐 API를 호출하는 HTTP 클라이언트이다.

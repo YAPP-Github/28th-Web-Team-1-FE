@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
-import { ACCESS_TOKEN_MAX_AGE, AUTH_ERROR, cookieOptions, refreshTokens, unauthorizedResponse } from '@/src/shared/lib/auth'
+import { ACCESS_TOKEN_MAX_AGE, cookieOptions, refreshTokens, unauthorizedResponse } from '@shared/lib/auth'
+import { AUTH_ERROR } from '@shared/lib/auth-error'
 
 export { handler as GET, handler as POST, handler as PUT, handler as PATCH, handler as DELETE }
 

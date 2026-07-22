@@ -23,9 +23,8 @@ Sentry.init({
   tracesSampleRate: 1.0,
 
   // Define how likely Replay events are sampled.
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
+  // Replays 쿼터가 월 50개로 작아 무작위 세션 샘플링은 끄고, 에러 발생 시에만 기록한다.
+  replaysSessionSampleRate: 0,
 
   // Define how likely Replay events are sampled when an error occurs.
   replaysOnErrorSampleRate: 1.0,
