@@ -18,3 +18,20 @@ export const useWorkspaceId = () => {
   })
   return data
 }
+
+/**
+ * 현재 로그인한 사용자 정보(이름/이메일 등)를 Suspense로 조회한다.
+ * @example
+ * ```tsx
+ * const { me } = useMe()
+ * me.name  // 이름
+ * me.email // 이메일
+ * ```
+ */
+export const useMe = () => {
+  const { data } = useSuspenseQuery({
+    ...userQueries.me(),
+    select: (data) => data.me
+  })
+  return { me: data }
+}
