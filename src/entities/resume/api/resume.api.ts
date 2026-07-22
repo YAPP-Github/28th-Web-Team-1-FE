@@ -1,11 +1,46 @@
 import { execute, graphql } from '@shared/lib'
-import { type CreateResumeInput, type SaveResumeInput } from '@shared/lib/gql/graphql'
+import { type CreateResumeInput, type ResumeStatusType, type SaveResumeInput } from '@shared/lib/gql/graphql'
 
 export const resumeAPI = {
   createResume: (variables: { workspaceId: string; input: CreateResumeInput }) => execute(createResumeDocument, variables),
   updateResume: (variables: { workspaceId: string; resumeId: string; input: SaveResumeInput }) => execute(updateResumeDocument, variables),
-  getResume: (variables: { resumeId: string; workspaceId: string }) => execute(resumeDocument, variables)
+  getResume: (variables: { resumeId: string; workspaceId: string }) => execute(resumeDocument, variables),
+  getResumes: (variables: { workspaceId: string; size: number; cursor?: string | null; statuses?: ResumeStatusType[] | null }) => execute(resumesDocument, variables),
+  getResumeCounts: (variables: { workspaceId: string }) => execute(resumeCountsDocument, variables)
 }
+
+/** 이력서 목록. 카드 표시에 필요한 대상 JD(기업명·포지션·핵심 역량)와 등록일까지 함께 조회한다. */
+const resumesDocument = graphql(`
+  query Resumes($workspaceId: ID!, $size: Int!, $cursor: String, $statuses: [ResumeStatusType!]) {
+    resumes(workspaceId: $workspaceId, size: $size, cursor: $cursor, statuses: $statuses) {
+      cursor {
+        hasNext
+        nextCursor
+      }
+      resumes {
+        resumeId
+        status
+        createdAt
+        targetJd {
+          jdId
+          companyName
+          positionTitle
+          coreCompetencies
+        }
+      }
+    }
+  }
+`)
+
+/** 진행중(DRAFT)·완료(COMPLETED) 섹션 헤더에 노출할 상태별 이력서 개수. */
+const resumeCountsDocument = graphql(`
+  query ResumeCounts($workspaceId: ID!) {
+    resumeCounts(workspaceId: $workspaceId) {
+      status
+      count
+    }
+  }
+`)
 
 const createResumeDocument = graphql(`
   mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {

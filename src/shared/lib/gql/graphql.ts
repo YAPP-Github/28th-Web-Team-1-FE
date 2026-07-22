@@ -663,6 +663,23 @@ export type DeleteProjectMutationVariables = Exact<{
 
 export type DeleteProjectMutation = { deleteExperienceProject: boolean };
 
+export type ResumesQueryVariables = Exact<{
+  workspaceId: string | number;
+  size: number;
+  cursor?: string | null | undefined;
+  statuses?: Array<ResumeStatusType> | ResumeStatusType | null | undefined;
+}>;
+
+
+export type ResumesQuery = { resumes: { cursor: { hasNext: boolean, nextCursor: string | null }, resumes: Array<{ resumeId: string, status: ResumeStatusType, createdAt: string, targetJd: { jdId: string, companyName: string, positionTitle: string, coreCompetencies: Array<string> } | null }> } };
+
+export type ResumeCountsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type ResumeCountsQuery = { resumeCounts: Array<{ status: ResumeStatusType, count: unknown }> };
+
 export type CreateResumeMutationVariables = Exact<{
   workspaceId: string | number;
   input: CreateResumeInput;
@@ -1201,6 +1218,40 @@ export const DeleteProjectDocument = new TypedDocumentString(`
   deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)
 }
     `) as unknown as TypedDocumentString<DeleteProjectMutation, DeleteProjectMutationVariables>;
+export const ResumesDocument = new TypedDocumentString(`
+    query Resumes($workspaceId: ID!, $size: Int!, $cursor: String, $statuses: [ResumeStatusType!]) {
+  resumes(
+    workspaceId: $workspaceId
+    size: $size
+    cursor: $cursor
+    statuses: $statuses
+  ) {
+    cursor {
+      hasNext
+      nextCursor
+    }
+    resumes {
+      resumeId
+      status
+      createdAt
+      targetJd {
+        jdId
+        companyName
+        positionTitle
+        coreCompetencies
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ResumesQuery, ResumesQueryVariables>;
+export const ResumeCountsDocument = new TypedDocumentString(`
+    query ResumeCounts($workspaceId: ID!) {
+  resumeCounts(workspaceId: $workspaceId) {
+    status
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<ResumeCountsQuery, ResumeCountsQueryVariables>;
 export const CreateResumeDocument = new TypedDocumentString(`
     mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {
   createResume(workspaceId: $workspaceId, input: $input) {
