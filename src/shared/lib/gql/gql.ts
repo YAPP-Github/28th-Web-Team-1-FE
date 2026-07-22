@@ -26,6 +26,10 @@ type Documents = {
     "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": typeof types.JdInsightDocument,
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": typeof types.JdMetaDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": typeof types.RegisterJdDocument,
+    "\n  mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {\n    connectNotion(workspaceId: $workspaceId, request: $request) {\n      connectionId\n      notionWorkspaceName\n      notionWorkspaceIcon\n    }\n  }\n": typeof types.ConnectNotionDocument,
+    "\n  query NotionConnections($workspaceId: ID!, $size: Int!) {\n    notionConnections(workspaceId: $workspaceId, size: $size) {\n      connections {\n        connectionId\n        notionWorkspaceName\n        notionWorkspaceIcon\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": typeof types.NotionConnectionsDocument,
+    "\n  query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {\n    notionPages(workspaceId: $workspaceId, connectionId: $connectionId, query: $query, size: $size, cursor: $cursor) {\n      pages {\n        pageId\n        title\n        url\n        lastEditedTime\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": typeof types.NotionPagesDocument,
+    "\n  mutation ImportNotionExperiences($workspaceId: ID!, $request: NotionExperienceImportRequest!) {\n    importNotionExperiences(workspaceId: $workspaceId, request: $request)\n  }\n": typeof types.ImportNotionExperiencesDocument,
     "\n  fragment ProjectListItem on ExperienceProject {\n    projectId\n    name\n  }\n": typeof types.ProjectListItemFragmentDoc,
     "\n  query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    projectList: experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": typeof types.ProjectsDocument,
     "\n  query Project($workspaceId: ID!, $projectId: ID!) {\n    project: experienceProject(workspaceId: $workspaceId, projectId: $projectId) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": typeof types.ProjectDocument,
@@ -60,6 +64,10 @@ const documents: Documents = {
     "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": types.JdInsightDocument,
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": types.JdMetaDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": types.RegisterJdDocument,
+    "\n  mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {\n    connectNotion(workspaceId: $workspaceId, request: $request) {\n      connectionId\n      notionWorkspaceName\n      notionWorkspaceIcon\n    }\n  }\n": types.ConnectNotionDocument,
+    "\n  query NotionConnections($workspaceId: ID!, $size: Int!) {\n    notionConnections(workspaceId: $workspaceId, size: $size) {\n      connections {\n        connectionId\n        notionWorkspaceName\n        notionWorkspaceIcon\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": types.NotionConnectionsDocument,
+    "\n  query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {\n    notionPages(workspaceId: $workspaceId, connectionId: $connectionId, query: $query, size: $size, cursor: $cursor) {\n      pages {\n        pageId\n        title\n        url\n        lastEditedTime\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": types.NotionPagesDocument,
+    "\n  mutation ImportNotionExperiences($workspaceId: ID!, $request: NotionExperienceImportRequest!) {\n    importNotionExperiences(workspaceId: $workspaceId, request: $request)\n  }\n": types.ImportNotionExperiencesDocument,
     "\n  fragment ProjectListItem on ExperienceProject {\n    projectId\n    name\n  }\n": types.ProjectListItemFragmentDoc,
     "\n  query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    projectList: experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": types.ProjectsDocument,
     "\n  query Project($workspaceId: ID!, $projectId: ID!) {\n    project: experienceProject(workspaceId: $workspaceId, projectId: $projectId) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": types.ProjectDocument,
@@ -127,6 +135,22 @@ export function graphql(source: "\n  query JdMeta($workspaceId: ID!, $jdId: ID!)
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n"): typeof import('./graphql').RegisterJdDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {\n    connectNotion(workspaceId: $workspaceId, request: $request) {\n      connectionId\n      notionWorkspaceName\n      notionWorkspaceIcon\n    }\n  }\n"): typeof import('./graphql').ConnectNotionDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query NotionConnections($workspaceId: ID!, $size: Int!) {\n    notionConnections(workspaceId: $workspaceId, size: $size) {\n      connections {\n        connectionId\n        notionWorkspaceName\n        notionWorkspaceIcon\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n"): typeof import('./graphql').NotionConnectionsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {\n    notionPages(workspaceId: $workspaceId, connectionId: $connectionId, query: $query, size: $size, cursor: $cursor) {\n      pages {\n        pageId\n        title\n        url\n        lastEditedTime\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n"): typeof import('./graphql').NotionPagesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ImportNotionExperiences($workspaceId: ID!, $request: NotionExperienceImportRequest!) {\n    importNotionExperiences(workspaceId: $workspaceId, request: $request)\n  }\n"): typeof import('./graphql').ImportNotionExperiencesDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

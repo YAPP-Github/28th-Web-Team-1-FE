@@ -33,8 +33,8 @@ interface OnboardingStepShellProps {
  */
 export const OnboardingStepShell = ({ title, description, wide = false, onNext, nextDisabled = false, nextLabel = '다음', onPrev, prevLabel = '이전', onSkip, children }: OnboardingStepShellProps) => {
   return (
-    <Flex direction="column" gap="40px" className={cn('w-full', wide ? 'max-w-248' : 'max-w-125')}>
-      <Flex direction="column" align="center" gap="2">
+    <Flex direction="column" gap="40px" className={cn('max-h-full min-h-0 w-full', wide ? 'max-w-248' : 'max-w-125')}>
+      <Flex direction="column" align="center" gap="2" className="shrink-0">
         <Heading variant="title3" color="text-basic">
           {title}
         </Heading>
@@ -43,10 +43,12 @@ export const OnboardingStepShell = ({ title, description, wide = false, onNext, 
         </Text>
       </Flex>
 
-      {/* 스텝 콘텐츠 영역*/}
-      {children}
+      {/* 스텝 콘텐츠 영역: 대부분 자기 크기만큼만 차지하고, 내부 스크롤이 필요한 스텝(Notion 페이지 선택 등)만 flex-1로 남은 공간을 채워 스크롤한다 */}
+      <Flex direction="column" className="min-h-0 flex-1">
+        {children}
+      </Flex>
 
-      <Flex direction="column" align="center" gap="4">
+      <Flex direction="column" align="center" gap="4" className="shrink-0">
         <Flex gap="4" className="w-full">
           {onPrev && (
             <Button variant="tertiary" size="xl" className="flex-1" onClick={onPrev}>

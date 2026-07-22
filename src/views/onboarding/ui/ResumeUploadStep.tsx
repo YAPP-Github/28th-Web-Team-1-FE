@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { PdfUpload } from '@features/pdf_upload'
-import type { OnboardingStepProps } from '../model/useOnboardingFlow'
+import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 
 /** 온보딩 스텝2: 작성해 둔 이력서 파일(pdf) 업로드 */

@@ -1202,6 +1202,15 @@ enum ResumeOptimizationMode {
   NONE
 }
 
+"""이력서 저장 시 경험 내용을 처리하는 방식입니다."""
+enum ResumeOptimizationMode {
+  """대상 채용공고를 기준으로 경험 내용을 첨삭하여 저장합니다."""
+  JOB_SPECIFIC
+
+  """입력한 내용을 그대로 저장합니다."""
+  NONE
+}
+
 """이력서 섹션 응답입니다."""
 type ResumeSection {
   """생성 시각입니다."""

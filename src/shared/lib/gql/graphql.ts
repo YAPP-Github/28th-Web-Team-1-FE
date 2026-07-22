@@ -4,6 +4,14 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
+/** Notion 연결 요청입니다. */
+export type ConnectNotionRequest = {
+  /** Notion OAuth authorization code입니다. */
+  authorizationCode: string;
+  /** Notion OAuth redirect URI입니다. */
+  redirectUri: string;
+};
+
 /** 경험 프로젝트 생성 입력입니다. */
 export type CreateExperienceProjectRequest = {
   /** 경험 프로젝트 이름입니다. */
@@ -78,6 +86,14 @@ export type JdRegisterRequest = {
   body?: string | null | undefined;
   /** 등록할 JD 공고의 URL입니다. (크롤 등록) */
   sourceUrl?: string | null | undefined;
+};
+
+/** Notion 경험 가져오기 요청입니다. */
+export type NotionExperienceImportRequest = {
+  /** Notion 연결 ID입니다. */
+  connectionId: string | number;
+  /** 가져올 Notion 페이지 ID입니다. */
+  pageId: string;
 };
 
 /** 기간 입력입니다. */
@@ -424,6 +440,41 @@ export type RegisterJdMutationVariables = Exact<{
 
 
 export type RegisterJdMutation = { registerJd: { jd: { jdId: string } | null, candidates: Array<{ title: string, body: string }> | null } };
+
+export type ConnectNotionMutationVariables = Exact<{
+  workspaceId: string | number;
+  request: ConnectNotionRequest;
+}>;
+
+
+export type ConnectNotionMutation = { connectNotion: { connectionId: string, notionWorkspaceName: string | null, notionWorkspaceIcon: string | null } };
+
+export type NotionConnectionsQueryVariables = Exact<{
+  workspaceId: string | number;
+  size: number;
+}>;
+
+
+export type NotionConnectionsQuery = { notionConnections: { connections: Array<{ connectionId: string, notionWorkspaceName: string | null, notionWorkspaceIcon: string | null }>, cursor: { hasNext: boolean, nextCursor: string | null } } };
+
+export type NotionPagesQueryVariables = Exact<{
+  workspaceId: string | number;
+  connectionId: string | number;
+  query?: string | null | undefined;
+  size: number;
+  cursor?: string | null | undefined;
+}>;
+
+
+export type NotionPagesQuery = { notionPages: { pages: Array<{ pageId: string, title: string, url: string | null, lastEditedTime: string | null }>, cursor: { hasNext: boolean, nextCursor: string | null } } };
+
+export type ImportNotionExperiencesMutationVariables = Exact<{
+  workspaceId: string | number;
+  request: NotionExperienceImportRequest;
+}>;
+
+
+export type ImportNotionExperiencesMutation = { importNotionExperiences: boolean };
 
 export type ProjectListItemFragment = { projectId: string, name: string };
 
@@ -823,6 +874,57 @@ export const RegisterJdDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RegisterJdMutation, RegisterJdMutationVariables>;
+export const ConnectNotionDocument = new TypedDocumentString(`
+    mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {
+  connectNotion(workspaceId: $workspaceId, request: $request) {
+    connectionId
+    notionWorkspaceName
+    notionWorkspaceIcon
+  }
+}
+    `) as unknown as TypedDocumentString<ConnectNotionMutation, ConnectNotionMutationVariables>;
+export const NotionConnectionsDocument = new TypedDocumentString(`
+    query NotionConnections($workspaceId: ID!, $size: Int!) {
+  notionConnections(workspaceId: $workspaceId, size: $size) {
+    connections {
+      connectionId
+      notionWorkspaceName
+      notionWorkspaceIcon
+    }
+    cursor {
+      hasNext
+      nextCursor
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<NotionConnectionsQuery, NotionConnectionsQueryVariables>;
+export const NotionPagesDocument = new TypedDocumentString(`
+    query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {
+  notionPages(
+    workspaceId: $workspaceId
+    connectionId: $connectionId
+    query: $query
+    size: $size
+    cursor: $cursor
+  ) {
+    pages {
+      pageId
+      title
+      url
+      lastEditedTime
+    }
+    cursor {
+      hasNext
+      nextCursor
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<NotionPagesQuery, NotionPagesQueryVariables>;
+export const ImportNotionExperiencesDocument = new TypedDocumentString(`
+    mutation ImportNotionExperiences($workspaceId: ID!, $request: NotionExperienceImportRequest!) {
+  importNotionExperiences(workspaceId: $workspaceId, request: $request)
+}
+    `) as unknown as TypedDocumentString<ImportNotionExperiencesMutation, ImportNotionExperiencesMutationVariables>;
 export const ProjectsDocument = new TypedDocumentString(`
     query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {
   projectList: experienceProjects(

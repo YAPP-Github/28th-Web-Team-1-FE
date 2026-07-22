@@ -7,7 +7,7 @@ import { Button, Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
 import { ADDABLE_SECTION_TYPES, INITIAL_SECTION_TYPES, RESUME_SECTIONS, type ResumeField, type ResumeSectionInstance, type ResumeSectionType } from '../model/resumeSections'
-import type { OnboardingStepProps } from '../model/useOnboardingFlow'
+import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 
 const createInstance = (type: ResumeSectionType): ResumeSectionInstance => ({ id: crypto.randomUUID(), type, values: {} })

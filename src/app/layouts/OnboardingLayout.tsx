@@ -16,11 +16,11 @@ import { Logo } from '@shared/icon'
  */
 export const OnboardingLayout = ({ children }: PropsWithChildren) => {
   return (
-    <main className="bg-element-white flex min-h-screen flex-col">
-      <header className="border-border-subtle flex items-center justify-center border-b py-3">
+    <main className="bg-element-white flex h-screen flex-col">
+      <header className="border-border-subtle flex shrink-0 items-center justify-center border-b py-3">
         <Logo />
       </header>
-      <div className="flex flex-1 items-center justify-center px-6 py-10">{children}</div>
+      <div className="flex min-h-0 flex-1 items-center justify-center px-6 py-10">{children}</div>
     </main>
   )
 }
