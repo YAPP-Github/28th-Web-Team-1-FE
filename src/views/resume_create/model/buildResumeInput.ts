@@ -5,17 +5,7 @@ import type { Experience } from './experience.types'
  * 이력서 생성 시 채울 섹션 순서(표시 순서 = 배열 순서).
  * EXPERIENCE만 선택된 경험으로 items를 채우고, 나머지는 서버 기본 아이템(useDefaultItems)을 사용한다.
  */
-const CREATE_SECTION_TYPES: ResumeSectionType[] = [
-  'BASIC_INFO',
-  'CORE_SKILL',
-  'EXPERIENCE',
-  'CAREER',
-  'EDUCATION',
-  'AWARD',
-  'CERTIFICATE',
-  'LANGUAGE',
-  'SKILL'
-]
+const CREATE_SECTION_TYPES: ResumeSectionType[] = ['BASIC_INFO', 'CORE_SKILL', 'EXPERIENCE', 'CAREER', 'EDUCATION', 'AWARD', 'CERTIFICATE', 'LANGUAGE', 'SKILL']
 
 /**
  * 경험 상세 내용(구조화된 FREE/STAR)을 이력서 payload용 단일 문자열로 평탄화한다.
