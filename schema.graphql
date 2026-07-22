@@ -132,7 +132,7 @@ type Experience {
   project: ExperienceProject
 
   """선정 이유입니다. 매칭률 상위 5개 경험에만 채워집니다. (그 외 null)"""
-  reason: String
+  recommendedReason: String
 
   """경험에서 맡은 역할입니다."""
   role: String
