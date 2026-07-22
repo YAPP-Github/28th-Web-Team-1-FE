@@ -105,7 +105,7 @@ const searchExperiencesDocument = graphql(`
   }
 `)
 
-/** JD 매칭 조회용. jdId 기준 matchRate와 상위 5개 recommendedReason(= reason)이 함께 내려온다. */
+/** JD 매칭 조회용. jdId 기준 matchRate와 상위 5개 recommendedReason이 함께 내려온다. */
 const matchedExperiencesDocument = graphql(`
   query MatchedExperiences($workspaceId: ID!, $jdId: ID!, $size: Int!, $cursor: String) {
     experiences(workspaceId: $workspaceId, jdId: $jdId, size: $size, cursor: $cursor) {
@@ -118,7 +118,7 @@ const matchedExperiencesDocument = graphql(`
         title
         tags
         matchRate
-        recommendedReason: reason
+        recommendedReason
         role
         period {
           startAt
