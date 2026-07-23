@@ -21,9 +21,11 @@ export const Sidebar = () => {
     >
       <header className={cn('flex h-10', isExpanded ? 'justify-between' : 'justify-center')}>
         {isExpanded && (
-          <Heading size={'6'} weight={'bold'} className={cn('border-border-subtle overflow-hidden rounded-sm border px-2 py-1 whitespace-nowrap')}>
-            Scoop
-          </Heading>
+          <Link href="/home">
+            <Heading size={'6'} weight={'bold'} className={cn('border-border-subtle font-elms overflow-hidden rounded-sm border px-2 py-1 tracking-[-0.02em] whitespace-nowrap')}>
+              Scoop
+            </Heading>
+          </Link>
         )}
         <button
           className={'bg-element-gray-lighter hover:bg-element-gray-light text-icon-gray-light hover:text-icon-gray h-fit cursor-pointer rounded-sm p-1.5'}
