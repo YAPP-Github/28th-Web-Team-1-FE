@@ -1,6 +1,6 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { type UpdateProfileRequest } from '@shared/lib/gql/graphql'
+import { type PolishProfileTextRequest, type UpdateProfileRequest } from '@shared/lib/gql/graphql'
 import { profileAPI } from '../api/profile.api'
 import { profileKeys } from './profile.keys'
 
@@ -22,5 +22,24 @@ export const useUpdateProfile = (workspaceId: string) => {
       return updateProfile
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: profileKeys.detail(workspaceId) })
+  })
+}
+
+/**
+ * 프로필 텍스트를 AI로 다듬는다. 항목(kind)별 1콜, 결과 문자열만 반환(저장하지 않음).
+ * 저장이 아니라 '제안 생성'이라 캐시 무효화가 없다 — 결과는 편집 폼에 로컬 반영 후 별도 저장(useUpdateResume)한다.
+ * `request.jdId`로 지원 전략을 반영하려면 `workspaceId`를 함께 넘긴다.
+ * @example
+ * ```tsx
+ * const { mutateAsync: polish } = usePolishProfileText()
+ * const polished = await polish({ request: { kind: 'CORE_COMPETENCY', text }, workspaceId })
+ * ```
+ */
+export const usePolishProfileText = () => {
+  return useMutation({
+    mutationFn: async (variables: { request: PolishProfileTextRequest; workspaceId?: string | null }) => {
+      const { polishProfileText } = await profileAPI.polishProfileText(variables)
+      return polishProfileText
+    }
   })
 }
