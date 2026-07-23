@@ -28,7 +28,7 @@ export const MyProfilePage = () => {
 
       <Spacing size={32} />
 
-      <Flex direction={'column'} className={'w-full max-w-[634px]'}>
+      <Flex direction={'column'} className={'w-full max-w-158.5'}>
         <ErrorBoundary fallback={<ProfileSummaryFallback>사용자 정보를 불러오는 데 실패했습니다.</ProfileSummaryFallback>}>
           <Suspense fallback={<ProfileSummaryFallback>불러오는 중...</ProfileSummaryFallback>}>
             <ProfileSummary />
@@ -36,7 +36,7 @@ export const MyProfilePage = () => {
         </ErrorBoundary>
 
         <Spacing size={32} />
-        <Divider />
+        <Divider color="gray-10" />
         <Spacing size={32} />
 
         <AccordionPrimitive.Root type={'multiple'} className={'flex flex-col gap-5'}>
@@ -53,8 +53,8 @@ const ProfileSummary = () => {
   const { me } = useMe()
 
   return (
-    <Flex gap={'3'} align={'center'}>
-      <Avatar imageUrl={me.profileImageUrl} />
+    <Flex gap={'5'} align={'center'} className="shadow-1 rounded-xl px-5 py-4">
+      <Avatar imageUrl={me.profileImageUrl} size="xl" />
       <Flex direction={'column'}>
         <Text variant={'headline2'} color={'text-basic'}>
           {me.name}
@@ -80,13 +80,13 @@ interface InfoAccordionItemProps {
 
 const InfoAccordionItem = ({ value, label }: InfoAccordionItemProps) => {
   return (
-    <AccordionPrimitive.Item value={value} className={'border-border-subtle overflow-hidden rounded-2xl border'}>
+    <AccordionPrimitive.Item value={value} className={'border-border-subtler overflow-hidden rounded-xl border'}>
       <AccordionPrimitive.Header>
-        <AccordionPrimitive.Trigger className={cn('group flex h-[54px] w-full cursor-pointer items-center justify-between px-6 outline-none')}>
-          <Text variant={'label1'} color={'text-basic'} weight={'bold'}>
+        <AccordionPrimitive.Trigger className={cn('group flex h-13.5 w-full cursor-pointer items-center justify-between py-3 pr-6 pl-5 outline-none')}>
+          <Text variant="headline2" color={'text-basic'}>
             {label}
           </Text>
-          <ChevronDown size={16} className={'text-icon-gray-light transition-transform duration-200 group-data-[state=open]:rotate-180'} />
+          <ChevronDown size={20} className={'text-icon-gray-light transition-transform duration-200 group-data-[state=open]:rotate-180'} />
         </AccordionPrimitive.Trigger>
       </AccordionPrimitive.Header>
       <AccordionPrimitive.Content className={'border-border-subtler border-t px-6 py-5'}>
