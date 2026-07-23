@@ -157,11 +157,9 @@ const ResumeToolbar = ({ targetJd, onSave, isSaving, lastSavedAt }: ResumeToolba
     <header className={'flex justify-between px-8 py-5'}>
       <Flex direction="column" justify="center" className={'gap-0.5'}>
         <Text variant="heading2">{targetJd?.companyName ?? '이력서'}</Text>
-        {targetJd?.positionTitle && (
-          <Text variant="body2" color="text-subtle">
-            {targetJd.positionTitle}
-          </Text>
-        )}
+        <Text variant="body2" color="text-subtle">
+          {targetJd?.positionTitle ?? '포지션'}
+        </Text>
       </Flex>
 
       <Flex align={'center'} gap="4">
@@ -171,7 +169,7 @@ const ResumeToolbar = ({ targetJd, onSave, isSaving, lastSavedAt }: ResumeToolba
         </Text>
 
         <Button variant="primary" size={'md'} className={'leading-0'} onClick={onSave} disabled={isSaving}>
-          <FileCheckCorner size={18} className="inline-block" />
+          <FileCheckCorner size={18} className="inline-block" data-icon="inline-start" />
           이력서 저장
         </Button>
       </Flex>

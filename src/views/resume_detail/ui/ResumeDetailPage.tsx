@@ -2,11 +2,13 @@
 import { Suspense, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
-import { Divider, Spacing, Text } from '@shared/ui'
-import type { ResumeBasicInfoFieldsFragment } from '@shared/lib/gql/graphql'
+import { Button, Divider, Spacing, Text } from '@shared/ui'
+import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
 import { useResumeDetail } from '@entities/resume'
 import { useWorkspaceId } from '@entities/user'
 import { ResumeBasicInfoHeader, ResumeSectionView, toPreviewSections, type ResumeSectionData } from '@widgets/resume_preview'
+import { Download, Pencil } from 'lucide-react'
+import Link from 'next/link'
 
 export const ResumeDetailPage = ({ resumeId }: { resumeId: string }) => {
   return (
@@ -41,10 +43,46 @@ const ResumeDetail = ({ resumeId }: { resumeId: string }) => {
   const basicInfo = basicInfoSection?.items[0]?.payload.basicInfo ?? null
 
   return (
-    <main className="flex min-h-0 flex-1">
-      <ResumePreview basicInfo={basicInfo} sections={bodySections} />
-      <JDInfo />
-    </main>
+    <Flex direction="column" className="h-full flex-1 overflow-hidden">
+      <ResumeToolbar resumeId={resumeId} targetJd={resume.targetJd} />
+      <main className="flex min-h-0 flex-1">
+        <ResumePreview basicInfo={basicInfo} sections={bodySections} />
+        <JDInfo />
+      </main>
+    </Flex>
+  )
+}
+
+interface ResumeToolbarProps {
+  resumeId: string
+  targetJd: ResumeQuery['resume']['targetJd']
+}
+
+/** 편집 화면 상단 도구바. 이력서가 맞춤 대상으로 삼은 채용공고(targetJd)의 회사명·포지션과 저장 상태·액션을 보여준다. */
+const ResumeToolbar = ({ resumeId, targetJd }: ResumeToolbarProps) => {
+  return (
+    <header className={'flex justify-between px-8 py-5'}>
+      <Flex direction="column" justify="center" className={'gap-0.5'}>
+        <Text variant="heading2">{targetJd?.companyName ?? '이력서'}</Text>
+        <Text variant="body2" color="text-subtle">
+          {targetJd?.positionTitle ?? '포지션'}
+        </Text>
+      </Flex>
+
+      <Flex align={'center'} gap="4">
+        <Button asChild variant="secondary" size={'md'} className={'leading-0'}>
+          <Link href={`/home/resume/${resumeId}`}>
+            <Pencil size={18} className="inline-block" data-icon="inline-start" />
+            수정
+          </Link>
+        </Button>
+
+        <Button variant="primary" size={'md'} className={'leading-0'}>
+          <Download size={18} className="inline-block" data-icon="inline-start" />
+          다운로드
+        </Button>
+      </Flex>
+    </header>
   )
 }
 
