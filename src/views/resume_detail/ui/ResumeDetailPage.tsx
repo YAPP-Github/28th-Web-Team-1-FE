@@ -114,7 +114,7 @@ const JD_INSIGHT_TAB = 'ai-insight'
 /**
  * 이력서가 맞춤 대상으로 삼은 채용공고(targetJd) 정보 패널.
  * '공고 원문' 탭은 JD 단건 조회(`useJdDetail`)로 팀 소개·업무내용·자격요건·우대경험·전형 절차를 보여준다.
- * JD 조회는 Suspense라 미리보기를 막지 않도록 탭 콘텐츠에만 별도 `Suspense`를 건다.
+ * JD 조회의 로딩·에러는 탭 콘텐츠 내부의 `Suspense`/`ErrorBoundary`가 처리한다.
  */
 const JDInfo = ({ workspaceId, jdId }: { workspaceId: string; jdId: string | null }) => {
   const [tab, setTab] = useState(JD_SOURCE_TAB)
@@ -131,14 +131,12 @@ const JDInfo = ({ workspaceId, jdId }: { workspaceId: string; jdId: string | nul
       <Flex direction={'column'} className={'min-h-0 flex-1 overflow-y-auto'}>
         {jdId === null ? (
           <JDPlaceholder>연결된 채용공고가 없어요.</JDPlaceholder>
-        ) : tab === JD_SOURCE_TAB ? (
-          <Suspense fallback={<JDPlaceholder>불러오는 중...</JDPlaceholder>}>
-            <JDSource workspaceId={workspaceId} jdId={jdId} />
-          </Suspense>
         ) : (
-          <Suspense fallback={<JDPlaceholder>불러오는 중...</JDPlaceholder>}>
-            <JDInsight workspaceId={workspaceId} jdId={jdId} />
-          </Suspense>
+          <ErrorBoundary fallback={<JDPlaceholder>채용공고 정보를 불러오지 못했어요.</JDPlaceholder>}>
+            <Suspense fallback={<JDPlaceholder>불러오는 중...</JDPlaceholder>}>
+              {tab === JD_SOURCE_TAB ? <JDSource workspaceId={workspaceId} jdId={jdId} /> : <JDInsight workspaceId={workspaceId} jdId={jdId} />}
+            </Suspense>
+          </ErrorBoundary>
         )}
       </Flex>
     </Flex>
