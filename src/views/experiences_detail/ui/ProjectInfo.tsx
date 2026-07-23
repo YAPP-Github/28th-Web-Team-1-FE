@@ -128,7 +128,8 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
 
   const setField = (key: 'name' | 'role' | 'summary') => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
     const period =
       form.periodStart || form.periodEnd ? { startAt: form.periodStart ? monthToApiDate(form.periodStart, 'start') : null, endAt: form.periodEnd ? monthToApiDate(form.periodEnd, 'end') : null } : null
     updateProject(
@@ -157,54 +158,56 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
           </Text>
         </DialogTitle>
 
-        <Flex direction="column" className="gap-4">
-          <Flex align="center" className="gap-4">
-            <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-              이름
-            </Text>
-            <div className="min-w-0 flex-1">
-              <Input value={form.name} onChange={setField('name')} placeholder="입력된 프로젝트 명" clearable={false} />
-            </div>
-          </Flex>
-          <Flex className="gap-5">
-            <Flex align="center" className="flex-1 gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <Flex direction="column" className="gap-4">
+            <Flex align="center" className="gap-4">
               <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-                역할
+                이름
               </Text>
               <div className="min-w-0 flex-1">
-                <Input value={form.role} onChange={setField('role')} placeholder="입력된 역할" clearable={false} />
+                <Input value={form.name} onChange={setField('name')} placeholder="입력된 프로젝트 명" clearable={false} />
               </div>
             </Flex>
-            <Flex align="center" className="flex-1 gap-4">
-              <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-                기간
-              </Text>
-              <Flex align="center" className="min-w-0 flex-1 gap-2">
-                <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" />
-                <span className="text-text-subtler">-</span>
-                <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" />
+            <Flex className="gap-5">
+              <Flex align="center" className="flex-1 gap-4">
+                <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                  역할
+                </Text>
+                <div className="min-w-0 flex-1">
+                  <Input value={form.role} onChange={setField('role')} placeholder="입력된 역할" clearable={false} />
+                </div>
+              </Flex>
+              <Flex align="center" className="flex-1 gap-4">
+                <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                  기간
+                </Text>
+                <Flex align="center" className="min-w-0 flex-1 gap-2">
+                  <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" />
+                  <span className="text-text-subtler">-</span>
+                  <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" />
+                </Flex>
               </Flex>
             </Flex>
+            <Flex align="start" className="gap-4">
+              <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                설명
+              </Text>
+              <div className="min-w-0 flex-1">
+                <Textarea maxLength={2000} placeholder="텍스트를 입력해 주세요." value={form.summary} onChange={setField('summary')} className="min-h-19.25" />
+              </div>
+            </Flex>
           </Flex>
-          <Flex align="start" className="gap-4">
-            <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-              설명
-            </Text>
-            <div className="min-w-0 flex-1">
-              <Textarea maxLength={2000} placeholder="텍스트를 입력해 주세요." value={form.summary} onChange={setField('summary')} className="min-h-19.25" />
-            </div>
-          </Flex>
-        </Flex>
-        <DialogFooter className="flex-col gap-4">
-          <DialogClose asChild>
-            <Button variant="tertiary" size="lg" className="flex-1" disabled={isPending}>
-              취소
+          <DialogFooter className="flex-col gap-4">
+            <DialogClose asChild>
+              <Button type="button" variant="tertiary" size="lg" className="flex-1" disabled={isPending}>
+                취소
+              </Button>
+            </DialogClose>
+            <Button type="submit" variant="primary" size="lg" className="flex-1" disabled={isPending}>
+              저장
             </Button>
-          </DialogClose>
-          <Button variant="primary" size="lg" className="flex-1" onClick={handleSubmit} disabled={isPending}>
-            저장
-          </Button>
-        </DialogFooter>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

@@ -169,7 +169,8 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
 
   const setField = (key: 'title' | 'role') => (e: React.ChangeEvent<HTMLInputElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
     const trimmed = form.title.trim()
     if (!trimmed) {
       toast.warning('경험 제목을 입력해 주세요.', { id: 'experience-title-required', position: 'top-center' })
@@ -214,47 +215,49 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
           </Text>
         </DialogTitle>
 
-        <Flex direction="column" gap="4">
-          <Flex align="center" gap="4">
-            <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-              이름
-            </Text>
-            <div className="min-w-0 flex-1">
-              <Input value={form.title} onChange={setField('title')} placeholder="입력된 경험명" clearable={false} />
-            </div>
-          </Flex>
-          <Flex gap="5">
-            <Flex align="center" gap="4" className="flex-1">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <Flex direction="column" gap="4">
+            <Flex align="center" gap="4">
               <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-                역할
+                이름
               </Text>
               <div className="min-w-0 flex-1">
-                <Input value={form.role} onChange={setField('role')} placeholder="입력된 역할" clearable={false} />
+                <Input value={form.title} onChange={setField('title')} placeholder="입력된 경험명" clearable={false} />
               </div>
             </Flex>
-            <Flex align="center" gap="4" className="flex-1">
-              <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-                기간
-              </Text>
-              <Flex align="center" gap="2" className="min-w-0 flex-1">
-                <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" />
-                <span className="text-text-subtler">-</span>
-                <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" />
+            <Flex gap="5">
+              <Flex align="center" gap="4" className="flex-1">
+                <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                  역할
+                </Text>
+                <div className="min-w-0 flex-1">
+                  <Input value={form.role} onChange={setField('role')} placeholder="입력된 역할" clearable={false} />
+                </div>
+              </Flex>
+              <Flex align="center" gap="4" className="flex-1">
+                <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                  기간
+                </Text>
+                <Flex align="center" gap="2" className="min-w-0 flex-1">
+                  <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" />
+                  <span className="text-text-subtler">-</span>
+                  <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" />
+                </Flex>
               </Flex>
             </Flex>
           </Flex>
-        </Flex>
 
-        <Flex gap="4">
-          <DialogClose asChild>
-            <Button variant="tertiary" size="lg" className="flex-1" disabled={isPending}>
-              취소
+          <Flex gap="4">
+            <DialogClose asChild>
+              <Button type="button" variant="tertiary" size="lg" className="flex-1" disabled={isPending}>
+                취소
+              </Button>
+            </DialogClose>
+            <Button type="submit" variant="primary" size="lg" className="flex-1" disabled={isPending}>
+              저장
             </Button>
-          </DialogClose>
-          <Button variant="primary" size="lg" className="flex-1" onClick={handleSubmit} disabled={isPending}>
-            저장
-          </Button>
-        </Flex>
+          </Flex>
+        </form>
       </DialogContent>
     </Dialog>
   )

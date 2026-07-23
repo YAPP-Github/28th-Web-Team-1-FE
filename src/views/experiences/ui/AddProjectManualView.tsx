@@ -11,22 +11,30 @@ import { cn } from '@shared/lib/cn'
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
 import { Input } from '@shared/ui/input'
 
+/** 선택 목록에 쓰는 프로젝트 하나. 서버 프로젝트는 `projectId`를, 아직 생성 전인 초안은 `local:이름`을 id로 쓴다. */
+interface ProjectOption {
+  id: string
+  name: string
+}
+
 export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: (input: CreateProjectInput) => void }) => {
-  const [selected, setSelected] = useState('')
+  const [selectedId, setSelectedId] = useState('')
   const [content, setContent] = useState('')
-  const [createdProjects, setCreatedProjects] = useState<string[]>([])
+  const [createdProjects, setCreatedProjects] = useState<ProjectOption[]>([])
   const workspaceId = useWorkspaceId()
 
   // 서버의 기존 프로젝트 목록 + 화면에서 새로 추가한 이름(아직 생성 전)을 합쳐 선택지로 보여준다.
-  const serverProjectNames = useProjectOptions(workspaceId).map((project) => project.name)
-  const projects = [...createdProjects, ...serverProjectNames.filter((name) => !createdProjects.includes(name))]
+  // 이름이 아니라 id로 구분한다 — 서버 프로젝트는 이름이 같아도 projectId가 다른 별개 프로젝트일 수 있다.
+  const serverProjects: ProjectOption[] = useProjectOptions(workspaceId).map((project) => ({ id: project.projectId, name: project.name }))
+  const projects = [...createdProjects, ...serverProjects]
 
   // 명시적으로 고르지 않았으면 목록 첫 번째 프로젝트를 기본 선택으로 사용한다.
-  const selectedProject = selected || projects[0] || ''
+  const selectedProject = projects.find((project) => project.id === selectedId) ?? projects[0] ?? null
 
   const handleCreateProject = (name: string) => {
-    setCreatedProjects((prev) => (prev.includes(name) ? prev : [name, ...prev]))
-    setSelected(name)
+    const id = `local:${name}`
+    setCreatedProjects((prev) => (prev.some((project) => project.id === id) ? prev : [{ id, name }, ...prev]))
+    setSelectedId(id)
   }
 
   const handleExtract = () => {
@@ -38,7 +46,7 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
       toast.warning('경험 내용을 입력해 주세요.', { id: 'content-required', position: 'top-center' })
       return
     }
-    onExtract({ name: selectedProject, summary: content })
+    onExtract({ name: selectedProject.name, summary: content })
   }
 
   return (
@@ -54,7 +62,7 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
       </DialogHeader>
       <Flex direction="column" className="max-h-[60vh] gap-6 overflow-y-auto">
         <Flex className="gap-2">
-          {projects.length > 0 && <ProjectSelectPopover projects={projects} selected={selectedProject} onSelect={setSelected} />}
+          {projects.length > 0 && <ProjectSelectPopover projects={projects} selectedName={selectedProject?.name ?? ''} onSelect={setSelectedId} />}
           <ProjectCreatePopover projects={projects} onCreate={handleCreateProject} />
         </Flex>
         <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />
@@ -67,7 +75,7 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
 }
 
 interface ProjectCreatePopoverProps {
-  projects: string[]
+  projects: ProjectOption[]
   onCreate: (name: string) => void
 }
 const ProjectCreatePopover = ({ projects, onCreate }: ProjectCreatePopoverProps) => {
@@ -88,6 +96,13 @@ const ProjectCreatePopover = ({ projects, onCreate }: ProjectCreatePopoverProps)
     onCreate(text)
     setText('')
     setIsOpen(false)
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // 텍스트가 비어 있으면 "직접 추가" 버튼 자체가 렌더되지 않는 것과 동일하게, 제출도 무시한다.
+    if (!text) return
+    handleCreate()
   }
 
   return (
@@ -121,35 +136,36 @@ const ProjectCreatePopover = ({ projects, onCreate }: ProjectCreatePopoverProps)
         )}
       </PopoverTrigger>
       <PopoverContent sideOffset={10} align="start" className="shadow-1 w-max max-w-lg min-w-80 overflow-hidden rounded-sm">
-        <div className="bg-bg-gray-subtler px-2.5 py-2.5">
-          <Input placeholder="프로젝트 명을 직접 입력해서 추가할 수 있어요." value={text} onChange={(e) => handleChange(e.target.value)} />
-        </div>
-        {text && (
-          <div className="bg-bg-gray-subtler border-btn-outline-border border-t px-2.5 py-2.5">
-            <button
-              type="button"
-              onClick={handleCreate}
-              className={cn(
-                'border-btn-secondary-border bg-btn-secondary-fill text-text-primary-basic text-body2 flex w-full items-center gap-1 rounded-lg border border-dashed px-4 py-3 whitespace-nowrap',
-                //hover
-                'hover:bg-btn-secondary-fill-hovered hover:font-semibold'
-              )}
-            >
-              <Plus size={18} />`{text}` 직접 추가
-            </button>
+        <form onSubmit={handleSubmit}>
+          <div className="bg-bg-gray-subtler px-2.5 py-2.5">
+            <Input placeholder="프로젝트 명을 직접 입력해서 추가할 수 있어요." value={text} onChange={(e) => handleChange(e.target.value)} />
           </div>
-        )}
+          {text && (
+            <div className="bg-bg-gray-subtler border-btn-outline-border border-t px-2.5 py-2.5">
+              <button
+                type="submit"
+                className={cn(
+                  'border-btn-secondary-border bg-btn-secondary-fill text-text-primary-basic text-body2 flex w-full items-center gap-1 rounded-lg border border-dashed px-4 py-3 whitespace-nowrap',
+                  //hover
+                  'hover:bg-btn-secondary-fill-hovered hover:font-semibold'
+                )}
+              >
+                <Plus size={18} />`{text}` 직접 추가
+              </button>
+            </div>
+          )}
+        </form>
       </PopoverContent>
     </Popover>
   )
 }
 
 interface ProjectSelectPopoverProps {
-  projects: string[]
-  selected: string
-  onSelect: (project: string) => void
+  projects: ProjectOption[]
+  selectedName: string
+  onSelect: (id: string) => void
 }
-const ProjectSelectPopover = ({ projects, selected, onSelect }: ProjectSelectPopoverProps) => {
+const ProjectSelectPopover = ({ projects, selectedName, onSelect }: ProjectSelectPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -164,22 +180,22 @@ const ProjectSelectPopover = ({ projects, selected, onSelect }: ProjectSelectPop
             'data-[state=open]:bg-btn-secondary-fill-pressed data-[state=open]:text-text-primary-bolder data-[state=open]:border-btn-secondary-border-pressed'
           )}
         >
-          <span className="min-w-0 truncate">{selected}</span>
+          <span className="min-w-0 truncate">{selectedName}</span>
           <ChevronDown className="shrink-0" />
         </Button>
       </PopoverTrigger>
       <PopoverContent sideOffset={10} align="start" className="shadow-1 max-w-60 overflow-hidden rounded-sm">
         {projects.map((project) => (
           <button
-            key={project}
+            key={project.id}
             type="button"
             onClick={() => {
-              onSelect(project)
+              onSelect(project.id)
               setIsOpen(false)
             }}
             className="text-text-subtle hover:text-text-basic bg-element-gray-lighter hover:bg-element-gray-light px-3 py-2.5 text-start"
           >
-            <Text variant="body2">{project}</Text>
+            <Text variant="body2">{project.name}</Text>
           </button>
         ))}
       </PopoverContent>
