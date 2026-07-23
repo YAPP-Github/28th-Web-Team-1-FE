@@ -1,4 +1,4 @@
-import type { ResumeSectionData } from '../../model/section'
+import type { ResumeFormSection } from '../../model/resume-form.types'
 import { AwardSection } from './AwardSection'
 import { BasicInfoSection } from './BasicInfoSection'
 import { CareerSection } from './CarrerSection'
@@ -14,7 +14,7 @@ import { SkillSection } from './SkillSection'
  * 각 섹션은 폼 필드 경로 조립에 쓸 `sectionIndex`(폼 `sections` 배열 내 위치)를 받아
  * `useFormContext`/`useFieldArray`로 공유 폼에 직접 연결된다.
  */
-export const ResumeSectionEdit = ({ section, sectionIndex, targetJdId }: { section: ResumeSectionData; sectionIndex: number; targetJdId: string | null }) => {
+export const ResumeSectionEdit = ({ section, sectionIndex, targetJdId }: { section: ResumeFormSection; sectionIndex: number; targetJdId: string | null }) => {
   const { type, displayText } = section
 
   switch (type) {

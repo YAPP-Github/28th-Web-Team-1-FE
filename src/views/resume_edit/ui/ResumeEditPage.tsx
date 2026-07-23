@@ -8,15 +8,14 @@ import { FileCheckCorner, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { formatDate } from '@shared/lib'
 import { useIntervalAutosave } from '@shared/hooks/useIntervalAutosave'
-import type { ResumeBasicInfoFieldsFragment, ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
+import type { ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
 import { useResumeDetail, useUpdateResume } from '@entities/resume'
 import { useWorkspaceId } from '@entities/user'
-import type { ResumeSectionData } from '../model/section'
-import type { ResumeFormValues } from '../model/resume-form.types'
+import { ResumeBasicInfoHeader, ResumeSectionView } from '@widgets/resume_preview'
+import type { ResumeFormSection, ResumeFormValues } from '../model/resume-form.types'
 import { resumeToFormValues } from '../model/resumeToFormValues'
 import { formToSaveInput } from '../model/formToSaveInput'
 import { ResumeIndex } from './ResumeIndex'
-import { ResumeSectionView } from './preview/ResumeSectionView'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
 
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
@@ -181,8 +180,8 @@ const ResumeToolbar = ({ targetJd, onSave, isSaving, lastSavedAt }: ResumeToolba
 }
 
 interface ResumePreviewProps {
-  basicInfoSection: ResumeSectionData | null
-  sections: ResumeSectionData[]
+  basicInfoSection: ResumeFormSection | null
+  sections: ResumeFormSection[]
   activeSectionUid: string | null
   onSelectSection: (sectionUid: string) => void
   registerSectionRef: (uid: string, el: HTMLElement | null) => void
@@ -250,30 +249,6 @@ const SelectableArea = ({ sectionUid, activeSectionUid, onSelect, registerRef, c
   )
 }
 
-const ResumeBasicInfoHeader = ({ basicInfo }: { basicInfo: ResumeBasicInfoFieldsFragment | null }) => {
-  return (
-    <section className={'group-data-[active=true]:bg-primary-5/50 group-data-[active=false]:hover:bg-gray-5/50 flex w-full justify-between rounded-sm p-3 transition-colors'}>
-      <Text variant={'title1'}>{basicInfo?.name}</Text>
-
-      {/* 연락처 숨김(hideContact) 시 전화·이메일 미표시. 값 자체는 폼에 보존된다. */}
-      {!basicInfo?.hideContact && (
-        <Flex direction="column" gap="2">
-          {basicInfo?.phone && (
-            <Text size={'1'} color={'gray-40'}>
-              {basicInfo.phone}
-            </Text>
-          )}
-          {basicInfo?.email && (
-            <Text size={'1'} color={'gray-40'}>
-              {basicInfo.email}
-            </Text>
-          )}
-        </Flex>
-      )}
-    </section>
-  )
-}
-
-const ResumeEdit = ({ section, sectionIndex, targetJdId }: { section: ResumeSectionData | null; sectionIndex: number; targetJdId: string | null }) => {
+const ResumeEdit = ({ section, sectionIndex, targetJdId }: { section: ResumeFormSection | null; sectionIndex: number; targetJdId: string | null }) => {
   return <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} sectionIndex={sectionIndex} targetJdId={targetJdId} /> : null}</Flex>
 }

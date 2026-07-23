@@ -1,4 +1,4 @@
-import { payloadsOf, visibleItems, type ResumeSectionData } from '../../model/section'
+import { payloadsOf, visibleItems, type ResumeSectionData } from '../model/section'
 import { AwardSection } from './AwardSection'
 import { CareerSection } from './CareerSection'
 import { CertificatesSection } from './CertificatesSection'
