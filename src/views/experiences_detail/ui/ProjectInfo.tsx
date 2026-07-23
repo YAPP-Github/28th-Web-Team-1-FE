@@ -165,7 +165,7 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
                 이름
               </Text>
               <div className="min-w-0 flex-1">
-                <Input value={form.name} onChange={setField('name')} placeholder="입력된 프로젝트 명" clearable={false} />
+                <Input value={form.name} onChange={setField('name')} maxLength={20} placeholder="입력된 프로젝트 명" clearable={false} />
               </div>
             </Flex>
             <Flex className="gap-5">
@@ -174,7 +174,7 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
                   역할
                 </Text>
                 <div className="min-w-0 flex-1">
-                  <Input value={form.role} onChange={setField('role')} placeholder="입력된 역할" clearable={false} />
+                  <Input value={form.role} onChange={setField('role')} maxLength={20} placeholder="입력된 역할" clearable={false} />
                 </div>
               </Flex>
               <Flex align="center" className="flex-1 gap-4">
@@ -193,7 +193,7 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
                 설명
               </Text>
               <div className="min-w-0 flex-1">
-                <Textarea maxLength={2000} placeholder="텍스트를 입력해 주세요." value={form.summary} onChange={setField('summary')} className="min-h-19.25" />
+                <Textarea maxLength={500} placeholder="텍스트를 입력해 주세요." value={form.summary} onChange={setField('summary')} className="min-h-19.25" />
               </div>
             </Flex>
           </Flex>

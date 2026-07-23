@@ -222,7 +222,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
                 이름
               </Text>
               <div className="min-w-0 flex-1">
-                <Input value={form.title} onChange={setField('title')} placeholder="입력된 경험명" clearable={false} />
+                <Input value={form.title} onChange={setField('title')} maxLength={20} placeholder="입력된 경험명" clearable={false} />
               </div>
             </Flex>
             <Flex gap="5">
@@ -231,7 +231,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
                   역할
                 </Text>
                 <div className="min-w-0 flex-1">
-                  <Input value={form.role} onChange={setField('role')} placeholder="입력된 역할" clearable={false} />
+                  <Input value={form.role} onChange={setField('role')} maxLength={20} placeholder="입력된 역할" clearable={false} />
                 </div>
               </Flex>
               <Flex align="center" gap="4" className="flex-1">
