@@ -41,3 +41,23 @@ export const useJdMeta = (workspaceId: string, jdId: string) => {
   })
   return { jd: data, ...rest }
 }
+
+/**
+ * JD 원문 상세(팀 소개/업무내용/자격요건/우대경험/전형 절차)를 Suspense로 조회한다.
+ * 로딩은 상위 `Suspense`, 실패는 상위 `ErrorBoundary`가 처리한다.
+ * @param workspaceId 라우트 `[workspaceId]`에서 온 워크스페이스 ID
+ * @param jdId 이력서가 맞춤 대상으로 삼은 JD ID(`resume.targetJd.jdId`)
+ * @example
+ * ```tsx
+ * const { jd } = useJdDetail(workspaceId, jdId)
+ * jd?.responsibilities   // 업무내용
+ * jd?.requiredExperiences // 자격요건
+ * ```
+ */
+export const useJdDetail = (workspaceId: string, jdId: string) => {
+  const { data, ...rest } = useSuspenseQuery({
+    ...jdQueries.detail(workspaceId, jdId),
+    select: (data) => data.jd
+  })
+  return { jd: data, ...rest }
+}

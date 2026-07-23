@@ -8,16 +8,16 @@ import { FileCheckCorner, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { formatDate } from '@shared/lib'
 import { useIntervalAutosave } from '@shared/hooks/useIntervalAutosave'
-import type { ResumeBasicInfoFieldsFragment, ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
+import type { ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
 import { useResumeDetail, useUpdateResume } from '@entities/resume'
 import { useWorkspaceId } from '@entities/user'
-import type { ResumeSectionData } from '../model/section'
-import type { ResumeFormValues } from '../model/resume-form.types'
+import { ResumeBasicInfoHeader, ResumeSectionView } from '@widgets/resume_preview'
+import type { ResumeFormSection, ResumeFormValues } from '../model/resume-form.types'
 import { resumeToFormValues } from '../model/resumeToFormValues'
 import { formToSaveInput } from '../model/formToSaveInput'
 import { ResumeIndex } from './ResumeIndex'
-import { ResumeSectionView } from './preview/ResumeSectionView'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
+import { useRouter } from 'next/navigation'
 
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
   return (
@@ -48,6 +48,7 @@ const ResumeFallback = ({ children }: { children: ReactNode }) => (
 const AUTOSAVE_INTERVAL_MS = 30_000
 
 const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
+  const router = useRouter()
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
 
@@ -74,7 +75,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
       onSuccess: () => {
         setLastSavedAt(new Date())
         toast.success('이력서가 저장되었습니다.', { position: 'top-center' })
-        // TODO: 저장 완료 후 페이지 이동 추가 (예: router.push('/home'))
+        router.replace(`/resumes/${resumeId}`)
       },
       onError: (error) => toast.error(error.message, { position: 'top-center' })
     })
@@ -158,11 +159,9 @@ const ResumeToolbar = ({ targetJd, onSave, isSaving, lastSavedAt }: ResumeToolba
     <header className={'flex justify-between px-8 py-5'}>
       <Flex direction="column" justify="center" className={'gap-0.5'}>
         <Text variant="heading2">{targetJd?.companyName ?? '이력서'}</Text>
-        {targetJd?.positionTitle && (
-          <Text variant="body2" color="text-subtle">
-            {targetJd.positionTitle}
-          </Text>
-        )}
+        <Text variant="body2" color="text-subtle">
+          {targetJd?.positionTitle ?? '포지션'}
+        </Text>
       </Flex>
 
       <Flex align={'center'} gap="4">
@@ -172,7 +171,7 @@ const ResumeToolbar = ({ targetJd, onSave, isSaving, lastSavedAt }: ResumeToolba
         </Text>
 
         <Button variant="primary" size={'md'} className={'leading-0'} onClick={onSave} disabled={isSaving}>
-          <FileCheckCorner size={18} className="inline-block" />
+          <FileCheckCorner size={18} className="inline-block" data-icon="inline-start" />
           이력서 저장
         </Button>
       </Flex>
@@ -181,8 +180,8 @@ const ResumeToolbar = ({ targetJd, onSave, isSaving, lastSavedAt }: ResumeToolba
 }
 
 interface ResumePreviewProps {
-  basicInfoSection: ResumeSectionData | null
-  sections: ResumeSectionData[]
+  basicInfoSection: ResumeFormSection | null
+  sections: ResumeFormSection[]
   activeSectionUid: string | null
   onSelectSection: (sectionUid: string) => void
   registerSectionRef: (uid: string, el: HTMLElement | null) => void
@@ -250,30 +249,6 @@ const SelectableArea = ({ sectionUid, activeSectionUid, onSelect, registerRef, c
   )
 }
 
-const ResumeBasicInfoHeader = ({ basicInfo }: { basicInfo: ResumeBasicInfoFieldsFragment | null }) => {
-  return (
-    <section className={'group-data-[active=true]:bg-primary-5/50 group-data-[active=false]:hover:bg-gray-5/50 flex w-full justify-between rounded-sm p-3 transition-colors'}>
-      <Text variant={'title1'}>{basicInfo?.name}</Text>
-
-      {/* 연락처 숨김(hideContact) 시 전화·이메일 미표시. 값 자체는 폼에 보존된다. */}
-      {!basicInfo?.hideContact && (
-        <Flex direction="column" gap="2">
-          {basicInfo?.phone && (
-            <Text size={'1'} color={'gray-40'}>
-              {basicInfo.phone}
-            </Text>
-          )}
-          {basicInfo?.email && (
-            <Text size={'1'} color={'gray-40'}>
-              {basicInfo.email}
-            </Text>
-          )}
-        </Flex>
-      )}
-    </section>
-  )
-}
-
-const ResumeEdit = ({ section, sectionIndex, targetJdId }: { section: ResumeSectionData | null; sectionIndex: number; targetJdId: string | null }) => {
+const ResumeEdit = ({ section, sectionIndex, targetJdId }: { section: ResumeFormSection | null; sectionIndex: number; targetJdId: string | null }) => {
   return <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} sectionIndex={sectionIndex} targetJdId={targetJdId} /> : null}</Flex>
 }
