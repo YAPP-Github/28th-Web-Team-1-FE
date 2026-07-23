@@ -20,7 +20,8 @@ import {
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
-import { formatPeriod, parsePeriodInput } from '@shared/lib'
+import { MonthPicker } from '@shared/ui/month_picker'
+import { formatDate, formatPeriod, monthToApiDate } from '@shared/lib'
 
 interface ProjectInfoCardProps {
   workspaceId: string
@@ -107,7 +108,8 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
   const [form, setForm] = useState({
     name: project.name,
     role: project.role ?? '',
-    period: formatPeriod(project.period?.startAt, project.period?.endAt),
+    periodStart: formatDate(project.period?.startAt, 'YYYY.MM') || null,
+    periodEnd: formatDate(project.period?.endAt, 'YYYY.MM') || null,
     summary: project.summary
   })
   const { mutate: updateProject, isPending } = useUpdateProject(workspaceId, project.projectId)
@@ -117,17 +119,20 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
       setForm({
         name: project.name,
         role: project.role ?? '',
-        period: formatPeriod(project.period?.startAt, project.period?.endAt),
+        periodStart: formatDate(project.period?.startAt, 'YYYY.MM') || null,
+        periodEnd: formatDate(project.period?.endAt, 'YYYY.MM') || null,
         summary: project.summary
       })
     setIsOpen(next)
   }
 
-  const setField = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
+  const setField = (key: 'name' | 'role' | 'summary') => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
   const handleSubmit = () => {
+    const period =
+      form.periodStart || form.periodEnd ? { startAt: form.periodStart ? monthToApiDate(form.periodStart, 'start') : null, endAt: form.periodEnd ? monthToApiDate(form.periodEnd, 'end') : null } : null
     updateProject(
-      { name: form.name.trim(), role: form.role.trim(), summary: form.summary.trim(), period: parsePeriodInput(form.period) },
+      { name: form.name.trim(), role: form.role.trim(), summary: form.summary.trim(), period },
       {
         onSuccess: () => {
           toast.success('프로젝트가 수정되었어요.', { id: 'project-updated', position: 'top-center' })
@@ -145,7 +150,7 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
           수정하기
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-150 gap-6">
+      <DialogContent className="w-160 gap-6">
         <DialogTitle>
           <Text variant="heading2" weight="semibold" color="text-basic">
             프로젝트
@@ -174,9 +179,11 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
               <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
                 기간
               </Text>
-              <div className="min-w-0 flex-1">
-                <Input value={form.period} onChange={setField('period')} placeholder="입력된 기간" clearable={false} />
-              </div>
+              <Flex align="center" className="min-w-0 flex-1 gap-2">
+                <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" />
+                <span className="text-text-subtler">-</span>
+                <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" />
+              </Flex>
             </Flex>
           </Flex>
           <Flex align="start" className="gap-4">

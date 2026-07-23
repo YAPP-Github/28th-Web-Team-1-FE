@@ -21,7 +21,8 @@ import { Chip } from '@shared/ui/chip'
 import { Divider } from '@shared/ui/divider'
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
-import { formatPeriod, parsePeriodInput } from '@shared/lib'
+import { MonthPicker } from '@shared/ui/month_picker'
+import { formatDate, formatPeriod, monthToApiDate } from '@shared/lib'
 import { StarEditor } from './StarEditor'
 
 interface ExperienceDetailPanelProps {
@@ -151,7 +152,8 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
   const [form, setForm] = useState({
     title: experience.title,
     role: experience.role ?? '',
-    period: formatPeriod(experience.period?.startAt, experience.period?.endAt)
+    periodStart: formatDate(experience.period?.startAt, 'YYYY.MM') || null,
+    periodEnd: formatDate(experience.period?.endAt, 'YYYY.MM') || null
   })
 
   const handleOpenChange = (next: boolean) => {
@@ -159,12 +161,13 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
       setForm({
         title: experience.title,
         role: experience.role ?? '',
-        period: formatPeriod(experience.period?.startAt, experience.period?.endAt)
+        periodStart: formatDate(experience.period?.startAt, 'YYYY.MM') || null,
+        periodEnd: formatDate(experience.period?.endAt, 'YYYY.MM') || null
       })
     setIsOpen(next)
   }
 
-  const setField = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
+  const setField = (key: 'title' | 'role') => (e: React.ChangeEvent<HTMLInputElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
   const handleSubmit = () => {
     const trimmed = form.title.trim()
@@ -173,6 +176,8 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
       return
     }
     const trimmedRole = form.role.trim()
+    const period =
+      form.periodStart || form.periodEnd ? { startAt: form.periodStart ? monthToApiDate(form.periodStart, 'start') : null, endAt: form.periodEnd ? monthToApiDate(form.periodEnd, 'end') : null } : null
     updateExperience(
       {
         experienceId: experience.experienceId,
@@ -182,7 +187,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
           tags: experience.tags,
           contents: experience.contents,
           role: trimmedRole || null,
-          period: parsePeriodInput(form.period)
+          period
         }
       },
       {
@@ -202,7 +207,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
           수정하기
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-150 gap-6">
+      <DialogContent className="w-160 gap-6">
         <DialogTitle>
           <Text variant="heading2" weight="semibold" color="text-basic">
             경험
@@ -231,9 +236,11 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
               <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
                 기간
               </Text>
-              <div className="min-w-0 flex-1">
-                <Input value={form.period} onChange={setField('period')} placeholder="입력된 기간" clearable={false} />
-              </div>
+              <Flex align="center" gap="2" className="min-w-0 flex-1">
+                <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" />
+                <span className="text-text-subtler">-</span>
+                <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" />
+              </Flex>
             </Flex>
           </Flex>
         </Flex>

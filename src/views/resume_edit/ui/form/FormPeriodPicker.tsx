@@ -1,18 +1,11 @@
-import dayjs from 'dayjs'
 import { Controller, useFormContext, type FieldPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Text } from '@shared/ui'
 import { MonthPicker } from '@shared/ui/month_picker'
-import { formatDate } from '@shared/lib'
+import { formatDate, monthToApiDate } from '@shared/lib'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 
 type Period = { startAt: string | null; endAt: string | null } | null
-
-/** 'YYYY.MM' → 저장용 'YYYY-MM-DD'. 시작은 그 달 1일, 종료는 말일(윤년 반영)로 확장한다. (`parsePeriodInput`과 동일 규약) */
-const monthToApiDate = (value: string, boundary: 'start' | 'end') => {
-  const first = dayjs(`${value.replace(/\./g, '-')}-01`)
-  return (boundary === 'start' ? first : first.endOf('month')).format('YYYY-MM-DD')
-}
 
 interface FormPeriodPickerProps {
   /** 기간(`{ startAt, endAt }`) 객체의 폼 경로. 예: `sections.0.items.0.payload.career.period` */
