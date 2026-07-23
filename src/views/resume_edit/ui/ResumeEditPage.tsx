@@ -17,6 +17,7 @@ import { resumeToFormValues } from '../model/resumeToFormValues'
 import { formToSaveInput } from '../model/formToSaveInput'
 import { ResumeIndex } from './ResumeIndex'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
+import { useRouter } from 'next/navigation'
 
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
   return (
@@ -47,6 +48,7 @@ const ResumeFallback = ({ children }: { children: ReactNode }) => (
 const AUTOSAVE_INTERVAL_MS = 30_000
 
 const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
+  const router = useRouter()
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
 
@@ -73,7 +75,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
       onSuccess: () => {
         setLastSavedAt(new Date())
         toast.success('이력서가 저장되었습니다.', { position: 'top-center' })
-        // TODO: 저장 완료 후 페이지 이동 추가 (예: router.push('/home'))
+        router.replace(`/resumes/${resumeId}`)
       },
       onError: (error) => toast.error(error.message, { position: 'top-center' })
     })
