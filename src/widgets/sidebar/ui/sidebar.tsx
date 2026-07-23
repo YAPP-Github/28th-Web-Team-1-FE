@@ -35,9 +35,11 @@ export const Sidebar = () => {
     >
       <header className={cn('flex h-10', isEffectiveExpanded ? 'justify-between' : 'justify-center')}>
         {isEffectiveExpanded && (
-          <Heading size={'6'} weight={'bold'} className={cn('border-border-subtle overflow-hidden rounded-sm border px-2 py-1 whitespace-nowrap')}>
-            Scoop
-          </Heading>
+         <Link href="/home">
+            <Heading size={'6'} weight={'bold'} className={cn('border-border-subtle font-elms overflow-hidden rounded-sm border px-2 py-1 tracking-[-0.02em] whitespace-nowrap')}>
+              Scoop
+            </Heading>
+          </Link>
         )}
         <button
           className={cn(
@@ -64,20 +66,8 @@ export const Sidebar = () => {
       <Spacing size={16} />
 
       <Menu trigger={isEffectiveExpanded ? <UserProfile /> : <UserAvatar />}>
-        <MenuItem
-          icon={Settings}
-          label={'내 정보'}
-          onSelect={() => {
-            console.log('내 정보')
-          }}
-        />
-        <MenuItem
-          icon={UserRoundIcon}
-          label={'계정관리'}
-          onSelect={() => {
-            console.log('계정관리')
-          }}
-        />
+        <MenuItem icon={Settings} label={'내 정보'} href={'/mypage/profile'} />
+        <MenuItem icon={UserRoundIcon} label={'계정관리'} href={'/mypage/account'} />
         <MenuItem
           icon={MessageCircleMore}
           label={'제보'}
@@ -147,22 +137,32 @@ const Menu = ({ trigger, children }: MenuProps) => {
 interface MenuItemProps {
   icon: LucideIcon
   label: string
+  href?: string
   onSelect?: () => void
   disabled?: boolean
 }
 
-const MenuItem = ({ icon: Icon, label, onSelect: handleSelect, disabled }: MenuItemProps) => {
+const MenuItem = ({ icon: Icon, label, href, onSelect: handleSelect, disabled }: MenuItemProps) => {
+  const className = cn(
+    'flex items-center gap-3 px-4 py-3.5',
+    'data-highlighted:bg-element-gray-lighter data-highlighted:text-text-basic',
+    'cursor-pointer outline-none',
+    disabled && 'pointer-events-none opacity-50'
+  )
+
+  if (href) {
+    return (
+      <DropdownMenu.Item asChild disabled={disabled} className={className}>
+        <Link href={href}>
+          <Icon size={16} />
+          <Text variant={'label1'}>{label}</Text>
+        </Link>
+      </DropdownMenu.Item>
+    )
+  }
+
   return (
-    <DropdownMenu.Item
-      className={cn(
-        'flex items-center gap-3 px-4 py-3.5',
-        'data-highlighted:bg-element-gray-lighter data-highlighted:text-text-basic',
-        'cursor-pointer outline-none',
-        disabled && 'pointer-events-none opacity-50'
-      )}
-      onSelect={handleSelect}
-      disabled={disabled}
-    >
+    <DropdownMenu.Item className={className} onSelect={handleSelect} disabled={disabled}>
       <Icon size={16} />
       <Text variant={'label1'}>{label}</Text>
     </DropdownMenu.Item>
