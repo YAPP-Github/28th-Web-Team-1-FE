@@ -33,7 +33,7 @@ export const AddProjectDialog = () => {
   const [isOpen, setIsOpen] = useState(() => Boolean(connectionId))
   const [view, setView] = useState<DialogView>(() => (connectionId ? 'notion-select' : 'default'))
 
-  const MAX_PROJECTS = 10
+  const MAX_PROJECTS = 20
 
   const handleOpenChange = (next: boolean) => {
     if (next && projectCount >= MAX_PROJECTS) {

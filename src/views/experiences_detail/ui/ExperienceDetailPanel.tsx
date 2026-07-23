@@ -21,7 +21,8 @@ import { Chip } from '@shared/ui/chip'
 import { Divider } from '@shared/ui/divider'
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
-import { formatPeriod, parsePeriodInput } from '@shared/lib'
+import { MonthPicker } from '@shared/ui/month_picker'
+import { formatDate, formatPeriod, monthToApiDate } from '@shared/lib'
 import { StarEditor } from './StarEditor'
 
 interface ExperienceDetailPanelProps {
@@ -99,7 +100,7 @@ const ExperienceDetailPanelContent = ({ workspaceId, experienceId, onClose }: { 
 
       <Divider />
 
-      <StarEditor workspaceId={workspaceId} experience={experience} />
+      <StarEditor key={experience.experienceId} workspaceId={workspaceId} experience={experience} />
     </Flex>
   )
 }
@@ -151,7 +152,8 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
   const [form, setForm] = useState({
     title: experience.title,
     role: experience.role ?? '',
-    period: formatPeriod(experience.period?.startAt, experience.period?.endAt)
+    periodStart: formatDate(experience.period?.startAt, 'YYYY.MM') || null,
+    periodEnd: formatDate(experience.period?.endAt, 'YYYY.MM') || null
   })
 
   const handleOpenChange = (next: boolean) => {
@@ -159,20 +161,24 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
       setForm({
         title: experience.title,
         role: experience.role ?? '',
-        period: formatPeriod(experience.period?.startAt, experience.period?.endAt)
+        periodStart: formatDate(experience.period?.startAt, 'YYYY.MM') || null,
+        periodEnd: formatDate(experience.period?.endAt, 'YYYY.MM') || null
       })
     setIsOpen(next)
   }
 
-  const setField = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
+  const setField = (key: 'title' | 'role') => (e: React.ChangeEvent<HTMLInputElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
     const trimmed = form.title.trim()
     if (!trimmed) {
       toast.warning('경험 제목을 입력해 주세요.', { id: 'experience-title-required', position: 'top-center' })
       return
     }
     const trimmedRole = form.role.trim()
+    const period =
+      form.periodStart || form.periodEnd ? { startAt: form.periodStart ? monthToApiDate(form.periodStart, 'start') : null, endAt: form.periodEnd ? monthToApiDate(form.periodEnd, 'end') : null } : null
     updateExperience(
       {
         experienceId: experience.experienceId,
@@ -182,7 +188,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
           tags: experience.tags,
           contents: experience.contents,
           role: trimmedRole || null,
-          period: parsePeriodInput(form.period)
+          period
         }
       },
       {
@@ -202,52 +208,56 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
           수정하기
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-150 gap-6">
+      <DialogContent className="w-160 gap-6">
         <DialogTitle>
           <Text variant="heading2" weight="semibold" color="text-basic">
             경험
           </Text>
         </DialogTitle>
 
-        <Flex direction="column" gap="4">
-          <Flex align="center" gap="4">
-            <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-              이름
-            </Text>
-            <div className="min-w-0 flex-1">
-              <Input value={form.title} onChange={setField('title')} placeholder="입력된 경험명" clearable={false} />
-            </div>
-          </Flex>
-          <Flex gap="5">
-            <Flex align="center" gap="4" className="flex-1">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <Flex direction="column" gap="4">
+            <Flex align="center" gap="4">
               <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-                역할
+                이름
               </Text>
               <div className="min-w-0 flex-1">
-                <Input value={form.role} onChange={setField('role')} placeholder="입력된 역할" clearable={false} />
+                <Input value={form.title} onChange={setField('title')} maxLength={20} placeholder="입력된 경험명" clearable={false} />
               </div>
             </Flex>
-            <Flex align="center" gap="4" className="flex-1">
-              <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
-                기간
-              </Text>
-              <div className="min-w-0 flex-1">
-                <Input value={form.period} onChange={setField('period')} placeholder="입력된 기간" clearable={false} />
-              </div>
+            <Flex gap="5">
+              <Flex align="center" gap="4" className="flex-1">
+                <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                  역할
+                </Text>
+                <div className="min-w-0 flex-1">
+                  <Input value={form.role} onChange={setField('role')} maxLength={20} placeholder="입력된 역할" clearable={false} />
+                </div>
+              </Flex>
+              <Flex align="center" gap="4" className="flex-1">
+                <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
+                  기간
+                </Text>
+                <Flex align="center" gap="2" className="min-w-0 flex-1">
+                  <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" />
+                  <span className="text-text-subtler">-</span>
+                  <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" />
+                </Flex>
+              </Flex>
             </Flex>
           </Flex>
-        </Flex>
 
-        <Flex gap="4">
-          <DialogClose asChild>
-            <Button variant="tertiary" size="lg" className="flex-1" disabled={isPending}>
-              취소
+          <Flex gap="4">
+            <DialogClose asChild>
+              <Button type="button" variant="tertiary" size="lg" className="flex-1" disabled={isPending}>
+                취소
+              </Button>
+            </DialogClose>
+            <Button type="submit" variant="primary" size="lg" className="flex-1" disabled={isPending}>
+              저장
             </Button>
-          </DialogClose>
-          <Button variant="primary" size="lg" className="flex-1" onClick={handleSubmit} disabled={isPending}>
-            저장
-          </Button>
-        </Flex>
+          </Flex>
+        </form>
       </DialogContent>
     </Dialog>
   )

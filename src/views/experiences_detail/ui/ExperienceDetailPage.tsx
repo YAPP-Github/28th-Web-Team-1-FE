@@ -1,6 +1,6 @@
 'use client'
 import { Suspense, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { useProject } from '@entities/project'
@@ -41,14 +41,15 @@ export const ExperienceDetailPage = () => {
 const ExperienceDetailContent = () => {
   const workspaceId = useWorkspaceId()
   const { projectId } = useParams<{ projectId: string }>()
+  const searchParams = useSearchParams()
   const { project } = useProject(workspaceId, projectId)
   const { experiences } = useProjectExperiences(workspaceId, projectId)
 
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(() => searchParams.get('experienceId'))
   const selectedExperience = experiences.find((experience) => experience.experienceId === selectedId) ?? null
 
   const handleSelect = (experienceId: string) => {
-    setSelectedId((prev) => (prev === experienceId ? null : experienceId))
+    setSelectedId(experienceId)
   }
 
   return (

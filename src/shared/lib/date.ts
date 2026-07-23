@@ -67,6 +67,20 @@ const formatPeriod = (startAt?: dayjs.ConfigType, endAt?: dayjs.ConfigType, form
   [formatDate(startAt, format), formatDate(endAt, format)].filter(Boolean).join(' - ')
 
 /**
+ * `'YYYY.MM'`(월 단위 선택값, `MonthPicker`가 주고받는 포맷)을 API 저장용 `'YYYY-MM-DD'`로 확장한다.
+ * 시작 경계는 그 달 1일, 종료 경계는 그 달 말일(윤년 반영)로 채운다. (`parsePeriodInput`과 동일 규약)
+ * @example
+ * ```ts
+ * monthToApiDate('2025.05', 'start') // '2025-05-01'
+ * monthToApiDate('2025.05', 'end')   // '2025-05-31'
+ * ```
+ */
+const monthToApiDate = (value: string, boundary: 'start' | 'end'): string => {
+  const first = dayjs(`${value.replace(/\./g, '-')}-01`)
+  return (boundary === 'start' ? first : first.endOf('month')).format('YYYY-MM-DD')
+}
+
+/**
  * 기간 입력 텍스트(`'2025.05 - 2025.08'` / `'2025.05'`)를 API 저장용 `{ startAt, endAt }`로 변환한다.
  * `formatPeriod`의 역변환. 각 날짜를 `YYYY-MM-DD`로 확장한다 — 월 단위(`YYYY.MM`)면 시작은 그 달 1일,
  * 종료는 그 달 말일(윤년 반영). 이미 일(day)까지 있으면 그대로, 파싱 불가하면 `null`.
@@ -97,4 +111,4 @@ const parsePeriodInput = (value: string): { startAt: string | null; endAt: strin
   return { startAt: toApiDate(start, 'start'), endAt: toApiDate(end, 'end') }
 }
 
-export { formatDate, formatPeriod, parsePeriodInput }
+export { formatDate, formatPeriod, parsePeriodInput, monthToApiDate }
