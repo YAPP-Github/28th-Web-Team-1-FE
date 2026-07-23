@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { PencilSparkles, RotateCcw, Trash2 } from 'lucide-react'
+import { RotateCcw, Trash2 } from 'lucide-react'
 import { ExperiencePickerDialog } from '@views/resume_create'
 import { Section } from './Section'
+import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
@@ -32,7 +33,7 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
       }
     >
       {fields.map((field, index) => (
-        <ExperienceSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} />
+        <ExperienceSectionItem key={field.id} sectionIndex={sectionIndex} index={index} targetJdId={targetJdId} onRemove={() => remove(index)} />
       ))}
 
       <ExperiencePickerDialog
@@ -48,7 +49,7 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
   )
 }
 
-const ExperienceSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: number; index: number; onRemove: () => void }) => {
+const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove }: { sectionIndex: number; index: number; targetJdId: string | null; onRemove: () => void }) => {
   const base = `sections.${sectionIndex}.items.${index}.payload.experience`
 
   return (
@@ -81,10 +82,13 @@ const ExperienceSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex
       <Flex direction={'column'} className={'gap-5 py-1'}>
         <FormTextarea name={`${base}.contents`} label={'세부내용'} />
 
-        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'}>
-          <PencilSparkles size={16} data-icon="inline-start" />
-          AI 첨삭
-        </Button>
+        <AiFeedbackDialog
+          jdId={targetJdId}
+          targets={[
+            { name: `${base}.name`, label: '경험명', kind: 'EXPERIENCE_TITLE', multiline: false },
+            { name: `${base}.contents`, label: '세부내용', kind: 'EXPERIENCE_DESCRIPTION', multiline: true }
+          ]}
+        />
       </Flex>
     </Flex>
   )

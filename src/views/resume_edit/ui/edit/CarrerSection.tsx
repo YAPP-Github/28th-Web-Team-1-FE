@@ -1,8 +1,9 @@
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { PencilSparkles, Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { Section } from './Section'
+import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
@@ -73,10 +74,7 @@ const CareerSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: nu
       <Flex direction={'column'} className={'gap-5 py-1'}>
         <FormTextarea name={`${base}.contents`} label={'세부내용'} />
 
-        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'}>
-          <PencilSparkles size={16} data-icon="inline-start" />
-          AI 첨삭
-        </Button>
+        <AiFeedbackDialog targets={[{ name: `${base}.contents`, label: '세부내용', kind: 'CAREER_DESCRIPTION', multiline: true }]} />
       </Flex>
     </Flex>
   )

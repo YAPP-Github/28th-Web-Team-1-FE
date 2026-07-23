@@ -24,22 +24,22 @@ export const JDAnalysisForm = () => {
   const { mutate: registerJd, isPending } = useRegisterJd(workspaceId)
 
   const handleRegister = (request: JdRegisterInput) => {
+    const toastId = toast.loading('채용공고를 분석하고 있어요', {
+      position: 'top-center'
+    })
     registerJd(request, {
       onSuccess: (res) => {
+        toast.dismiss(toastId)
         if (res.jd) {
           router.push(`/home/resume/create?jdId=${res.jd.jdId}`)
         } else if (res.candidates?.length) {
           setCandidates(res.candidates)
           setPhase('SELECT_POSITION')
-        } else {
-          toast('분석 결과를 찾지 못했어요. 다른 공고로 시도해 주세요.', {
-            position: 'top-center'
-          })
         }
       },
       onError: (err) => {
-        // Todo: graphQL 에러 처리 필요
-        toast(err.message, {
+        toast.error(err.message, {
+          id: toastId,
           position: 'top-center'
         })
       }

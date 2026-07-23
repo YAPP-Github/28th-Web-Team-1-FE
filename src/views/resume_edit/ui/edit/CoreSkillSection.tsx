@@ -1,8 +1,7 @@
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
-import { Button } from '@shared/ui'
-import { PencilSparkles } from 'lucide-react'
 import { Section } from './Section'
+import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { FormTextarea } from '../form/FormTextarea'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 
@@ -20,13 +19,12 @@ export const CoreSkillSection = ({ title, sectionIndex }: { title: string; secti
 }
 
 const CoreSkillItem = ({ sectionIndex, index }: { sectionIndex: number; index: number }) => {
+  const contentName = `sections.${sectionIndex}.items.${index}.payload.coreSkill.content`
+
   return (
     <Flex direction={'column'} className={'gap-5 py-1'}>
-      <FormTextarea name={`sections.${sectionIndex}.items.${index}.payload.coreSkill.content`} label={'내용'} />
-      <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'}>
-        <PencilSparkles size={16} data-icon="inline-start" />
-        AI 첨삭
-      </Button>
+      <FormTextarea name={contentName} label={'내용'} />
+      <AiFeedbackDialog targets={[{ name: contentName, label: '내용', kind: 'CORE_COMPETENCY', multiline: true }]} />
     </Flex>
   )
 }

@@ -126,6 +126,31 @@ export type PeriodInput = {
   startAt?: string | null | undefined;
 };
 
+/** 프로필 텍스트 AI 다듬기 입력입니다. */
+export type PolishProfileTextRequest = {
+  /** 직접 작성 지침입니다. 어투, 강조할 수치 등을 자유롭게 적습니다. (최대 200자) */
+  instruction?: string | null | undefined;
+  /** JD ID입니다. 주면 해당 JD의 지원 전략을 반영해 다듬습니다. workspaceId와 함께 사용합니다. */
+  jdId?: string | number | null | undefined;
+  /** 다듬기 대상 항목입니다. 항목별 글자수 제한에 맞춰 다듬습니다. */
+  kind: ProfilePolishKind;
+  /** 작성 구조입니다. (불렛형/문제-해결-성과/산문형, 미지정 시 원문 형식 유지) */
+  structure?: PolishStructure | null | undefined;
+  /** 다듬을 원문입니다. (최대 500자) */
+  text: string;
+  /** 경험명입니다. 경험 세부 내용을 다듬을 때 맥락으로 사용됩니다. (최대 100자) */
+  title?: string | null | undefined;
+};
+
+/** 첨삭 결과의 작성 구조입니다. */
+export type PolishStructure =
+  /** 불렛형 */
+  | 'BULLET'
+  /** 문제-해결-성과 */
+  | 'PROBLEM_SOLUTION_RESULT'
+  /** 산문형 */
+  | 'PROSE';
+
 /** 수상 입력입니다. */
 export type ProfileAwardRequest = {
   /** 수상일입니다. (YYYY-MM-DD) */
@@ -181,6 +206,17 @@ export type ProfileLanguageTestRequest = {
   /** 시험명입니다. */
   testName?: string | null | undefined;
 };
+
+/** 프로필 텍스트 다듬기 대상 항목입니다. */
+export type ProfilePolishKind =
+  /** 경력 세부 내용 (최대 500자) */
+  | 'CAREER_DESCRIPTION'
+  /** 핵심역량 (최대 500자) */
+  | 'CORE_COMPETENCY'
+  /** 경험 STAR 설명 (최대 500자) */
+  | 'EXPERIENCE_DESCRIPTION'
+  /** 경험명 (최대 48자) */
+  | 'EXPERIENCE_TITLE';
 
 /** 스킬 입력입니다. */
 export type ProfileSkillRequest = {
@@ -617,6 +653,14 @@ export type UpdateProfileMutationVariables = Exact<{
 
 
 export type UpdateProfileMutation = { updateProfile: { profileId: string } };
+
+export type PolishProfileTextMutationVariables = Exact<{
+  request: PolishProfileTextRequest;
+  workspaceId?: string | number | null | undefined;
+}>;
+
+
+export type PolishProfileTextMutation = { polishProfileText: string };
 
 export type ProjectListItemFragment = { projectId: string, name: string };
 
@@ -1149,6 +1193,11 @@ export const UpdateProfileDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateProfileMutation, UpdateProfileMutationVariables>;
+export const PolishProfileTextDocument = new TypedDocumentString(`
+    mutation PolishProfileText($request: PolishProfileTextRequest!, $workspaceId: ID) {
+  polishProfileText(request: $request, workspaceId: $workspaceId)
+}
+    `) as unknown as TypedDocumentString<PolishProfileTextMutation, PolishProfileTextMutationVariables>;
 export const ProjectsDocument = new TypedDocumentString(`
     query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {
   projectList: experienceProjects(
