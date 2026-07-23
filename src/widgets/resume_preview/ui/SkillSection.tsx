@@ -6,9 +6,9 @@ import { Section } from './Section'
 export const SkillSection = ({ title, items }: { title: string; items: ResumeSkillFieldsFragment[] }) => {
   return (
     <Section title={title}>
-      <Grid columns={'2'} className={'w-full gap-15'}>
+      <Grid columns={'2'} className={'w-full gap-x-16 gap-y-1.5'}>
         {items.map((item, index) => (
-          <Flex key={index} gap="2">
+          <Flex key={index} justify={'between'}>
             <Text variant="caption1" color={'text-bolder'} className={'min-w-0 truncate'}>
               {item.name}
             </Text>
