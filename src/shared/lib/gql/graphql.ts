@@ -552,6 +552,14 @@ export type JdMetaQueryVariables = Exact<{
 
 export type JdMetaQuery = { jd: { companyName: string, positionTitle: string } | null };
 
+export type JdDetailQueryVariables = Exact<{
+  workspaceId: string | number;
+  jdId: string | number;
+}>;
+
+
+export type JdDetailQuery = { jd: { companyIntro: string, responsibilities: Array<string>, requiredExperiences: Array<string>, preferredExperiences: Array<string>, hiringProcess: Array<string> } | null };
+
 export type RegisterJdMutationVariables = Exact<{
   workspaceId: string | number;
   request: JdRegisterRequest;
@@ -1012,6 +1020,17 @@ export const JdMetaDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<JdMetaQuery, JdMetaQueryVariables>;
+export const JdDetailDocument = new TypedDocumentString(`
+    query JdDetail($workspaceId: ID!, $jdId: ID!) {
+  jd(workspaceId: $workspaceId, id: $jdId) {
+    companyIntro
+    responsibilities
+    requiredExperiences
+    preferredExperiences
+    hiringProcess
+  }
+}
+    `) as unknown as TypedDocumentString<JdDetailQuery, JdDetailQueryVariables>;
 export const RegisterJdDocument = new TypedDocumentString(`
     mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {
   registerJd(workspaceId: $workspaceId, request: $request) {
