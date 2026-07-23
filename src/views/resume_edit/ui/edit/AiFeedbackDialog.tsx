@@ -119,7 +119,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className={'bg-bg-gray-subtler flex w-254 p-3'}>
+      <DialogContent className={'bg-bg-gray-subtler flex w-254 p-3'} onOpenAutoFocus={(event) => event.preventDefault()}>
         {/* 좌측: 지원전략(JD 컨텍스트) + AI 편집 지침 */}
         <Flex direction="column" flexGrow={'1'} flexBasis={'0'} minWidth={'0'} p={'4'}>
           <Flex direction={'column'} gap={'4'} flexShrink={'0'}>
