@@ -1,7 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useFormContext, type FieldPath } from 'react-hook-form'
-import { Flex } from '@radix-ui/themes'
+import { Flex, Skeleton } from '@radix-ui/themes'
 import { ArrowRight, PencilSparkles } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Dialog, DialogContent, DialogTrigger } from '@shared/ui/dialog'
@@ -10,6 +10,7 @@ import { HelpTooltip } from '@shared/ui/tooltip'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
 import { usePolishProfileText } from '@entities/profile'
+import { useJdInsight } from '@entities/jd'
 import { useWorkspaceId } from '@entities/user'
 import type { PolishProfileTextRequest, PolishStructure, ProfilePolishKind } from '@shared/lib/gql/graphql'
 import type { ResumeFormValues } from '../../model/resume-form.types'
@@ -123,8 +124,15 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
         <Flex direction="column" flexGrow={'1'} flexBasis={'0'} minWidth={'0'} p={'4'}>
           <Flex direction={'column'} gap={'4'} flexShrink={'0'}>
             <Text variant={'headline1'}>지원전략</Text>
-            {/* 대상 JD 기반 지원전략 텍스트 자리표시자 — 추후 실제 데이터 연결 */}
-            <Text>대상 채용공고를 기준으로 한 지원전략이 여기에 표시됩니다.</Text>
+            {jdId ? (
+              <Suspense fallback={<JdStrategyLoading />}>
+                <JdStrategy workspaceId={workspaceId} jdId={jdId} />
+              </Suspense>
+            ) : (
+              <Text variant={'label2'} color={'text-subtler'}>
+                연결된 채용공고가 없어요.
+              </Text>
+            )}
           </Flex>
 
           <Spacing size={40} />
@@ -158,7 +166,8 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
             <Spacing size={12} />
 
             <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'} onClick={handleGenerate} disabled={isGenerating}>
-              {isGenerating ? 'AI 수정 중...' : 'AI 수정 시작'} <ArrowRight data-icon="inline-end" />
+              AI 수정 시작
+              <ArrowRight data-icon="inline-end" />
             </Button>
           </Flex>
         </Flex>
@@ -172,8 +181,20 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
           <Flex direction={'column'} gap={'4'} className={'min-h-0 flex-1 overflow-y-auto'}>
             {targets.map((target) => (
               <Flex key={target.name} direction={'column'} gap={'2'}>
-                {target.multiline ? (
-                  <Textarea label={target.label} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} />
+                {isGenerating ? (
+                  <>
+                    <Text variant={'label1'} weight={'semibold'} className={'truncate'}>
+                      {target.label}
+                    </Text>
+                    <Flex direction={'column'} gap={'2'} className={`border-border-subtle rounded-lg border ${target.multiline ? 'h-50 p-4' : 'h-11.75 px-4 py-3'}`}>
+                      {/* Textarea는 여러 줄, Input은 한 줄 */}
+                      {Array.from({ length: target.multiline ? 4 : 1 }).map((_, index, lines) => (
+                        <Skeleton key={`${target.name}-skeleton-${index}`} height={'14px'} width={lines.length > 1 && index === lines.length - 1 ? '60%' : '100%'} />
+                      ))}
+                    </Flex>
+                  </>
+                ) : target.multiline ? (
+                  <Textarea label={target.label} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} className={'h-50'} />
                 ) : (
                   <Input label={target.label} clearable={false} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} />
                 )}
@@ -196,3 +217,31 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
     </Dialog>
   )
 }
+
+/** 대상 JD의 지원 전략(서술형 문단)을 Suspense로 조회해 보여준다. `jdId`가 있을 때만 렌더한다. */
+const JdStrategy = ({ workspaceId, jdId }: { workspaceId: string; jdId: string }) => {
+  const { insight } = useJdInsight(workspaceId, jdId)
+
+  if (!insight) {
+    return (
+      <Text variant={'label2'} color={'text-subtler'}>
+        지원전략을 불러오지 못했어요.
+      </Text>
+    )
+  }
+
+  return (
+    <Text variant={'label2'} color={'text-subtle'}>
+      {insight.strategy}
+    </Text>
+  )
+}
+
+/** 지원전략(AI 생성) 로딩 스켈레톤. */
+const JdStrategyLoading = () => (
+  <Flex direction={'column'} gap={'1'}>
+    <Skeleton height={'14px'} width={'100%'} />
+    <Skeleton height={'14px'} width={'100%'} />
+    <Skeleton height={'14px'} width={'80%'} />
+  </Flex>
+)
