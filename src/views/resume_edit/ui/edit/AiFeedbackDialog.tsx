@@ -1,5 +1,6 @@
 'use client'
 import { Suspense, useState } from 'react'
+import { ErrorBoundary } from '@sentry/nextjs'
 import { useFormContext, type FieldPath } from 'react-hook-form'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { ArrowRight, PencilSparkles } from 'lucide-react'
@@ -125,9 +126,17 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
           <Flex direction={'column'} gap={'4'} flexShrink={'0'}>
             <Text variant={'headline1'}>지원전략</Text>
             {jdId ? (
-              <Suspense fallback={<JdStrategyLoading />}>
-                <JdStrategy workspaceId={workspaceId} jdId={jdId} />
-              </Suspense>
+              <ErrorBoundary
+                fallback={
+                  <Text variant={'label2'} color={'text-subtler'}>
+                    지원전략을 불러오지 못했어요.
+                  </Text>
+                }
+              >
+                <Suspense fallback={<JdStrategyLoading />}>
+                  <JdStrategy workspaceId={workspaceId} jdId={jdId} />
+                </Suspense>
+              </ErrorBoundary>
             ) : (
               <Text variant={'label2'} color={'text-subtler'}>
                 연결된 채용공고가 없어요.
@@ -218,14 +227,19 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
   )
 }
 
-/** 대상 JD의 지원 전략(서술형 문단)을 Suspense로 조회해 보여준다. `jdId`가 있을 때만 렌더한다. */
+/**
+ * 대상 JD의 지원 전략(서술형 문단)을 Suspense로 조회해 보여준다. `jdId`가 있을 때만 렌더한다.
+ * 네트워크·GraphQL 오류는 `useSuspenseQuery`가 throw → 상위 `ErrorBoundary`가 처리한다(여기선 못 잡음).
+ * 아래 `!insight`는 스키마상 nullable인 `jdInsight` 필드를 서버가 null로 반환한 정상 케이스만 다룬다.
+ */
 const JdStrategy = ({ workspaceId, jdId }: { workspaceId: string; jdId: string }) => {
   const { insight } = useJdInsight(workspaceId, jdId)
 
+  // 오류가 아니라 '인사이트 없음'(nullable 필드) 상태.
   if (!insight) {
     return (
       <Text variant={'label2'} color={'text-subtler'}>
-        지원전략을 불러오지 못했어요.
+        지원전략이 아직 없어요.
       </Text>
     )
   }
