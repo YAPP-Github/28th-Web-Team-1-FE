@@ -4,6 +4,7 @@ import { type JdRegisterInput } from '../model/jd.types'
 export const jdAPI = {
   getJdInsight: (variables: { workspaceId: string; jdId: string }) => execute(jdInsightDocument, variables),
   getJdMeta: (variables: { workspaceId: string; jdId: string }) => execute(jdMetaDocument, variables),
+  getJdDetail: (variables: { workspaceId: string; jdId: string }) => execute(jdDetailDocument, variables),
   registerJd: (variables: { workspaceId: string; request: JdRegisterInput }) => execute(registerJdDocument, variables)
 }
 
@@ -21,6 +22,18 @@ const jdMetaDocument = graphql(`
     jd(workspaceId: $workspaceId, id: $jdId) {
       companyName
       positionTitle
+    }
+  }
+`)
+
+const jdDetailDocument = graphql(`
+  query JdDetail($workspaceId: ID!, $jdId: ID!) {
+    jd(workspaceId: $workspaceId, id: $jdId) {
+      companyIntro
+      responsibilities
+      requiredExperiences
+      preferredExperiences
+      hiringProcess
     }
   }
 `)

@@ -25,6 +25,7 @@ type Documents = {
     "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": typeof types.DeleteExperienceDocument,
     "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": typeof types.JdInsightDocument,
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": typeof types.JdMetaDocument,
+    "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n": typeof types.JdDetailDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": typeof types.RegisterJdDocument,
     "\n  mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {\n    connectNotion(workspaceId: $workspaceId, request: $request) {\n      connectionId\n      notionWorkspaceName\n      notionWorkspaceIcon\n    }\n  }\n": typeof types.ConnectNotionDocument,
     "\n  query NotionConnections($workspaceId: ID!, $size: Int!) {\n    notionConnections(workspaceId: $workspaceId, size: $size) {\n      connections {\n        connectionId\n        notionWorkspaceName\n        notionWorkspaceIcon\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": typeof types.NotionConnectionsDocument,
@@ -67,6 +68,7 @@ const documents: Documents = {
     "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": types.DeleteExperienceDocument,
     "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": types.JdInsightDocument,
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": types.JdMetaDocument,
+    "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n": types.JdDetailDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": types.RegisterJdDocument,
     "\n  mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {\n    connectNotion(workspaceId: $workspaceId, request: $request) {\n      connectionId\n      notionWorkspaceName\n      notionWorkspaceIcon\n    }\n  }\n": types.ConnectNotionDocument,
     "\n  query NotionConnections($workspaceId: ID!, $size: Int!) {\n    notionConnections(workspaceId: $workspaceId, size: $size) {\n      connections {\n        connectionId\n        notionWorkspaceName\n        notionWorkspaceIcon\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": types.NotionConnectionsDocument,
@@ -139,6 +141,10 @@ export function graphql(source: "\n  query JdInsight($workspaceId: ID!, $jdId: I
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n"): typeof import('./graphql').JdMetaDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n"): typeof import('./graphql').JdDetailDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
