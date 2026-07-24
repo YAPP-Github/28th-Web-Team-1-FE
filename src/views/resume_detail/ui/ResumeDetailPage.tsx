@@ -167,14 +167,13 @@ const JDSource = ({ workspaceId, jdId }: { workspaceId: string; jdId: string }) 
   )
 }
 
-/** 'AI 인사이트' 탭 본문. 등록 시 AI가 생성해 저장한 공고 핵심·지원 전략을 보여준다. */
+/** 'AI 인사이트' 탭 본문. 등록 시 AI가 생성해 저장한 지원 전략을 보여준다. */
 const JDInsight = ({ workspaceId, jdId }: { workspaceId: string; jdId: string }) => {
   const { insight } = useJdInsight(workspaceId, jdId)
   if (!insight) return <JDPlaceholder>AI 인사이트 정보가 없어요.</JDPlaceholder>
 
   return (
     <Flex direction={'column'} gap={'7'}>
-      {/*<JDParagraphSection title={'공고 핵심'} content={insight.keyPoints} />*/}
       <JDParagraphSection title={'지원 전략'} content={insight.strategy} />
     </Flex>
   )

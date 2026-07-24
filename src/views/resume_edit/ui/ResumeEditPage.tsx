@@ -66,7 +66,7 @@ const applyCoreCompetencyToForm = (form: UseFormReturn<ResumeFormValues>, coreCo
       itemId: null,
       displayOrder: nextDisplayOrder(items),
       visible: true,
-      payload: { ...emptyItemPayload, coreSkill: { content: coreCompetency } }
+      payload: { ...emptyItemPayload, coreSkill: { content: coreCompetency, isInitialItem: false } }
     }
     form.setValue(`sections.${sectionIndex}.items`, [newItem], { shouldDirty: true, shouldValidate: true })
     return
@@ -74,6 +74,13 @@ const applyCoreCompetencyToForm = (form: UseFormReturn<ResumeFormValues>, coreCo
 
   form.setValue(`sections.${sectionIndex}.items.0.payload.coreSkill.content`, coreCompetency, { shouldDirty: true, shouldValidate: true })
 }
+
+/**
+ * CORE_SKILL 섹션에 '이력서 최초 생성 과정에서 만들어진' 아이템(isInitialItem)이 아직 남아 있으면
+ * AI 핵심역량이 채워지지 않은 상태라 자동 생성이 필요하다.
+ * 한번 생성하면 서버가 아이템을 비-초기로 기록하므로, 이후 진입에서는 사용자가 편집한 내용을 덮어쓰지 않는다.
+ */
+const needsCoreCompetency = (resume: ResumeQuery['resume']) => resume.sections.some((section) => section.type === 'CORE_SKILL' && section.items.some((item) => item.payload.coreSkill?.isInitialItem))
 
 const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const router = useRouter()
@@ -90,7 +97,9 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
     if (hasGeneratedRef.current) return
     hasGeneratedRef.current = true
 
-    // TODO: 백엔드가 resume 조회에 '핵심역량 생성 필요' 판단 필드를 추가하면 여기서 분기해 조기 return.
+    // 최초 생성 아이템(isInitialItem)이 아직 남아 있을 때만 생성한다. 이미 채워진(사용자 편집) 경우 재생성하지 않는다.
+    if (!needsCoreCompetency(resume)) return
+
     void generateCoreCompetency({ workspaceId, jdId: resume.targetJd?.jdId ?? null })
       .then(({ coreCompetency }) => applyCoreCompetencyToForm(form, coreCompetency))
       .catch(() => toast.error('핵심역량 생성에 실패했어요. 잠시 후 다시 시도해주세요.'))

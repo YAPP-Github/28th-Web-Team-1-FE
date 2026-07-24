@@ -418,10 +418,13 @@ type Mutation {
     workspaceId: ID!
   ): Boolean!
 
-  """프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성합니다. 결과만 반환하고 저장하지 않습니다."""
+  """
+  프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성합니다.
+  생성 결과는 응답으로만 반환하고, 이력서에는 생성 성공 여부만 기록합니다.
+  """
   generateCoreCompetency(
     """
-    JD ID입니다. 주면 해당 JD의 지원 전략(strategy)을 기준으로 핵심역량을 생성하고 전략을 함께 반환합니다. (선택)
+    JD ID입니다. 주면 해당 JD 내용을 반영해 핵심역량을 생성하고 화면 표시용 지원 전략(strategy)을 함께 반환합니다. (선택)
     """
     jdId: ID = null
 
@@ -1138,12 +1141,18 @@ input ResumeCertificatePayloadInput {
 type ResumeCoreSkillPayload {
   """핵심 역량 내용입니다."""
   content: String
+
+  """이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다."""
+  isInitialItem: Boolean!
 }
 
 """핵심 역량 payload 입력입니다."""
 input ResumeCoreSkillPayloadInput {
   """핵심 역량 내용입니다."""
   content: String
+
+  """이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다."""
+  isInitialItem: Boolean! = false
 }
 
 """학력 payload 응답입니다."""

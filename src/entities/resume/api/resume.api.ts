@@ -71,6 +71,7 @@ export const resumeBasicInfoFields = graphql(`
 export const resumeCoreSkillFields = graphql(`
   fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {
     content
+    isInitialItem
   }
 `)
 

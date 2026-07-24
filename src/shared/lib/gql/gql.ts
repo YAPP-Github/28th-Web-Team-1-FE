@@ -23,7 +23,7 @@ type Documents = {
     "\n  mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {\n    createExperience(workspaceId: $workspaceId, request: $request) {\n      experienceId\n    }\n  }\n": typeof types.CreateExperienceDocument,
     "\n  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {\n    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {\n      experienceId\n    }\n  }\n": typeof types.UpdateExperienceDocument,
     "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": typeof types.DeleteExperienceDocument,
-    "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": typeof types.JdInsightDocument,
+    "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      strategy\n    }\n  }\n": typeof types.JdInsightDocument,
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": typeof types.JdMetaDocument,
     "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n": typeof types.JdDetailDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": typeof types.RegisterJdDocument,
@@ -47,7 +47,7 @@ type Documents = {
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": typeof types.CreateResumeDocument,
     "\n  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {\n    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {\n      resumeId\n    }\n  }\n": typeof types.UpdateResumeDocument,
     "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": typeof types.ResumeBasicInfoFieldsFragmentDoc,
-    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n": typeof types.ResumeCoreSkillFieldsFragmentDoc,
+    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n    isInitialItem\n  }\n": typeof types.ResumeCoreSkillFieldsFragmentDoc,
     "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeCareerFieldsFragmentDoc,
     "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeExperienceFieldsFragmentDoc,
     "\n  fragment ResumeEducationFields on ResumeEducationPayload {\n    schoolName\n    major\n    degree\n    status\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeEducationFieldsFragmentDoc,
@@ -68,7 +68,7 @@ const documents: Documents = {
     "\n  mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {\n    createExperience(workspaceId: $workspaceId, request: $request) {\n      experienceId\n    }\n  }\n": types.CreateExperienceDocument,
     "\n  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {\n    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {\n      experienceId\n    }\n  }\n": types.UpdateExperienceDocument,
     "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": types.DeleteExperienceDocument,
-    "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": types.JdInsightDocument,
+    "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      strategy\n    }\n  }\n": types.JdInsightDocument,
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": types.JdMetaDocument,
     "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n": types.JdDetailDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": types.RegisterJdDocument,
@@ -92,7 +92,7 @@ const documents: Documents = {
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": types.CreateResumeDocument,
     "\n  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {\n    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {\n      resumeId\n    }\n  }\n": types.UpdateResumeDocument,
     "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": types.ResumeBasicInfoFieldsFragmentDoc,
-    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n": types.ResumeCoreSkillFieldsFragmentDoc,
+    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n    isInitialItem\n  }\n": types.ResumeCoreSkillFieldsFragmentDoc,
     "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeCareerFieldsFragmentDoc,
     "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeExperienceFieldsFragmentDoc,
     "\n  fragment ResumeEducationFields on ResumeEducationPayload {\n    schoolName\n    major\n    degree\n    status\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeEducationFieldsFragmentDoc,
@@ -140,7 +140,7 @@ export function graphql(source: "\n  mutation DeleteExperience($workspaceId: ID!
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n"): typeof import('./graphql').JdInsightDocument;
+export function graphql(source: "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      strategy\n    }\n  }\n"): typeof import('./graphql').JdInsightDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -236,7 +236,7 @@ export function graphql(source: "\n  fragment ResumeBasicInfoFields on ResumeBas
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n"): typeof import('./graphql').ResumeCoreSkillFieldsFragmentDoc;
+export function graphql(source: "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n    isInitialItem\n  }\n"): typeof import('./graphql').ResumeCoreSkillFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
