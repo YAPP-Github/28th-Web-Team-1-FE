@@ -177,10 +177,9 @@ const ResumeSectionCard = ({ instance, onSave, onDelete }: ResumeSectionCardProp
   const config = RESUME_SECTIONS[instance.type]
   const {
     control,
-    handleSubmit,
+    getValues,
     formState: { isDirty }
   } = useForm<Record<string, string>>({ defaultValues: instance.values })
-  const onSubmit = handleSubmit((values) => onSave(values))
 
   return (
     <Dialog>
@@ -225,7 +224,7 @@ const ResumeSectionCard = ({ instance, onSave, onDelete }: ResumeSectionCardProp
         </Grid>
         <div className="flex w-full flex-col items-center gap-2.5">
           <DialogClose asChild>
-            <Button variant="primary" size="lg" fullWidth disabled={!isDirty} onClick={onSubmit}>
+            <Button variant="primary" size="lg" fullWidth disabled={!isDirty} onClick={() => onSave(getValues())}>
               저장
             </Button>
           </DialogClose>
