@@ -102,7 +102,7 @@ const ExperienceDetailPanelSkeleton = () => (
             </Text>
           </Flex>
           <Skeleton className="min-w-0 flex-1">
-            <div className="min-h-32 w-full rounded-lg" />
+            <div className="min-h-30 w-full rounded-lg" />
           </Skeleton>
         </Flex>
       ))}

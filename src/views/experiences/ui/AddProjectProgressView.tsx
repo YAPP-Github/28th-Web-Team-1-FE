@@ -42,6 +42,13 @@ export const AddProjectProgressView = ({ isComplete, onCancel }: AddProjectProgr
     return () => clearTimeout(timer)
   }, [isComplete])
 
+  useEffect(() => {
+    if (!isSuccess) return
+    // 성공 화면을 3초간 보여준 뒤 자동으로 닫는다.
+    const timer = setTimeout(() => onCancel(), 3000)
+    return () => clearTimeout(timer)
+  }, [isSuccess, onCancel])
+
   // 완료되면 실제 진행률과 무관하게 100%로 표시한다.
   const displayProgress = isComplete ? 100 : Math.round(progress)
   // 진행률을 단계 수로 나눠, 몫을 넘긴 단계까지 체크 처리한다. (100%에서 마지막 단계 체크)
@@ -144,9 +151,22 @@ const RollingNumber = ({ value }: { value: number }) => {
 const SuccessView = () => {
   return (
     <Flex direction="column" align="center" className="gap-10 py-10">
-      <span className="bg-element-primary ring-element-primary-lighter flex size-15 items-center justify-center rounded-full ring-10">
-        <Check size={33.75} className="text-icon-inverse" strokeWidth={2.81} />
-      </span>
+      <motion.span
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 18, delay: 0.05 }}
+        className="bg-element-primary ring-element-primary-lighter relative flex size-15 items-center justify-center rounded-full ring-10"
+      >
+        <motion.span
+          initial={{ scale: 1, opacity: 0.6 }}
+          animate={{ scale: 1.6, opacity: 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
+          className="bg-element-primary-lighter absolute inset-0 rounded-full"
+        />
+        <motion.span initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 600, damping: 20, delay: 0.22 }}>
+          <Check size={33.75} className="text-icon-inverse" strokeWidth={2.81} />
+        </motion.span>
+      </motion.span>
       <Flex direction="column" align="center" className="gap-1">
         <DialogDescription className="text-body1 text-text-subtler">정리된 경험을 확인하고 이력서에 활용해 보세요.</DialogDescription>
         <DialogTitle className="text-title3 text-text-basic font-bold">경험을 성공적으로 가져왔어요!</DialogTitle>
