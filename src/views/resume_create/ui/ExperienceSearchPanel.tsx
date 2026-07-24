@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react'
 import { Flex } from '@radix-ui/themes'
-import { SearchField, Spacing } from '@shared/ui'
+import { SearchField, Spacing, Text } from '@shared/ui'
 import { useMatchedExperiences } from '@entities/experience'
 import { ProjectFilter, PROJECT_FILTER, type ProjectFilterValue, ProjectFilterLoading } from './ProjectFilter'
 import { ExperienceCard, ExperienceCardSkeleton } from './ExperienceCard'
@@ -53,6 +53,32 @@ const ExperienceList = ({ workspaceId, jdId, search, projectFilter, isSelected, 
   const { experiences } = useMatchedExperiences(workspaceId, jdId)
   const browseList = sortByMatchRateDesc(experiences)
   const filtered = browseList.filter((experience) => matchesSearch(experience, search) && matchesProject(experience, projectFilter))
+
+  if (filtered.length === 0) {
+    if (projectFilter !== PROJECT_FILTER.recommended) {
+      return (
+        <Flex direction={'column'} align={'center'} className={'m-auto'}>
+          <Text variant={'label1'} color={'text-subtle'}>
+            채용 공고와 맞는 경험을 찾지 못했어요
+          </Text>
+          <Text variant={'caption1'} color={'text-subtler'}>
+            관련 경험을 추가하거나 다른 경험을 선택해보세요
+          </Text>
+        </Flex>
+      )
+    }
+
+    return (
+      <Flex direction={'column'} align={'center'} className={'m-auto'}>
+        <Text variant={'label1'} color={'text-subtle'}>
+          프로젝트에 등록된 경험이 없어요
+        </Text>
+        <Text variant={'caption1'} color={'text-subtler'}>
+          관련 경험을 추가해 주세요
+        </Text>
+      </Flex>
+    )
+  }
 
   return (
     <Flex direction={'column'} gap={'2'} minHeight={'0'} flexGrow={'1'} className={'overflow-y-auto'}>
