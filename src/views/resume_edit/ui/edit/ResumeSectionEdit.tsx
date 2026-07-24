@@ -21,9 +21,9 @@ export const ResumeSectionEdit = ({ section, sectionIndex, targetJdId }: { secti
     case 'BASIC_INFO':
       return <BasicInfoSection title={displayText} sectionIndex={sectionIndex} />
     case 'CAREER':
-      return <CareerSection title={displayText} sectionIndex={sectionIndex} />
+      return <CareerSection title={displayText} sectionIndex={sectionIndex} targetJdId={targetJdId} />
     case 'CORE_SKILL':
-      return <CoreSkillSection title={displayText} sectionIndex={sectionIndex} />
+      return <CoreSkillSection title={displayText} sectionIndex={sectionIndex} targetJdId={targetJdId} />
     case 'EXPERIENCE':
       return <ExperienceSection title={displayText} sectionIndex={sectionIndex} targetJdId={targetJdId} />
     case 'EDUCATION':

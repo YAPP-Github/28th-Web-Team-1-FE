@@ -214,9 +214,6 @@ type Experiences {
 
   """조회된 경험 목록입니다."""
   experiences: [Experience!]!
-
-  """JD 기준 지원 전략입니다. experiences 조회에 jdId를 준 경우에만 채워집니다."""
-  strategy: String
 }
 
 """FREE 형식의 경험 상세 내용입니다."""
@@ -257,7 +254,7 @@ type Jd {
   """전형 절차 목록입니다."""
   hiringProcess: [String!]!
 
-  """등록 시 AI가 생성해 저장한 공고 핵심과 지원 전략입니다."""
+  """JD 등록 시 워크스페이스 프로필을 기반으로 생성해 저장한 지원 전략입니다."""
   insight: JdInsight!
 
   """JD를 식별하는 ID입니다."""
@@ -296,9 +293,6 @@ type JdCandidate {
 
 """JD의 AI 인사이트입니다."""
 type JdInsight {
-  """공고 핵심입니다. 공고가 원하는 인재상/핵심 요구를 요약한 서술형 문단입니다."""
-  keyPoints: String!
-
   """지원 전략입니다. 어떤 경험을 어떻게 강조하면 좋을지 조언하는 서술형 문단입니다."""
   strategy: String!
 }
@@ -427,6 +421,9 @@ type Mutation {
     JD ID입니다. 주면 해당 JD 내용을 반영해 핵심역량을 생성하고 화면 표시용 지원 전략(strategy)을 함께 반환합니다. (선택)
     """
     jdId: ID = null
+
+    """생성 여부를 기록할 이력서 ID입니다."""
+    resumeId: ID!
 
     """워크스페이스 ID입니다."""
     workspaceId: ID!
@@ -1010,6 +1007,9 @@ type Query {
 
 """이력서 상세 응답입니다."""
 type Resume {
+  """PROFILE_CORE_COMPETENCY_GENERATION을 성공적으로 수행했는지 여부입니다."""
+  coreCompetencyGenerated: Boolean!
+
   """생성 시각입니다."""
   createdAt: String!
 
@@ -1424,6 +1424,9 @@ enum ResumeStatusType {
 
 """이력서 목록용 요약 응답입니다."""
 type ResumeSummary {
+  """PROFILE_CORE_COMPETENCY_GENERATION을 성공적으로 수행했는지 여부입니다."""
+  coreCompetencyGenerated: Boolean!
+
   """생성 시각입니다."""
   createdAt: String!
 

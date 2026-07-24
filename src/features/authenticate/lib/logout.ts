@@ -1,6 +1,6 @@
 'use server'
 import { cookies } from 'next/headers'
-import { clearAuthCookies } from '@/src/shared/lib'
+import { clearAuthCookies } from '@shared/lib/auth'
 
 const API_URL = process.env.API_URL
 /**

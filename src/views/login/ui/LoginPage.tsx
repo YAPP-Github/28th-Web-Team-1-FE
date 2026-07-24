@@ -1,12 +1,16 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
-import { GoogleLoginButton } from '@features/authenticate'
+import { AuthErrorToast, GoogleLoginButton } from '@features/authenticate'
 import { Button, Heading, Text } from '@shared/ui'
 import { Logo } from '@shared/icon'
 
 export const LoginPage = () => {
   return (
     <main className="relative">
+      <Suspense fallback={null}>
+        <AuthErrorToast />
+      </Suspense>
       <header className="absolute top-8 left-8 flex items-center gap-16">
         <Logo />
         {/* TODO : 링크 연결 필요 */}

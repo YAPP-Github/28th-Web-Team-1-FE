@@ -11,12 +11,14 @@ import { NotionPageCard } from '@features/notion_connect'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 
+const MAX_NOTION_PAGES = 3
+
 interface NotionPageSelectStepProps extends OnboardingStepProps {
   /** OAuth 콜백이 URL로 넘긴 Notion 연결 ID. 없으면 연결 목록의 첫 연결로 폴백한다. */
   connectionId?: string
 }
 
-/** 온보딩 스텝: 연동된 Notion에서 가져온 페이지 중 이력서로 만들 페이지 검색·선택(다중) 후 경험으로 추출 */
+/** 온보딩 스텝: 연동된 Notion에서 가져온 페이지 중 이력서로 만들 페이지 검색·선택(다중, 최대 3개) 후 경험으로 추출 */
 export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: connectionIdFromUrl }: NotionPageSelectStepProps) => {
   const [pageIds, setPageIds] = useState<string[]>([])
   const [keyword, setKeyword] = useState('')
@@ -34,7 +36,14 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
   })
 
   const toggle = useCallback((id: string) => {
-    setPageIds((prev) => (prev.includes(id) ? prev.filter((pageId) => pageId !== id) : [...prev, id]))
+    setPageIds((prev) => {
+      if (prev.includes(id)) return prev.filter((pageId) => pageId !== id)
+      if (prev.length >= MAX_NOTION_PAGES) {
+        toast.warning(`페이지는 최대 ${MAX_NOTION_PAGES}개까지 선택할 수 있어요.`, { id: 'notion-page-max', position: 'top-center' })
+        return prev
+      }
+      return [...prev, id]
+    })
   }, [])
 
   const handleImport = () => {
@@ -68,9 +77,20 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
         {pages.length > 0 ? (
           <Flex ref={scrollRef} direction="column" className="min-h-0 w-full flex-1 overflow-y-auto pr-2">
             <Grid columns={pages.length > 20 ? '2' : '1'} gap="3">
-              {pages.map((page) => (
-                <NotionPageCard key={page.pageId} id={page.pageId} title={page.title} lastEditedTime={page.lastEditedTime} isSelected={pageIds.includes(page.pageId)} onToggle={toggle} />
-              ))}
+              {pages.map((page) => {
+                const isSelected = pageIds.includes(page.pageId)
+                return (
+                  <NotionPageCard
+                    key={page.pageId}
+                    id={page.pageId}
+                    title={page.title}
+                    lastEditedTime={page.lastEditedTime}
+                    isSelected={isSelected}
+                    onToggle={toggle}
+                    disabled={!isSelected && pageIds.length >= MAX_NOTION_PAGES}
+                  />
+                )
+              })}
             </Grid>
             {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-px shrink-0" />}
           </Flex>

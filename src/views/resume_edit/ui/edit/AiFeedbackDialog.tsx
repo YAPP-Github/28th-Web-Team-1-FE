@@ -122,7 +122,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
 
       <DialogContent className={'bg-bg-gray-subtler flex w-254 p-3'} onOpenAutoFocus={(event) => event.preventDefault()}>
         {/* 좌측: 지원전략(JD 컨텍스트) + AI 편집 지침 */}
-        <Flex direction="column" flexGrow={'1'} flexBasis={'0'} minWidth={'0'} p={'4'}>
+        <Flex direction="column" flexGrow={'1'} flexBasis={'0'} minWidth={'0'} p={'5'}>
           <Flex direction={'column'} gap={'4'} flexShrink={'0'}>
             <Text variant={'headline1'}>지원전략</Text>
             {jdId ? (
@@ -182,7 +182,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
         </Flex>
 
         {/* 우측: 내용 다듬기(첨삭 결과) — 대상 필드 수만큼 렌더. 항상 직접 편집 가능 */}
-        <Flex direction="column" flexShrink={'0'} className={'bg-bg-white w-107 min-w-107 rounded-xl p-6'}>
+        <Flex direction="column" flexShrink={'0'} className={'bg-bg-white w-115 min-w-115 rounded-xl p-6'}>
           <Text variant={'headline1'}>내용 다듬기</Text>
 
           <Spacing size={16} />
@@ -195,23 +195,26 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
                     <Text variant={'label1'} weight={'semibold'} className={'truncate'}>
                       {target.label}
                     </Text>
-                    <Flex direction={'column'} gap={'2'} className={`border-border-subtle rounded-lg border ${target.multiline ? 'h-50 p-4' : 'h-11.75 px-4 py-3'}`}>
-                      {/* Textarea는 여러 줄, Input은 한 줄 */}
-                      {Array.from({ length: target.multiline ? 4 : 1 }).map((_, index, lines) => (
-                        <Skeleton key={`${target.name}-skeleton-${index}`} height={'14px'} width={lines.length > 1 && index === lines.length - 1 ? '60%' : '100%'} />
-                      ))}
-                    </Flex>
+                    {target.multiline ? (
+                      <Flex direction={'column'} gap={'2'} className={`border-border-subtle my-auto h-60 rounded-lg border p-4`}>
+                        {Array.from({ length: 4 }).map((_, index) => (
+                          <Skeleton key={`${target.name}-skeleton-${index}`} height={'14px'} width={index % 2 ? '60%' : '100%'} />
+                        ))}
+                      </Flex>
+                    ) : (
+                      <Flex direction={'column'} justify={'center'} className={`border-border-subtle my-auto h-11.75 rounded-lg border px-4 py-3`}>
+                        <Skeleton height={'14px'} width={'100%'} />
+                      </Flex>
+                    )}
                   </>
                 ) : target.multiline ? (
-                  <Textarea label={target.label} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} className={'h-50'} />
+                  <Textarea label={target.label} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} className={'h-60'} />
                 ) : (
                   <Input label={target.label} clearable={false} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} />
                 )}
               </Flex>
             ))}
           </Flex>
-
-          <Spacing size={16} />
 
           <Flex className={'mt-auto w-full gap-2'}>
             <Button variant={'tertiary'} size={'md'} className={'flex-1'} onClick={() => setDrafts(snapshotFromForm())} disabled={isGenerating}>
@@ -238,14 +241,14 @@ const JdStrategy = ({ workspaceId, jdId }: { workspaceId: string; jdId: string }
   // 오류가 아니라 '인사이트 없음'(nullable 필드) 상태.
   if (!insight) {
     return (
-      <Text variant={'label2'} color={'text-subtler'}>
+      <Text variant={'label2'} color={'text-subtler'} className={'h-36.75'}>
         지원전략이 아직 없어요.
       </Text>
     )
   }
 
   return (
-    <Text variant={'label2'} color={'text-subtle'}>
+    <Text variant={'label2'} color={'text-subtle'} className={'h-36.75 overflow-y-auto'}>
       {insight.strategy}
     </Text>
   )
@@ -253,7 +256,7 @@ const JdStrategy = ({ workspaceId, jdId }: { workspaceId: string; jdId: string }
 
 /** 지원전략(AI 생성) 로딩 스켈레톤. */
 const JdStrategyLoading = () => (
-  <Flex direction={'column'} gap={'1'}>
+  <Flex direction={'column'} gap={'1'} className={'h-36.75'}>
     <Skeleton height={'14px'} width={'100%'} />
     <Skeleton height={'14px'} width={'100%'} />
     <Skeleton height={'14px'} width={'80%'} />

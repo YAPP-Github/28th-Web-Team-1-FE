@@ -11,7 +11,6 @@ export const jdAPI = {
 const jdInsightDocument = graphql(`
   query JdInsight($workspaceId: ID!, $jdId: ID!) {
     jdInsight(workspaceId: $workspaceId, jdId: $jdId) {
-      keyPoints
       strategy
     }
   }

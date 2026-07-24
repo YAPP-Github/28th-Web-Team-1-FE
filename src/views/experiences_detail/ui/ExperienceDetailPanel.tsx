@@ -2,7 +2,8 @@
 import { Suspense, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { Flex } from '@radix-ui/themes'
+import { Flex, Skeleton } from '@radix-ui/themes'
+import { cn } from '@shared/lib/cn'
 import { ChevronsRight, Trash2 } from 'lucide-react'
 import { useDeleteExperience, useExperienceSuspense, useUpdateExperience, type ExperienceDetail } from '@entities/experience'
 import { Button, Text } from '@shared/ui'
@@ -29,28 +30,85 @@ interface ExperienceDetailPanelProps {
   workspaceId: string
   experienceId: string
   onClose: () => void
+  className?: string
 }
-export const ExperienceDetailPanel = ({ workspaceId, experienceId, onClose }: ExperienceDetailPanelProps) => {
+export const ExperienceDetailPanel = ({ workspaceId, experienceId, onClose, className }: ExperienceDetailPanelProps) => {
   return (
-    <Flex direction="column" className="border-border-subtle bg-bg-gray-subtler h-screen w-148.5 shrink-0 overflow-y-auto border-l p-8">
+    <Flex direction="column" className={cn('border-border-subtle bg-bg-gray-subtler h-screen w-148.5 shrink-0 overflow-y-auto border-l p-8', className)}>
       <button type="button" aria-label="상세 패널 닫기" onClick={() => onClose()} className="mb-5 w-fit">
         <ChevronsRight size={24} className="text-icon-gray-lighter" />
       </button>
 
-      <Suspense
-        fallback={
-          <Flex align="center" justify="center" className="h-screen">
-            <Text variant="headline2" color="text-basic">
-              로딩중
-            </Text>
-          </Flex>
-        }
-      >
+      <Suspense fallback={<ExperienceDetailPanelSkeleton />}>
         <ExperienceDetailPanelContent workspaceId={workspaceId} experienceId={experienceId} onClose={onClose} />
       </Suspense>
     </Flex>
   )
 }
+
+const STAR_FIELD_LABELS = [
+  { key: 'situation', label: 'Situation', sublabel: '상황' },
+  { key: 'task', label: 'Task', sublabel: '과업' },
+  { key: 'action', label: 'Action', sublabel: '행동' },
+  { key: 'result', label: 'Result', sublabel: '결과' }
+] as const
+
+// 실제 패널 레이아웃(제목/역할·기간/태그 + STAR 입력 영역)을 그대로 따르는 스켈레톤.
+const ExperienceDetailPanelSkeleton = () => (
+  <Flex direction="column" gap="8">
+    <Flex direction="column" gap="3" className="py-2">
+      <Flex align="center" className="h-7.5">
+        <Skeleton>
+          <Text variant="headline2">경험 제목이 표시되는 영역</Text>
+        </Skeleton>
+      </Flex>
+      <Flex direction="column" gap="10px">
+        <Flex align="center" gap="5">
+          <Text variant="label2" color="text-subtler" className="w-16 shrink-0">
+            역할 및 기간
+          </Text>
+          <Skeleton>
+            <Text variant="label2">백엔드 개발자 · 2024.01 - 2024.06</Text>
+          </Skeleton>
+        </Flex>
+        <Flex align="center" gap="5">
+          <Text variant="label2" color="text-subtler" className="w-16 shrink-0">
+            관련 역량
+          </Text>
+          <Flex align="center" gap="1" className="min-w-0 flex-1 flex-wrap">
+            {['React', 'TypeScript'].map((tag) => (
+              <Skeleton key={tag}>
+                <Chip size="sm" variant="ghost">
+                  {tag}
+                </Chip>
+              </Skeleton>
+            ))}
+          </Flex>
+        </Flex>
+      </Flex>
+    </Flex>
+
+    <Divider />
+
+    <Flex direction="column" className="gap-4">
+      {STAR_FIELD_LABELS.map((field) => (
+        <Flex key={field.key} className="gap-4">
+          <Flex direction="column" className="w-18.5 shrink-0">
+            <Text variant="label1" weight="semibold" color="text-basic">
+              {field.label}
+            </Text>
+            <Text variant="label2" color="text-subtler">
+              {field.sublabel}
+            </Text>
+          </Flex>
+          <Skeleton className="min-w-0 flex-1">
+            <div className="min-h-30 w-full rounded-lg" />
+          </Skeleton>
+        </Flex>
+      ))}
+    </Flex>
+  </Flex>
+)
 
 const ExperienceDetailPanelContent = ({ workspaceId, experienceId, onClose }: { workspaceId: string; experienceId: string; onClose: () => void }) => {
   const { experience } = useExperienceSuspense(workspaceId, experienceId)
