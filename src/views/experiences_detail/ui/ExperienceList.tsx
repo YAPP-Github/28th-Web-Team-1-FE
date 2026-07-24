@@ -10,7 +10,7 @@ import { Plus } from 'lucide-react'
 import { useCreateExperience, type ProjectExperience } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
-import { Textarea } from '@/src/shared/ui/textarea'
+import { Textarea } from '@shared/ui/textarea'
 
 interface ExperienceListProps {
   experiences: ProjectExperience[]

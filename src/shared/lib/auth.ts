@@ -1,46 +1,12 @@
 import { NextResponse } from 'next/server'
+import { AUTH_ERROR } from './auth-error'
+
+export { AUTH_ERROR } from './auth-error'
 
 const API_URL = process.env.API_URL
 
-/**
- * 로그인 관련 오류를 식별하는 코드 모음이다.
- * 서버 응답의 `error.code`, OAuth 콜백 리다이렉트의 `?error=` 값으로 공통 사용해 문자열이 흩어지지 않게 한다.
- */
-export const AUTH_ERROR = {
-  AUTH: 'auth' /** OAuth 콜백에서 인가 코드 누락·토큰 교환 실패 등 로그인 자체가 실패한 경우 */,
-  TOKEN_EXPIRED: 'token_expired' /** accessToken 만료 후 refresh까지 실패해 재인증이 필요한 경우 */,
-  INTERNAL: 'internal_error' /** 그 밖의 서버 측 처리 실패 */
-} as const
-
 export const ACCESS_TOKEN_MAX_AGE = 30 * 60 // 30분
 export const REFRESH_TOKEN_MAX_AGE = 14 * 24 * 60 * 60 // 14일
-
-export type AuthErrorCode = (typeof AUTH_ERROR)[keyof typeof AUTH_ERROR]
-
-/** 각 오류 코드에 대응하는 사용자 노출 메시지. 리다이렉트(`?error=`)·토스트 등에서 공통으로 사용한다. */
-export const AUTH_ERROR_MESSAGE: Record<AuthErrorCode | 'DEFAULT', string> = {
-  [AUTH_ERROR.AUTH]: '로그인에 실패했어요. 다시 시도해 주세요.',
-  [AUTH_ERROR.TOKEN_EXPIRED]: '세션이 만료되었습니다. 다시 로그인해주세요.',
-  [AUTH_ERROR.INTERNAL]: ' 일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요.',
-  /** 알 수 없는 코드가 들어왔을 때 보여줄 기본 메시지. */
-  DEFAULT: '문제가 발생했어요. 잠시 후 다시 시도해 주세요.'
-}
-
-/**
- * 오류 코드 문자열을 사용자 메시지로 변환하는 함수이다.
- * 주로 `?error=` 쿼리 파라미터 값을 받아 화면에 표시할 메시지를 얻는 데 쓴다.
- * @param code 오류 코드(`?error=`/`error.code` 값). 없으면 표시할 메시지가 없다는 뜻으로 `null`을 반환한다.
- * @returns 매핑된 메시지, 알 수 없는 코드면 기본 메시지, 코드가 없으면 `null`
- * @example
- * ```ts
- * getAuthErrorMessage('token_expired') // '세션이 만료되었습니다. 다시 로그인해주세요.'
- * getAuthErrorMessage(null)            // null
- * ```
- */
-export const getAuthErrorMessage = (code?: string | null): string | null => {
-  if (!code) return null
-  return AUTH_ERROR_MESSAGE[code as AuthErrorCode] ?? AUTH_ERROR_MESSAGE.DEFAULT
-}
 
 /** `delete(name)`을 가진 쿠키 컨테이너의 최소 형태. 요청/응답 쿠키와 `cookies()` 스토어가 모두 호환된다. */
 type DeletableCookies = { delete: (name: string) => unknown }
@@ -78,6 +44,18 @@ export const unauthorizedResponse = (cookies: DeletableCookies) => {
 export const authFailureRedirect = (origin: string) => {
   const url = new URL('/', origin)
   url.searchParams.set('error', AUTH_ERROR.AUTH)
+  return NextResponse.redirect(url)
+}
+
+/**
+ * 로그인하지 않은 상태로 보호된 페이지에 접근했을 때 로그인 페이지로 `?error=auth_required`를 붙여 리다이렉트하는 함수이다.
+ * 미들웨어의 접근 제어(비로그인 시 `/`·`/login` 외 접근 차단)에서 사용한다.
+ * @param request 원래 요청. 리다이렉트 기준 URL을 만드는 데 쓴다.
+ * @returns `/login?error=auth_required`로의 `NextResponse` 리다이렉트
+ */
+export const requireAuthRedirect = (request: Request) => {
+  const url = new URL('/login', request.url)
+  url.searchParams.set('error', AUTH_ERROR.REQUIRED)
   return NextResponse.redirect(url)
 }
 
