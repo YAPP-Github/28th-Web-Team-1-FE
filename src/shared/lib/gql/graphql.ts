@@ -578,7 +578,7 @@ export type JdInsightQueryVariables = Exact<{
 }>;
 
 
-export type JdInsightQuery = { jdInsight: { keyPoints: string, strategy: string } | null };
+export type JdInsightQuery = { jdInsight: { strategy: string } | null };
 
 export type JdMetaQueryVariables = Exact<{
   workspaceId: string | number;
@@ -1051,7 +1051,6 @@ export const DeleteExperienceDocument = new TypedDocumentString(`
 export const JdInsightDocument = new TypedDocumentString(`
     query JdInsight($workspaceId: ID!, $jdId: ID!) {
   jdInsight(workspaceId: $workspaceId, jdId: $jdId) {
-    keyPoints
     strategy
   }
 }
