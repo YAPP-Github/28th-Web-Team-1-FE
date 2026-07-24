@@ -116,15 +116,6 @@ const JdInsight = ({ workspaceId, jdId }: { workspaceId: string; jdId: string })
     <Flex direction={'column'} gap={'2'}>
       <Flex direction={'column'}>
         <Text variant={'label1'} color={'text-basic'}>
-          핵심
-        </Text>
-        <Text variant={'label2'} color={'text-subtle'}>
-          {insight.keyPoints}
-        </Text>
-      </Flex>
-
-      <Flex direction={'column'}>
-        <Text variant={'label1'} color={'text-basic'}>
           지원 전략
         </Text>
         <Text variant={'label2'} color={'text-subtle'}>
