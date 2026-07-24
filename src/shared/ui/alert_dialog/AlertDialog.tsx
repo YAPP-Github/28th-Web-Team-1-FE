@@ -180,7 +180,7 @@ const AlertDialogDescription = ({ className, ...props }: React.ComponentProps<ty
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
-      className={cn('text-text-subtler text-body1 *:[a]:hover:text-foreground md:text-pretty *:[a]:underline *:[a]:underline-offset-3', className)}
+      className={cn('text-text-subtler text-body1 break-keep *:[a]:hover:text-foreground md:text-pretty *:[a]:underline *:[a]:underline-offset-3', className)}
       {...props}
     />
   )
