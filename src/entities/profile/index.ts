@@ -1,5 +1,5 @@
 export { profileAPI } from './api/profile.api'
 export { profileKeys, profileQueries } from './model/profile.keys'
 export { useProfile } from './model/profile.queries'
-export { useUpdateProfile, usePolishProfileText } from './model/profile.mutations'
+export { useUpdateProfile, usePolishProfileText, useGenerateCoreCompetency } from './model/profile.mutations'
 export type { Profile } from './model/profile.types'

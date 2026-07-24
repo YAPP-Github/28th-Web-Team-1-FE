@@ -43,3 +43,22 @@ export const usePolishProfileText = () => {
     }
   })
 }
+
+/**
+ * 프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성한다. 결과만 반환(저장하지 않음)해 편집 폼에 로컬 반영 후 별도 저장한다.
+ * `jdId`를 주면 해당 JD 지원 전략을 기준으로 생성하고 `strategy`도 함께 반환한다.
+ * @example
+ * ```tsx
+ * const { mutateAsync: generate } = useGenerateCoreCompetency()
+ * const { coreCompetency, strategy } = await generate({ workspaceId, jdId })
+ * ```
+ */
+export const useGenerateCoreCompetency = () => {
+  return useMutation({
+    mutationKey: profileKeys.generateCoreCompetency(),
+    mutationFn: async (variables: { workspaceId: string; jdId?: string | null }) => {
+      const { generateCoreCompetency } = await profileAPI.generateCoreCompetency(variables)
+      return generateCoreCompetency
+    }
+  })
+}

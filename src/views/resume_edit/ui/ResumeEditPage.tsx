@@ -2,7 +2,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
-import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form'
+import { FormProvider, useForm, useFormContext, useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import { FileCheckCorner, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
@@ -10,12 +10,14 @@ import { formatDate } from '@shared/lib'
 import { useIntervalAutosave } from '@shared/hooks/useIntervalAutosave'
 import type { ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
 import { useResumeDetail, useUpdateResume } from '@entities/resume'
+import { useGenerateCoreCompetency } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import { ResumeBasicInfoHeader, ResumeSectionView } from '@widgets/resume_preview'
-import type { ResumeFormSection, ResumeFormValues } from '../model/resume-form.types'
+import { emptyItemPayload, nextDisplayOrder, type ResumeFormItem, type ResumeFormSection, type ResumeFormValues } from '../model/resume-form.types'
 import { resumeToFormValues } from '../model/resumeToFormValues'
 import { formToSaveInput } from '../model/formToSaveInput'
 import { ResumeIndex } from './ResumeIndex'
+import { CoreSkillPreviewSection } from './CoreSkillPreviewSection'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
 import { useRouter } from 'next/navigation'
 
@@ -47,6 +49,39 @@ const ResumeFallback = ({ children }: { children: ReactNode }) => (
  */
 const AUTOSAVE_INTERVAL_MS = 30_000
 
+/**
+ * AI로 생성한 핵심역량 문단을 폼의 CORE_SKILL 섹션 첫 항목 content에 반영한다.
+ * `setValue`가 dirty를 유발해 이후 자동저장/저장에 함께 반영된다.
+ * - 항목이 없으면 빈 핵심역량 항목을 하나 추가해 채운다.
+ * - CORE_SKILL 섹션 자체가 없으면(사용자가 제거) 아무것도 하지 않는다.
+ */
+const applyCoreCompetencyToForm = (form: UseFormReturn<ResumeFormValues>, coreCompetency: string) => {
+  const sections = form.getValues('sections')
+  const sectionIndex = sections.findIndex((section) => section.type === 'CORE_SKILL')
+  if (sectionIndex < 0) return
+
+  const items = sections[sectionIndex].items
+  if (items.length === 0) {
+    const newItem: ResumeFormItem = {
+      itemId: null,
+      displayOrder: nextDisplayOrder(items),
+      visible: true,
+      payload: { ...emptyItemPayload, coreSkill: { content: coreCompetency, isInitialItem: false } }
+    }
+    form.setValue(`sections.${sectionIndex}.items`, [newItem], { shouldDirty: true, shouldValidate: true })
+    return
+  }
+
+  form.setValue(`sections.${sectionIndex}.items.0.payload.coreSkill.content`, coreCompetency, { shouldDirty: true, shouldValidate: true })
+}
+
+/**
+ * CORE_SKILL 섹션에 '이력서 최초 생성 과정에서 만들어진' 아이템(isInitialItem)이 아직 남아 있으면
+ * AI 핵심역량이 채워지지 않은 상태라 자동 생성이 필요하다.
+ * 한번 생성하면 서버가 아이템을 비-초기로 기록하므로, 이후 진입에서는 사용자가 편집한 내용을 덮어쓰지 않는다.
+ */
+const needsCoreCompetency = (resume: ResumeQuery['resume']) => resume.sections.some((section) => section.type === 'CORE_SKILL' && section.items.some((item) => item.payload.coreSkill?.isInitialItem))
+
 const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const router = useRouter()
   const workspaceId = useWorkspaceId()
@@ -55,6 +90,22 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const defaultValues = useMemo(() => resumeToFormValues(resume), [resume])
   const form = useForm<ResumeFormValues>({ defaultValues })
   const { mutate: updateResume, mutateAsync: updateResumeAsync, isPending } = useUpdateResume(workspaceId, resumeId)
+  const { mutateAsync: generateCoreCompetency } = useGenerateCoreCompetency()
+
+  const hasGeneratedRef = useRef(false)
+  useEffect(() => {
+    if (hasGeneratedRef.current) return
+    hasGeneratedRef.current = true
+
+    // 최초 생성 아이템(isInitialItem)이 아직 남아 있을 때만 생성한다. 이미 채워진(사용자 편집) 경우 재생성하지 않는다.
+    if (!needsCoreCompetency(resume)) return
+
+    void generateCoreCompetency({ workspaceId, jdId: resume.targetJd?.jdId ?? null })
+      .then(({ coreCompetency }) => applyCoreCompetencyToForm(form, coreCompetency))
+      .catch(() => toast.error('핵심역량 생성에 실패했어요. 잠시 후 다시 시도해주세요.'))
+    // 페이지 진입 시 1회만 실행한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // 마지막으로 저장에 성공한 시각(서버가 200 OK로 응답한 시점의 클라 시간). 수동·자동 저장 모두 갱신하며 툴바에 표시한다.
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
@@ -208,7 +259,7 @@ const ResumePreview = ({ basicInfoSection, sections, activeSectionUid, onSelectS
         <Flex direction={'column'} gap="5">
           {sections.map((section) => (
             <SelectableArea key={section.uid} sectionUid={section.uid} activeSectionUid={activeSectionUid} onSelect={onSelectSection} registerRef={registerSectionRef}>
-              <ResumeSectionView section={section} />
+              {section.type === 'CORE_SKILL' ? <CoreSkillPreviewSection section={section} /> : <ResumeSectionView section={section} />}
             </SelectableArea>
           ))}
         </Flex>
