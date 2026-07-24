@@ -46,7 +46,7 @@ export const AddProjectNotionView = ({ workspaceId, connectionId, onExtract }: A
     <>
       <DialogHeader>
         <DialogTitle className="text-title3 text-text-basic font-bold">노션 페이지를 선택해주세요.</DialogTitle>
-        <DialogDescription className="text-body1 text-text-subtler">SCOOP의 경험정리에 가져올 이력서/경험정리 페이지를 최대 {MAX_NOTION_PAGES}개까지 선택해 주세요.</DialogDescription>
+        <DialogDescription className="text-body1 text-text-subtler">SCOOP의 경험정리에 가져올 이력서/경험정리 페이지를 선택해 주세요.</DialogDescription>
       </DialogHeader>
       <Flex direction="column" className="gap-5">
         <SearchField placeholder="보이지 않는 페이지 또는 데이터베이스는 제목으로 검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} />

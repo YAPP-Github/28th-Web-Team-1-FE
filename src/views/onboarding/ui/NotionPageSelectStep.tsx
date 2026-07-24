@@ -64,7 +64,7 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
   return (
     <OnboardingStepShell
       title="노션 페이지를 선택해주세요."
-      description={`SCOOP의 경험정리에 가져올 이력서/경험정리 페이지를 최대 ${MAX_NOTION_PAGES}개까지 선택해 주세요.`}
+      description="SCOOP의 경험정리에 가져올 이력서/경험정리 페이지를 선택해 주세요."
       onNext={handleImport}
       nextDisabled={pageIds.length === 0 || !connectionId || isPending}
       nextLabel={isPending ? '가져오는 중...' : '경험 추출하기'}
