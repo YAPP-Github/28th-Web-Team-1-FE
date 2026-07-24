@@ -18,6 +18,8 @@ export const useOnboardingFlow = (initialStep?: OnboardingStep) => {
   const [history, setHistory] = useState<OnboardingStep[]>(() => buildInitialHistory(initialStep))
   // "다음"으로 통과한 스텝 기록. 스킵은 기록하지 않아 완료 여부(연동 여부)를 구분한다.
   const [completed, setCompleted] = useState<OnboardingStep[]>([])
+  // 스텝 전환 애니메이션 방향. 1이면 다음(오른쪽→왼쪽), -1이면 이전(왼쪽→오른쪽)으로 화면이 쉬프트된다.
+  const [direction, setDirection] = useState<1 | -1>(1)
   const step = history[history.length - 1]
 
   const next = useCallback(
@@ -26,6 +28,7 @@ export const useOnboardingFlow = (initialStep?: OnboardingStep) => {
       const resolved = typeof target === 'function' ? target(answer ?? false) : target
       if (!resolved) return
       setCompleted((prev) => (prev.includes(step) ? prev : [...prev, step]))
+      setDirection(1)
       setHistory((prev) => [...prev, resolved])
     },
     [step]
@@ -33,7 +36,10 @@ export const useOnboardingFlow = (initialStep?: OnboardingStep) => {
 
   const skip = useCallback(() => {
     const target = ONBOARDING_FLOW[step].skip
-    if (target) setHistory((prev) => [...prev, target])
+    if (target) {
+      setDirection(1)
+      setHistory((prev) => [...prev, target])
+    }
   }, [step])
 
   const back = useCallback(() => {
@@ -41,11 +47,13 @@ export const useOnboardingFlow = (initialStep?: OnboardingStep) => {
     // 되돌아간 스텝은 다시 진행해야 하므로 완료 기록에서 제거
     const returnTo = history[history.length - 2]
     setCompleted((prev) => prev.filter((completedStep) => completedStep !== returnTo))
+    setDirection(-1)
     setHistory((prev) => prev.slice(0, -1))
   }, [history])
 
   return {
     step,
+    direction,
     next,
     skip,
     back,

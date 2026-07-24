@@ -2,6 +2,7 @@
 import { Suspense, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { Flex } from '@radix-ui/themes'
+import { AnimatePresence, motion } from 'motion/react'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { useProject } from '@entities/project'
 import { useProjectExperiences } from '@entities/experience'
@@ -44,7 +45,7 @@ const ExperienceDetailContent = () => {
   }
 
   return (
-    <Flex className="h-screen">
+    <Flex className="h-screen overflow-x-hidden">
       <Flex direction="column" className="h-full flex-1 overflow-y-auto p-8">
         <Flex direction="column" gap="8" className={cn('w-full', selectedExperience ? 'max-w-full' : 'max-w-198.75')}>
           <Flex direction="column" gap="2">
@@ -60,7 +61,20 @@ const ExperienceDetailContent = () => {
         </Flex>
       </Flex>
 
-      {selectedExperience && <ExperienceDetailPanel workspaceId={workspaceId} experienceId={selectedExperience.experienceId} onClose={() => setSelectedId(null)} />}
+      <AnimatePresence>
+        {selectedExperience && (
+          <motion.div
+            key="detail-panel"
+            className="h-screen shrink-0"
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 40, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <ExperienceDetailPanel workspaceId={workspaceId} experienceId={selectedExperience.experienceId} onClose={() => setSelectedId(null)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Flex>
   )
 }
