@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, type ComponentType } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Accordion as AccordionPrimitive } from 'radix-ui'
 import { ErrorBoundary } from '@sentry/nextjs'
@@ -9,17 +9,25 @@ import { cn } from '@shared/lib/cn'
 import { Divider, Heading, Spacing, Text } from '@shared/ui'
 import { Avatar } from '@shared/ui/avatar'
 import { useMe } from '@entities/user'
+import { BasicSection } from './profile/BasicSection'
+import { CoreCompetencySection } from './profile/CoreCompetencySection'
+import { EducationSection } from './profile/EducationSection'
+import { CareerSection } from './profile/CareerSection'
+import { LanguageSection } from './profile/LanguageSection'
+import { AwardSection } from './profile/AwardSection'
+import { CertificateSection } from './profile/CertificateSection'
+import { SkillSection } from './profile/SkillSection'
 
-const INFO_SECTIONS = [
-  { value: 'basic', label: '기본 정보' },
-  { value: 'competency', label: '핵심 역량' },
-  { value: 'education', label: '학력' },
-  { value: 'career', label: '경력' },
-  { value: 'language', label: '어학' },
-  { value: 'award', label: '수상' },
-  { value: 'certificate', label: '자격증' },
-  { value: 'skill', label: '기술' }
-] as const
+const INFO_SECTIONS: Array<{ value: string; label: string; Component: ComponentType }> = [
+  { value: 'basic', label: '기본 정보', Component: BasicSection },
+  { value: 'competency', label: '핵심 역량', Component: CoreCompetencySection },
+  { value: 'education', label: '학력', Component: EducationSection },
+  { value: 'career', label: '경력', Component: CareerSection },
+  { value: 'language', label: '어학', Component: LanguageSection },
+  { value: 'award', label: '수상', Component: AwardSection },
+  { value: 'certificate', label: '자격증', Component: CertificateSection },
+  { value: 'skill', label: '기술', Component: SkillSection }
+]
 
 export const MyProfilePage = () => {
   return (
@@ -31,8 +39,8 @@ export const MyProfilePage = () => {
       <Spacing size={32} />
 
       <Flex direction="column" className="w-full max-w-158.5">
-        <ErrorBoundary fallback={<ProfileSummaryFallback>사용자 정보를 불러오는 데 실패했습니다.</ProfileSummaryFallback>}>
-          <Suspense fallback={<ProfileSummaryFallback>불러오는 중...</ProfileSummaryFallback>}>
+        <ErrorBoundary fallback={<SectionFallback>사용자 정보를 불러오는 데 실패했습니다.</SectionFallback>}>
+          <Suspense fallback={<SectionFallback>불러오는 중...</SectionFallback>}>
             <ProfileSummary />
           </Suspense>
         </ErrorBoundary>
@@ -43,7 +51,7 @@ export const MyProfilePage = () => {
 
         <AccordionPrimitive.Root type="multiple" className="flex flex-col gap-5">
           {INFO_SECTIONS.map((section) => (
-            <InfoAccordionItem key={section.value} value={section.value} label={section.label} />
+            <InfoAccordionItem key={section.value} value={section.value} label={section.label} Component={section.Component} />
           ))}
         </AccordionPrimitive.Root>
       </Flex>
@@ -69,7 +77,7 @@ const ProfileSummary = () => {
   )
 }
 
-const ProfileSummaryFallback = ({ children }: { children: React.ReactNode }) => (
+const SectionFallback = ({ children }: { children: React.ReactNode }) => (
   <Text variant="label1" color="text-subtler">
     {children}
   </Text>
@@ -78,8 +86,9 @@ const ProfileSummaryFallback = ({ children }: { children: React.ReactNode }) => 
 interface InfoAccordionItemProps {
   value: string
   label: string
+  Component: ComponentType
 }
-const InfoAccordionItem = ({ value, label }: InfoAccordionItemProps) => {
+const InfoAccordionItem = ({ value, label, Component }: InfoAccordionItemProps) => {
   return (
     <AccordionPrimitive.Item value={value} className="border-border-subtler data-[state=open]:border-border-subtle data-[state=open]:shadow-2 overflow-hidden rounded-xl border">
       <AccordionPrimitive.Header>
@@ -90,10 +99,12 @@ const InfoAccordionItem = ({ value, label }: InfoAccordionItemProps) => {
           <ChevronDown size={20} className="text-icon-gray-light transition-transform duration-200 group-data-[state=open]:rotate-180" />
         </AccordionPrimitive.Trigger>
       </AccordionPrimitive.Header>
-      <AccordionPrimitive.Content className="px-6 py-5">
-        <Text variant="body2" color="text-subtler">
-          아직 준비 중이에요. 곧 이곳에서 {label}을(를) 관리할 수 있어요.
-        </Text>
+      <AccordionPrimitive.Content className="px-6 pt-2 pb-6">
+        <ErrorBoundary fallback={<SectionFallback>정보를 불러오는 데 실패했습니다.</SectionFallback>}>
+          <Suspense fallback={<SectionFallback>불러오는 중...</SectionFallback>}>
+            <Component />
+          </Suspense>
+        </ErrorBoundary>
       </AccordionPrimitive.Content>
     </AccordionPrimitive.Item>
   )
