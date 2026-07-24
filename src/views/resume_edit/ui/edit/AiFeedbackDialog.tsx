@@ -196,7 +196,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
                       {target.label}
                     </Text>
                     {target.multiline ? (
-                      <Flex direction={'column'} gap={'2'} className={`border-border-subtle my-auto h-34.5 rounded-lg border p-4`}>
+                      <Flex direction={'column'} gap={'2'} className={`border-border-subtle my-auto h-60 rounded-lg border p-4`}>
                         {Array.from({ length: 4 }).map((_, index) => (
                           <Skeleton key={`${target.name}-skeleton-${index}`} height={'14px'} width={index % 2 ? '60%' : '100%'} />
                         ))}
@@ -208,15 +208,13 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
                     )}
                   </>
                 ) : target.multiline ? (
-                  <Textarea label={target.label} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} className={'h-34.5'} />
+                  <Textarea label={target.label} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} className={'h-60'} />
                 ) : (
                   <Input label={target.label} clearable={false} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} />
                 )}
               </Flex>
             ))}
           </Flex>
-
-          <Spacing size={170} />
 
           <Flex className={'mt-auto w-full gap-2'}>
             <Button variant={'tertiary'} size={'md'} className={'flex-1'} onClick={() => setDrafts(snapshotFromForm())} disabled={isGenerating}>
@@ -243,7 +241,7 @@ const JdStrategy = ({ workspaceId, jdId }: { workspaceId: string; jdId: string }
   // 오류가 아니라 '인사이트 없음'(nullable 필드) 상태.
   if (!insight) {
     return (
-      <Text variant={'label2'} color={'text-subtler'}>
+      <Text variant={'label2'} color={'text-subtler'} className={'h-36.75'}>
         지원전략이 아직 없어요.
       </Text>
     )
@@ -258,7 +256,7 @@ const JdStrategy = ({ workspaceId, jdId }: { workspaceId: string; jdId: string }
 
 /** 지원전략(AI 생성) 로딩 스켈레톤. */
 const JdStrategyLoading = () => (
-  <Flex direction={'column'} gap={'1'}>
+  <Flex direction={'column'} gap={'1'} className={'h-36.75'}>
     <Skeleton height={'14px'} width={'100%'} />
     <Skeleton height={'14px'} width={'100%'} />
     <Skeleton height={'14px'} width={'80%'} />
