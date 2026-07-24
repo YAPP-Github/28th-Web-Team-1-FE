@@ -23,21 +23,12 @@ export const ExperienceDetailPage = () => {
         </Flex>
       }
     >
-      <Suspense
-        fallback={
-          <Flex align="center" justify="center" className="h-screen">
-            <Text variant="headline2" color="text-basic">
-              로딩중
-            </Text>
-          </Flex>
-        }
-      >
+      <Suspense fallback={null}>
         <ExperienceDetailContent />
       </Suspense>
     </ErrorBoundary>
   )
 }
-
 const ExperienceDetailContent = () => {
   const workspaceId = useWorkspaceId()
   const { projectId } = useParams<{ projectId: string }>()
