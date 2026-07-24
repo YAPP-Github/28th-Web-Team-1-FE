@@ -50,8 +50,8 @@ export const AddProjectDialog = () => {
   }
 
   // 추출 요청 실패 시 기본 화면으로 되돌린다.
-  const handleExtractError = () => {
-    toast.error('요청에 실패했어요. 다시 시도해 주세요.', { position: 'top-center' })
+  const handleExtractError = (error: Error) => {
+    toast.error(error.message, { position: 'top-center' })
     setView('default')
   }
 

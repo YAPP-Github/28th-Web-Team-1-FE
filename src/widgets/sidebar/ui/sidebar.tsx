@@ -18,7 +18,8 @@ const isCollapseLockedPath = (pathname: string) => /^\/home\/resume\/[^/]+$/.tes
 
 export const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true)
-  const { handleLogout } = useLogout()
+  // TODO : 랜딩페이지 구현 시 랜딩페이지로 변경 필요
+  const { handleLogout } = useLogout({ redirectTo: '/login' })
 
   const pathname = usePathname()
   const isCollapseLocked = isCollapseLockedPath(pathname)

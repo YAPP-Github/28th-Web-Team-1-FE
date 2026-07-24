@@ -1,16 +1,17 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { Check } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { DialogTitle, DialogDescription } from '@shared/ui/dialog'
 
 const STEPS = ['경험 불러오는 중', '핵심 내용 분석하는 중', 'STAR 구조로 정리 중']
 
-// 백엔드 완료 신호가 오기 전까지 프론트에서 임의로 채우는 진행률 상한
-const FAKE_PROGRESS_CEIL = 90
-const FAKE_STEP_MIN = 2
-const FAKE_STEP_RANGE = 8
+const FAKE_PROGRESS_CEIL = 97
+const FAKE_TICK_MS = 400
+const FAKE_DECAY = 0.1
+const FAKE_MAX_STEP = 4.4
 
 interface AddProjectProgressViewProps {
   isComplete: boolean
@@ -20,16 +21,17 @@ export const AddProjectProgressView = ({ isComplete, onCancel }: AddProjectProgr
   const [progress, setProgress] = useState(0)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  // 완료 신호 전까지 진행률을 상한선(90%)까지만 채우고, 실제 응답을 기다린다.
+  // 완료 신호 전까지 진행률을 상한선까지만 채우고, 실제 응답을 기다린다.
   useEffect(() => {
     if (isComplete) return
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= FAKE_PROGRESS_CEIL) return prev
-        const next = prev + Math.random() * FAKE_STEP_RANGE + FAKE_STEP_MIN
-        return Math.min(next, FAKE_PROGRESS_CEIL)
+        const remaining = FAKE_PROGRESS_CEIL - prev
+        const step = Math.min(remaining * FAKE_DECAY, FAKE_MAX_STEP) * (0.7 + Math.random() * 0.6)
+        return Math.min(prev + step, FAKE_PROGRESS_CEIL)
       })
-    }, 400)
+    }, FAKE_TICK_MS)
     return () => clearInterval(timer)
   }, [isComplete])
 
@@ -94,11 +96,48 @@ const ProgressRing = ({ value }: { value: number }) => {
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className="stroke-element-primary transition-[stroke-dashoffset] duration-500 ease-out"
+          className="stroke-element-primary transition-[stroke-dashoffset] duration-300 ease-linear"
         />
       </svg>
-      <span className="text-title3 text-text-basic absolute inset-0 flex items-center justify-center font-bold">{value}%</span>
+      <span className="text-title3 text-text-basic absolute inset-0 flex items-center justify-center font-bold">
+        <RollingNumber value={value} />
+      </span>
     </div>
+  )
+}
+
+// 값이 바뀔 때 자릿수마다 위로 롤링되는 숫자 카운터
+const RollingNumber = ({ value }: { value: number }) => {
+  const chars = `${value}%`.split('')
+
+  return (
+    <span className="inline-flex tabular-nums">
+      {chars.map((char, index) => {
+        if (!/\d/.test(char)) {
+          return (
+            <span key={`static-${index}`} className="inline-block">
+              {char}
+            </span>
+          )
+        }
+        return (
+          <span key={`digit-${index}`} className="relative inline-block h-[1.2em] w-[0.62em] overflow-hidden">
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.span
+                key={char}
+                initial={{ y: '70%', opacity: 0 }}
+                animate={{ y: '0%', opacity: 1 }}
+                exit={{ y: '-70%', opacity: 0 }}
+                transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute inset-0 flex items-center justify-center"
+              >
+                {char}
+              </motion.span>
+            </AnimatePresence>
+          </span>
+        )
+      })}
+    </span>
   )
 }
 
