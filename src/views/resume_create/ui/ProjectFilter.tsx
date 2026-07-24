@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { Button } from '@shared/ui'
 import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
@@ -32,6 +32,12 @@ export const ProjectFilter = ({ value, onChange }: Props) => {
     enabled: hasNextPage && !isFetchingNextPage,
     onIntersect: fetchNextPage
   })
+
+  useEffect(() => {
+    if (value === PROJECT_FILTER.all) {
+      scrollRef.current?.scrollTo({ left: 0, behavior: 'smooth' })
+    }
+  }, [value])
 
   const variant = (target: ProjectFilterValue) => (value === target ? 'primary' : 'tertiary')
 
