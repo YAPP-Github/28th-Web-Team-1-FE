@@ -18,7 +18,8 @@ const isCollapseLockedPath = (pathname: string) => /^\/home\/resume\/[^/]+$/.tes
 
 export const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true)
-  const { handleLogout } = useLogout()
+  // TODO : 랜딩페이지 구현 시 랜딩페이지로 변경 필요
+  const { handleLogout } = useLogout({ redirectTo: '/login' })
 
   const pathname = usePathname()
   const isCollapseLocked = isCollapseLockedPath(pathname)
@@ -35,7 +36,7 @@ export const Sidebar = () => {
     >
       <header className={cn('flex h-10', isEffectiveExpanded ? 'justify-between' : 'justify-center')}>
         {isEffectiveExpanded && (
-         <Link href="/home">
+          <Link href="/home">
             <Heading size={'6'} weight={'bold'} className={cn('border-border-subtle font-elms overflow-hidden rounded-sm border px-2 py-1 tracking-[-0.02em] whitespace-nowrap')}>
               Scoop
             </Heading>

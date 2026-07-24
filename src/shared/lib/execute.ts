@@ -1,5 +1,5 @@
 import type { TypedDocumentString } from './gql/graphql'
-import { AUTH_ERROR } from './auth'
+import { AUTH_ERROR } from './auth-error'
 import { ApiError, getServerContext, type ApiErrorDetail } from './http'
 import { GraphQLError, type GraphQLErrorObject } from './graphql-error'
 

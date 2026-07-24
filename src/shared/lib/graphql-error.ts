@@ -1,4 +1,4 @@
-import { AUTH_ERROR } from './auth'
+import { AUTH_ERROR } from './auth-error'
 import { ApiError, type ApiErrorDetail } from './http'
 
 /**
