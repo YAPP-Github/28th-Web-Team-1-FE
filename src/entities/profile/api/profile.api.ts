@@ -4,7 +4,8 @@ import { type PolishProfileTextRequest, type UpdateProfileRequest } from '@share
 export const profileAPI = {
   getProfile: (variables: { workspaceId: string }) => execute(profileDocument, variables),
   updateProfile: (variables: { workspaceId: string; request: UpdateProfileRequest }) => execute(updateProfileDocument, variables),
-  polishProfileText: (variables: { request: PolishProfileTextRequest; workspaceId?: string | null }) => execute(polishProfileTextDocument, variables)
+  polishProfileText: (variables: { request: PolishProfileTextRequest; workspaceId?: string | null }) => execute(polishProfileTextDocument, variables),
+  generateCoreCompetency: (variables: { workspaceId: string; jdId?: string | null }) => execute(generateCoreCompetencyDocument, variables)
 }
 
 const profileDocument = graphql(`
@@ -67,5 +68,15 @@ const updateProfileDocument = graphql(`
 const polishProfileTextDocument = graphql(`
   mutation PolishProfileText($request: PolishProfileTextRequest!, $workspaceId: ID) {
     polishProfileText(request: $request, workspaceId: $workspaceId)
+  }
+`)
+
+/** 프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성한다. 결과만 반환하고 저장하지 않는다. jdId를 주면 해당 JD 지원 전략 기준으로 생성하고 strategy도 함께 반환한다. */
+const generateCoreCompetencyDocument = graphql(`
+  mutation GenerateCoreCompetency($workspaceId: ID!, $jdId: ID) {
+    generateCoreCompetency(workspaceId: $workspaceId, jdId: $jdId) {
+      coreCompetency
+      strategy
+    }
   }
 `)

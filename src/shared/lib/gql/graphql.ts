@@ -662,6 +662,14 @@ export type PolishProfileTextMutationVariables = Exact<{
 
 export type PolishProfileTextMutation = { polishProfileText: string };
 
+export type GenerateCoreCompetencyMutationVariables = Exact<{
+  workspaceId: string | number;
+  jdId?: string | number | null | undefined;
+}>;
+
+
+export type GenerateCoreCompetencyMutation = { generateCoreCompetency: { coreCompetency: string, strategy: string | null } };
+
 export type ProjectListItemFragment = { projectId: string, name: string };
 
 export type ProjectsQueryVariables = Exact<{
@@ -1198,6 +1206,14 @@ export const PolishProfileTextDocument = new TypedDocumentString(`
   polishProfileText(request: $request, workspaceId: $workspaceId)
 }
     `) as unknown as TypedDocumentString<PolishProfileTextMutation, PolishProfileTextMutationVariables>;
+export const GenerateCoreCompetencyDocument = new TypedDocumentString(`
+    mutation GenerateCoreCompetency($workspaceId: ID!, $jdId: ID) {
+  generateCoreCompetency(workspaceId: $workspaceId, jdId: $jdId) {
+    coreCompetency
+    strategy
+  }
+}
+    `) as unknown as TypedDocumentString<GenerateCoreCompetencyMutation, GenerateCoreCompetencyMutationVariables>;
 export const ProjectsDocument = new TypedDocumentString(`
     query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {
   projectList: experienceProjects(
