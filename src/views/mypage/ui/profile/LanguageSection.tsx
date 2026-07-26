@@ -5,8 +5,7 @@ import { Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { DatePicker } from '@shared/ui/date_picker'
 import { formatDate } from '@shared/lib'
-import { useProfile } from '@entities/profile'
-import { useWorkspaceId } from '@entities/user'
+import type { Profile } from '@entities/profile'
 import { EMPTY_LANGUAGE, toLanguageForms, withLanguageTests, type LanguageForm } from '../../model/profileForm'
 import { AddItemButton, RepeatableItemHeader, SaveButton, useProfileSectionForm } from './sectionForm'
 
@@ -14,8 +13,7 @@ interface LanguageSectionForm {
   items: LanguageForm[]
 }
 
-export const LanguageSection = () => {
-  const profile = useProfile(useWorkspaceId())
+export const LanguageSection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<LanguageSectionForm>({ items: toLanguageForms(profile) }, (values) => withLanguageTests(profile, values.items))
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
 

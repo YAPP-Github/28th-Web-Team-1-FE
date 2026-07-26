@@ -6,8 +6,7 @@ import { X } from 'lucide-react'
 import { Button, Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { Chip } from '@shared/ui/chip'
-import { useProfile } from '@entities/profile'
-import { useWorkspaceId } from '@entities/user'
+import type { Profile } from '@entities/profile'
 import { SKILL_LEVEL_OPTIONS, toSkillForms, withSkills, type SkillForm } from '../../model/profileForm'
 import { SelectBox } from './SelectBox'
 import { SaveButton, useProfileSectionForm } from './sectionForm'
@@ -16,8 +15,7 @@ interface SkillSectionForm {
   items: SkillForm[]
 }
 
-export const SkillSection = () => {
-  const profile = useProfile(useWorkspaceId())
+export const SkillSection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<SkillSectionForm>({ items: toSkillForms(profile) }, (values) => withSkills(profile, values.items))
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
 

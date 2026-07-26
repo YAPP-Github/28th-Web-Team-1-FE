@@ -1,13 +1,11 @@
 'use client'
 import { Controller } from 'react-hook-form'
 import { Textarea } from '@shared/ui/textarea'
-import { useProfile } from '@entities/profile'
-import { useWorkspaceId } from '@entities/user'
+import type { Profile } from '@entities/profile'
 import { toCoreCompetencyForm, withCoreCompetency, type CoreCompetencyForm } from '../../model/profileForm'
 import { SaveButton, useProfileSectionForm } from './sectionForm'
 
-export const CoreCompetencySection = () => {
-  const profile = useProfile(useWorkspaceId())
+export const CoreCompetencySection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<CoreCompetencyForm>(toCoreCompetencyForm(profile), (values) => withCoreCompetency(profile, values))
 
   return (

@@ -8,7 +8,8 @@ import { ChevronDown } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Divider, Heading, Spacing, Text } from '@shared/ui'
 import { Avatar } from '@shared/ui/avatar'
-import { useMe } from '@entities/user'
+import { useMe, useWorkspaceId } from '@entities/user'
+import { useProfile, type Profile } from '@entities/profile'
 import { BasicSection } from './profile/BasicSection'
 import { CoreCompetencySection } from './profile/CoreCompetencySection'
 import { EducationSection } from './profile/EducationSection'
@@ -18,7 +19,7 @@ import { AwardSection } from './profile/AwardSection'
 import { CertificateSection } from './profile/CertificateSection'
 import { SkillSection } from './profile/SkillSection'
 
-const INFO_SECTIONS: Array<{ value: string; label: string; Component: ComponentType }> = [
+const INFO_SECTIONS: Array<{ value: string; label: string; Component: ComponentType<{ profile: Profile }> }> = [
   { value: 'basic', label: '기본 정보', Component: BasicSection },
   { value: 'competency', label: '핵심 역량', Component: CoreCompetencySection },
   { value: 'education', label: '학력', Component: EducationSection },
@@ -40,7 +41,7 @@ export const MyProfilePage = () => {
 
       <Flex direction="column" className="w-full max-w-158.5">
         <ErrorBoundary fallback={<SectionFallback>사용자 정보를 불러오는 데 실패했습니다.</SectionFallback>}>
-          <Suspense fallback={<SectionFallback>불러오는 중...</SectionFallback>}>
+          <Suspense fallback={null}>
             <ProfileSummary />
           </Suspense>
         </ErrorBoundary>
@@ -49,11 +50,12 @@ export const MyProfilePage = () => {
         <Divider color="gray-10" />
         <Spacing size={32} />
 
-        <AccordionPrimitive.Root type="multiple" className="flex flex-col gap-5">
-          {INFO_SECTIONS.map((section) => (
-            <InfoAccordionItem key={section.value} value={section.value} label={section.label} Component={section.Component} />
-          ))}
-        </AccordionPrimitive.Root>
+        {/* profile을 여기서 한 번만 가져와 각 섹션에 내려주므로, 섹션마다 따로 로딩되지 않고 아코디언을 처음 열 때도 대기 없이 바로 보인다. */}
+        <ErrorBoundary fallback={<SectionFallback>정보를 불러오는 데 실패했습니다.</SectionFallback>}>
+          <Suspense fallback={null}>
+            <ProfileSections />
+          </Suspense>
+        </ErrorBoundary>
       </Flex>
     </Flex>
   )
@@ -77,6 +79,18 @@ const ProfileSummary = () => {
   )
 }
 
+const ProfileSections = () => {
+  const profile = useProfile(useWorkspaceId())
+
+  return (
+    <AccordionPrimitive.Root type="single" collapsible className="flex flex-col gap-5">
+      {INFO_SECTIONS.map((section) => (
+        <InfoAccordionItem key={section.value} value={section.value} label={section.label} Component={section.Component} profile={profile} />
+      ))}
+    </AccordionPrimitive.Root>
+  )
+}
+
 const SectionFallback = ({ children }: { children: React.ReactNode }) => (
   <Text variant="label1" color="text-subtler">
     {children}
@@ -86,9 +100,10 @@ const SectionFallback = ({ children }: { children: React.ReactNode }) => (
 interface InfoAccordionItemProps {
   value: string
   label: string
-  Component: ComponentType
+  Component: ComponentType<{ profile: Profile }>
+  profile: Profile
 }
-const InfoAccordionItem = ({ value, label, Component }: InfoAccordionItemProps) => {
+const InfoAccordionItem = ({ value, label, Component, profile }: InfoAccordionItemProps) => {
   return (
     <AccordionPrimitive.Item value={value} className="border-border-subtler data-[state=open]:border-border-subtle data-[state=open]:shadow-2 overflow-hidden rounded-xl border">
       <AccordionPrimitive.Header>
@@ -100,11 +115,7 @@ const InfoAccordionItem = ({ value, label, Component }: InfoAccordionItemProps) 
         </AccordionPrimitive.Trigger>
       </AccordionPrimitive.Header>
       <AccordionPrimitive.Content className="px-6 pt-2 pb-6">
-        <ErrorBoundary fallback={<SectionFallback>정보를 불러오는 데 실패했습니다.</SectionFallback>}>
-          <Suspense fallback={<SectionFallback>불러오는 중...</SectionFallback>}>
-            <Component />
-          </Suspense>
-        </ErrorBoundary>
+        <Component profile={profile} />
       </AccordionPrimitive.Content>
     </AccordionPrimitive.Item>
   )

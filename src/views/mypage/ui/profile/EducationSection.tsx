@@ -5,8 +5,7 @@ import { Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { MonthPicker } from '@shared/ui/month_picker'
 import { formatDate, monthToApiDate } from '@shared/lib'
-import { useProfile } from '@entities/profile'
-import { useWorkspaceId } from '@entities/user'
+import type { Profile } from '@entities/profile'
 import { DEGREE_OPTIONS, EDUCATION_STATUS_OPTIONS, EMPTY_EDUCATION, toEducationForms, withEducations, type EducationForm } from '../../model/profileForm'
 import { SelectBox } from './SelectBox'
 import { AddItemButton, RepeatableItemHeader, SaveButton, useProfileSectionForm } from './sectionForm'
@@ -15,8 +14,7 @@ interface EducationSectionForm {
   items: EducationForm[]
 }
 
-export const EducationSection = () => {
-  const profile = useProfile(useWorkspaceId())
+export const EducationSection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<EducationSectionForm>({ items: toEducationForms(profile) }, (values) => withEducations(profile, values.items))
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
 

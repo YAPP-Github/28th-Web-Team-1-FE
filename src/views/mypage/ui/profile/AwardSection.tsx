@@ -5,8 +5,7 @@ import { Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { DatePicker } from '@shared/ui/date_picker'
 import { formatDate } from '@shared/lib'
-import { useProfile } from '@entities/profile'
-import { useWorkspaceId } from '@entities/user'
+import type { Profile } from '@entities/profile'
 import { EMPTY_AWARD, toAwardForms, withAwards, type AwardForm } from '../../model/profileForm'
 import { AddItemButton, RepeatableItemHeader, SaveButton, useProfileSectionForm } from './sectionForm'
 
@@ -14,8 +13,7 @@ interface AwardSectionForm {
   items: AwardForm[]
 }
 
-export const AwardSection = () => {
-  const profile = useProfile(useWorkspaceId())
+export const AwardSection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<AwardSectionForm>({ items: toAwardForms(profile) }, (values) => withAwards(profile, values.items))
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
 

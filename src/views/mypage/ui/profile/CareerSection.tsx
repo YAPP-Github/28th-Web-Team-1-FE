@@ -6,8 +6,7 @@ import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
 import { MonthPicker } from '@shared/ui/month_picker'
 import { formatDate, monthToApiDate } from '@shared/lib'
-import { useProfile } from '@entities/profile'
-import { useWorkspaceId } from '@entities/user'
+import type { Profile } from '@entities/profile'
 import { EMPTY_CAREER, toCareerForms, withCareers, type CareerForm } from '../../model/profileForm'
 import { AddItemButton, RepeatableItemHeader, SaveButton, useProfileSectionForm } from './sectionForm'
 
@@ -15,8 +14,7 @@ interface CareerSectionForm {
   items: CareerForm[]
 }
 
-export const CareerSection = () => {
-  const profile = useProfile(useWorkspaceId())
+export const CareerSection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<CareerSectionForm>({ items: toCareerForms(profile) }, (values) => withCareers(profile, values.items))
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
 

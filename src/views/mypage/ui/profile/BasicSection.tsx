@@ -2,13 +2,11 @@
 import { Controller } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Input } from '@shared/ui/input'
-import { useProfile } from '@entities/profile'
-import { useWorkspaceId } from '@entities/user'
+import type { Profile } from '@entities/profile'
 import { toBasicForm, withBasic, type BasicForm } from '../../model/profileForm'
 import { SaveButton, useProfileSectionForm } from './sectionForm'
 
-export const BasicSection = () => {
-  const profile = useProfile(useWorkspaceId())
+export const BasicSection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<BasicForm>(toBasicForm(profile), (values) => withBasic(profile, values))
 
   return (
