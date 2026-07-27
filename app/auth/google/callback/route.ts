@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, cookieOptions, authFailureRedirect, safeRedirectPath } from '@/src/shared/lib'
+import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, cookieOptions, authFailureRedirect, safeRedirectPath } from '@shared/lib/auth'
 
 const API_URL = process.env.API_URL
 

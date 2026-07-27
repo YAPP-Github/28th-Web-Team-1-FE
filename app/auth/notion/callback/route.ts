@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { ApiError, authFailureRedirect, safeRedirectPath } from '@shared/lib'
+import { ApiError } from '@shared/lib'
+import { authFailureRedirect, safeRedirectPath } from '@shared/lib/auth'
 import { notionAPI } from '@entities/notion'
 import { NOTION_OAUTH_NONCE_COOKIE, NOTION_CONNECT_ERROR, NOTION_PAGE_SELECT_STEP } from '@features/notion_connect'
 
