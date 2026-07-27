@@ -7,8 +7,8 @@ import { MonthPicker } from '@shared/ui/month_picker'
 import { formatDate, monthToApiDate } from '@shared/lib'
 import { DEGREE_OPTIONS, EDUCATION_STATUS_OPTIONS, type Profile } from '@entities/profile'
 import { EMPTY_EDUCATION, toEducationForms, withEducations, type EducationForm } from '../../model/profileForm'
-import { SelectBox } from './SelectBox'
-import { AddItemButton, RepeatableItemHeader, SaveButton, useProfileSectionForm } from './sectionForm'
+import { AddItemButton, RepeatableItemHeader, SaveButton, SelectBox } from './sectionForm'
+import { useProfileSectionForm } from '../../hooks/useProfileSectionForm'
 
 interface EducationSectionForm {
   items: EducationForm[]

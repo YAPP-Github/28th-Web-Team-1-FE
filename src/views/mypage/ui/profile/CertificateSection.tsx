@@ -7,7 +7,8 @@ import { DatePicker } from '@shared/ui/date_picker'
 import { formatDate } from '@shared/lib'
 import type { Profile } from '@entities/profile'
 import { EMPTY_CERTIFICATE, toCertificateForms, withCertifications, type CertificateForm } from '../../model/profileForm'
-import { AddItemButton, RepeatableItemHeader, SaveButton, useProfileSectionForm } from './sectionForm'
+import { AddItemButton, RepeatableItemHeader, SaveButton } from './sectionForm'
+import { useProfileSectionForm } from '../../hooks/useProfileSectionForm'
 
 interface CertificateSectionForm {
   items: CertificateForm[]

@@ -3,7 +3,8 @@ import { Controller } from 'react-hook-form'
 import { Textarea } from '@shared/ui/textarea'
 import type { Profile } from '@entities/profile'
 import { toCoreCompetencyForm, withCoreCompetency, type CoreCompetencyForm } from '../../model/profileForm'
-import { SaveButton, useProfileSectionForm } from './sectionForm'
+import { SaveButton } from './sectionForm'
+import { useProfileSectionForm } from '../../hooks/useProfileSectionForm'
 
 export const CoreCompetencySection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<CoreCompetencyForm>(toCoreCompetencyForm(profile), (values) => withCoreCompetency(profile, values))

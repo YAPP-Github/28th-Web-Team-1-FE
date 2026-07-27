@@ -8,8 +8,8 @@ import { Input } from '@shared/ui/input'
 import { Chip } from '@shared/ui/chip'
 import { SKILL_LEVEL_OPTIONS, type Profile } from '@entities/profile'
 import { toSkillForms, withSkills, type SkillForm } from '../../model/profileForm'
-import { SelectBox } from './SelectBox'
-import { SaveButton, useProfileSectionForm } from './sectionForm'
+import { SaveButton, SelectBox } from './sectionForm'
+import { useProfileSectionForm } from '../../hooks/useProfileSectionForm'
 
 interface SkillSectionForm {
   items: SkillForm[]
@@ -19,7 +19,6 @@ export const SkillSection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<SkillSectionForm>({ items: toSkillForms(profile) }, (values) => withSkills(profile, values.items))
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
 
-  // 새 기술은 상단 입력으로 만들어 append하므로, 입력 중 값은 폼이 아닌 로컬 상태로 둔다.
   const [name, setName] = useState('')
   const [level, setLevel] = useState('')
 

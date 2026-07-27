@@ -5,7 +5,8 @@ import { Input } from '@shared/ui/input'
 import { formatPhoneNumber } from '@shared/lib'
 import type { Profile } from '@entities/profile'
 import { toBasicForm, withBasic, type BasicForm } from '../../model/profileForm'
-import { SaveButton, useProfileSectionForm } from './sectionForm'
+import { SaveButton } from './sectionForm'
+import { useProfileSectionForm } from '../../hooks/useProfileSectionForm'
 
 export const BasicSection = ({ profile }: { profile: Profile }) => {
   const { control, onSubmit, isDirty, isPending } = useProfileSectionForm<BasicForm>(toBasicForm(profile), (values) => withBasic(profile, values))

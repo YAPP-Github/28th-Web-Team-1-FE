@@ -1,34 +1,11 @@
 'use client'
-import { useForm, type DefaultValues, type FieldValues } from 'react-hook-form'
-import { toast } from 'sonner'
+import { useState } from 'react'
 import { Flex } from '@radix-ui/themes'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Check, ChevronDown } from 'lucide-react'
+import { cn } from '@shared/lib/cn'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { useUpdateProfile } from '@entities/profile'
-import { useWorkspaceId } from '@entities/user'
-import type { UpdateProfileRequest } from '@shared/lib/gql/graphql'
-
-/**
- * 마이페이지 섹션 편집 폼 공통 훅.
- * 저장 성공 시 방금 값을 새 기준선으로 삼아(reset) `isDirty`를 초기화한다.
- */
-export const useProfileSectionForm = <T extends FieldValues>(seed: T, toRequest: (values: T) => UpdateProfileRequest) => {
-  const workspaceId = useWorkspaceId()
-  const { mutate, isPending } = useUpdateProfile(workspaceId)
-  const methods = useForm<T>({ defaultValues: seed as DefaultValues<T> })
-
-  const onSubmit = methods.handleSubmit((values) => {
-    mutate(toRequest(values), {
-      onSuccess: () => {
-        toast.success('저장되었어요.', { id: 'profile-save', position: 'top-center' })
-        methods.reset(values)
-      },
-      onError: () => toast.error('저장에 실패했어요. 다시 시도해 주세요.', { id: 'profile-save-error', position: 'top-center' })
-    })
-  })
-
-  return { control: methods.control, onSubmit, isPending, isDirty: methods.formState.isDirty }
-}
+import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
+import type { SelectOption } from '@entities/profile'
 
 /** 섹션 하단 전체폭 저장 버튼. */
 export const SaveButton = ({ disabled }: { disabled: boolean }) => (
@@ -63,3 +40,76 @@ export const AddItemButton = ({ label, onClick }: { label: string; onClick: () =
     </Button>
   </Flex>
 )
+
+interface SelectBoxProps {
+  value: string
+  onChange: (value: string) => void
+  options: readonly SelectOption[]
+  label?: string
+  placeholder?: string
+  clearable?: boolean
+  clearLabel?: string
+  className?: string
+}
+
+/**
+ * 값 하나를 고르는 드롭다운 위젯. 트리거 박스는 `Input`/`DatePicker`와 같은 스타일이라 나란히 놓으면 정렬이 맞는다.
+ * 라벨을 보여주고 코드(`option.value`)를 저장한다. (RHF는 섹션에서 `Controller`로 직접 연결)
+ */
+export const SelectBox = ({ value, onChange, options, label, placeholder = '선택', clearable = true, clearLabel = '선택 안 함', className }: SelectBoxProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const items = clearable ? [{ value: '', label: clearLabel }, ...options] : options
+  const selectedLabel = options.find((option) => option.value === value)?.label
+
+  const handleSelect = (next: string) => {
+    onChange(next)
+    setIsOpen(false)
+  }
+
+  return (
+    <Flex direction="column" gap="2" className={className}>
+      {label && (
+        <Text variant="label1" weight="semibold">
+          {label}
+        </Text>
+      )}
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={cn(
+              'flex w-full min-w-0 items-center justify-between gap-2 rounded-lg border px-4 py-3 text-left outline-none',
+              'text-body2 bg-element-white border-border-subtle transition-[border-color,background-color] duration-150',
+              'hover:bg-element-gray-lighter data-[state=open]:border-border-primary'
+            )}
+          >
+            <span className={cn('min-w-0 truncate', selectedLabel ? 'text-text-basic' : 'text-text-subtler')}>{selectedLabel || placeholder}</span>
+            <ChevronDown size={18} strokeWidth={1.67} className="text-icon-gray-light shrink-0" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="start" sideOffset={6} className="bg-bg-white shadow-2 w-(--radix-popover-trigger-width) overflow-hidden rounded-lg p-1">
+          {items.map((item) => {
+            const isSelected = value === item.value
+            return (
+              <button
+                key={item.value || 'none'}
+                type="button"
+                onClick={() => handleSelect(item.value)}
+                className={cn(
+                  'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2.5 text-left outline-none',
+                  'hover:bg-element-gray-lighter',
+                  isSelected ? 'text-text-basic' : 'text-text-subtle hover:text-text-basic'
+                )}
+              >
+                <Text as="span" variant="body2" className="min-w-0 truncate">
+                  {item.label}
+                </Text>
+                {isSelected && <Check size={16} className="text-icon-gray shrink-0" />}
+              </button>
+            )
+          })}
+        </PopoverContent>
+      </Popover>
+    </Flex>
+  )
+}
