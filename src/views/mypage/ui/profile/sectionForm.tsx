@@ -10,7 +10,6 @@ import type { UpdateProfileRequest } from '@shared/lib/gql/graphql'
 
 /**
  * 마이페이지 섹션 편집 폼 공통 훅.
- * 섹션 값으로 폼을 seed하고, 저장 시 `toRequest`(전체 스냅샷에 자기 섹션만 덮어쓴 요청)를 보낸다.
  * 저장 성공 시 방금 값을 새 기준선으로 삼아(reset) `isDirty`를 초기화한다.
  */
 export const useProfileSectionForm = <T extends FieldValues>(seed: T, toRequest: (values: T) => UpdateProfileRequest) => {
@@ -50,7 +49,7 @@ export const RepeatableItemHeader = ({ title, onRemove }: { title: string; onRem
       </Button>
     </Flex>
     <Spacing size={12} />
-    <Divider />
+    <Divider color="gray-10" />
     <Spacing size={16} />
   </Flex>
 )

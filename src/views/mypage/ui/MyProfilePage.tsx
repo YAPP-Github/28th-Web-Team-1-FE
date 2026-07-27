@@ -40,7 +40,13 @@ export const MyProfilePage = () => {
       <Spacing size={32} />
 
       <Flex direction="column" className="w-full max-w-158.5">
-        <ErrorBoundary fallback={<SectionFallback>사용자 정보를 불러오는 데 실패했습니다.</SectionFallback>}>
+        <ErrorBoundary
+          fallback={
+            <Text variant="label1" color="text-subtler">
+              정보를 불러오는 데 실패했습니다.
+            </Text>
+          }
+        >
           <Suspense fallback={null}>
             <ProfileSummary />
           </Suspense>
@@ -50,8 +56,13 @@ export const MyProfilePage = () => {
         <Divider color="gray-10" />
         <Spacing size={32} />
 
-        {/* profile을 여기서 한 번만 가져와 각 섹션에 내려주므로, 섹션마다 따로 로딩되지 않고 아코디언을 처음 열 때도 대기 없이 바로 보인다. */}
-        <ErrorBoundary fallback={<SectionFallback>정보를 불러오는 데 실패했습니다.</SectionFallback>}>
+        <ErrorBoundary
+          fallback={
+            <Text variant="label1" color="text-subtler">
+              정보를 불러오는 데 실패했습니다.
+            </Text>
+          }
+        >
           <Suspense fallback={null}>
             <ProfileSections />
           </Suspense>
@@ -85,38 +96,24 @@ const ProfileSections = () => {
   return (
     <AccordionPrimitive.Root type="single" collapsible className="flex flex-col gap-5">
       {INFO_SECTIONS.map((section) => (
-        <InfoAccordionItem key={section.value} value={section.value} label={section.label} Component={section.Component} profile={profile} />
+        <AccordionPrimitive.Item
+          key={section.value}
+          value={section.value}
+          className="border-border-subtler data-[state=open]:border-border-subtle data-[state=open]:shadow-2 overflow-hidden rounded-xl border"
+        >
+          <AccordionPrimitive.Header>
+            <AccordionPrimitive.Trigger className={cn('group flex h-13.5 w-full cursor-pointer items-center justify-between py-3 pr-6 pl-5 outline-none')}>
+              <Text variant="headline2" color="text-basic">
+                {section.label}
+              </Text>
+              <ChevronDown size={20} className="text-icon-gray-light transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </AccordionPrimitive.Trigger>
+          </AccordionPrimitive.Header>
+          <AccordionPrimitive.Content className="px-6 pt-2 pb-6">
+            <section.Component profile={profile} />
+          </AccordionPrimitive.Content>
+        </AccordionPrimitive.Item>
       ))}
     </AccordionPrimitive.Root>
-  )
-}
-
-const SectionFallback = ({ children }: { children: React.ReactNode }) => (
-  <Text variant="label1" color="text-subtler">
-    {children}
-  </Text>
-)
-
-interface InfoAccordionItemProps {
-  value: string
-  label: string
-  Component: ComponentType<{ profile: Profile }>
-  profile: Profile
-}
-const InfoAccordionItem = ({ value, label, Component, profile }: InfoAccordionItemProps) => {
-  return (
-    <AccordionPrimitive.Item value={value} className="border-border-subtler data-[state=open]:border-border-subtle data-[state=open]:shadow-2 overflow-hidden rounded-xl border">
-      <AccordionPrimitive.Header>
-        <AccordionPrimitive.Trigger className={cn('group flex h-13.5 w-full cursor-pointer items-center justify-between py-3 pr-6 pl-5 outline-none')}>
-          <Text variant="headline2" color="text-basic">
-            {label}
-          </Text>
-          <ChevronDown size={20} className="text-icon-gray-light transition-transform duration-200 group-data-[state=open]:rotate-180" />
-        </AccordionPrimitive.Trigger>
-      </AccordionPrimitive.Header>
-      <AccordionPrimitive.Content className="px-6 pt-2 pb-6">
-        <Component profile={profile} />
-      </AccordionPrimitive.Content>
-    </AccordionPrimitive.Item>
   )
 }

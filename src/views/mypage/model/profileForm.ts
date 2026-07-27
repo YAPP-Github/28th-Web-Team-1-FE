@@ -209,14 +209,13 @@ const careersToRequest = (items: CareerForm[]): ProfileCareerRequest[] => buildR
 const languageTestsToRequest = (items: LanguageForm[]): ProfileLanguageTestRequest[] => buildRequestItems<LanguageForm, ProfileLanguageTestRequest>(items, LANGUAGE_FIELDS)
 const awardsToRequest = (items: AwardForm[]): ProfileAwardRequest[] => buildRequestItems<AwardForm, ProfileAwardRequest>(items, AWARD_FIELDS)
 const certificationsToRequest = (items: CertificateForm[]): ProfileCertificationRequest[] => buildRequestItems<CertificateForm, ProfileCertificationRequest>(items, CERTIFICATE_FIELDS)
-// skill은 name만으로 빈 행을 판단한다(level만 채워진 행은 저장하지 않음) — 기존 동작 보존을 위한 override.
 const skillsToRequest = (items: SkillForm[]): ProfileSkillRequest[] => buildRequestItems<SkillForm, ProfileSkillRequest>(items, SKILL_FIELDS, (item) => !item.name.trim())
 
 /**
  * 현재 프로필을 그대로 `UpdateProfileRequest`(전체 스냅샷)로 변환한다.
  * 섹션 저장 시 이 베이스에 자기 섹션만 덮어써서 보낸다: `{ ...profileToUpdateRequest(profile), educations }`.
  */
-export const profileToUpdateRequest = (profile: Profile): UpdateProfileRequest => ({
+const profileToUpdateRequest = (profile: Profile): UpdateProfileRequest => ({
   name: profile.name,
   email: profile.email,
   phone: profile.phone,

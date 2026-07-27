@@ -55,7 +55,7 @@ export const CareerSection = ({ profile }: { profile: Profile }) => {
                         placeholder="시작"
                         className="min-w-0 flex-1"
                       />
-                      <span className="text-text-subtler">-</span>
+                      <span className="text-icon-gray-lighter">-</span>
                       <MonthPicker
                         value={formatDate(period.endAt, 'YYYY.MM') || null}
                         onChange={(month) => field.onChange({ startAt: period.startAt, endAt: monthToApiDate(month, 'end') })}
