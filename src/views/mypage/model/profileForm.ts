@@ -1,7 +1,5 @@
 import type { Profile } from '@entities/profile'
 import type {
-  Degree,
-  EducationStatus,
   PeriodInput,
   ProfileAwardRequest,
   ProfileCareerRequest,
@@ -9,7 +7,6 @@ import type {
   ProfileEducationRequest,
   ProfileLanguageTestRequest,
   ProfileSkillRequest,
-  SkillLevel,
   UpdateProfileRequest
 } from '@shared/lib/gql/graphql'
 
@@ -19,22 +16,11 @@ import type {
  * `updateProfile`가 프로필 전체 스냅샷을 교체하므로, 각 섹션 저장은 `profileToUpdateRequest(profile)`로 만든
  * 베이스 스냅샷에 자기 섹션만 덮어써서 보낸다. 폼 값은 저장 형태에 가깝게(enum=코드, 기간=`{startAt,endAt}`,
  * 날짜=`YYYY-MM-DD`) 들고 다니고, 표시용 라벨 변환은 렌더링(드롭다운)에서 한다.
+ *
+ * 학력/경력/어학/수상/자격증/기술 6개 도메인은 폼 필드명이 `Profile` 서브아이템·`*Request` 타입과
+ * 정확히 일치해서(예: 학력 = school/major/degree/status/period), 필드별 반복 로직(seed/빈값/request 변환)을
+ * `FieldSpec` 설정 + 아래 엔진으로 대체했다. 도메인을 추가/수정할 땐 새 함수를 쓰는 대신 `*_FIELDS` 배열만 바꾸면 된다.
  */
-
-/** enum 코드 ↔ 한글 라벨의 단일 출처. (`satisfies`로 enum 전체 강제) */
-export const DEGREE_LABELS = { BACHELOR: '학사', MASTER: '석사', DOCTOR: '박사' } satisfies Record<Degree, string>
-export const EDUCATION_STATUS_LABELS = { ENROLLED: '재학', ON_LEAVE: '휴학', GRADUATED: '졸업', EXPECTED_GRADUATION: '졸업예정', COMPLETED: '수료' } satisfies Record<EducationStatus, string>
-export const SKILL_LEVEL_LABELS = { HIGH: '상', MEDIUM: '중', LOW: '하' } satisfies Record<SkillLevel, string>
-
-export interface SelectOption {
-  value: string
-  label: string
-}
-const toOptions = (labels: Record<string, string>): SelectOption[] => Object.entries(labels).map(([value, label]) => ({ value, label }))
-
-export const DEGREE_OPTIONS = toOptions(DEGREE_LABELS)
-export const EDUCATION_STATUS_OPTIONS = toOptions(EDUCATION_STATUS_LABELS)
-export const SKILL_LEVEL_OPTIONS = toOptions(SKILL_LEVEL_LABELS)
 
 // ---- 폼 값 타입 ----
 
@@ -90,58 +76,141 @@ const nullIfBlank = (value?: string | null): string | null => value?.trim() || n
 const toPeriod = (period?: { startAt: string | null; endAt: string | null } | null): FormPeriod => ({ startAt: period?.startAt ?? null, endAt: period?.endAt ?? null })
 const periodToRequest = (period: FormPeriod): PeriodInput | null => (period.startAt || period.endAt ? { startAt: period.startAt, endAt: period.endAt } : null)
 
-// ---- 프로필 → 폼 (seed) ----
-
 export const toBasicForm = (profile: Profile): BasicForm => ({ name: profile.name ?? '', phone: profile.phone ?? '', email: profile.email ?? '' })
 export const toCoreCompetencyForm = (profile: Profile): CoreCompetencyForm => ({ coreCompetency: profile.coreCompetency ?? '' })
 
-export const toEducationForms = (profile: Profile): EducationForm[] =>
-  profile.educations.map((e) => ({ school: e.school ?? '', status: e.status ?? '', period: toPeriod(e.period), major: e.major ?? '', degree: e.degree ?? '' }))
-export const toCareerForms = (profile: Profile): CareerForm[] =>
-  profile.careers.map((c) => ({ company: c.company ?? '', position: c.position ?? '', period: toPeriod(c.period), description: c.description ?? '' }))
-export const toLanguageForms = (profile: Profile): LanguageForm[] => profile.languageTests.map((l) => ({ testName: l.testName ?? '', score: l.score ?? '', acquiredAt: l.acquiredAt ?? '' }))
-export const toAwardForms = (profile: Profile): AwardForm[] => profile.awards.map((a) => ({ title: a.title ?? '', organization: a.organization ?? '', awardedAt: a.awardedAt ?? '' }))
-export const toCertificateForms = (profile: Profile): CertificateForm[] => profile.certifications.map((c) => ({ name: c.name ?? '', issuer: c.issuer ?? '', acquiredAt: c.acquiredAt ?? '' }))
-export const toSkillForms = (profile: Profile): SkillForm[] => profile.skills.map((s) => ({ name: s.name ?? '', level: s.level ?? '' }))
+// ---- 반복 섹션(학력/경력/어학/수상/자격증/기술) 공통 엔진 ----
+
+type FieldKind = 'text' | 'date' | 'enum' | 'period'
+
+/**
+ * key는 TForm과 TReq 양쪽에 실존해야 한다(오타 방지). period 값 필드는 kind:'period'만 허용하도록
+ * 조건부 타입으로 제약해, 기간 필드를 text/enum으로 잘못 표시하는 실수를 컴파일 타임에 막는다.
+ */
+type FieldSpec<TForm, TReq> = {
+  [K in keyof TForm & keyof TReq & string]: TForm[K] extends FormPeriod ? { key: K; kind: 'period' } : { key: K; kind: 'text' | 'date' | 'enum' }
+}[keyof TForm & keyof TReq & string]
+
+const isFieldBlank = (kind: FieldKind, value: unknown): boolean => {
+  if (kind === 'period') {
+    const period = value as FormPeriod
+    return !period.startAt && !period.endAt
+  }
+  if (kind === 'text') return !(value as string)?.trim()
+  return !value // 'date' | 'enum' — 기존 코드와 동일하게 trim 없이 truthy만 확인
+}
+
+const fieldToRequestValue = (kind: FieldKind, value: unknown): unknown => {
+  if (kind === 'period') return periodToRequest(value as FormPeriod)
+  if (kind === 'enum') return (value as string) || null
+  return nullIfBlank(value as string) // 'text' | 'date'
+}
+
+const fieldToFormValue = (kind: FieldKind, value: unknown): unknown =>
+  kind === 'period' ? toPeriod(value as { startAt: string | null; endAt: string | null } | null) : ((value as string | null) ?? '')
+
+// TS는 `FieldSpec`(매핑+인덱스 접근 조건부 타입)만으로 TForm/TReq를 역추론하지 못하므로, 아래 세 함수는
+// 항상 호출부에서 `<Form, Request>` 타입 인자를 명시한다(TSource만 인자에서 추론되도록 마지막에 둠).
+const buildFormItems = <TForm, TReq, TSource>(items: readonly TSource[], fields: ReadonlyArray<FieldSpec<TForm, TReq>>): TForm[] =>
+  items.map((item) => {
+    const form = {} as Record<string, unknown>
+    const source = item as Record<string, unknown>
+    fields.forEach((f) => {
+      form[f.key] = fieldToFormValue(f.kind, source[f.key])
+    })
+    return form as TForm
+  })
+
+const emptyFormRow = <TForm, TReq>(fields: ReadonlyArray<FieldSpec<TForm, TReq>>): TForm => {
+  const form = {} as Record<string, unknown>
+  fields.forEach((f) => {
+    form[f.key] = f.kind === 'period' ? { startAt: null, endAt: null } : ''
+  })
+  return form as TForm
+}
+
+/**
+ * isRowBlank 기본값 = "설정된 필드 중 하나라도 값이 있으면 유지"(학력/경력/어학/수상/자격증 공통 규칙).
+ * skill처럼 예외가 있는 도메인만 override로 넘긴다(name만으로 판단, level은 무시).
+ */
+const buildRequestItems = <TForm, TReq>(
+  items: readonly TForm[],
+  fields: ReadonlyArray<FieldSpec<TForm, TReq>>,
+  isRowBlank: (item: TForm) => boolean = (item) => fields.every((f) => isFieldBlank(f.kind, (item as Record<string, unknown>)[f.key]))
+): TReq[] =>
+  items
+    .filter((item) => !isRowBlank(item))
+    .map((item) => {
+      const request = {} as Record<string, unknown>
+      const source = item as Record<string, unknown>
+      fields.forEach((f) => {
+        request[f.key] = fieldToRequestValue(f.kind, source[f.key])
+      })
+      return request as TReq
+    })
+
+// ---- 도메인별 필드 설정 ----
+
+const EDUCATION_FIELDS: Array<FieldSpec<EducationForm, ProfileEducationRequest>> = [
+  { key: 'school', kind: 'text' },
+  { key: 'major', kind: 'text' },
+  { key: 'degree', kind: 'enum' },
+  { key: 'status', kind: 'enum' },
+  { key: 'period', kind: 'period' }
+]
+const CAREER_FIELDS: Array<FieldSpec<CareerForm, ProfileCareerRequest>> = [
+  { key: 'company', kind: 'text' },
+  { key: 'position', kind: 'text' },
+  { key: 'description', kind: 'text' },
+  { key: 'period', kind: 'period' }
+]
+const LANGUAGE_FIELDS: Array<FieldSpec<LanguageForm, ProfileLanguageTestRequest>> = [
+  { key: 'testName', kind: 'text' },
+  { key: 'score', kind: 'text' },
+  { key: 'acquiredAt', kind: 'date' }
+]
+const AWARD_FIELDS: Array<FieldSpec<AwardForm, ProfileAwardRequest>> = [
+  { key: 'title', kind: 'text' },
+  { key: 'organization', kind: 'text' },
+  { key: 'awardedAt', kind: 'date' }
+]
+const CERTIFICATE_FIELDS: Array<FieldSpec<CertificateForm, ProfileCertificationRequest>> = [
+  { key: 'name', kind: 'text' },
+  { key: 'issuer', kind: 'text' },
+  { key: 'acquiredAt', kind: 'date' }
+]
+const SKILL_FIELDS: Array<FieldSpec<SkillForm, ProfileSkillRequest>> = [
+  { key: 'name', kind: 'text' },
+  { key: 'level', kind: 'enum' }
+]
+
+// ---- 프로필 → 폼 (seed) ----
+
+export const toEducationForms = (profile: Profile): EducationForm[] => buildFormItems<EducationForm, ProfileEducationRequest, Profile['educations'][number]>(profile.educations, EDUCATION_FIELDS)
+export const toCareerForms = (profile: Profile): CareerForm[] => buildFormItems<CareerForm, ProfileCareerRequest, Profile['careers'][number]>(profile.careers, CAREER_FIELDS)
+export const toLanguageForms = (profile: Profile): LanguageForm[] => buildFormItems<LanguageForm, ProfileLanguageTestRequest, Profile['languageTests'][number]>(profile.languageTests, LANGUAGE_FIELDS)
+export const toAwardForms = (profile: Profile): AwardForm[] => buildFormItems<AwardForm, ProfileAwardRequest, Profile['awards'][number]>(profile.awards, AWARD_FIELDS)
+export const toCertificateForms = (profile: Profile): CertificateForm[] =>
+  buildFormItems<CertificateForm, ProfileCertificationRequest, Profile['certifications'][number]>(profile.certifications, CERTIFICATE_FIELDS)
+export const toSkillForms = (profile: Profile): SkillForm[] => buildFormItems<SkillForm, ProfileSkillRequest, Profile['skills'][number]>(profile.skills, SKILL_FIELDS)
 
 // 새 항목 추가 시 쓰는 빈 값
-export const EMPTY_EDUCATION: EducationForm = { school: '', status: '', period: { startAt: null, endAt: null }, major: '', degree: '' }
-export const EMPTY_CAREER: CareerForm = { company: '', position: '', period: { startAt: null, endAt: null }, description: '' }
-export const EMPTY_LANGUAGE: LanguageForm = { testName: '', score: '', acquiredAt: '' }
-export const EMPTY_AWARD: AwardForm = { title: '', organization: '', awardedAt: '' }
-export const EMPTY_CERTIFICATE: CertificateForm = { name: '', issuer: '', acquiredAt: '' }
-export const EMPTY_SKILL: SkillForm = { name: '', level: '' }
+export const EMPTY_EDUCATION: EducationForm = emptyFormRow<EducationForm, ProfileEducationRequest>(EDUCATION_FIELDS)
+export const EMPTY_CAREER: CareerForm = emptyFormRow<CareerForm, ProfileCareerRequest>(CAREER_FIELDS)
+export const EMPTY_LANGUAGE: LanguageForm = emptyFormRow<LanguageForm, ProfileLanguageTestRequest>(LANGUAGE_FIELDS)
+export const EMPTY_AWARD: AwardForm = emptyFormRow<AwardForm, ProfileAwardRequest>(AWARD_FIELDS)
+export const EMPTY_CERTIFICATE: CertificateForm = emptyFormRow<CertificateForm, ProfileCertificationRequest>(CERTIFICATE_FIELDS)
+export const EMPTY_SKILL: SkillForm = emptyFormRow<SkillForm, ProfileSkillRequest>(SKILL_FIELDS)
 
 // ---- 폼 → 저장 요청 (섹션 슬라이스) ----
 
-const educationsToRequest = (items: EducationForm[]): ProfileEducationRequest[] =>
-  items
-    .filter((e) => e.school.trim() || e.major.trim() || e.degree || e.status || e.period.startAt || e.period.endAt)
-    .map((e) => ({
-      school: nullIfBlank(e.school),
-      major: nullIfBlank(e.major),
-      degree: (e.degree || null) as Degree | null,
-      status: (e.status || null) as EducationStatus | null,
-      period: periodToRequest(e.period)
-    }))
-
-const careersToRequest = (items: CareerForm[]): ProfileCareerRequest[] =>
-  items
-    .filter((c) => c.company.trim() || c.position.trim() || c.description.trim() || c.period.startAt || c.period.endAt)
-    .map((c) => ({ company: nullIfBlank(c.company), position: nullIfBlank(c.position), description: nullIfBlank(c.description), period: periodToRequest(c.period) }))
-
-const languageTestsToRequest = (items: LanguageForm[]): ProfileLanguageTestRequest[] =>
-  items.filter((l) => l.testName.trim() || l.score.trim() || l.acquiredAt).map((l) => ({ testName: nullIfBlank(l.testName), score: nullIfBlank(l.score), acquiredAt: nullIfBlank(l.acquiredAt) }))
-
-const awardsToRequest = (items: AwardForm[]): ProfileAwardRequest[] =>
-  items
-    .filter((a) => a.title.trim() || a.organization.trim() || a.awardedAt)
-    .map((a) => ({ title: nullIfBlank(a.title), organization: nullIfBlank(a.organization), awardedAt: nullIfBlank(a.awardedAt) }))
-
-const certificationsToRequest = (items: CertificateForm[]): ProfileCertificationRequest[] =>
-  items.filter((c) => c.name.trim() || c.issuer.trim() || c.acquiredAt).map((c) => ({ name: nullIfBlank(c.name), issuer: nullIfBlank(c.issuer), acquiredAt: nullIfBlank(c.acquiredAt) }))
-
-const skillsToRequest = (items: SkillForm[]): ProfileSkillRequest[] => items.filter((s) => s.name.trim()).map((s) => ({ name: nullIfBlank(s.name), level: (s.level || null) as SkillLevel | null }))
+const educationsToRequest = (items: EducationForm[]): ProfileEducationRequest[] => buildRequestItems<EducationForm, ProfileEducationRequest>(items, EDUCATION_FIELDS)
+const careersToRequest = (items: CareerForm[]): ProfileCareerRequest[] => buildRequestItems<CareerForm, ProfileCareerRequest>(items, CAREER_FIELDS)
+const languageTestsToRequest = (items: LanguageForm[]): ProfileLanguageTestRequest[] => buildRequestItems<LanguageForm, ProfileLanguageTestRequest>(items, LANGUAGE_FIELDS)
+const awardsToRequest = (items: AwardForm[]): ProfileAwardRequest[] => buildRequestItems<AwardForm, ProfileAwardRequest>(items, AWARD_FIELDS)
+const certificationsToRequest = (items: CertificateForm[]): ProfileCertificationRequest[] => buildRequestItems<CertificateForm, ProfileCertificationRequest>(items, CERTIFICATE_FIELDS)
+// skill은 name만으로 빈 행을 판단한다(level만 채워진 행은 저장하지 않음) — 기존 동작 보존을 위한 override.
+const skillsToRequest = (items: SkillForm[]): ProfileSkillRequest[] => buildRequestItems<SkillForm, ProfileSkillRequest>(items, SKILL_FIELDS, (item) => !item.name.trim())
 
 /**
  * 현재 프로필을 그대로 `UpdateProfileRequest`(전체 스냅샷)로 변환한다.

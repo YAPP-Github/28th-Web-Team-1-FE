@@ -1,6 +1,6 @@
 import { formatPeriod, parsePeriodInput } from '@shared/lib'
-import type { Profile } from '@entities/profile'
-import type { Degree, EducationStatus, SkillLevel, UpdateProfileRequest } from '@shared/lib/gql/graphql'
+import { DEGREE_LABELS as DEGREE, EDUCATION_STATUS_LABELS as STATUS, SKILL_LEVEL_LABELS as LEVEL, type Profile } from '@entities/profile'
+import type { UpdateProfileRequest } from '@shared/lib/gql/graphql'
 import { INITIAL_SECTION_TYPES, type ResumeSectionInstance, type ResumeSectionType } from './resumeSections'
 
 /**
@@ -8,11 +8,6 @@ import { INITIAL_SECTION_TYPES, type ResumeSectionInstance, type ResumeSectionTy
  * 카드 값은 전부 문자열이라, enum은 한글 라벨로 / 기간은 formatPeriod·parsePeriodInput로 왕복한다.
  * (라벨과 정확히 일치하지 않는 값은 저장 시 null로 떨어짐)
  */
-
-// enum 코드 → 한글 라벨. (표시는 코드로 조회, 저장은 codeOf로 라벨→코드 역조회)
-const DEGREE = { BACHELOR: '학사', MASTER: '석사', DOCTOR: '박사' } satisfies Record<Degree, string>
-const STATUS = { ENROLLED: '재학', ON_LEAVE: '휴학', GRADUATED: '졸업', EXPECTED_GRADUATION: '졸업예정', COMPLETED: '수료' } satisfies Record<EducationStatus, string>
-const LEVEL = { HIGH: '상', MEDIUM: '중', LOW: '하' } satisfies Record<SkillLevel, string>
 
 const codeOf = <T extends string>(labels: Record<T, string>, label?: string): T | null => (Object.keys(labels) as T[]).find((code) => labels[code] === label?.trim()) ?? null
 const nullIfBlank = (value?: string): string | null => value?.trim() || null

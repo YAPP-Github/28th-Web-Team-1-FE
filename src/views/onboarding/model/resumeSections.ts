@@ -1,3 +1,5 @@
+import { DEGREE_LEVELS, EDUCATION_STATUSES, SKILL_LEVELS } from '@entities/profile'
+
 export type ResumeSectionType = 'basic' | 'education' | 'career' | 'award' | 'language' | 'certificate' | 'skill'
 
 /** 편집 폼은 4열 그리드다. 필드 하나가 차지하는 칸 수(1=1/4, 2=1/2, 3=3/4, 4=한 행 전체). 미지정 시 4(전체 폭). */
@@ -46,15 +48,6 @@ const selectInput = (key: string, label: string, opts: { options: readonly strin
   kind: 'select',
   options: opts.options
 })
-
-/** 기술 숙련도 드롭다운 선택지(한글 라벨). */
-export const SKILL_LEVELS = ['상', '중', '하'] as const
-
-/** 학력 학위 드롭다운 선택지(한글 라벨). `profileMapping`의 `DEGREE` 맵과 같은 라벨을 쓴다. */
-export const DEGREE_LEVELS = ['학사', '석사', '박사'] as const
-
-/** 학력 상태 드롭다운 선택지(한글 라벨). `profileMapping`의 `STATUS` 맵과 같은 라벨을 쓴다. */
-export const EDUCATION_STATUSES = ['재학', '휴학', '졸업', '졸업예정', '수료'] as const
 
 /**
  * 이력서 섹션 타입별 구성(제목 + 필드 스키마).

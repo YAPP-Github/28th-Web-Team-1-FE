@@ -5,7 +5,7 @@ import { Check, ChevronDown } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Text } from '@shared/ui'
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
-import type { SelectOption } from '../../model/profileForm'
+import type { SelectOption } from '@entities/profile'
 
 interface SelectBoxProps {
   value: string
