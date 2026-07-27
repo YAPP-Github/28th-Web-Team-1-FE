@@ -2,6 +2,7 @@
 import { Controller } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Input } from '@shared/ui/input'
+import { formatPhoneNumber } from '@shared/lib'
 import type { Profile } from '@entities/profile'
 import { toBasicForm, withBasic, type BasicForm } from '../../model/profileForm'
 import { SaveButton, useProfileSectionForm } from './sectionForm'
@@ -20,7 +21,17 @@ export const BasicSection = ({ profile }: { profile: Profile }) => {
         <Controller
           control={control}
           name="phone"
-          render={({ field }) => <Input label="연락처" clearable={false} placeholder="010-1234-5678" className="w-full" value={field.value ?? ''} onChange={field.onChange} onBlur={field.onBlur} />}
+          render={({ field }) => (
+            <Input
+              label="연락처"
+              clearable={false}
+              placeholder="010-1234-5678"
+              className="w-full"
+              value={field.value ?? ''}
+              onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))}
+              onBlur={field.onBlur}
+            />
+          )}
         />
         <Controller
           control={control}

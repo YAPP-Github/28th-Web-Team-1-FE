@@ -24,7 +24,12 @@ export const profileToSections = (profile: Profile): ResumeSectionInstance[] => 
       status: e.status ? STATUS[e.status] : '',
       period: formatPeriod(e.period?.startAt, e.period?.endAt)
     })),
-    career: profile.careers.map((c) => ({ company: c.company ?? '', position: c.position ?? '', period: formatPeriod(c.period?.startAt, c.period?.endAt) })),
+    career: profile.careers.map((c) => ({
+      company: c.company ?? '',
+      position: c.position ?? '',
+      period: formatPeriod(c.period?.startAt, c.period?.endAt),
+      description: c.description ?? ''
+    })),
     award: profile.awards.map((a) => ({ title: a.title ?? '', organization: a.organization ?? '', awardedAt: a.awardedAt ?? '' })),
     language: profile.languageTests.map((l) => ({ testName: l.testName ?? '', score: l.score ?? '', acquiredAt: l.acquiredAt ?? '' })),
     certificate: profile.certifications.map((c) => ({ name: c.name ?? '', issuer: c.issuer ?? '', acquiredAt: c.acquiredAt ?? '' })),
@@ -48,7 +53,12 @@ export const sectionsToUpdateRequest = (sections: ResumeSectionInstance[]): Upda
       status: codeOf(STATUS, v.status),
       period: parsePeriodInput(v.period ?? '')
     })),
-    careers: pick('career').map((v) => ({ company: nullIfBlank(v.company), position: nullIfBlank(v.position), period: parsePeriodInput(v.period ?? '') })),
+    careers: pick('career').map((v) => ({
+      company: nullIfBlank(v.company),
+      position: nullIfBlank(v.position),
+      period: parsePeriodInput(v.period ?? ''),
+      description: nullIfBlank(v.description)
+    })),
     awards: pick('award').map((v) => ({ title: nullIfBlank(v.title), organization: nullIfBlank(v.organization), awardedAt: nullIfBlank(v.awardedAt) })),
     languageTests: pick('language').map((v) => ({ testName: nullIfBlank(v.testName), score: nullIfBlank(v.score), acquiredAt: nullIfBlank(v.acquiredAt) })),
     certifications: pick('certificate').map((v) => ({ name: nullIfBlank(v.name), issuer: nullIfBlank(v.issuer), acquiredAt: nullIfBlank(v.acquiredAt) })),
