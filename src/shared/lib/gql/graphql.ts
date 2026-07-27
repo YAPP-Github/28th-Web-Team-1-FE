@@ -646,7 +646,7 @@ export type ProfileQueryVariables = Exact<{
 }>;
 
 
-export type ProfileQuery = { profile: { profileId: string, name: string | null, email: string | null, phone: string | null, educations: Array<{ school: string | null, major: string | null, degree: Degree | null, status: EducationStatus | null, period: { startAt: string | null, endAt: string | null } | null }>, careers: Array<{ company: string | null, position: string | null, period: { startAt: string | null, endAt: string | null } | null }>, awards: Array<{ title: string | null, organization: string | null, awardedAt: string | null }>, languageTests: Array<{ testName: string | null, score: string | null, acquiredAt: string | null }>, certifications: Array<{ name: string | null, issuer: string | null, acquiredAt: string | null }>, skills: Array<{ name: string | null, level: SkillLevel | null }> } };
+export type ProfileQuery = { profile: { profileId: string, name: string | null, email: string | null, phone: string | null, coreCompetency: string | null, educations: Array<{ school: string | null, major: string | null, degree: Degree | null, status: EducationStatus | null, period: { startAt: string | null, endAt: string | null } | null }>, careers: Array<{ company: string | null, position: string | null, description: string | null, period: { startAt: string | null, endAt: string | null } | null }>, awards: Array<{ title: string | null, organization: string | null, awardedAt: string | null }>, languageTests: Array<{ testName: string | null, score: string | null, acquiredAt: string | null }>, certifications: Array<{ name: string | null, issuer: string | null, acquiredAt: string | null }>, skills: Array<{ name: string | null, level: SkillLevel | null }> } };
 
 export type UpdateProfileMutationVariables = Exact<{
   workspaceId: string | number;
@@ -1157,6 +1157,7 @@ export const ProfileDocument = new TypedDocumentString(`
     name
     email
     phone
+    coreCompetency
     educations {
       school
       major
@@ -1170,6 +1171,7 @@ export const ProfileDocument = new TypedDocumentString(`
     careers {
       company
       position
+      description
       period {
         startAt
         endAt

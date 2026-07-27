@@ -17,8 +17,20 @@ export const MyAccountPage = () => {
       <Spacing size={32} />
 
       <Flex direction="column" className="w-full max-w-158.5">
-        <ErrorBoundary fallback={<AccountsFallback>계정 정보를 불러오는 데 실패했습니다.</AccountsFallback>}>
-          <Suspense fallback={<AccountsFallback>불러오는 중...</AccountsFallback>}>
+        <ErrorBoundary
+          fallback={
+            <Text variant="label1" color="text-subtler">
+              계정 정보를 불러오는 데 실패했습니다.
+            </Text>
+          }
+        >
+          <Suspense
+            fallback={
+              <Text variant="label1" color="text-subtler">
+                불러오는 중...
+              </Text>
+            }
+          >
             <ConnectedAccounts />
           </Suspense>
         </ErrorBoundary>
@@ -71,9 +83,3 @@ const AccountCard = ({ icon, name, description, badge }: AccountCardProps) => {
     </Flex>
   )
 }
-
-const AccountsFallback = ({ children }: { children: ReactNode }) => (
-  <Text variant="label1" color="text-subtler">
-    {children}
-  </Text>
-)

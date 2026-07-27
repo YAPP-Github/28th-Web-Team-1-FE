@@ -5,11 +5,12 @@ import { Flex, Grid } from '@radix-ui/themes'
 import { Plus, Pencil, ChevronDown } from 'lucide-react'
 import { Button, Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
+import { Textarea } from '@shared/ui/textarea'
 import { DatePicker } from '@shared/ui/date_picker'
 import { MonthPicker } from '@shared/ui/month_picker'
 import { Popover, PopoverTrigger, PopoverContent } from '@shared/ui/popover'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
-import { formatDate, parsePeriodInput } from '@shared/lib'
+import { formatDate, formatPhoneNumber, parsePeriodInput } from '@shared/lib'
 import { useProfile, useUpdateProfile } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import { ADDABLE_SECTION_TYPES, RESUME_SECTIONS, type ResumeField, type ResumeFieldSpan, type ResumeSectionInstance, type ResumeSectionType } from '../model/resumeSections'
@@ -158,6 +159,14 @@ const ResumeFieldInput = ({ field, value, onChange }: ResumeFieldInputProps) => 
         <SelectDropdown value={value} onChange={onChange} options={field.options ?? []} />
       </Flex>
     )
+  }
+
+  if (field.kind === 'textarea') {
+    return <Textarea label={field.label} maxLength={500} placeholder={field.placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
+  }
+
+  if (field.kind === 'phone') {
+    return <Input label={field.label} placeholder={field.placeholder} clearable={false} value={value} onChange={(e) => onChange(formatPhoneNumber(e.target.value))} />
   }
 
   return <Input label={field.label} placeholder={field.placeholder} clearable={false} value={value} onChange={(e) => onChange(e.target.value)} />

@@ -15,6 +15,7 @@ const profileDocument = graphql(`
       name
       email
       phone
+      coreCompetency
       educations {
         school
         major
@@ -28,6 +29,7 @@ const profileDocument = graphql(`
       careers {
         company
         position
+        description
         period {
           startAt
           endAt

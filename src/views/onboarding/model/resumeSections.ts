@@ -1,3 +1,5 @@
+import { DEGREE_LEVELS, EDUCATION_STATUSES, SKILL_LEVELS } from '@entities/profile'
+
 export type ResumeSectionType = 'basic' | 'education' | 'career' | 'award' | 'language' | 'certificate' | 'skill'
 
 /** 편집 폼은 4열 그리드다. 필드 하나가 차지하는 칸 수(1=1/4, 2=1/2, 3=3/4, 4=한 행 전체). 미지정 시 4(전체 폭). */
@@ -9,8 +11,11 @@ export interface ResumeField {
   placeholder: string
   /** 이 필드가 차지하는 폭. 같은 행에 놓이려면 인접 필드들의 span 합이 4 이하여야 한다. */
   span?: ResumeFieldSpan
-  /** 값 입력 방식. 미지정(기본)이면 텍스트 `Input`, `'date'`면 `DatePicker`, `'period'`면 `MonthPicker` 두 개(시작~종료), `'select'`면 드롭다운으로 렌더링한다. */
-  kind?: 'date' | 'period' | 'select'
+  /**
+   * 값 입력 방식. 미지정(기본)이면 텍스트 `Input`, `'date'`면 `DatePicker`, `'period'`면 `MonthPicker` 두 개(시작~종료),
+   * `'select'`면 드롭다운, `'textarea'`면 여러 줄 `Textarea`, `'phone'`이면 입력 중 자동으로 하이픈이 들어가는 `Input`으로 렌더링한다.
+   */
+  kind?: 'date' | 'period' | 'select' | 'textarea' | 'phone'
   /** `kind: 'select'`일 때의 선택지. */
   options?: readonly string[]
 }
@@ -47,14 +52,17 @@ const selectInput = (key: string, label: string, opts: { options: readonly strin
   options: opts.options
 })
 
-/** 기술 숙련도 드롭다운 선택지(한글 라벨). */
-export const SKILL_LEVELS = ['상', '중', '하'] as const
+/** 입력 중 자동으로 하이픈이 들어가는(`010-1234-5678`) 전화번호 필드. */
+const phoneInput = (key: string, label: string, opts?: { span?: ResumeFieldSpan }): ResumeField => ({ key, label, placeholder: '010-1234-5678', span: opts?.span, kind: 'phone' })
 
-/** 학력 학위 드롭다운 선택지(한글 라벨). `profileMapping`의 `DEGREE` 맵과 같은 라벨을 쓴다. */
-export const DEGREE_LEVELS = ['학사', '석사', '박사'] as const
-
-/** 학력 상태 드롭다운 선택지(한글 라벨). `profileMapping`의 `STATUS` 맵과 같은 라벨을 쓴다. */
-export const EDUCATION_STATUSES = ['재학', '휴학', '졸업', '졸업예정', '수료'] as const
+/** 여러 줄 `Textarea`로 렌더링되는 필드(최대 500자, 마이페이지와 동일). */
+const textareaInput = (key: string, label: string, opts?: { placeholder?: string; span?: ResumeFieldSpan }): ResumeField => ({
+  key,
+  label,
+  placeholder: opts?.placeholder ?? `${label}를 입력해 주세요.`,
+  span: opts?.span,
+  kind: 'textarea'
+})
 
 /**
  * 이력서 섹션 타입별 구성(제목 + 필드 스키마).
@@ -65,7 +73,7 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
     type: 'basic',
     title: '기본 정보',
     fixed: true,
-    fields: [input('name', '이름'), input('phone', '연락처', { placeholder: '010-1234-5678', span: 2 }), input('email', '이메일', { placeholder: 'ID@gmail.com', span: 2 })]
+    fields: [input('name', '이름'), phoneInput('phone', '연락처', { span: 2 }), input('email', '이메일', { placeholder: 'ID@gmail.com', span: 2 })]
   },
   education: {
     type: 'education',
@@ -80,8 +88,13 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
   },
   career: {
     type: 'career',
-    title: '경력',
-    fields: [input('company', '회사명'), input('position', '직책', { placeholder: '직책을 입력해주세요.', span: 2 }), periodInput('period', '기간')]
+    title: '경력 / 활동',
+    fields: [
+      input('company', '회사명'),
+      input('position', '직책', { placeholder: '직책을 입력해주세요.', span: 2 }),
+      periodInput('period', '기간'),
+      textareaInput('description', '세부 내용', { placeholder: '세부 내용을 입력해 주세요.' })
+    ]
   },
   award: {
     type: 'award',

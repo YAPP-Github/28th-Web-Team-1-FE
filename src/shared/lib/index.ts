@@ -1,5 +1,6 @@
 export { cn } from './cn'
 export { formatDate, formatPeriod, parsePeriodInput, formatYYYYMM, monthToApiDate } from './date'
+export { formatPhoneNumber } from './phone'
 export { http, ApiError } from './http'
 export { execute } from './execute'
 export { GraphQLError } from './graphql-error'
