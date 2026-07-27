@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
-import { toast } from 'sonner'
 import { Flex } from '@radix-ui/themes'
 import { useUpdateExperience, type ExperienceDetail } from '@entities/experience'
 import { Text } from '@shared/ui'
@@ -17,7 +16,7 @@ const STAR_FIELDS = [
 
 type StarKey = (typeof STAR_FIELDS)[number]['key']
 
-// TODO : 자동저장 디바운스 지연 시간은 논의 필요 -> 일단 8초
+// 타이핑 중에는 8초 디바운스로 저장하고, 필드에서 blur되는 즉시 대기 중인 변경분을 flush한다.
 const AUTOSAVE_DELAY_MS = 8000
 
 interface StarEditorProps {
@@ -37,26 +36,23 @@ export const StarEditor = ({ workspaceId, experience }: StarEditorProps) => {
   })
 
   const save = () => {
-    updateExperience(
-      {
-        experienceId: experience.experienceId,
-        request: {
-          projectId,
-          title: experience.title,
-          tags: experience.tags,
-          contents: { type: 'STAR', star: values },
-          role: experience.role ?? null,
-          period: experience.period ?? null
-        }
-      },
-      { onError: () => toast.error('저장에 실패했어요. 다시 시도해 주세요.', { id: 'experience-star-save-error', position: 'top-center' }) }
-    )
+    updateExperience({
+      experienceId: experience.experienceId,
+      request: {
+        projectId,
+        title: experience.title,
+        tags: experience.tags,
+        contents: { type: 'STAR', star: values },
+        role: experience.role ?? null,
+        period: experience.period ?? null
+      }
+    })
   }
-  const handleAutoSave = useAutosave(save, AUTOSAVE_DELAY_MS)
+  const { schedule: scheduleAutoSave, flush: flushAutoSave } = useAutosave(save, AUTOSAVE_DELAY_MS)
 
   const handleChange = (key: StarKey) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValues((prev) => ({ ...prev, [key]: e.target.value }))
-    handleAutoSave()
+    scheduleAutoSave()
   }
 
   return (
@@ -72,7 +68,7 @@ export const StarEditor = ({ workspaceId, experience }: StarEditorProps) => {
             </Text>
           </Flex>
           <div className="min-w-0 flex-1">
-            <Textarea maxLength={600} placeholder="텍스트를 입력해 주세요." value={values[field.key]} onChange={handleChange(field.key)} />
+            <Textarea maxLength={600} placeholder="텍스트를 입력해 주세요." value={values[field.key]} onChange={handleChange(field.key)} onBlur={() => flushAutoSave()} />
           </div>
         </Flex>
       ))}

@@ -228,6 +228,15 @@ input FreeExperienceContentsRequest {
   content: String!
 }
 
+"""AI로 생성한 핵심역량입니다."""
+type GeneratedCoreCompetency {
+  """생성된 핵심역량 문단입니다."""
+  coreCompetency: String!
+
+  """화면 표시용 JD 지원 전략입니다. jdId를 준 경우에만 채워지며, 핵심역량 생성 입력에는 사용되지 않습니다."""
+  strategy: String
+}
+
 """JD입니다."""
 type Jd {
   """기업/팀 소개입니다."""
@@ -245,7 +254,7 @@ type Jd {
   """전형 절차 목록입니다."""
   hiringProcess: [String!]!
 
-  """등록 시 AI가 생성해 저장한 공고 핵심과 지원 전략입니다."""
+  """JD 등록 시 워크스페이스 프로필을 기반으로 생성해 저장한 지원 전략입니다."""
   insight: JdInsight!
 
   """JD를 식별하는 ID입니다."""
@@ -284,9 +293,6 @@ type JdCandidate {
 
 """JD의 AI 인사이트입니다."""
 type JdInsight {
-  """공고 핵심입니다. 공고가 원하는 인재상/핵심 요구를 요약한 서술형 문단입니다."""
-  keyPoints: String!
-
   """지원 전략입니다. 어떤 경험을 어떻게 강조하면 좋을지 조언하는 서술형 문단입니다."""
   strategy: String!
 }
@@ -406,11 +412,22 @@ type Mutation {
     workspaceId: ID!
   ): Boolean!
 
-  """프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성합니다. 결과만 반환하고 저장하지 않습니다."""
+  """
+  프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성합니다.
+  생성 결과는 응답으로만 반환하고, 이력서에는 생성 성공 여부만 기록합니다.
+  """
   generateCoreCompetency(
+    """
+    JD ID입니다. 주면 해당 JD 내용을 반영해 핵심역량을 생성하고 화면 표시용 지원 전략(strategy)을 함께 반환합니다. (선택)
+    """
+    jdId: ID = null
+
+    """생성 여부를 기록할 이력서 ID입니다."""
+    resumeId: ID!
+
     """워크스페이스 ID입니다."""
     workspaceId: ID!
-  ): String!
+  ): GeneratedCoreCompetency!
 
   """Notion 페이지 내용을 경험으로 가져옵니다."""
   importNotionExperiences(
@@ -437,6 +454,9 @@ type Mutation {
   polishProfileText(
     """텍스트 다듬기 입력입니다."""
     request: PolishProfileTextRequest!
+
+    """워크스페이스 ID입니다. request.jdId로 지원 전략을 반영할 때 필수입니다."""
+    workspaceId: ID = null
   ): String!
 
   """
@@ -578,11 +598,35 @@ input PeriodInput {
 
 """프로필 텍스트 AI 다듬기 입력입니다."""
 input PolishProfileTextRequest {
+  """직접 작성 지침입니다. 어투, 강조할 수치 등을 자유롭게 적습니다. (최대 200자)"""
+  instruction: String = null
+
+  """JD ID입니다. 주면 해당 JD의 지원 전략을 반영해 다듬습니다. workspaceId와 함께 사용합니다."""
+  jdId: ID = null
+
   """다듬기 대상 항목입니다. 항목별 글자수 제한에 맞춰 다듬습니다."""
   kind: ProfilePolishKind!
 
-  """다듬을 원문입니다. (최대 600자)"""
+  """작성 구조입니다. (불렛형/문제-해결-성과/산문형, 미지정 시 원문 형식 유지)"""
+  structure: PolishStructure = null
+
+  """다듬을 원문입니다. (최대 500자)"""
   text: String!
+
+  """경험명입니다. 경험 세부 내용을 다듬을 때 맥락으로 사용됩니다. (최대 100자)"""
+  title: String = null
+}
+
+"""첨삭 결과의 작성 구조입니다."""
+enum PolishStructure {
+  """불렛형"""
+  BULLET
+
+  """문제-해결-성과"""
+  PROBLEM_SOLUTION_RESULT
+
+  """산문형"""
+  PROSE
 }
 
 """이력서 기본 정보 프로필입니다. 이력서에 들어가는 정보의 원본을 워크스페이스당 1개 관리합니다."""
@@ -767,7 +811,7 @@ enum ProfilePolishKind {
   """핵심역량 (최대 500자)"""
   CORE_COMPETENCY
 
-  """경험 STAR 설명 (최대 600자)"""
+  """경험 STAR 설명 (최대 500자)"""
   EXPERIENCE_DESCRIPTION
 
   """경험명 (최대 48자)"""
@@ -828,7 +872,9 @@ type Query {
     """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
     cursor: String = null
 
-    """JD ID입니다. 주면 각 경험에 해당 JD 기준 matchRate와 reason(상위 5개)을 채웁니다. (선택)"""
+    """
+    JD ID입니다. 주면 지원 전략(strategy)과 각 경험에 해당 JD 기준 matchRate와 recommendedReason(상위 5개)을 채웁니다. (선택)
+    """
     jdId: ID = null
 
     """특정 프로젝트의 경험만 조회할 때 사용하는 프로젝트 ID입니다 (선택)"""
@@ -961,6 +1007,9 @@ type Query {
 
 """이력서 상세 응답입니다."""
 type Resume {
+  """PROFILE_CORE_COMPETENCY_GENERATION을 성공적으로 수행했는지 여부입니다."""
+  coreCompetencyGenerated: Boolean!
+
   """생성 시각입니다."""
   createdAt: String!
 
@@ -978,9 +1027,6 @@ type Resume {
 
   """이력서 템플릿입니다."""
   template: ResumeTemplate!
-
-  """마지막 수정 시각입니다."""
-  updatedAt: String!
 }
 
 """수상 payload 응답입니다."""
@@ -1095,12 +1141,18 @@ input ResumeCertificatePayloadInput {
 type ResumeCoreSkillPayload {
   """핵심 역량 내용입니다."""
   content: String
+
+  """이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다."""
+  isInitialItem: Boolean!
 }
 
 """핵심 역량 payload 입력입니다."""
 input ResumeCoreSkillPayloadInput {
   """핵심 역량 내용입니다."""
   content: String
+
+  """이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다."""
+  isInitialItem: Boolean! = false
 }
 
 """학력 payload 응답입니다."""
@@ -1202,15 +1254,6 @@ enum ResumeOptimizationMode {
   NONE
 }
 
-"""이력서 저장 시 경험 내용을 처리하는 방식입니다."""
-enum ResumeOptimizationMode {
-  """대상 채용공고를 기준으로 경험 내용을 첨삭하여 저장합니다."""
-  JOB_SPECIFIC
-
-  """입력한 내용을 그대로 저장합니다."""
-  NONE
-}
-
 """이력서 섹션 응답입니다."""
 type ResumeSection {
   """생성 시각입니다."""
@@ -1231,9 +1274,6 @@ type ResumeSection {
   """섹션 종류입니다."""
   type: ResumeSectionType!
 
-  """마지막 수정 시각입니다."""
-  updatedAt: String!
-
   """섹션 노출 여부입니다."""
   visible: Boolean!
 }
@@ -1251,9 +1291,6 @@ type ResumeSectionItem {
 
   """아이템 상세 payload입니다."""
   payload: ResumeSectionItemPayload!
-
-  """마지막 수정 시각입니다."""
-  updatedAt: String!
 
   """아이템 노출 여부입니다."""
   visible: Boolean!
@@ -1387,6 +1424,9 @@ enum ResumeStatusType {
 
 """이력서 목록용 요약 응답입니다."""
 type ResumeSummary {
+  """PROFILE_CORE_COMPETENCY_GENERATION을 성공적으로 수행했는지 여부입니다."""
+  coreCompetencyGenerated: Boolean!
+
   """생성 시각입니다."""
   createdAt: String!
 
@@ -1401,9 +1441,6 @@ type ResumeSummary {
 
   """이력서 템플릿입니다."""
   template: ResumeTemplate!
-
-  """마지막 수정 시각입니다."""
-  updatedAt: String!
 }
 
 """이력서 템플릿 종류입니다."""

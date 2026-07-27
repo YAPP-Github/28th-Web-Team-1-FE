@@ -1,8 +1,8 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { type ChangeEvent, Suspense, useState } from 'react'
 import { Flex } from '@radix-ui/themes'
-import { SearchField, Spacing } from '@shared/ui'
+import { SearchField, Spacing, Text } from '@shared/ui'
 import { useMatchedExperiences } from '@entities/experience'
 import { ProjectFilter, PROJECT_FILTER, type ProjectFilterValue, ProjectFilterLoading } from './ProjectFilter'
 import { ExperienceCard, ExperienceCardSkeleton } from './ExperienceCard'
@@ -20,9 +20,18 @@ export const ExperienceSearchPanel = ({ workspaceId, jdId, isSelected, isFull, o
   const [search, setSearch] = useState('')
   const [projectFilter, setProjectFilter] = useState<ProjectFilterValue>(PROJECT_FILTER.recommended)
 
+  // 타 카테고리 선택 상태에서 검색을 시작하면 전체 경험에서 찾도록 '전체'로 전환한다.
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setSearch(value)
+    if (value.trim() && projectFilter !== PROJECT_FILTER.all) {
+      setProjectFilter(PROJECT_FILTER.all)
+    }
+  }
+
   return (
     <Flex direction="column" flexShrink={'0'} className={'bg-bg-white w-107 min-w-107 rounded-xl p-6'}>
-      <SearchField size={'sm'} placeholder={'경험명 또는 역량 키워드를 검색해 보세요.'} value={search} onChange={(event) => setSearch(event.target.value)} />
+      <SearchField size={'sm'} placeholder={'경험명 또는 역량 키워드를 검색해 보세요.'} value={search} onChange={handleSearchChange} />
 
       <Spacing size={20} />
 
@@ -53,6 +62,45 @@ const ExperienceList = ({ workspaceId, jdId, search, projectFilter, isSelected, 
   const { experiences } = useMatchedExperiences(workspaceId, jdId)
   const browseList = sortByMatchRateDesc(experiences)
   const filtered = browseList.filter((experience) => matchesSearch(experience, search) && matchesProject(experience, projectFilter))
+
+  if (filtered.length === 0) {
+    if (projectFilter === PROJECT_FILTER.recommended) {
+      return (
+        <Flex direction={'column'} align={'center'} className={'m-auto'}>
+          <Text variant={'label1'} color={'text-subtle'}>
+            채용 공고와 맞는 경험을 찾지 못했어요
+          </Text>
+          <Text variant={'caption1'} color={'text-subtler'}>
+            관련 경험을 추가하거나 다른 경험을 선택해보세요
+          </Text>
+        </Flex>
+      )
+    }
+
+    if (search.trim()) {
+      return (
+        <Flex direction={'column'} align={'center'} className={'m-auto'}>
+          <Text variant={'label1'} color={'text-subtle'}>
+            검색 결과가 없어요
+          </Text>
+          <Text variant={'caption1'} color={'text-subtler'}>
+            관련 경험을 추가하거나 다른 경험을 선택해보세요
+          </Text>
+        </Flex>
+      )
+    }
+
+    return (
+      <Flex direction={'column'} align={'center'} className={'m-auto'}>
+        <Text variant={'label1'} color={'text-subtle'}>
+          프로젝트에 등록된 경험이 없어요
+        </Text>
+        <Text variant={'caption1'} color={'text-subtler'}>
+          관련 경험을 추가해 주세요
+        </Text>
+      </Flex>
+    )
+  }
 
   return (
     <Flex direction={'column'} gap={'2'} minHeight={'0'} flexGrow={'1'} className={'overflow-y-auto'}>

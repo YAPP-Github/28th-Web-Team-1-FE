@@ -1,6 +1,7 @@
 'use client'
 import { useRef, useState, type DragEvent } from 'react'
 import { Flex } from '@radix-ui/themes'
+import { AnimatePresence, motion } from 'motion/react'
 import { toast } from 'sonner'
 import { FilePlusCorner, Trash2 } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
@@ -63,35 +64,48 @@ export const PdfUpload = ({ file, onChange, className }: PdfUploadProps) => {
           e.target.value = ''
         }}
       />
-      {file ? (
-        <UploadCompleteCard />
-      ) : (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          onDragOver={(e) => {
-            e.preventDefault()
-            setIsDragging(true)
-          }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleDrop}
-          className={cn(
-            'border-btn-outline-border bg-element-gray-lighter flex h-38.5 w-full grow flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-6 py-10',
-            isDragging && 'border-btn-secondary-border',
-            'hover:border-btn-secondary-border hover:bg-element-primary-lighter'
-          )}
-        >
-          <FilePlusCorner size={24} className="text-text-subtler" />
-          <Flex direction="column" align="center" className="gap-0.5">
-            <Text variant="headline2" color="text-subtler">
-              이력서 파일을 드래그하거나 선택해 주세요.
-            </Text>
-            <Text variant="caption1" color="text-subtler">
-              지원가능 파일 : pdf (최대 4.5MB까지 업로드 가능)
-            </Text>
-          </Flex>
-        </button>
-      )}
+      <AnimatePresence mode="wait" initial={false}>
+        {file ? (
+          <motion.div
+            key="complete"
+            className="flex w-full grow flex-col"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <UploadCompleteCard />
+          </motion.div>
+        ) : (
+          <motion.div key="dropzone" className="flex w-full grow flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault()
+                setIsDragging(true)
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+              className={cn(
+                'border-btn-outline-border bg-element-gray-lighter flex h-38.5 w-full grow flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-6 py-10',
+                isDragging && 'border-btn-secondary-border',
+                'hover:border-btn-secondary-border hover:bg-element-primary-lighter'
+              )}
+            >
+              <FilePlusCorner size={24} className="text-text-subtler" />
+              <Flex direction="column" align="center" className="gap-0.5">
+                <Text variant="headline2" color="text-subtler">
+                  이력서 파일을 드래그하거나 선택해 주세요.
+                </Text>
+                <Text variant="caption1" color="text-subtler">
+                  지원가능 파일 : pdf (최대 4.5MB까지 업로드 가능)
+                </Text>
+              </Flex>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {file && <UploadedFileRow file={file} onRemove={() => onChange(null)} />}
     </Flex>
   )
@@ -101,7 +115,9 @@ const UploadCompleteCard = () => {
   return (
     <Flex direction="column" align="center" justify="center" className="border-border-subtle h-38.5 w-full grow gap-5 rounded-xl border px-6 py-8">
       <Flex direction="column" align="center" className="gap-2">
-        <FilePlusCorner size={24} className="text-text-basic" />
+        <motion.div initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 400, damping: 15, delay: 0.05 }}>
+          <FilePlusCorner size={24} className="text-text-basic" />
+        </motion.div>
         <Text variant="headline2" color="text-basic">
           업로드 완료
         </Text>

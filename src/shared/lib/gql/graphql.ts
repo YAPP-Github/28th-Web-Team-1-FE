@@ -126,6 +126,31 @@ export type PeriodInput = {
   startAt?: string | null | undefined;
 };
 
+/** 프로필 텍스트 AI 다듬기 입력입니다. */
+export type PolishProfileTextRequest = {
+  /** 직접 작성 지침입니다. 어투, 강조할 수치 등을 자유롭게 적습니다. (최대 200자) */
+  instruction?: string | null | undefined;
+  /** JD ID입니다. 주면 해당 JD의 지원 전략을 반영해 다듬습니다. workspaceId와 함께 사용합니다. */
+  jdId?: string | number | null | undefined;
+  /** 다듬기 대상 항목입니다. 항목별 글자수 제한에 맞춰 다듬습니다. */
+  kind: ProfilePolishKind;
+  /** 작성 구조입니다. (불렛형/문제-해결-성과/산문형, 미지정 시 원문 형식 유지) */
+  structure?: PolishStructure | null | undefined;
+  /** 다듬을 원문입니다. (최대 500자) */
+  text: string;
+  /** 경험명입니다. 경험 세부 내용을 다듬을 때 맥락으로 사용됩니다. (최대 100자) */
+  title?: string | null | undefined;
+};
+
+/** 첨삭 결과의 작성 구조입니다. */
+export type PolishStructure =
+  /** 불렛형 */
+  | 'BULLET'
+  /** 문제-해결-성과 */
+  | 'PROBLEM_SOLUTION_RESULT'
+  /** 산문형 */
+  | 'PROSE';
+
 /** 수상 입력입니다. */
 export type ProfileAwardRequest = {
   /** 수상일입니다. (YYYY-MM-DD) */
@@ -181,6 +206,17 @@ export type ProfileLanguageTestRequest = {
   /** 시험명입니다. */
   testName?: string | null | undefined;
 };
+
+/** 프로필 텍스트 다듬기 대상 항목입니다. */
+export type ProfilePolishKind =
+  /** 경력 세부 내용 (최대 500자) */
+  | 'CAREER_DESCRIPTION'
+  /** 핵심역량 (최대 500자) */
+  | 'CORE_COMPETENCY'
+  /** 경험 STAR 설명 (최대 500자) */
+  | 'EXPERIENCE_DESCRIPTION'
+  /** 경험명 (최대 48자) */
+  | 'EXPERIENCE_TITLE';
 
 /** 스킬 입력입니다. */
 export type ProfileSkillRequest = {
@@ -238,6 +274,8 @@ export type ResumeCertificatePayloadInput = {
 export type ResumeCoreSkillPayloadInput = {
   /** 핵심 역량 내용입니다. */
   content?: string | null | undefined;
+  /** 이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다. */
+  isInitialItem?: boolean;
 };
 
 /** 학력 payload 입력입니다. */
@@ -542,7 +580,7 @@ export type JdInsightQueryVariables = Exact<{
 }>;
 
 
-export type JdInsightQuery = { jdInsight: { keyPoints: string, strategy: string } | null };
+export type JdInsightQuery = { jdInsight: { strategy: string } | null };
 
 export type JdMetaQueryVariables = Exact<{
   workspaceId: string | number;
@@ -551,6 +589,14 @@ export type JdMetaQueryVariables = Exact<{
 
 
 export type JdMetaQuery = { jd: { companyName: string, positionTitle: string } | null };
+
+export type JdDetailQueryVariables = Exact<{
+  workspaceId: string | number;
+  jdId: string | number;
+}>;
+
+
+export type JdDetailQuery = { jd: { companyIntro: string, responsibilities: Array<string>, requiredExperiences: Array<string>, preferredExperiences: Array<string>, hiringProcess: Array<string> } | null };
 
 export type RegisterJdMutationVariables = Exact<{
   workspaceId: string | number;
@@ -600,7 +646,7 @@ export type ProfileQueryVariables = Exact<{
 }>;
 
 
-export type ProfileQuery = { profile: { profileId: string, name: string | null, email: string | null, phone: string | null, educations: Array<{ school: string | null, major: string | null, degree: Degree | null, status: EducationStatus | null, period: { startAt: string | null, endAt: string | null } | null }>, careers: Array<{ company: string | null, position: string | null, period: { startAt: string | null, endAt: string | null } | null }>, awards: Array<{ title: string | null, organization: string | null, awardedAt: string | null }>, languageTests: Array<{ testName: string | null, score: string | null, acquiredAt: string | null }>, certifications: Array<{ name: string | null, issuer: string | null, acquiredAt: string | null }>, skills: Array<{ name: string | null, level: SkillLevel | null }> } };
+export type ProfileQuery = { profile: { profileId: string, name: string | null, email: string | null, phone: string | null, coreCompetency: string | null, educations: Array<{ school: string | null, major: string | null, degree: Degree | null, status: EducationStatus | null, period: { startAt: string | null, endAt: string | null } | null }>, careers: Array<{ company: string | null, position: string | null, description: string | null, period: { startAt: string | null, endAt: string | null } | null }>, awards: Array<{ title: string | null, organization: string | null, awardedAt: string | null }>, languageTests: Array<{ testName: string | null, score: string | null, acquiredAt: string | null }>, certifications: Array<{ name: string | null, issuer: string | null, acquiredAt: string | null }>, skills: Array<{ name: string | null, level: SkillLevel | null }> } };
 
 export type UpdateProfileMutationVariables = Exact<{
   workspaceId: string | number;
@@ -609,6 +655,23 @@ export type UpdateProfileMutationVariables = Exact<{
 
 
 export type UpdateProfileMutation = { updateProfile: { profileId: string } };
+
+export type PolishProfileTextMutationVariables = Exact<{
+  request: PolishProfileTextRequest;
+  workspaceId?: string | number | null | undefined;
+}>;
+
+
+export type PolishProfileTextMutation = { polishProfileText: string };
+
+export type GenerateCoreCompetencyMutationVariables = Exact<{
+  workspaceId: string | number;
+  resumeId: string | number;
+  jdId?: string | number | null | undefined;
+}>;
+
+
+export type GenerateCoreCompetencyMutation = { generateCoreCompetency: { coreCompetency: string, strategy: string | null } };
 
 export type ProjectListItemFragment = { projectId: string, name: string };
 
@@ -663,6 +726,23 @@ export type DeleteProjectMutationVariables = Exact<{
 
 export type DeleteProjectMutation = { deleteExperienceProject: boolean };
 
+export type ResumesQueryVariables = Exact<{
+  workspaceId: string | number;
+  size: number;
+  cursor?: string | null | undefined;
+  statuses?: Array<ResumeStatusType> | ResumeStatusType | null | undefined;
+}>;
+
+
+export type ResumesQuery = { resumes: { cursor: { hasNext: boolean, nextCursor: string | null }, resumes: Array<{ resumeId: string, status: ResumeStatusType, createdAt: string, targetJd: { jdId: string, companyName: string, positionTitle: string, coreCompetencies: Array<string> } | null }> } };
+
+export type ResumeCountsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type ResumeCountsQuery = { resumeCounts: Array<{ status: ResumeStatusType, count: unknown }> };
+
 export type CreateResumeMutationVariables = Exact<{
   workspaceId: string | number;
   input: CreateResumeInput;
@@ -682,7 +762,7 @@ export type UpdateResumeMutation = { updateResume: { resumeId: string } };
 
 export type ResumeBasicInfoFieldsFragment = { name: string | null, email: string | null, phone: string | null, hideContact: boolean };
 
-export type ResumeCoreSkillFieldsFragment = { content: string | null };
+export type ResumeCoreSkillFieldsFragment = { content: string | null, isInitialItem: boolean };
 
 export type ResumeCareerFieldsFragment = { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
@@ -704,7 +784,7 @@ export type ResumeQueryVariables = Exact<{
 }>;
 
 
-export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string | null, email: string | null, phone: string | null, hideContact: boolean } | null, coreSkill: { content: string | null } | null, career: { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string | null, organization: string | null, awardedAt: string | null } | null, language: { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null } | null, certificate: { name: string | null, organization: string | null, acquiredAt: string | null } | null, skill: { name: string | null, level: string | null } | null } }> }> } };
+export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string | null, email: string | null, phone: string | null, hideContact: boolean } | null, coreSkill: { content: string | null, isInitialItem: boolean } | null, career: { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string | null, organization: string | null, awardedAt: string | null } | null, language: { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null } | null, certificate: { name: string | null, organization: string | null, acquiredAt: string | null } | null, skill: { name: string | null, level: string | null } | null } }> }> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -751,6 +831,7 @@ export const ResumeBasicInfoFieldsFragmentDoc = new TypedDocumentString(`
 export const ResumeCoreSkillFieldsFragmentDoc = new TypedDocumentString(`
     fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {
   content
+  isInitialItem
 }
     `, {"fragmentName":"ResumeCoreSkillFields"}) as unknown as TypedDocumentString<ResumeCoreSkillFieldsFragment, unknown>;
 export const ResumeCareerFieldsFragmentDoc = new TypedDocumentString(`
@@ -982,7 +1063,6 @@ export const DeleteExperienceDocument = new TypedDocumentString(`
 export const JdInsightDocument = new TypedDocumentString(`
     query JdInsight($workspaceId: ID!, $jdId: ID!) {
   jdInsight(workspaceId: $workspaceId, jdId: $jdId) {
-    keyPoints
     strategy
   }
 }
@@ -995,6 +1075,17 @@ export const JdMetaDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<JdMetaQuery, JdMetaQueryVariables>;
+export const JdDetailDocument = new TypedDocumentString(`
+    query JdDetail($workspaceId: ID!, $jdId: ID!) {
+  jd(workspaceId: $workspaceId, id: $jdId) {
+    companyIntro
+    responsibilities
+    requiredExperiences
+    preferredExperiences
+    hiringProcess
+  }
+}
+    `) as unknown as TypedDocumentString<JdDetailQuery, JdDetailQueryVariables>;
 export const RegisterJdDocument = new TypedDocumentString(`
     mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {
   registerJd(workspaceId: $workspaceId, request: $request) {
@@ -1066,6 +1157,7 @@ export const ProfileDocument = new TypedDocumentString(`
     name
     email
     phone
+    coreCompetency
     educations {
       school
       major
@@ -1079,6 +1171,7 @@ export const ProfileDocument = new TypedDocumentString(`
     careers {
       company
       position
+      description
       period {
         startAt
         endAt
@@ -1113,6 +1206,23 @@ export const UpdateProfileDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateProfileMutation, UpdateProfileMutationVariables>;
+export const PolishProfileTextDocument = new TypedDocumentString(`
+    mutation PolishProfileText($request: PolishProfileTextRequest!, $workspaceId: ID) {
+  polishProfileText(request: $request, workspaceId: $workspaceId)
+}
+    `) as unknown as TypedDocumentString<PolishProfileTextMutation, PolishProfileTextMutationVariables>;
+export const GenerateCoreCompetencyDocument = new TypedDocumentString(`
+    mutation GenerateCoreCompetency($workspaceId: ID!, $resumeId: ID!, $jdId: ID) {
+  generateCoreCompetency(
+    workspaceId: $workspaceId
+    resumeId: $resumeId
+    jdId: $jdId
+  ) {
+    coreCompetency
+    strategy
+  }
+}
+    `) as unknown as TypedDocumentString<GenerateCoreCompetencyMutation, GenerateCoreCompetencyMutationVariables>;
 export const ProjectsDocument = new TypedDocumentString(`
     query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {
   projectList: experienceProjects(
@@ -1201,6 +1311,40 @@ export const DeleteProjectDocument = new TypedDocumentString(`
   deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)
 }
     `) as unknown as TypedDocumentString<DeleteProjectMutation, DeleteProjectMutationVariables>;
+export const ResumesDocument = new TypedDocumentString(`
+    query Resumes($workspaceId: ID!, $size: Int!, $cursor: String, $statuses: [ResumeStatusType!]) {
+  resumes(
+    workspaceId: $workspaceId
+    size: $size
+    cursor: $cursor
+    statuses: $statuses
+  ) {
+    cursor {
+      hasNext
+      nextCursor
+    }
+    resumes {
+      resumeId
+      status
+      createdAt
+      targetJd {
+        jdId
+        companyName
+        positionTitle
+        coreCompetencies
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ResumesQuery, ResumesQueryVariables>;
+export const ResumeCountsDocument = new TypedDocumentString(`
+    query ResumeCounts($workspaceId: ID!) {
+  resumeCounts(workspaceId: $workspaceId) {
+    status
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<ResumeCountsQuery, ResumeCountsQueryVariables>;
 export const CreateResumeDocument = new TypedDocumentString(`
     mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {
   createResume(workspaceId: $workspaceId, input: $input) {
@@ -1277,6 +1421,7 @@ export const ResumeDocument = new TypedDocumentString(`
 }
 fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {
   content
+  isInitialItem
 }
 fragment ResumeCareerFields on ResumeCareerPayload {
   companyName

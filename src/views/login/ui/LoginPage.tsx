@@ -1,12 +1,16 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
-import { GoogleLoginButton, WithdrawButton } from '@features/authenticate'
+import { AuthErrorToast, GoogleLoginButton } from '@features/authenticate'
 import { Button, Heading, Text } from '@shared/ui'
 import { Logo } from '@shared/icon'
 
 export const LoginPage = () => {
   return (
     <main className="relative">
+      <Suspense fallback={null}>
+        <AuthErrorToast />
+      </Suspense>
       <header className="absolute top-8 left-8 flex items-center gap-16">
         <Logo />
         {/* TODO : 링크 연결 필요 */}
@@ -18,10 +22,6 @@ export const LoginPage = () => {
         </Button>
       </header>
 
-      {/* TODO : 회원탈퇴 버튼은 임시로 추가. 추후 마이페이지 플로우가 완성되면 제거 필요 */}
-      <div className="absolute right-8 bottom-8">
-        <WithdrawButton />
-      </div>
       <Flex direction="column" gap="48px" align="center" justify="center" className="h-screen">
         <Flex gap="5" direction="column" align="center">
           {/* TODO : 로고가 생기면 변경 필요 */}

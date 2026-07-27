@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { Flex, Grid } from '@radix-ui/themes'
+import { toast } from 'sonner'
 import { Button, Text, SearchField } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
 import { DialogHeader, DialogTitle, DialogDescription } from '@shared/ui/dialog'
@@ -8,13 +9,15 @@ import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
 import { useNotionPages } from '@entities/notion'
 import { NotionPageCard } from '@features/notion_connect'
 
+const MAX_NOTION_PAGES = 3
+
 interface AddProjectNotionViewProps {
   workspaceId: string
   connectionId: string
   onExtract: (pageIds: string[]) => void
 }
 
-/** Notion 단계: 연동된 Notion에서 페이지를 검색·다중 선택해 프로젝트로 추출한다. */
+/** Notion 단계: 연동된 Notion에서 페이지를 검색·다중 선택해(최대 3개) 프로젝트로 추출한다. */
 export const AddProjectNotionView = ({ workspaceId, connectionId, onExtract }: AddProjectNotionViewProps) => {
   const [pageIds, setPageIds] = useState<string[]>([])
   const [keyword, setKeyword] = useState('')
@@ -29,7 +32,14 @@ export const AddProjectNotionView = ({ workspaceId, connectionId, onExtract }: A
   })
 
   const toggle = useCallback((id: string) => {
-    setPageIds((prev) => (prev.includes(id) ? prev.filter((pageId) => pageId !== id) : [...prev, id]))
+    setPageIds((prev) => {
+      if (prev.includes(id)) return prev.filter((pageId) => pageId !== id)
+      if (prev.length >= MAX_NOTION_PAGES) {
+        toast.warning(`페이지는 최대 ${MAX_NOTION_PAGES}개까지 선택할 수 있어요.`, { id: 'notion-page-max', position: 'top-center' })
+        return prev
+      }
+      return [...prev, id]
+    })
   }, [])
 
   return (
@@ -43,9 +53,20 @@ export const AddProjectNotionView = ({ workspaceId, connectionId, onExtract }: A
         {pages.length > 0 ? (
           <Flex ref={scrollRef} direction="column" className="max-h-[60vh] gap-3 overflow-y-auto pr-2">
             <Grid columns={pages.length > 20 ? '2' : '1'} gapX="3" gapY="3">
-              {pages.map((page) => (
-                <NotionPageCard key={page.pageId} id={page.pageId} title={page.title} lastEditedTime={page.lastEditedTime} isSelected={pageIds.includes(page.pageId)} onToggle={toggle} />
-              ))}
+              {pages.map((page) => {
+                const isSelected = pageIds.includes(page.pageId)
+                return (
+                  <NotionPageCard
+                    key={page.pageId}
+                    id={page.pageId}
+                    title={page.title}
+                    lastEditedTime={page.lastEditedTime}
+                    isSelected={isSelected}
+                    onToggle={toggle}
+                    disabled={!isSelected && pageIds.length >= MAX_NOTION_PAGES}
+                  />
+                )
+              })}
             </Grid>
             {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-px shrink-0" />}
           </Flex>

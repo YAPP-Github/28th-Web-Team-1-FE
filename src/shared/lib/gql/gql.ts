@@ -23,15 +23,18 @@ type Documents = {
     "\n  mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {\n    createExperience(workspaceId: $workspaceId, request: $request) {\n      experienceId\n    }\n  }\n": typeof types.CreateExperienceDocument,
     "\n  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {\n    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {\n      experienceId\n    }\n  }\n": typeof types.UpdateExperienceDocument,
     "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": typeof types.DeleteExperienceDocument,
-    "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": typeof types.JdInsightDocument,
+    "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      strategy\n    }\n  }\n": typeof types.JdInsightDocument,
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": typeof types.JdMetaDocument,
+    "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n": typeof types.JdDetailDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": typeof types.RegisterJdDocument,
     "\n  mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {\n    connectNotion(workspaceId: $workspaceId, request: $request) {\n      connectionId\n      notionWorkspaceName\n      notionWorkspaceIcon\n    }\n  }\n": typeof types.ConnectNotionDocument,
     "\n  query NotionConnections($workspaceId: ID!, $size: Int!) {\n    notionConnections(workspaceId: $workspaceId, size: $size) {\n      connections {\n        connectionId\n        notionWorkspaceName\n        notionWorkspaceIcon\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": typeof types.NotionConnectionsDocument,
     "\n  query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {\n    notionPages(workspaceId: $workspaceId, connectionId: $connectionId, query: $query, size: $size, cursor: $cursor) {\n      pages {\n        pageId\n        title\n        url\n        lastEditedTime\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": typeof types.NotionPagesDocument,
     "\n  mutation ImportNotionExperiences($workspaceId: ID!, $request: NotionExperienceImportRequest!) {\n    importNotionExperiences(workspaceId: $workspaceId, request: $request)\n  }\n": typeof types.ImportNotionExperiencesDocument,
-    "\n  query Profile($workspaceId: ID!) {\n    profile(workspaceId: $workspaceId) {\n      profileId\n      name\n      email\n      phone\n      educations {\n        school\n        major\n        degree\n        status\n        period {\n          startAt\n          endAt\n        }\n      }\n      careers {\n        company\n        position\n        period {\n          startAt\n          endAt\n        }\n      }\n      awards {\n        title\n        organization\n        awardedAt\n      }\n      languageTests {\n        testName\n        score\n        acquiredAt\n      }\n      certifications {\n        name\n        issuer\n        acquiredAt\n      }\n      skills {\n        name\n        level\n      }\n    }\n  }\n": typeof types.ProfileDocument,
+    "\n  query Profile($workspaceId: ID!) {\n    profile(workspaceId: $workspaceId) {\n      profileId\n      name\n      email\n      phone\n      coreCompetency\n      educations {\n        school\n        major\n        degree\n        status\n        period {\n          startAt\n          endAt\n        }\n      }\n      careers {\n        company\n        position\n        description\n        period {\n          startAt\n          endAt\n        }\n      }\n      awards {\n        title\n        organization\n        awardedAt\n      }\n      languageTests {\n        testName\n        score\n        acquiredAt\n      }\n      certifications {\n        name\n        issuer\n        acquiredAt\n      }\n      skills {\n        name\n        level\n      }\n    }\n  }\n": typeof types.ProfileDocument,
     "\n  mutation UpdateProfile($workspaceId: ID!, $request: UpdateProfileRequest!) {\n    updateProfile(workspaceId: $workspaceId, request: $request) {\n      profileId\n    }\n  }\n": typeof types.UpdateProfileDocument,
+    "\n  mutation PolishProfileText($request: PolishProfileTextRequest!, $workspaceId: ID) {\n    polishProfileText(request: $request, workspaceId: $workspaceId)\n  }\n": typeof types.PolishProfileTextDocument,
+    "\n  mutation GenerateCoreCompetency($workspaceId: ID!, $resumeId: ID!, $jdId: ID) {\n    generateCoreCompetency(workspaceId: $workspaceId, resumeId: $resumeId, jdId: $jdId) {\n      coreCompetency\n      strategy\n    }\n  }\n": typeof types.GenerateCoreCompetencyDocument,
     "\n  fragment ProjectListItem on ExperienceProject {\n    projectId\n    name\n  }\n": typeof types.ProjectListItemFragmentDoc,
     "\n  query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    projectList: experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": typeof types.ProjectsDocument,
     "\n  query Project($workspaceId: ID!, $projectId: ID!) {\n    project: experienceProject(workspaceId: $workspaceId, projectId: $projectId) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": typeof types.ProjectDocument,
@@ -39,10 +42,12 @@ type Documents = {
     "\n  query ProjectFilterOptions($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        ...ProjectListItem\n      }\n    }\n  }\n": typeof types.ProjectFilterOptionsDocument,
     "\n  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {\n    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": typeof types.UpdateProjectDocument,
     "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": typeof types.DeleteProjectDocument,
+    "\n  query Resumes($workspaceId: ID!, $size: Int!, $cursor: String, $statuses: [ResumeStatusType!]) {\n    resumes(workspaceId: $workspaceId, size: $size, cursor: $cursor, statuses: $statuses) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      resumes {\n        resumeId\n        status\n        createdAt\n        targetJd {\n          jdId\n          companyName\n          positionTitle\n          coreCompetencies\n        }\n      }\n    }\n  }\n": typeof types.ResumesDocument,
+    "\n  query ResumeCounts($workspaceId: ID!) {\n    resumeCounts(workspaceId: $workspaceId) {\n      status\n      count\n    }\n  }\n": typeof types.ResumeCountsDocument,
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": typeof types.CreateResumeDocument,
     "\n  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {\n    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {\n      resumeId\n    }\n  }\n": typeof types.UpdateResumeDocument,
     "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": typeof types.ResumeBasicInfoFieldsFragmentDoc,
-    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n": typeof types.ResumeCoreSkillFieldsFragmentDoc,
+    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n    isInitialItem\n  }\n": typeof types.ResumeCoreSkillFieldsFragmentDoc,
     "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeCareerFieldsFragmentDoc,
     "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeExperienceFieldsFragmentDoc,
     "\n  fragment ResumeEducationFields on ResumeEducationPayload {\n    schoolName\n    major\n    degree\n    status\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeEducationFieldsFragmentDoc,
@@ -63,15 +68,18 @@ const documents: Documents = {
     "\n  mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {\n    createExperience(workspaceId: $workspaceId, request: $request) {\n      experienceId\n    }\n  }\n": types.CreateExperienceDocument,
     "\n  mutation UpdateExperience($workspaceId: ID!, $experienceId: ID!, $request: UpdateExperienceRequest!) {\n    updateExperience(workspaceId: $workspaceId, experienceId: $experienceId, request: $request) {\n      experienceId\n    }\n  }\n": types.UpdateExperienceDocument,
     "\n  mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) {\n    deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId)\n  }\n": types.DeleteExperienceDocument,
-    "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n": types.JdInsightDocument,
+    "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      strategy\n    }\n  }\n": types.JdInsightDocument,
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": types.JdMetaDocument,
+    "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n": types.JdDetailDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": types.RegisterJdDocument,
     "\n  mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {\n    connectNotion(workspaceId: $workspaceId, request: $request) {\n      connectionId\n      notionWorkspaceName\n      notionWorkspaceIcon\n    }\n  }\n": types.ConnectNotionDocument,
     "\n  query NotionConnections($workspaceId: ID!, $size: Int!) {\n    notionConnections(workspaceId: $workspaceId, size: $size) {\n      connections {\n        connectionId\n        notionWorkspaceName\n        notionWorkspaceIcon\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": types.NotionConnectionsDocument,
     "\n  query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {\n    notionPages(workspaceId: $workspaceId, connectionId: $connectionId, query: $query, size: $size, cursor: $cursor) {\n      pages {\n        pageId\n        title\n        url\n        lastEditedTime\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": types.NotionPagesDocument,
     "\n  mutation ImportNotionExperiences($workspaceId: ID!, $request: NotionExperienceImportRequest!) {\n    importNotionExperiences(workspaceId: $workspaceId, request: $request)\n  }\n": types.ImportNotionExperiencesDocument,
-    "\n  query Profile($workspaceId: ID!) {\n    profile(workspaceId: $workspaceId) {\n      profileId\n      name\n      email\n      phone\n      educations {\n        school\n        major\n        degree\n        status\n        period {\n          startAt\n          endAt\n        }\n      }\n      careers {\n        company\n        position\n        period {\n          startAt\n          endAt\n        }\n      }\n      awards {\n        title\n        organization\n        awardedAt\n      }\n      languageTests {\n        testName\n        score\n        acquiredAt\n      }\n      certifications {\n        name\n        issuer\n        acquiredAt\n      }\n      skills {\n        name\n        level\n      }\n    }\n  }\n": types.ProfileDocument,
+    "\n  query Profile($workspaceId: ID!) {\n    profile(workspaceId: $workspaceId) {\n      profileId\n      name\n      email\n      phone\n      coreCompetency\n      educations {\n        school\n        major\n        degree\n        status\n        period {\n          startAt\n          endAt\n        }\n      }\n      careers {\n        company\n        position\n        description\n        period {\n          startAt\n          endAt\n        }\n      }\n      awards {\n        title\n        organization\n        awardedAt\n      }\n      languageTests {\n        testName\n        score\n        acquiredAt\n      }\n      certifications {\n        name\n        issuer\n        acquiredAt\n      }\n      skills {\n        name\n        level\n      }\n    }\n  }\n": types.ProfileDocument,
     "\n  mutation UpdateProfile($workspaceId: ID!, $request: UpdateProfileRequest!) {\n    updateProfile(workspaceId: $workspaceId, request: $request) {\n      profileId\n    }\n  }\n": types.UpdateProfileDocument,
+    "\n  mutation PolishProfileText($request: PolishProfileTextRequest!, $workspaceId: ID) {\n    polishProfileText(request: $request, workspaceId: $workspaceId)\n  }\n": types.PolishProfileTextDocument,
+    "\n  mutation GenerateCoreCompetency($workspaceId: ID!, $resumeId: ID!, $jdId: ID) {\n    generateCoreCompetency(workspaceId: $workspaceId, resumeId: $resumeId, jdId: $jdId) {\n      coreCompetency\n      strategy\n    }\n  }\n": types.GenerateCoreCompetencyDocument,
     "\n  fragment ProjectListItem on ExperienceProject {\n    projectId\n    name\n  }\n": types.ProjectListItemFragmentDoc,
     "\n  query Projects($workspaceId: ID!, $size: Int!, $cursor: String) {\n    projectList: experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        projectId\n        name\n        period {\n          startAt\n          endAt\n        }\n      }\n    }\n  }\n": types.ProjectsDocument,
     "\n  query Project($workspaceId: ID!, $projectId: ID!) {\n    project: experienceProject(workspaceId: $workspaceId, projectId: $projectId) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": types.ProjectDocument,
@@ -79,10 +87,12 @@ const documents: Documents = {
     "\n  query ProjectFilterOptions($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experienceProjects(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      projects {\n        ...ProjectListItem\n      }\n    }\n  }\n": types.ProjectFilterOptionsDocument,
     "\n  mutation UpdateProject($workspaceId: ID!, $projectId: ID!, $request: UpdateExperienceProjectRequest!) {\n    updateProject: updateExperienceProject(workspaceId: $workspaceId, projectId: $projectId, request: $request) {\n      projectId\n      name\n      role\n      summary\n      period {\n        startAt\n        endAt\n      }\n    }\n  }\n": types.UpdateProjectDocument,
     "\n  mutation DeleteProject($workspaceId: ID!, $projectId: ID!) {\n    deleteExperienceProject(workspaceId: $workspaceId, projectId: $projectId)\n  }\n": types.DeleteProjectDocument,
+    "\n  query Resumes($workspaceId: ID!, $size: Int!, $cursor: String, $statuses: [ResumeStatusType!]) {\n    resumes(workspaceId: $workspaceId, size: $size, cursor: $cursor, statuses: $statuses) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      resumes {\n        resumeId\n        status\n        createdAt\n        targetJd {\n          jdId\n          companyName\n          positionTitle\n          coreCompetencies\n        }\n      }\n    }\n  }\n": types.ResumesDocument,
+    "\n  query ResumeCounts($workspaceId: ID!) {\n    resumeCounts(workspaceId: $workspaceId) {\n      status\n      count\n    }\n  }\n": types.ResumeCountsDocument,
     "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n": types.CreateResumeDocument,
     "\n  mutation UpdateResume($workspaceId: ID!, $resumeId: ID!, $input: SaveResumeInput!) {\n    updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {\n      resumeId\n    }\n  }\n": types.UpdateResumeDocument,
     "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": types.ResumeBasicInfoFieldsFragmentDoc,
-    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n": types.ResumeCoreSkillFieldsFragmentDoc,
+    "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n    isInitialItem\n  }\n": types.ResumeCoreSkillFieldsFragmentDoc,
     "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeCareerFieldsFragmentDoc,
     "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeExperienceFieldsFragmentDoc,
     "\n  fragment ResumeEducationFields on ResumeEducationPayload {\n    schoolName\n    major\n    degree\n    status\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeEducationFieldsFragmentDoc,
@@ -130,11 +140,15 @@ export function graphql(source: "\n  mutation DeleteExperience($workspaceId: ID!
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      keyPoints\n      strategy\n    }\n  }\n"): typeof import('./graphql').JdInsightDocument;
+export function graphql(source: "\n  query JdInsight($workspaceId: ID!, $jdId: ID!) {\n    jdInsight(workspaceId: $workspaceId, jdId: $jdId) {\n      strategy\n    }\n  }\n"): typeof import('./graphql').JdInsightDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n"): typeof import('./graphql').JdMetaDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n"): typeof import('./graphql').JdDetailDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -158,11 +172,19 @@ export function graphql(source: "\n  mutation ImportNotionExperiences($workspace
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Profile($workspaceId: ID!) {\n    profile(workspaceId: $workspaceId) {\n      profileId\n      name\n      email\n      phone\n      educations {\n        school\n        major\n        degree\n        status\n        period {\n          startAt\n          endAt\n        }\n      }\n      careers {\n        company\n        position\n        period {\n          startAt\n          endAt\n        }\n      }\n      awards {\n        title\n        organization\n        awardedAt\n      }\n      languageTests {\n        testName\n        score\n        acquiredAt\n      }\n      certifications {\n        name\n        issuer\n        acquiredAt\n      }\n      skills {\n        name\n        level\n      }\n    }\n  }\n"): typeof import('./graphql').ProfileDocument;
+export function graphql(source: "\n  query Profile($workspaceId: ID!) {\n    profile(workspaceId: $workspaceId) {\n      profileId\n      name\n      email\n      phone\n      coreCompetency\n      educations {\n        school\n        major\n        degree\n        status\n        period {\n          startAt\n          endAt\n        }\n      }\n      careers {\n        company\n        position\n        description\n        period {\n          startAt\n          endAt\n        }\n      }\n      awards {\n        title\n        organization\n        awardedAt\n      }\n      languageTests {\n        testName\n        score\n        acquiredAt\n      }\n      certifications {\n        name\n        issuer\n        acquiredAt\n      }\n      skills {\n        name\n        level\n      }\n    }\n  }\n"): typeof import('./graphql').ProfileDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation UpdateProfile($workspaceId: ID!, $request: UpdateProfileRequest!) {\n    updateProfile(workspaceId: $workspaceId, request: $request) {\n      profileId\n    }\n  }\n"): typeof import('./graphql').UpdateProfileDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation PolishProfileText($request: PolishProfileTextRequest!, $workspaceId: ID) {\n    polishProfileText(request: $request, workspaceId: $workspaceId)\n  }\n"): typeof import('./graphql').PolishProfileTextDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation GenerateCoreCompetency($workspaceId: ID!, $resumeId: ID!, $jdId: ID) {\n    generateCoreCompetency(workspaceId: $workspaceId, resumeId: $resumeId, jdId: $jdId) {\n      coreCompetency\n      strategy\n    }\n  }\n"): typeof import('./graphql').GenerateCoreCompetencyDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -194,6 +216,14 @@ export function graphql(source: "\n  mutation DeleteProject($workspaceId: ID!, $
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query Resumes($workspaceId: ID!, $size: Int!, $cursor: String, $statuses: [ResumeStatusType!]) {\n    resumes(workspaceId: $workspaceId, size: $size, cursor: $cursor, statuses: $statuses) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      resumes {\n        resumeId\n        status\n        createdAt\n        targetJd {\n          jdId\n          companyName\n          positionTitle\n          coreCompetencies\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ResumesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ResumeCounts($workspaceId: ID!) {\n    resumeCounts(workspaceId: $workspaceId) {\n      status\n      count\n    }\n  }\n"): typeof import('./graphql').ResumeCountsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation CreateResume($workspaceId: ID!, $input: CreateResumeInput!) {\n    createResume(workspaceId: $workspaceId, input: $input) {\n      resumeId\n    }\n  }\n"): typeof import('./graphql').CreateResumeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -206,7 +236,7 @@ export function graphql(source: "\n  fragment ResumeBasicInfoFields on ResumeBas
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n  }\n"): typeof import('./graphql').ResumeCoreSkillFieldsFragmentDoc;
+export function graphql(source: "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n    isInitialItem\n  }\n"): typeof import('./graphql').ResumeCoreSkillFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

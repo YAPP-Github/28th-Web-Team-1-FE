@@ -12,7 +12,7 @@ export const projectKeys = {
 
 export const projectQueries = {
   /** 경험정리 메인 페이지의 프로젝트 목록을 커서 기반으로 조회한다. */
-  list: (workspaceId: string, size = 10) =>
+  list: (workspaceId: string, size = 20) =>
     infiniteQueryOptions({
       queryKey: projectKeys.list(workspaceId),
       queryFn: ({ pageParam }) => projectAPI.getProjects({ workspaceId, size, cursor: pageParam }),

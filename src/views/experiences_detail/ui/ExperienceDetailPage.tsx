@@ -1,7 +1,8 @@
 'use client'
 import { Suspense, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { Flex } from '@radix-ui/themes'
+import { AnimatePresence, motion } from 'motion/react'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { useProject } from '@entities/project'
 import { useProjectExperiences } from '@entities/experience'
@@ -23,36 +24,28 @@ export const ExperienceDetailPage = () => {
         </Flex>
       }
     >
-      <Suspense
-        fallback={
-          <Flex align="center" justify="center" className="h-screen">
-            <Text variant="headline2" color="text-basic">
-              로딩중
-            </Text>
-          </Flex>
-        }
-      >
+      <Suspense fallback={null}>
         <ExperienceDetailContent />
       </Suspense>
     </ErrorBoundary>
   )
 }
-
 const ExperienceDetailContent = () => {
   const workspaceId = useWorkspaceId()
   const { projectId } = useParams<{ projectId: string }>()
+  const searchParams = useSearchParams()
   const { project } = useProject(workspaceId, projectId)
   const { experiences } = useProjectExperiences(workspaceId, projectId)
 
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(() => searchParams.get('experienceId'))
   const selectedExperience = experiences.find((experience) => experience.experienceId === selectedId) ?? null
 
   const handleSelect = (experienceId: string) => {
-    setSelectedId((prev) => (prev === experienceId ? null : experienceId))
+    setSelectedId(experienceId)
   }
 
   return (
-    <Flex className="h-screen">
+    <Flex className="h-screen overflow-x-hidden">
       <Flex direction="column" className="h-full flex-1 overflow-y-auto p-8">
         <Flex direction="column" gap="8" className={cn('w-full', selectedExperience ? 'max-w-full' : 'max-w-198.75')}>
           <Flex direction="column" gap="2">
@@ -68,7 +61,20 @@ const ExperienceDetailContent = () => {
         </Flex>
       </Flex>
 
-      {selectedExperience && <ExperienceDetailPanel workspaceId={workspaceId} experienceId={selectedExperience.experienceId} onClose={() => setSelectedId(null)} />}
+      <AnimatePresence>
+        {selectedExperience && (
+          <motion.div
+            key="detail-panel"
+            className="h-screen shrink-0"
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 40, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <ExperienceDetailPanel workspaceId={workspaceId} experienceId={selectedExperience.experienceId} onClose={() => setSelectedId(null)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Flex>
   )
 }

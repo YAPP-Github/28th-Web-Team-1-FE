@@ -1,5 +1,6 @@
 'use client'
 import { Suspense, type ReactNode } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useNotionReturn } from '@features/notion_connect'
 import { HasResumeStep } from './HasResumeStep'
 import { ResumeUploadStep } from './ResumeUploadStep'
@@ -32,11 +33,24 @@ export const OnboardingPage = () => (
   </Suspense>
 )
 
+// 다음(오른쪽→왼쪽) / 이전(왼쪽→오른쪽) 방향에 따라 들어오고 나가는 위치를 반대로 잡는다.
+const stepVariants = {
+  enter: (direction: 1 | -1) => ({ x: direction > 0 ? 32 : -32, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (direction: 1 | -1) => ({ x: direction > 0 ? -32 : 32, opacity: 0 })
+}
+
 const OnboardingFlow = () => {
   const { connectionId } = useNotionReturn('/onboarding')
-  const { step, next, skip, back, hasPrev, hasSkip, hasConnected } = useOnboardingFlow(connectionId ? 'notion-page-select' : undefined)
+  const { step, direction, next, skip, back, hasPrev, hasSkip, hasConnected } = useOnboardingFlow(connectionId ? 'notion-page-select' : undefined)
 
   const stepProps: OnboardingStepProps = { onDone: next, onPrev: hasPrev ? back : undefined, onSkip: hasSkip ? skip : undefined }
 
-  return STEP_RENDERERS[step](stepProps, { connectionId: connectionId ?? undefined, hasConnected })
+  return (
+    <AnimatePresence mode="wait" custom={direction} initial={false}>
+      <motion.div key={step} custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit" transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}>
+        {STEP_RENDERERS[step](stepProps, { connectionId: connectionId ?? undefined, hasConnected })}
+      </motion.div>
+    </AnimatePresence>
+  )
 }

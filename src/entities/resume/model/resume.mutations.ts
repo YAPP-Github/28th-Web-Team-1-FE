@@ -26,7 +26,7 @@ export const useCreateResume = (workspaceId: string) => {
 /**
  * 기존 이력서를 전체 스냅샷 단위로 수정한다.
  * 요청에 없는 기존 섹션·아이템은 서버에서 삭제되므로, 편집 화면의 전체 상태를 그대로 담아 보낸다.
- * 성공 시 해당 이력서 상세 캐시를 무효화해 최신 스냅샷을 다시 불러온다.
+ * 성공 시 해당 이력서 상세와 함께 목록·개수 캐시도 무효화한다.
  * @param workspaceId 현재 워크스페이스 ID
  * @param resumeId 수정할 이력서 ID
  * @example
@@ -45,6 +45,8 @@ export const useUpdateResume = (workspaceId: string, resumeId: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: resumeKeys.detail(workspaceId, resumeId) })
+      queryClient.invalidateQueries({ queryKey: resumeKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: resumeKeys.counts(workspaceId) })
     }
   })
 }
