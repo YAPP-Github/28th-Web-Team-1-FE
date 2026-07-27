@@ -23,7 +23,7 @@ export const CareerSection = ({ profile }: { profile: Profile }) => {
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       {fields.map((arrayField, index) => (
         <Flex key={arrayField.id} direction="column" gap="4">
-          <RepeatableItemHeader title={`경력 ${index + 1}`} onRemove={() => remove(index)} />
+          <RepeatableItemHeader title={`경력 / 활동 ${index + 1}`} onRemove={() => remove(index)} />
 
           <Controller
             control={control}

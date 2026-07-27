@@ -88,7 +88,7 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
   },
   career: {
     type: 'career',
-    title: '경력',
+    title: '경력 / 활동',
     fields: [
       input('company', '회사명'),
       input('position', '직책', { placeholder: '직책을 입력해주세요.', span: 2 }),
