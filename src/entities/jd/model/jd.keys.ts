@@ -4,7 +4,8 @@ import { jdAPI } from '../api/jd.api'
 export const jdKeys = {
   all: ['jd'] as const,
   insight: (workspaceId: string, jdId: string) => [...jdKeys.all, 'insight', workspaceId, jdId] as const,
-  meta: (workspaceId: string, jdId: string) => [...jdKeys.all, 'meta', workspaceId, jdId] as const
+  meta: (workspaceId: string, jdId: string) => [...jdKeys.all, 'meta', workspaceId, jdId] as const,
+  detail: (workspaceId: string, jdId: string) => [...jdKeys.all, 'detail', workspaceId, jdId] as const
 }
 
 /**
@@ -28,5 +29,11 @@ export const jdQueries = {
     queryOptions({
       queryKey: jdKeys.meta(workspaceId, jdId),
       queryFn: () => jdAPI.getJdMeta({ workspaceId, jdId })
+    }),
+  /** JD 원문 상세(팀 소개/업무내용/자격요건/우대경험/전형 절차)를 조회한다. 공고 원문 화면에 쓴다. */
+  detail: (workspaceId: string, jdId: string) =>
+    queryOptions({
+      queryKey: jdKeys.detail(workspaceId, jdId),
+      queryFn: () => jdAPI.getJdDetail({ workspaceId, jdId })
     })
 }

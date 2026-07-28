@@ -10,27 +10,31 @@ interface NotionPageCardProps {
   lastEditedTime?: string | null
   isSelected: boolean
   onToggle: (id: string) => void
+  disabled?: boolean
 }
 
 /**
  * Notion 페이지 1개를 나타내는 선택 가능한 카드이다. 다중 선택(체크)·단일 선택(라디오) 모두
  * `isSelected` 상태와 `onToggle` 클릭 핸들러만으로 표현하며, 실제 선택 로직은 호출부(부모)가 결정한다.
+ * `disabled`는 선택 개수 상한 등으로 더 이상 선택할 수 없을 때(자신은 미선택 상태) 클릭을 막는 용도이다.
  * @example
  * ```tsx
  * <NotionPageCard id={page.pageId} title={page.title} lastEditedTime={page.lastEditedTime} isSelected={selected.includes(page.pageId)} onToggle={toggle} />
  * ```
  */
-export const NotionPageCard = memo(({ id, title, lastEditedTime, isSelected, onToggle }: NotionPageCardProps) => {
+export const NotionPageCard = memo(({ id, title, lastEditedTime, isSelected, onToggle, disabled }: NotionPageCardProps) => {
   const editedAt = formatDate(lastEditedTime)
   return (
     <button
       type="button"
       aria-pressed={isSelected}
+      disabled={disabled}
       onClick={() => onToggle(id)}
       className={cn(
         'bg-element-white border-border-subtle flex w-full items-center gap-3 rounded-xl border py-3 pr-5 pl-4 text-left transition-all outline-none',
         'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3',
-        isSelected && 'border-border-primary'
+        isSelected && 'border-border-primary',
+        disabled && 'cursor-not-allowed opacity-50'
       )}
     >
       <Flex align="center" gap="2" className="min-w-0 flex-1">

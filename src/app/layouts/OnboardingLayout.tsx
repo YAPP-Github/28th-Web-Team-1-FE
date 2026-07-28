@@ -15,7 +15,7 @@ import { Logo } from '@shared/icon'
  */
 export const OnboardingLayout = ({ children }: PropsWithChildren) => {
   return (
-    <main className="bg-element-white h-screen">
+    <main className="bg-element-white h-screen overflow-x-hidden">
       <header className="border-border-subtle bg-element-white fixed inset-x-0 top-0 z-10 flex h-16 items-center justify-center border-b">
         <Logo />
       </header>

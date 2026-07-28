@@ -1,0 +1,119 @@
+'use client'
+
+import { Suspense, type ComponentType } from 'react'
+import { Flex } from '@radix-ui/themes'
+import { Accordion as AccordionPrimitive } from 'radix-ui'
+import { ErrorBoundary } from '@sentry/nextjs'
+import { ChevronDown } from 'lucide-react'
+import { cn } from '@shared/lib/cn'
+import { Divider, Heading, Spacing, Text } from '@shared/ui'
+import { Avatar } from '@shared/ui/avatar'
+import { useMe, useWorkspaceId } from '@entities/user'
+import { useProfile, type Profile } from '@entities/profile'
+import { BasicSection } from './profile/BasicSection'
+import { CoreCompetencySection } from './profile/CoreCompetencySection'
+import { EducationSection } from './profile/EducationSection'
+import { CareerSection } from './profile/CareerSection'
+import { LanguageSection } from './profile/LanguageSection'
+import { AwardSection } from './profile/AwardSection'
+import { CertificateSection } from './profile/CertificateSection'
+import { SkillSection } from './profile/SkillSection'
+
+const INFO_SECTIONS: Array<{ value: string; label: string; Component: ComponentType<{ profile: Profile }> }> = [
+  { value: 'basic', label: '기본 정보', Component: BasicSection },
+  { value: 'competency', label: '핵심 역량', Component: CoreCompetencySection },
+  { value: 'education', label: '학력', Component: EducationSection },
+  { value: 'career', label: '경력 / 활동', Component: CareerSection },
+  { value: 'language', label: '어학', Component: LanguageSection },
+  { value: 'award', label: '수상', Component: AwardSection },
+  { value: 'certificate', label: '자격증', Component: CertificateSection },
+  { value: 'skill', label: '기술', Component: SkillSection }
+]
+
+export const MyProfilePage = () => {
+  return (
+    <Flex direction="column" p="8" className="min-h-0 flex-1 overflow-y-auto">
+      <Heading variant="heading2" color="text-basic">
+        내 정보
+      </Heading>
+
+      <Spacing size={32} />
+
+      <Flex direction="column" className="w-full max-w-158.5">
+        <ErrorBoundary
+          fallback={
+            <Text variant="label1" color="text-subtler">
+              정보를 불러오는 데 실패했습니다.
+            </Text>
+          }
+        >
+          <Suspense fallback={null}>
+            <ProfileSummary />
+          </Suspense>
+        </ErrorBoundary>
+
+        <Spacing size={32} />
+        <Divider color="gray-10" />
+        <Spacing size={32} />
+
+        <ErrorBoundary
+          fallback={
+            <Text variant="label1" color="text-subtler">
+              정보를 불러오는 데 실패했습니다.
+            </Text>
+          }
+        >
+          <Suspense fallback={null}>
+            <ProfileSections />
+          </Suspense>
+        </ErrorBoundary>
+      </Flex>
+    </Flex>
+  )
+}
+
+const ProfileSummary = () => {
+  const { me } = useMe()
+
+  return (
+    <Flex gap="5" align="center" className="shadow-1 rounded-xl px-5 py-4">
+      <Avatar imageUrl={me.profileImageUrl} size="xl" />
+      <Flex direction="column">
+        <Text variant="headline1" color="text-subtle">
+          {me.name}
+        </Text>
+        <Text variant="body2" color="text-subtler">
+          {me.email}
+        </Text>
+      </Flex>
+    </Flex>
+  )
+}
+
+const ProfileSections = () => {
+  const profile = useProfile(useWorkspaceId())
+
+  return (
+    <AccordionPrimitive.Root type="single" collapsible className="flex flex-col gap-5">
+      {INFO_SECTIONS.map((section) => (
+        <AccordionPrimitive.Item
+          key={section.value}
+          value={section.value}
+          className="border-border-subtler data-[state=open]:border-border-subtle data-[state=open]:shadow-2 overflow-hidden rounded-xl border"
+        >
+          <AccordionPrimitive.Header>
+            <AccordionPrimitive.Trigger className={cn('group flex h-13.5 w-full cursor-pointer items-center justify-between py-3 pr-6 pl-5 outline-none')}>
+              <Text variant="headline2" color="text-basic">
+                {section.label}
+              </Text>
+              <ChevronDown size={20} className="text-icon-gray-light transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </AccordionPrimitive.Trigger>
+          </AccordionPrimitive.Header>
+          <AccordionPrimitive.Content className="px-6 pt-2 pb-6">
+            <section.Component profile={profile} />
+          </AccordionPrimitive.Content>
+        </AccordionPrimitive.Item>
+      ))}
+    </AccordionPrimitive.Root>
+  )
+}

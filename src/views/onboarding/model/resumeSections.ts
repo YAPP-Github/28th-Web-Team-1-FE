@@ -1,11 +1,23 @@
+import { DEGREE_LEVELS, EDUCATION_STATUSES, SKILL_LEVELS } from '@entities/profile'
+
 export type ResumeSectionType = 'basic' | 'education' | 'career' | 'award' | 'language' | 'certificate' | 'skill'
 
-interface ResumeField {
+/** 편집 폼은 4열 그리드다. 필드 하나가 차지하는 칸 수(1=1/4, 2=1/2, 3=3/4, 4=한 행 전체). 미지정 시 4(전체 폭). */
+export type ResumeFieldSpan = 1 | 2 | 3 | 4
+
+export interface ResumeField {
   key: string
   label: string
   placeholder: string
-  /** true인 필드는 인접한 half 필드와 한 행(2열)으로 묶인다. */
-  half?: boolean
+  /** 이 필드가 차지하는 폭. 같은 행에 놓이려면 인접 필드들의 span 합이 4 이하여야 한다. */
+  span?: ResumeFieldSpan
+  /**
+   * 값 입력 방식. 미지정(기본)이면 텍스트 `Input`, `'date'`면 `DatePicker`, `'period'`면 `MonthPicker` 두 개(시작~종료),
+   * `'select'`면 드롭다운, `'textarea'`면 여러 줄 `Textarea`, `'phone'`이면 입력 중 자동으로 하이픈이 들어가는 `Input`으로 렌더링한다.
+   */
+  kind?: 'date' | 'period' | 'select' | 'textarea' | 'phone'
+  /** `kind: 'select'`일 때의 선택지. */
+  options?: readonly string[]
 }
 
 interface ResumeSectionConfig {
@@ -16,12 +28,40 @@ interface ResumeSectionConfig {
   fixed?: boolean
 }
 
-const input = (key: string, label: string, opts?: { placeholder?: string; half?: boolean }): ResumeField => ({
+const input = (key: string, label: string, opts?: { placeholder?: string; span?: ResumeFieldSpan }): ResumeField => ({
   key,
   label,
   // 디자인 문구를 그대로 따른다("{label}를 입력해 주세요.").
   placeholder: opts?.placeholder ?? `${label}를 입력해 주세요.`,
-  half: opts?.half
+  span: opts?.span
+})
+
+/** `DatePicker`(연·월·일)로 렌더링되는 필드. 값은 `formatPeriod`/`sectionsToUpdateRequest`와 맞춰 `YYYY-MM-DD`로 저장한다. */
+const dateInput = (key: string, label: string, opts?: { span?: ResumeFieldSpan }): ResumeField => ({ key, label, placeholder: 'YYYY.MM.DD', span: opts?.span ?? 2, kind: 'date' })
+
+/** `MonthPicker` 두 개(시작~종료)로 렌더링되는 기간 필드. 값은 `formatPeriod`/`parsePeriodInput`과 맞춰 `"YYYY.MM - YYYY.MM"`로 저장한다. */
+const periodInput = (key: string, label: string, opts?: { span?: ResumeFieldSpan }): ResumeField => ({ key, label, placeholder: 'YYYY.MM - YYYY.MM', span: opts?.span ?? 2, kind: 'period' })
+
+/** 드롭다운으로 렌더링되는 선택 필드. */
+const selectInput = (key: string, label: string, opts: { options: readonly string[]; span?: ResumeFieldSpan }): ResumeField => ({
+  key,
+  label,
+  placeholder: `${label} 선택`,
+  span: opts.span,
+  kind: 'select',
+  options: opts.options
+})
+
+/** 입력 중 자동으로 하이픈이 들어가는(`010-1234-5678`) 전화번호 필드. */
+const phoneInput = (key: string, label: string, opts?: { span?: ResumeFieldSpan }): ResumeField => ({ key, label, placeholder: '010-1234-5678', span: opts?.span, kind: 'phone' })
+
+/** 여러 줄 `Textarea`로 렌더링되는 필드(최대 500자, 마이페이지와 동일). */
+const textareaInput = (key: string, label: string, opts?: { placeholder?: string; span?: ResumeFieldSpan }): ResumeField => ({
+  key,
+  label,
+  placeholder: opts?.placeholder ?? `${label}를 입력해 주세요.`,
+  span: opts?.span,
+  kind: 'textarea'
 })
 
 /**
@@ -33,44 +73,48 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
     type: 'basic',
     title: '기본 정보',
     fixed: true,
-    fields: [input('name', '이름'), input('phone', '연락처', { placeholder: '010-1234-5678', half: true }), input('email', '이메일', { placeholder: 'ID@gmail.com', half: true })]
+    fields: [input('name', '이름'), phoneInput('phone', '연락처', { span: 2 }), input('email', '이메일', { placeholder: 'ID@gmail.com', span: 2 })]
   },
   education: {
     type: 'education',
     title: '학력',
     fields: [
       input('school', '학교', { placeholder: '학교명을 입력해주세요.' }),
-      input('status', '상태', { placeholder: '졸업 예정', half: true }),
-      input('period', '기간', { placeholder: 'YYYY-MM ~ YYYY-MM', half: true }),
-      input('major', '전공', { placeholder: '전공명', half: true }),
-      input('degree', '학위', { placeholder: '학사/석사/박사', half: true })
+      selectInput('status', '상태', { options: EDUCATION_STATUSES, span: 2 }),
+      periodInput('period', '기간'),
+      input('major', '전공', { placeholder: '전공명', span: 2 }),
+      selectInput('degree', '학위', { options: DEGREE_LEVELS, span: 2 })
     ]
   },
   career: {
     type: 'career',
-    title: '경력',
-    fields: [input('company', '회사명'), input('position', '직책', { placeholder: '직책을 입력해주세요.', half: true }), input('period', '기간', { placeholder: 'YYYY-MM ~ YYYY-MM', half: true })]
+    title: '경력 / 활동',
+    fields: [
+      input('company', '회사명'),
+      input('position', '직책', { placeholder: '직책을 입력해주세요.', span: 2 }),
+      periodInput('period', '기간'),
+      textareaInput('description', '세부 내용', { placeholder: '세부 내용을 입력해 주세요.' })
+    ]
   },
   award: {
     type: 'award',
     title: '수상',
-    fields: [input('title', '수상명'), input('organization', '기관', { placeholder: '기관명', half: true }), input('awardedAt', '수상일', { placeholder: 'YYYY-MM-DD', half: true })]
+    fields: [input('title', '수상명'), input('organization', '기관', { placeholder: '기관명', span: 2 }), dateInput('awardedAt', '수상일')]
   },
   language: {
     type: 'language',
     title: '어학',
-    fields: [input('testName', '시험명'), input('score', '점수/등급', { placeholder: '점수 또는 등급', half: true }), input('acquiredAt', '취득일', { placeholder: 'YYYY-MM-DD', half: true })]
+    fields: [input('testName', '시험명'), input('score', '점수/등급', { placeholder: '점수 또는 등급', span: 2 }), dateInput('acquiredAt', '취득일')]
   },
   certificate: {
     type: 'certificate',
     title: '자격증',
-    fields: [input('name', '자격증명'), input('issuer', '발급기관', { placeholder: '발급기관명', half: true }), input('acquiredAt', '취득일', { placeholder: 'YYYY-MM-DD', half: true })]
+    fields: [input('name', '자격증명'), input('issuer', '발급기관', { placeholder: '발급기관명', span: 2 }), dateInput('acquiredAt', '취득일')]
   },
   skill: {
     type: 'skill',
     title: '기술',
-    // 기술 카드는 항목(name/level) 목록을 태그로 보여주는 전용 UI를 쓰므로 fields는 사용하지 않는다.
-    fields: []
+    fields: [input('name', '기술/도구명', { span: 3 }), selectInput('level', '숙련도', { options: SKILL_LEVELS, span: 1 })]
   }
 }
 
@@ -80,22 +124,9 @@ export const INITIAL_SECTION_TYPES: ResumeSectionType[] = ['basic', 'education',
 /** "항목 추가하기"로 추가할 수 있는 섹션 타입(기본 정보 제외). */
 export const ADDABLE_SECTION_TYPES: ResumeSectionType[] = ['education', 'career', 'award', 'language', 'certificate', 'skill']
 
-/** 기술 숙련도 드롭다운 선택지(한글 라벨). */
-export const SKILL_LEVELS = ['상', '중', '하'] as const
-
-/** 기술 카드에 담기는 태그 한 개(기술명 + 숙련도). */
-export interface SkillItem {
-  id: string
-  name: string
-  /** '상' | '중' | '하' | '' (미선택) */
-  level: string
-}
-
 /** 화면에 놓인 카드 한 장(섹션 인스턴스). 같은 타입을 여러 개 가질 수 있다. */
 export interface ResumeSectionInstance {
   id: string
   type: ResumeSectionType
   values: Record<string, string>
-  /** type이 'skill'일 때만 사용하는 태그 목록. */
-  items?: SkillItem[]
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
-import { Elms_Sans } from 'next/font/google'
 import '../style/globals.css'
 import { Providers } from '../provider'
 
@@ -26,8 +25,10 @@ const pretendard = localFont({
   variable: '--font-pretendard'
 })
 
-const elmsSans = Elms_Sans({
-  subsets: ['latin'],
+const elmsSans = localFont({
+  src: '../../../public/font/ElmsSans-Bold.woff2',
+  weight: '700',
+  style: 'normal',
   display: 'swap',
   variable: '--font-elms'
 })

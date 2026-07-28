@@ -4,7 +4,8 @@ import { profileAPI } from '../api/profile.api'
 export const profileKeys = {
   all: ['profile'] as const,
   details: () => [...profileKeys.all, 'detail'] as const,
-  detail: (workspaceId: string) => [...profileKeys.details(), workspaceId] as const
+  detail: (workspaceId: string) => [...profileKeys.details(), workspaceId] as const,
+  generateCoreCompetency: () => [...profileKeys.all, 'generate-core-competency'] as const
 }
 
 export const profileQueries = {

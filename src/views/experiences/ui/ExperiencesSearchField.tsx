@@ -53,7 +53,7 @@ export const ExperiencesSearchField = () => {
 const ExperiencesSearchItem = ({ experience }: { experience: ReturnType<typeof useSearchExperiences>['results'][0] }) => {
   return (
     <Link
-      href={`/experiences/${experience.project?.projectId}`}
+      href={`/experiences/${experience.project?.projectId}?experienceId=${experience.experienceId}`}
       className="group hover:bg-element-gray-light focus-visible:bg-element-gray-light flex w-full cursor-pointer items-center justify-between px-5 py-3 text-left transition-colors outline-none"
     >
       <Flex direction="row" align="center" gap="3">

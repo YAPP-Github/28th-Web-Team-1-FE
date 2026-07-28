@@ -23,42 +23,18 @@ export const ExperiencesPage = () => {
       </Flex>
       <ErrorBoundary
         fallback={
-          <Flex direction="row" gap="4" justify="between" className="h-11">
-            <Text variant="body2" color="text-subtler">
+          <Flex align="center" justify="center" className="py-20">
+            <Text variant="body1" color="text-subtler">
               불러오는데 실패했습니다.
             </Text>
           </Flex>
         }
       >
-        <Suspense fallback={<div className="h-11" />}>
+        <Suspense fallback={null}>
           <Flex direction="row" gap="4" justify="between">
             <ExperiencesSearchField />
             <AddProjectDialog />
           </Flex>
-        </Suspense>
-      </ErrorBoundary>
-      <ErrorBoundary
-        fallback={
-          <Flex align="center" justify="center" className="py-20">
-            <Text variant="body1" color="text-subtler">
-              프로젝트 목록을 불러오는데 실패했습니다.
-            </Text>
-          </Flex>
-        }
-      >
-        <Suspense
-          // TODO : 디자인 미정
-          fallback={
-            <Flex direction="column" align="center" justify="center" className="border-border-subtle h-129 rounded-lg border border-dashed" gap="3">
-              <Text variant="headline2" color="text-basic">
-                로딩중
-              </Text>
-              <Text variant="body2" color="text-subtler">
-                디자인 시안을 기다리고있어요
-              </Text>
-            </Flex>
-          }
-        >
           <ExperiencesProjectGrid />
         </Suspense>
       </ErrorBoundary>

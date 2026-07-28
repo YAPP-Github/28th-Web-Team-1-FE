@@ -1,8 +1,9 @@
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { PencilSparkles, Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { Section } from './Section'
+import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
@@ -13,7 +14,7 @@ import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../..
  * 경력(CAREER) 편집 섹션. `useFieldArray`로 아이템 추가/삭제를 관리한다.
  * 리스트 key는 서버 itemId가 아니라 fieldArray가 주는 `field.id`를 써서 신규 항목의 중복 key를 원천 차단한다.
  */
-export const CareerSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
+export const CareerSection = ({ title, sectionIndex, targetJdId }: { title: string; sectionIndex: number; targetJdId: string | null }) => {
   const { control } = useFormContext<ResumeFormValues>()
   const { fields, append, remove } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
 
@@ -34,13 +35,13 @@ export const CareerSection = ({ title, sectionIndex }: { title: string; sectionI
       }
     >
       {fields.map((field, index) => (
-        <CareerSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} />
+        <CareerSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} targetJdId={targetJdId} />
       ))}
     </Section>
   )
 }
 
-const CareerSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: number; index: number; onRemove: () => void }) => {
+const CareerSectionItem = ({ sectionIndex, index, onRemove, targetJdId }: { sectionIndex: number; index: number; onRemove: () => void; targetJdId: string | null }) => {
   const base = `sections.${sectionIndex}.items.${index}.payload.career`
 
   return (
@@ -73,10 +74,7 @@ const CareerSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: nu
       <Flex direction={'column'} className={'gap-5 py-1'}>
         <FormTextarea name={`${base}.contents`} label={'세부내용'} />
 
-        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'}>
-          <PencilSparkles size={16} data-icon="inline-start" />
-          AI 첨삭
-        </Button>
+        <AiFeedbackDialog targets={[{ name: `${base}.contents`, label: '세부내용', kind: 'CAREER_DESCRIPTION', multiline: true }]} jdId={targetJdId} />
       </Flex>
     </Flex>
   )
