@@ -2,13 +2,13 @@
 import { Suspense, useState, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
-import { Button, Divider, Spacing, Text } from '@shared/ui'
+import { Button, Spacing, Text } from '@shared/ui'
 import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
 import { useResumeDetail, toPreviewSections, type ResumeSectionData } from '@entities/resume'
 import { useJdDetail, useJdInsight } from '@entities/jd'
 import { useWorkspaceId } from '@entities/user'
-import { ResumeBasicInfoHeader, ResumeSectionView } from '@widgets/resume_preview'
-import { Download, Pencil } from 'lucide-react'
+import { Pencil } from 'lucide-react'
+import { ResumeDownloadButton, ResumePdfPreview } from '@features/resume_pdf_download'
 import Link from 'next/link'
 import { SelectedControl, SelectedControlItem } from '@shared/ui/selected_control'
 
@@ -46,9 +46,9 @@ const ResumeDetail = ({ resumeId }: { resumeId: string }) => {
 
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
-      <ResumeToolbar resumeId={resumeId} targetJd={resume.targetJd} />
+      <ResumeToolbar resumeId={resumeId} targetJd={resume.targetJd} basicInfo={basicInfo} sections={bodySections} />
       <main className="flex min-h-0 flex-1">
-        <ResumePreview basicInfo={basicInfo} sections={bodySections} />
+        <ResumePdfPreview basicInfo={basicInfo} sections={bodySections} />
         <JDInfo workspaceId={workspaceId} jdId={resume.targetJd?.jdId ?? null} />
       </main>
     </Flex>
@@ -58,10 +58,12 @@ const ResumeDetail = ({ resumeId }: { resumeId: string }) => {
 interface ResumeToolbarProps {
   resumeId: string
   targetJd: ResumeQuery['resume']['targetJd']
+  basicInfo: ResumeBasicInfoFieldsFragment | null
+  sections: ResumeSectionData[]
 }
 
 /** 편집 화면 상단 도구바. 이력서가 맞춤 대상으로 삼은 채용공고(targetJd)의 회사명·포지션과 저장 상태·액션을 보여준다. */
-const ResumeToolbar = ({ resumeId, targetJd }: ResumeToolbarProps) => {
+const ResumeToolbar = ({ resumeId, targetJd, basicInfo, sections }: ResumeToolbarProps) => {
   return (
     <header className={'flex justify-between px-8 py-5'}>
       <Flex direction="column" justify="center" className={'gap-0.5'}>
@@ -79,32 +81,9 @@ const ResumeToolbar = ({ resumeId, targetJd }: ResumeToolbarProps) => {
           </Link>
         </Button>
 
-        <Button variant="primary" size={'md'} className={'leading-0'}>
-          <Download size={18} className="inline-block" data-icon="inline-start" />
-          다운로드
-        </Button>
+        <ResumeDownloadButton basicInfo={basicInfo} sections={sections} />
       </Flex>
     </header>
-  )
-}
-
-const ResumePreview = ({ basicInfo, sections }: { basicInfo: ResumeBasicInfoFieldsFragment | null; sections: ResumeSectionData[] }) => {
-  return (
-    <Flex align={'center'} className={'bg-bg-gray-subtler flex-1'}>
-      <Flex direction={'column'} className={'bg-bg-white mx-auto h-[calc(100%-2rem)] w-149 min-w-149 overflow-y-auto p-7'}>
-        <ResumeBasicInfoHeader basicInfo={basicInfo} />
-
-        <Spacing size={12} />
-        <Divider color={'gray-10'} />
-        <Spacing size={12} />
-
-        <Flex direction={'column'} gap="5">
-          {sections.map((section) => (
-            <ResumeSectionView key={section.sectionId} section={section} />
-          ))}
-        </Flex>
-      </Flex>
-    </Flex>
   )
 }
 
