@@ -99,7 +99,7 @@ const JDInfo = ({ workspaceId, jdId }: { workspaceId: string; jdId: string | nul
   const [tab, setTab] = useState(JD_SOURCE_TAB)
 
   return (
-    <Flex direction={'column'} className={'bg-bg-white mx-auto w-160 px-8 py-6'}>
+    <Flex direction={'column'} className={'bg-bg-white mx-auto w-160 min-w-160 px-8 py-6'}>
       <SelectedControl value={tab} onValueChange={setTab} className={'w-50'}>
         <SelectedControlItem value={JD_SOURCE_TAB}>공고 원문</SelectedControlItem>
         <SelectedControlItem value={JD_INSIGHT_TAB}>AI 인사이트</SelectedControlItem>

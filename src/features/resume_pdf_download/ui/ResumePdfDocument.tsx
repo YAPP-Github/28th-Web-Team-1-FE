@@ -1,5 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
-import type { ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import type { ResumeBasicInfoFieldsFragment } from '@shared/lib/gql/graphql'
 import { formatDate, formatYYYYMM } from '@shared/lib'
 import { payloadsOf, visibleItems, type ResumeSectionData } from '@entities/resume'
@@ -16,7 +16,7 @@ const COLOR = {
   basic: '#1e2124', // text-basic (이름·아이템 제목·본문)
   subtler: '#6d7882', // gray-50 (섹션 제목)
   meta: '#8a949e', // gray-40 (연락처·부제)
-  divider: '#e6e8ea' // gray-10
+  divider: '#cdd1d5' // gray-20
 }
 
 const styles = StyleSheet.create({
@@ -34,20 +34,22 @@ const styles = StyleSheet.create({
 
   divider: { borderBottomWidth: 1, borderBottomColor: COLOR.divider, marginVertical: 16 },
 
-  sections: { flexDirection: 'column', gap: 20 },
-  section: { flexDirection: 'row', gap: 16 },
+  sections: { flexDirection: 'column', gap: 40 },
+  section: { flexDirection: 'row', gap: 50 },
   sectionTitle: { width: 64, flexShrink: 0, fontSize: 10, color: COLOR.subtler },
-  sectionBody: { flex: 1, flexDirection: 'column', gap: 12 },
+  sectionBody: { flex: 1, flexDirection: 'column', gap: 24 },
 
   item: { flexDirection: 'column', gap: 3 },
   itemTitle: { fontSize: 11, fontWeight: 600 },
+  subtitle: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  subtitleDivider: { width: 1, height: 9, backgroundColor: COLOR.divider },
   itemSubtitle: { fontSize: 9, color: COLOR.meta },
-  itemContent: { fontSize: 9.5, color: COLOR.basic, lineHeight: 1.5 },
+  itemContent: { fontSize: 9.5, color: COLOR.basic, lineHeight: 1.6, marginTop: 6 },
 
   skillGrid: { flexDirection: 'row', flexWrap: 'wrap' },
-  skillCell: { width: '50%', flexDirection: 'row', justifyContent: 'space-between', paddingRight: 24, marginBottom: 3 },
-  skillName: { fontSize: 9.5 },
-  skillLevel: { fontSize: 9.5, color: COLOR.subtler }
+  skillCell: { width: '50%', flexDirection: 'row', alignItems: 'baseline', paddingRight: 24, marginBottom: 3 },
+  skillName: { fontSize: 9.5, flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0, maxLines: 1, textOverflow: 'ellipsis', marginRight: 8 },
+  skillLevel: { fontSize: 9.5, color: COLOR.subtler, flexShrink: 0 }
 })
 
 /** `{ startAt, endAt }` 기간을 `2025.03 - 2025.06` 형태로. 둘 다 없으면 null. (미리보기 periodText와 동일 규약) */
@@ -62,13 +64,34 @@ const periodText = (period?: { startAt?: string | null; endAt?: string | null } 
 const Subtitle = ({ parts }: { parts: Array<string | null | undefined> }) => {
   const visible = parts.filter((part): part is string => Boolean(part && part.trim()))
   if (visible.length === 0) return null
-  return <Text style={styles.itemSubtitle}>{visible.join('  ·  ')}</Text>
+  return (
+    <View style={styles.subtitle}>
+      {visible.map((part, index) => (
+        <Fragment key={index}>
+          {index > 0 && <View style={styles.subtitleDivider} />}
+          <Text style={styles.itemSubtitle}>{part}</Text>
+        </Fragment>
+      ))}
+    </View>
+  )
 }
 
 const SectionRow = ({ title, children }: { title: string; children: ReactNode }) => (
-  <View style={styles.section} wrap={false}>
+  <View style={styles.section}>
     <Text style={styles.sectionTitle}>{title}</Text>
     <View style={styles.sectionBody}>{children}</View>
+  </View>
+)
+
+/**
+ * 제목 + 부제(+ 선택적 본문) 구조의 공통 아이템 블록.
+ * 경력·활동·학력·자격증·수상·어학이 모두 이 형태라 공유한다. 페이지 중간에서 쪼개지지 않도록 wrap={false}.
+ */
+const ResumeItem = ({ title, subtitle, content }: { title: string | null | undefined; subtitle: Array<string | null | undefined>; content?: string | null }) => (
+  <View style={styles.item} wrap={false}>
+    <Text style={styles.itemTitle}>{title}</Text>
+    <Subtitle parts={subtitle} />
+    {content ? <Text style={styles.itemContent}>{content}</Text> : null}
   </View>
 )
 
@@ -82,7 +105,7 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
       return (
         <SectionRow title={displayText}>
           {payloadsOf(items, 'coreSkill').map((item, i) => (
-            <Text key={i} style={styles.itemContent}>
+            <Text key={i} style={styles.itemContent} wrap={false}>
               {item.content}
             </Text>
           ))}
@@ -92,11 +115,7 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
       return (
         <SectionRow title={`${displayText} / 활동`}>
           {payloadsOf(items, 'career').map((item, i) => (
-            <View key={i} style={styles.item}>
-              <Text style={styles.itemTitle}>{item.companyName}</Text>
-              <Subtitle parts={[item.role, periodText(item.period)]} />
-              {item.contents && <Text style={styles.itemContent}>{item.contents}</Text>}
-            </View>
+            <ResumeItem key={i} title={item.companyName} subtitle={[item.role, periodText(item.period)]} content={item.contents} />
           ))}
         </SectionRow>
       )
@@ -104,11 +123,7 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
       return (
         <SectionRow title={displayText}>
           {payloadsOf(items, 'experience').map((item, i) => (
-            <View key={i} style={styles.item}>
-              <Text style={styles.itemTitle}>{item.name}</Text>
-              <Subtitle parts={[item.role, periodText(item.period)]} />
-              {item.contents && <Text style={styles.itemContent}>{item.contents}</Text>}
-            </View>
+            <ResumeItem key={i} title={item.name} subtitle={[item.role, periodText(item.period)]} content={item.contents} />
           ))}
         </SectionRow>
       )
@@ -116,10 +131,7 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
       return (
         <SectionRow title={displayText}>
           {payloadsOf(items, 'education').map((item, i) => (
-            <View key={i} style={styles.item}>
-              <Text style={styles.itemTitle}>{[item.schoolName, item.major].filter(Boolean).join(' ')}</Text>
-              <Subtitle parts={[periodText(item.period), item.degree, item.status]} />
-            </View>
+            <ResumeItem key={i} title={[item.schoolName, item.major].filter(Boolean).join(' ')} subtitle={[periodText(item.period), item.degree, item.status]} />
           ))}
         </SectionRow>
       )
@@ -127,10 +139,7 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
       return (
         <SectionRow title={displayText}>
           {payloadsOf(items, 'certificate').map((item, i) => (
-            <View key={i} style={styles.item}>
-              <Text style={styles.itemTitle}>{item.name}</Text>
-              <Subtitle parts={[item.organization, formatDate(item.acquiredAt, 'YYYY.MM.DD')]} />
-            </View>
+            <ResumeItem key={i} title={item.name} subtitle={[item.organization, formatDate(item.acquiredAt, 'YYYY.MM.DD')]} />
           ))}
         </SectionRow>
       )
@@ -138,10 +147,7 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
       return (
         <SectionRow title={displayText}>
           {payloadsOf(items, 'award').map((item, i) => (
-            <View key={i} style={styles.item}>
-              <Text style={styles.itemTitle}>{item.name}</Text>
-              <Subtitle parts={[item.organization, formatDate(item.awardedAt, 'YYYY.MM.DD')]} />
-            </View>
+            <ResumeItem key={i} title={item.name} subtitle={[item.organization, formatDate(item.awardedAt, 'YYYY.MM.DD')]} />
           ))}
         </SectionRow>
       )
@@ -149,17 +155,14 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
       return (
         <SectionRow title={displayText}>
           {payloadsOf(items, 'language').map((item, i) => (
-            <View key={i} style={styles.item}>
-              <Text style={styles.itemTitle}>{item.examName}</Text>
-              <Subtitle parts={[item.scoreOrGrade, formatDate(item.acquiredAt, 'YYYY.MM.DD')]} />
-            </View>
+            <ResumeItem key={i} title={item.examName} subtitle={[item.scoreOrGrade, formatDate(item.acquiredAt, 'YYYY.MM.DD')]} />
           ))}
         </SectionRow>
       )
     case 'SKILL':
       return (
         <SectionRow title={displayText}>
-          <View style={styles.skillGrid}>
+          <View style={styles.skillGrid} wrap={false}>
             {payloadsOf(items, 'skill').map((item, i) => (
               <View key={i} style={styles.skillCell}>
                 <Text style={styles.skillName}>{item.name}</Text>
