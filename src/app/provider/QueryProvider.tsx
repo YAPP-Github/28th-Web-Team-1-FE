@@ -1,12 +1,24 @@
 'use client'
 import { useState } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryCache, QueryClient, QueryClientProvider, MutationCache } from '@tanstack/react-query'
 import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ApiError } from '@/src/shared/lib'
+import * as Sentry from '@sentry/nextjs'
+import { ApiError, AUTH_ERROR } from '@/src/shared/lib'
+
+/**
+ * GraphQL은 인증 실패도 HTTP 200으로 내려오기 때문에(status 기반 필터 불가),
+ * 예상된 재인증 흐름(AUTH_ERROR)만 코드로 걸러내고 나머지는 실제 버그로 간주해 Sentry로 보낸다.
+ */
+const reportQueryError = (error: unknown) => {
+  if (error instanceof ApiError && (error.code === AUTH_ERROR.AUTH || error.code === AUTH_ERROR.TOKEN_EXPIRED)) return
+  Sentry.captureException(error)
+}
 
 const createQueryClient = () =>
   new QueryClient({
+    queryCache: new QueryCache({ onError: reportQueryError }),
+    mutationCache: new MutationCache({ onError: reportQueryError }),
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000,
