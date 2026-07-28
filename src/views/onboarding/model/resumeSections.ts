@@ -5,6 +5,14 @@ export type ResumeSectionType = 'basic' | 'education' | 'career' | 'award' | 'la
 /** 편집 폼은 4열 그리드다. 필드 하나가 차지하는 칸 수(1=1/4, 2=1/2, 3=3/4, 4=한 행 전체). 미지정 시 4(전체 폭). */
 export type ResumeFieldSpan = 1 | 2 | 3 | 4
 
+/** 편집 폼 4열 그리드에서 `field.span`에 대응하는 Tailwind 클래스. (동적 문자열 조합은 JIT가 못 읽으므로 리터럴로 나열) */
+export const FIELD_SPAN_CLASS: Record<ResumeFieldSpan, string> = {
+  1: 'col-span-1',
+  2: 'col-span-2',
+  3: 'col-span-3',
+  4: 'col-span-4'
+}
+
 export interface ResumeField {
   key: string
   label: string
@@ -109,7 +117,7 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
   certificate: {
     type: 'certificate',
     title: '자격증',
-    fields: [input('name', '자격증명'), input('issuer', '발급기관', { placeholder: '발급기관명', span: 2 }), dateInput('acquiredAt', '취득일')]
+    fields: [input('name', '자격증'), input('issuer', '발급기관', { placeholder: '발급기관명', span: 2 }), dateInput('acquiredAt', '취득일')]
   },
   skill: {
     type: 'skill',
