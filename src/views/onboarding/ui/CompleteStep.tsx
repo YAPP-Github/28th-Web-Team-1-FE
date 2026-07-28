@@ -2,12 +2,7 @@ import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
 
-interface CompleteStepProps {
-  /** 온보딩 중 이력서 또는 Notion 연동을 완료했는지 */
-  hasConnected: boolean
-}
-
-export const CompleteStep = ({ hasConnected }: CompleteStepProps) => {
+export const CompleteStep = ({ hasConnected }: { hasConnected: boolean }) => {
   // TODO : 라이팅은 추후에 수정될 수 있음.
   const content = hasConnected
     ? {
@@ -24,7 +19,7 @@ export const CompleteStep = ({ hasConnected }: CompleteStepProps) => {
       }
 
   return (
-    <Flex direction="column" gap="7" className="w-full max-w-125">
+    <Flex direction="column" gap="7" className="w-125 max-w-full">
       <Flex direction="column" align="center" gap="2" className="w-full text-center">
         <Heading variant="title3" color="text-basic" className="whitespace-pre-line">
           {content.title}

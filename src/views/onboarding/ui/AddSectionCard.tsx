@@ -76,7 +76,7 @@ export const AddSectionCard = ({ onAdd }: { onAdd: (instances: ResumeSectionInst
               <CategoryChip key={type} label={RESUME_SECTIONS[type].title} variant="add" onClick={() => addSection(type)} />
             ))}
           </Flex>
-          <Divider orientation="vertical" />
+          <Divider orientation="vertical" className="h-auto self-stretch" color="gray-10" />
           {added.length === 0 ? (
             // 아무 항목도 추가되지 않았을 때 안내 문구
             <Flex align="center" justify="center" className="border-border-subtle min-w-0 flex-1 rounded-xl border border-dashed px-6 py-5">
@@ -93,7 +93,7 @@ export const AddSectionCard = ({ onAdd }: { onAdd: (instances: ResumeSectionInst
             <Flex direction="column" gap="6" className="min-w-0 flex-1 overflow-y-auto">
               {added.map((section, index) => (
                 <div key={section.id}>
-                  {index > 0 && <Divider className="mb-6" />}
+                  {index > 0 && <Divider className="mb-6" color="gray-10" />}
                   <div ref={(el) => void (sectionRefs.current[section.id] = el)}>
                     <Flex direction="column" gap="4">
                       <Text variant="headline1" weight="semibold" color="text-basic">

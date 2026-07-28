@@ -46,7 +46,7 @@ export const LanguageSection = ({ profile }: { profile: Profile }) => {
                   <Text variant="label1" weight="semibold">
                     취득일
                   </Text>
-                  <DatePicker value={formatDate(field.value || null, 'YYYY.MM.DD') || null} onChange={(date) => field.onChange(date.replace(/\./g, '-'))} />
+                  <DatePicker value={formatDate(field.value || null, 'YYYY.MM.DD') || null} onChange={(date) => field.onChange(date.replace(/\./g, '-'))} align="end" />
                 </Flex>
               )}
             />

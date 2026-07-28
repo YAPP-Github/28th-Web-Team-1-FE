@@ -30,7 +30,8 @@ export const ResumeFieldInput = ({ field, value, onChange }: ResumeFieldInputPro
         <Text variant="label1" weight="semibold" color="text-basic">
           {field.label}
         </Text>
-        <DatePicker value={picked} onChange={(next) => onChange(next.replace(/\./g, '-'))} placeholder={field.placeholder} />
+        {/* 현재 스키마상 단일 date 필드(수상일/취득일)는 항상 행의 오른쪽 절반에 놓이므로, 팝오버가 모달 밖으로 넘치지 않게 오른쪽 끝에 맞춘다. */}
+        <DatePicker value={picked} onChange={(next) => onChange(next.replace(/\./g, '-'))} placeholder={field.placeholder} align="end" />
       </Flex>
     )
   }
@@ -46,9 +47,9 @@ export const ResumeFieldInput = ({ field, value, onChange }: ResumeFieldInputPro
           {field.label}
         </Text>
         <Flex align="center" gap="2">
-          <MonthPicker value={start} onChange={(next) => onChange([next, end].filter(Boolean).join(' - '))} placeholder="시작" className="min-w-0 flex-1" />
+          <MonthPicker value={start} onChange={(next) => onChange([next, end].filter(Boolean).join(' - '))} placeholder="시작" className="min-w-0 flex-1" align="start" />
           <span className="text-text-subtler">-</span>
-          <MonthPicker value={end} onChange={(next) => onChange([start, next].filter(Boolean).join(' - '))} placeholder="종료" className="min-w-0 flex-1" />
+          <MonthPicker value={end} onChange={(next) => onChange([start, next].filter(Boolean).join(' - '))} placeholder="종료" className="min-w-0 flex-1" align="end" />
         </Flex>
       </Flex>
     )
