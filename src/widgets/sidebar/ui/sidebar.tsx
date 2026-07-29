@@ -59,7 +59,7 @@ export const Sidebar = () => {
 
       <nav className={'flex flex-1 flex-col gap-1'}>
         <LinkButton icon={Home} href={'/home'} label={'홈'} isExpanded={isEffectiveExpanded} />
-        <LinkButton icon={PencilLineIcon} href={'/experiences'} label={'경험 정리'} isExpanded={isEffectiveExpanded} />
+        <LinkButton icon={PencilLineIcon} href={'/experiences'} label={'내 경험'} isExpanded={isEffectiveExpanded} />
         <LinkButton icon={Layers} href={'/resumes'} label={'이력서'} isExpanded={isEffectiveExpanded} />
       </nav>
 
