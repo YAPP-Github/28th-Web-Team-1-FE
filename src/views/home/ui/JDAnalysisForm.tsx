@@ -31,7 +31,7 @@ export const JDAnalysisForm = () => {
       onSuccess: (res) => {
         toast.dismiss(toastId)
         if (res.jd) {
-          router.push(`/home/resume/create?jdId=${res.jd.jdId}`)
+          router.push(`/resumes/create?jdId=${res.jd.jdId}`)
         } else if (res.candidates?.length) {
           setCandidates(res.candidates)
           setPhase('SELECT_POSITION')

@@ -17,7 +17,7 @@ type ResumeSummary = ResumesQuery['resumes']['resumes'][number]
 
 /** 이력서 상태별 CTA 버튼(라벨·스타일·이동 경로). 카드가 resume.status로 골라 쓴다. */
 const RESUME_CTA: Record<ResumeStatusType, { label: string; variant: ComponentProps<typeof Button>['variant']; href: (resumeId: string) => string }> = {
-  DRAFT: { label: '이어서 작성', variant: 'primary', href: (resumeId) => `/home/resume/${resumeId}` },
+  DRAFT: { label: '이어서 작성', variant: 'primary', href: (resumeId) => `/resumes/edit/${resumeId}` },
   COMPLETED: { label: '이력서 확인', variant: 'secondary', href: (resumeId) => `/resumes/${resumeId}` }
 }
 

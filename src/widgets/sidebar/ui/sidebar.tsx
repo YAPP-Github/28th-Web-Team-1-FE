@@ -12,9 +12,9 @@ import { useActivePath } from '@shared/hooks/useActivePath'
 import { useLogout } from '@features/authenticate'
 
 /**
- * 이력서 작성·편집(`/home/resume/*`)·상세(`/resumes/[id]`) 화면에서는 넓은 작업 공간을 위해 사이드바를 강제로 접고 토글을 막는다.
+ * 이력서 작성(`/resumes/create`)·상세(`/resumes/[id]`)·편집(`/resumes/edit/[id]`) 화면에서는 넓은 작업 공간을 위해 사이드바를 강제로 접고 토글을 막는다.
  */
-const isCollapseLockedPath = (pathname: string) => /^\/home\/resume\/[^/]+$/.test(pathname) || /^\/resumes\/[^/]+$/.test(pathname)
+const isCollapseLockedPath = (pathname: string) => /^\/resumes\/[^/]+$/.test(pathname) || /^\/resumes\/edit\/[^/]+$/.test(pathname)
 
 export const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true)

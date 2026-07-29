@@ -215,7 +215,7 @@ const ResumeCreateContent = () => {
               // 편집 화면의 useResumeDetail(Suspense)이 첫 진입에서 fallback으로 번쩍이지 않도록,
               // 이동 전에 이력서 상세를 미리 캐시에 채워 둔다(warm cache). 모달은 페이지가 바뀌며 자연히 사라진다.
               await queryClient.prefetchQuery(resumeQueries.detail(workspaceId, resumeId))
-              router.push(`/home/resume/${resumeId}`)
+              router.push(`/resumes/edit/${resumeId}`)
             },
             onError: (error) => {
               setIsNavigating(false)

@@ -11,7 +11,7 @@ import { resumeKeys } from './resume.keys'
  * @example
  * ```tsx
  * const { mutate } = useCreateResume(workspaceId)
- * mutate(input, { onSuccess: ({ resumeId }) => router.push(`/home/resume/${resumeId}`) })
+ * mutate(input, { onSuccess: ({ resumeId }) => router.push(`/resumes/edit/${resumeId}`) })
  * ```
  */
 export const useCreateResume = (workspaceId: string) => {
