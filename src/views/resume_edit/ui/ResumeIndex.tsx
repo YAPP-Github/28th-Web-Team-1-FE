@@ -1,5 +1,5 @@
 'use client'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useFieldArray, useFormContext, useWatch, type FieldArrayPath } from 'react-hook-form'
 import { closestCenter, DndContext, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
@@ -49,15 +49,25 @@ export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSecti
     (from, to) => moveSection(bodyEntries[from].index, bodyEntries[to].index)
   )
 
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // 실제로 마우스가 얹혀 있거나(이미 얹힌 채 로드된 경우 포함) 드래그 중이면 닫지 않는다.
   useEffect(() => {
     const id = setTimeout(() => {
-      setIsOpen(false)
+      const isHovering = containerRef.current?.matches(':hover')
+      if (!isHovering) setIsOpen(false)
     }, 1500)
     return () => clearTimeout(id)
   }, [])
 
   return (
-    <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'} onMouseLeave={() => setIsOpen(false)}>
+    <Flex
+      ref={containerRef}
+      className={'bg-bg-gray-subtler relative w-16 px-4 py-20'}
+      onMouseLeave={() => {
+        setIsOpen(false)
+      }}
+    >
       <Flex direction="column" align={'end'} gap="2" className="h-fit w-full" onMouseEnter={() => setIsOpen(true)}>
         {basicInfoSectionUid && <div className={cn('h-0.75 w-6 rounded-full', activeSectionUid === basicInfoSectionUid ? 'bg-border-primary' : 'bg-border-subtle')} />}
         {bodyEntries.map(({ id, section }) => {
