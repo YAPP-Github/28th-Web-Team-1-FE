@@ -24,6 +24,8 @@ interface DatePickerProps {
   disabled?: boolean
   /** 트리거(필드)에 적용할 클래스. */
   className?: string
+  /** 달력 팝오버가 트리거의 어느 쪽 끝에 맞춰 열릴지. 필드가 폼/모달 오른쪽 끝에 있으면 `'end'`로 넘겨 밖으로 넘치지 않게 한다. @default 'start' */
+  align?: 'start' | 'center' | 'end'
 }
 
 /**
@@ -37,7 +39,7 @@ interface DatePickerProps {
  * <DatePicker value={date} onChange={setDate} placeholder="YYYY.MM.DD" />
  * ```
  */
-export const DatePicker = ({ value, onChange, placeholder = 'YYYY.MM.DD', disabled, className }: DatePickerProps) => {
+export const DatePicker = ({ value, onChange, placeholder = 'YYYY.MM.DD', disabled, className, align = 'start' }: DatePickerProps) => {
   const selected = parseDate(value)
   const today = dayjs()
 
@@ -79,7 +81,7 @@ export const DatePicker = ({ value, onChange, placeholder = 'YYYY.MM.DD', disabl
         </button>
       </PopoverTrigger>
 
-      <PopoverContent align={'start'} className={'bg-bg-white rounded-xl p-4'}>
+      <PopoverContent align={align} className={'bg-bg-white rounded-xl p-4'}>
         <div className={'flex items-center justify-between pb-3'}>
           <button
             type={'button'}

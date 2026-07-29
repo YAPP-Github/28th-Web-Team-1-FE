@@ -55,6 +55,7 @@ export const CareerSection = ({ profile }: { profile: Profile }) => {
                         onChange={(month) => field.onChange({ startAt: monthToApiDate(month, 'start'), endAt: period.endAt })}
                         placeholder="시작"
                         className="min-w-0 flex-1"
+                        align="start"
                       />
                       <span className="text-icon-gray-lighter">-</span>
                       <MonthPicker
@@ -62,6 +63,7 @@ export const CareerSection = ({ profile }: { profile: Profile }) => {
                         onChange={(month) => field.onChange({ startAt: period.startAt, endAt: monthToApiDate(month, 'end') })}
                         placeholder="종료"
                         className="min-w-0 flex-1"
+                        align="end"
                       />
                     </Flex>
                   </Flex>

@@ -182,9 +182,9 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
                   기간
                 </Text>
                 <Flex align="center" className="min-w-0 flex-1 gap-2">
-                  <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" />
+                  <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" align="start" />
                   <span className="text-text-subtler">-</span>
-                  <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" />
+                  <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" align="end" />
                 </Flex>
               </Flex>
             </Flex>
