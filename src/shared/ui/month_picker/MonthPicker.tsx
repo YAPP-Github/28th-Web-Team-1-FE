@@ -15,6 +15,8 @@ interface MonthPickerProps {
   disabled?: boolean
   /** 트리거(필드)에 적용할 클래스. */
   className?: string
+  /** 달력 팝오버가 트리거의 어느 쪽 끝에 맞춰 열릴지. 필드가 폼/모달 오른쪽 끝에 있으면 `'end'`로 넘겨 밖으로 넘치지 않게 한다. @default 'start' */
+  align?: 'start' | 'center' | 'end'
 }
 
 /** `'YYYY.MM'` → dayjs(유효하지 않으면 null). ISO(`YYYY-MM-01`)로 바꿔 파싱해 별도 플러그인 없이 처리한다. */
@@ -35,7 +37,7 @@ const parseMonth = (value: string | null) => {
  * <MonthPicker value={month} onChange={setMonth} placeholder="YYYY.MM" />
  * ```
  */
-export const MonthPicker = ({ value, onChange, placeholder = 'YYYY.MM', disabled, className }: MonthPickerProps) => {
+export const MonthPicker = ({ value, onChange, placeholder = 'YYYY.MM', disabled, className, align = 'start' }: MonthPickerProps) => {
   const selected = parseMonth(value)
   const today = dayjs()
 
@@ -73,7 +75,7 @@ export const MonthPicker = ({ value, onChange, placeholder = 'YYYY.MM', disabled
         </button>
       </PopoverTrigger>
 
-      <PopoverContent align={'start'} className={'bg-bg-white rounded-xl p-4'}>
+      <PopoverContent align={align} className={'bg-bg-white rounded-xl p-4'}>
         <div className={'flex items-center justify-between pb-3'}>
           <button type={'button'} aria-label={'이전 연도'} onClick={() => setViewYear((year) => year - 1)} className={'text-icon-gray hover:bg-element-gray-lighter rounded-md p-1 transition-colors'}>
             <ChevronLeft size={20} />
