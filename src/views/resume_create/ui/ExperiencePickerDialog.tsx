@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Loader2Icon } from 'lucide-react'
 import { Dialog, DialogContent } from '@shared/ui/dialog'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
@@ -11,6 +11,9 @@ import { ExperienceCard } from './ExperienceCard'
 import { ExperienceSearchPanel } from './ExperienceSearchPanel'
 import { useMultiSelect } from '@shared/hooks/useMultiSelect'
 import type { Experience } from '../model/experience.types'
+
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 
 const MAX_SELECT = 5
 
@@ -24,6 +27,11 @@ interface Props {
 
 export const ExperiencePickerDialog = ({ isOpen, jdId, isCompleting = false, onOpenChange, onComplete }: Props) => {
   const workspaceId = useWorkspaceId()
+
+  useEffect(() => {
+    // 페이지 진입 시 Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_VIEWED)
+  }, [])
 
   const { selectedItems, isSelected, toggle, isFull, count } = useMultiSelect((experience: Experience) => experience.experienceId, MAX_SELECT)
 

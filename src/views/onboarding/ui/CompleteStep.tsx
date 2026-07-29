@@ -1,5 +1,5 @@
 'use client'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
@@ -24,6 +24,10 @@ export const CompleteStep = ({ hasConnected }: { hasConnected: boolean }) => {
 
   const handleCtaClick = useCallback(() => {
     if (!hasConnected) amplitude.track(AMPLITUDE_EVENTS.DIRECT_WRITE_ENTERED)
+  }, [hasConnected])
+
+  useEffect(() => {
+    amplitude.track(AMPLITUDE_EVENTS.ONBOARDING_COMPLETE_VIEWED, { has_connected: hasConnected })
   }, [hasConnected])
 
   return (

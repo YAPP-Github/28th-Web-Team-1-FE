@@ -8,6 +8,7 @@ export const AMPLITUDE_EVENTS = {
   NOTION_VIEWED: 'notion_viewed',
   NOTION_SELECTED_VIEWED: 'notion_selected_viewed',
   DIRECT_WRITE_ENTERED: 'direct_write_entered',
+  ONBOARDING_COMPLETE_VIEWED: 'onboarding_complete_viewed',
 
   // 세그먼트 분기
   RESUME_STATUS_SELECTED: 'resume_status_selected',

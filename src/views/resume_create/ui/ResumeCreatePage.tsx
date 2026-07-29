@@ -20,11 +20,6 @@ import * as amplitude from '@amplitude/unified'
 import { AMPLITUDE_EVENTS } from '@shared/config'
 
 export const ResumeCreatePage = () => {
-  useEffect(() => {
-    // 페이지 진입 시 Amplitude 이벤트 전송
-    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_VIEWED)
-  }, [])
-
   return (
     // 다이얼로그 뒤로 이력서 편집 화면과 같은 배경을 깔아, 경험 선택이 이력서 위에서 이뤄지는 것처럼 보이게 한다.
     <Flex direction={'column'} className={'relative h-full flex-1 overflow-hidden'}>
