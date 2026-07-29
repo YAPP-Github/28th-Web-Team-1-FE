@@ -2,7 +2,8 @@
 import { useIsMutating } from '@tanstack/react-query'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { profileKeys } from '@entities/profile'
-import { ResumeSectionView, Section, type ResumeSectionData } from '@widgets/resume_preview'
+import { ResumeSectionView, Section } from '@widgets/resume_preview'
+import { type ResumeSectionData } from '@entities/resume'
 
 /**
  * 편집 페이지 미리보기 전용 핵심역량 섹션.

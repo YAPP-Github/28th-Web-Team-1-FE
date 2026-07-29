@@ -219,7 +219,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
                       {target.label}
                     </Text>
                     {target.multiline ? (
-                      <Flex direction={'column'} gap={'2'} className={`border-border-subtle my-auto h-60 rounded-lg border p-4`}>
+                      <Flex direction={'column'} gap={'2'} className={`border-border-subtle my-auto h-70 rounded-lg border p-4`}>
                         {Array.from({ length: 4 }).map((_, index) => (
                           <Skeleton key={`${target.name}-skeleton-${index}`} height={'14px'} width={index % 2 ? '60%' : '100%'} />
                         ))}
@@ -237,7 +237,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
                     // Amplitude 이벤트 전송용: 포커스 시점 값과 달라지는 첫 onChange에서만 1회 전송
                     onFocus={(event) => handleFieldFocus(target, event.target.value)}
                     onChange={(event) => handleFieldChange(target, event.target.value)}
-                    className={'h-60'}
+                    className={'h-70 max-h-70'}
                   />
                 ) : (
                   <Input label={target.label} clearable={false} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} />

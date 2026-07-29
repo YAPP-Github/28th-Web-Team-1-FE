@@ -6,11 +6,7 @@ import { Button, Heading, Text } from '@shared/ui'
 import { AMPLITUDE_EVENTS } from '@shared/lib'
 import * as amplitude from '@amplitude/unified'
 
-interface CompleteStepProps {
-  hasConnected: boolean
-}
-
-export const CompleteStep = ({ hasConnected }: CompleteStepProps) => {
+export const CompleteStep = ({ hasConnected }: { hasConnected: boolean }) => {
   // TODO : 라이팅은 추후에 수정될 수 있음.
   const content = hasConnected
     ? {
@@ -31,7 +27,7 @@ export const CompleteStep = ({ hasConnected }: CompleteStepProps) => {
   }, [hasConnected])
 
   return (
-    <Flex direction="column" gap="7" className="w-full max-w-125">
+    <Flex direction="column" gap="7" className="w-125 max-w-full">
       <Flex direction="column" align="center" gap="2" className="w-full text-center">
         <Heading variant="title3" color="text-basic" className="whitespace-pre-line">
           {content.title}
