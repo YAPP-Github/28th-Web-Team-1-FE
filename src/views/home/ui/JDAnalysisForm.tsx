@@ -86,10 +86,21 @@ const JDInputStep = ({ onSubmit, isPending }: { onSubmit: (request: JdRegisterIn
   const [inputValue, setInputValue] = useState('')
   const placeholder = inputType === 'url' ? 'https:// 채용 공고 링크를 입력하세요' : '채용 공고 원문을 복사해 붙여넣어 주세요. 회사명, 직무 요건, 우대사항이 포함될수록 분석 정확도가 높아져요.'
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const submit = () => {
     if (!inputValue.trim() || isPending) return
     onSubmit(inputType === 'url' ? { sourceUrl: inputValue.trim() } : { body: inputValue.trim() })
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    submit()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+      e.preventDefault()
+      submit()
+    }
   }
 
   return (
@@ -103,6 +114,7 @@ const JDInputStep = ({ onSubmit, isPending }: { onSubmit: (request: JdRegisterIn
         <textarea
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={cn(
             'field-sizing-content',
