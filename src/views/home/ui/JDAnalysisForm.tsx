@@ -13,6 +13,9 @@ import { useRegisterJd, type JdRegisterInput, type JdCandidate } from '@entities
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/lib'
+
 type AnalysisPhase = 'INPUT' | 'SELECT_POSITION'
 
 export const JDAnalysisForm = () => {
@@ -24,6 +27,9 @@ export const JDAnalysisForm = () => {
   const { mutate: registerJd, isPending } = useRegisterJd(workspaceId)
 
   const handleRegister = (request: JdRegisterInput) => {
+    // 버튼 클릭 또는 제출 시 Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.JD_URL_ENTERED)
+
     const toastId = toast.loading('채용공고를 분석하고 있어요', {
       position: 'top-center'
     })
