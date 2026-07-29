@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import * as amplitude from '@amplitude/unified'
 
 export const CompleteStep = ({ hasConnected }: { hasConnected: boolean }) => {

@@ -14,7 +14,7 @@ import { AddProjectManualView } from './AddProjectManualView'
 import { AddProjectNotionView } from './AddProjectNotionView'
 import { AddProjectProgressView } from './AddProjectProgressView'
 
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import * as amplitude from '@amplitude/unified'
 
 type DialogView = 'default' | 'manual' | 'notion-select' | 'progress'

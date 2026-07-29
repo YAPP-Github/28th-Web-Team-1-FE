@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import * as amplitude from '@amplitude/unified'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 
 type AnalysisPhase = 'INPUT' | 'SELECT_POSITION'
 

@@ -1,7 +1,7 @@
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import * as amplitude from '@amplitude/unified'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { Section } from './Section'
 import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { FormTextarea } from '../form/FormTextarea'

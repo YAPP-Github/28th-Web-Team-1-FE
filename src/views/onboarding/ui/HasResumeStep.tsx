@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import * as amplitude from '@amplitude/unified'
 
 /** 온보딩 스텝1: 이력서 보유 여부 선택 화면 */

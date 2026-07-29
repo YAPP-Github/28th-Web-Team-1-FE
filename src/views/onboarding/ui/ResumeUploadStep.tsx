@@ -8,7 +8,7 @@ import { profileKeys } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import * as amplitude from '@amplitude/unified'
 
 /**

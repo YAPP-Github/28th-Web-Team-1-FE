@@ -17,7 +17,7 @@ import type { PolishProfileTextRequest, PolishStructure, ProfilePolishKind } fro
 import type { ResumeFormValues } from '../../model/resume-form.types'
 
 import * as amplitude from '@amplitude/unified'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 
 /** 첨삭 대상 필드 하나. `name`은 RHF 필드 경로(동적 문자열). */
 export interface AiFeedbackTarget {

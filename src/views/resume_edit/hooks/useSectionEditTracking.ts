@@ -1,7 +1,7 @@
 'use client'
 import { useRef } from 'react'
 import * as amplitude from '@amplitude/unified'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 
 type SectionEditName = 'core_competency' | 'experience' | 'career'
 type SectionEditLocation = 'editor' | 'ai_modal'

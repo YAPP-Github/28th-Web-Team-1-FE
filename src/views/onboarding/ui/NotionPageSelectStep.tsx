@@ -10,7 +10,7 @@ import { useNotionPages, useNotionConnectionId, useImportNotionExperiences } fro
 import { NotionPageCard } from '@features/notion_connect'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import * as amplitude from '@amplitude/unified'
 
 const MAX_NOTION_PAGES = 3

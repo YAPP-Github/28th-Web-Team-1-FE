@@ -17,7 +17,7 @@ import { ExperiencePickerDialog } from './ExperiencePickerDialog'
 import { buildResumeInput } from '../model/buildResumeInput'
 
 import * as amplitude from '@amplitude/unified'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 
 export const ResumeCreatePage = () => {
   useEffect(() => {

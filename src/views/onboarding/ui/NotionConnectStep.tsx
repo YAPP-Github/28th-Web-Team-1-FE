@@ -9,7 +9,7 @@ import { startNotionOAuth } from '@features/notion_connect'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
-import { AMPLITUDE_EVENTS } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import * as amplitude from '@amplitude/unified'
 
 /** 온보딩 스텝: 경험 정리해 둔 Notion 페이지 보유 여부 선택. "있어요"면 Notion OAuth 동의 화면으로 이탈한다. */
