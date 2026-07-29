@@ -129,6 +129,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   )
 
   const handleSave = form.handleSubmit((values) => {
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED)
     updateResume(buildSaveInput(values, 'COMPLETED'), {
       onSuccess: () => {
         setLastSavedAt(new Date())

@@ -3,6 +3,8 @@ import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-f
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { RotateCcw, Trash2 } from 'lucide-react'
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/lib'
 import { ExperiencePickerDialog } from '@views/resume_create'
 import { Section } from './Section'
 import { AiFeedbackDialog } from './AiFeedbackDialog'
@@ -80,7 +82,7 @@ const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove }: { 
       <Spacing size={16} />
 
       <Flex direction={'column'} className={'gap-5 py-1'}>
-        <FormTextarea name={`${base}.contents`} label={'세부내용'} />
+        <FormTextarea name={`${base}.contents`} label={'세부내용'} onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { section_name: 'experience' })} />
 
         <AiFeedbackDialog
           jdId={targetJdId}
