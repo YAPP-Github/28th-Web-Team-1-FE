@@ -1,9 +1,11 @@
+'use client'
+import { useCallback } from 'react'
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
+import * as amplitude from '@amplitude/unified'
 
 interface CompleteStepProps {
-  /** 온보딩 중 이력서 또는 Notion 연동을 완료했는지 */
   hasConnected: boolean
 }
 
@@ -23,6 +25,10 @@ export const CompleteStep = ({ hasConnected }: CompleteStepProps) => {
         cta: '경험정리 하러가기'
       }
 
+  const handleCtaClick = useCallback(() => {
+    if (!hasConnected) amplitude.track('direct_write_entered')
+  }, [hasConnected])
+
   return (
     <Flex direction="column" gap="7" className="w-full max-w-125">
       <Flex direction="column" align="center" gap="2" className="w-full text-center">
@@ -33,7 +39,7 @@ export const CompleteStep = ({ hasConnected }: CompleteStepProps) => {
           {content.description}
         </Text>
       </Flex>
-      <Button asChild variant="primary" size="xl" fullWidth>
+      <Button asChild variant="primary" size="xl" fullWidth onClick={handleCtaClick}>
         <Link href={content.href}>{content.cta}</Link>
       </Button>
     </Flex>

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Flex, Grid } from '@radix-ui/themes'
 import { Plus, Pencil, ChevronDown } from 'lucide-react'
@@ -18,6 +18,7 @@ import { profileToSections, sectionsToUpdateRequest } from '../model/profileMapp
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
+import * as amplitude from '@amplitude/unified'
 
 const createInstance = (type: ResumeSectionType): ResumeSectionInstance => ({ id: crypto.randomUUID(), type, values: {} })
 
@@ -51,6 +52,11 @@ export const ResumeInfoStep = ({ onDone, onPrev }: OnboardingStepProps) => {
   const addSections = (types: ResumeSectionType[]) => {
     setSections((prev) => [...prev, ...types.map(createInstance)])
   }
+
+  useEffect(() => {
+    // Amplitude 이벤트 전송
+    amplitude.track('resume_confirm_viewed')
+  }, [])
 
   return (
     <OnboardingStepShell

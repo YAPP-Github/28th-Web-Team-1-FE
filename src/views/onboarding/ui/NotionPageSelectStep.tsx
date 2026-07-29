@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Flex, Grid } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { Text, SearchField } from '@shared/ui'
@@ -10,6 +10,7 @@ import { useNotionPages, useNotionConnectionId, useImportNotionExperiences } fro
 import { NotionPageCard } from '@features/notion_connect'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
+import * as amplitude from '@amplitude/unified'
 
 const MAX_NOTION_PAGES = 3
 
@@ -34,6 +35,11 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
     enabled: hasNextPage && !isFetchingNextPage,
     onIntersect: fetchNextPage
   })
+
+  useEffect(() => {
+    // Amplitude 이벤트 전송
+    amplitude.track('notion_selected_viewed')
+  }, [])
 
   const toggle = useCallback((id: string) => {
     setPageIds((prev) => {

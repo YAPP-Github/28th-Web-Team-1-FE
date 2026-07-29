@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { PdfUpload } from '@features/pdf_upload'
@@ -8,6 +8,7 @@ import { profileKeys } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
+import * as amplitude from '@amplitude/unified'
 
 /**
  * 온보딩 스텝2: 작성해 둔 이력서 파일(pdf)을 업로드한다.
@@ -31,6 +32,10 @@ export const ResumeUploadStep = ({ onDone, onPrev, onSkip }: OnboardingStepProps
       onError: () => toast.error('요청에 실패했어요. 다시 시도해 주세요.', { id: toastId, position: 'top-center' })
     })
   }
+  useEffect(() => {
+    // Amplitude 이벤트 전송
+    amplitude.track('resume_upload_viewed')
+  }, [])
 
   return (
     <OnboardingStepShell
