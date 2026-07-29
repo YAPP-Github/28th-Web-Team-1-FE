@@ -1,5 +1,5 @@
 'use client'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useFieldArray, useFormContext, useWatch, type FieldArrayPath } from 'react-hook-form'
 import { closestCenter, DndContext, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
@@ -14,6 +14,7 @@ import { getItemLabel, visibleItems } from '@entities/resume'
 import { ADDABLE_CATEGORY_TYPES, createCategorySection, SECTION_CATEGORY_LABELS } from '../model/category'
 import type { ResumeFormSection, ResumeFormValues } from '../model/resume-form.types'
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
+import { AnimatePresence, motion } from 'motion/react'
 
 /** 섹션·아이템 이동 종료 이벤트를 fieldArray move 인덱스로 옮기는 공통 핸들러 생성기. */
 const makeDragEndHandler = (fieldIds: string[], move: (from: number, to: number) => void) => (event: DragEndEvent) => {
@@ -34,7 +35,7 @@ export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSecti
   const sections = useWatch({ control, name: 'sections' }) ?? []
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
 
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
   const [activeId, setActiveId] = useState<string | null>(null)
 
   const bodyEntries = sectionFields
@@ -48,8 +49,25 @@ export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSecti
     (from, to) => moveSection(bodyEntries[from].index, bodyEntries[to].index)
   )
 
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // 실제로 마우스가 얹혀 있거나(이미 얹힌 채 로드된 경우 포함) 드래그 중이면 닫지 않는다.
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const isHovering = containerRef.current?.matches(':hover')
+      if (!isHovering) setIsOpen(false)
+    }, 1500)
+    return () => clearTimeout(id)
+  }, [])
+
   return (
-    <Flex className={'bg-bg-gray-subtler relative w-16 px-4 py-20'} onMouseLeave={() => setIsOpen(false)}>
+    <Flex
+      ref={containerRef}
+      className={'bg-bg-gray-subtler relative w-16 px-4 py-20'}
+      onMouseLeave={() => {
+        setIsOpen(false)
+      }}
+    >
       <Flex direction="column" align={'end'} gap="2" className="h-fit w-full" onMouseEnter={() => setIsOpen(true)}>
         {basicInfoSectionUid && <div className={cn('h-0.75 w-6 rounded-full', activeSectionUid === basicInfoSectionUid ? 'bg-border-primary' : 'bg-border-subtle')} />}
         {bodyEntries.map(({ id, section }) => {
@@ -65,48 +83,53 @@ export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSecti
         })}
       </Flex>
 
-      {isOpen && (
-        <Flex direction="column" className={cn('bg-element-white border-border-subtler shadow-1 absolute top-16 right-4 z-10 w-55.5 gap-1.5 rounded-lg border px-5 py-3')}>
-          <button
-            type="button"
-            onClick={() => basicInfoSectionUid && onSelectSection(basicInfoSectionUid)}
-            className={cn('flex w-full cursor-pointer items-center rounded-sm px-1.5 py-1 text-left', activeSectionUid === basicInfoSectionUid && 'bg-element-primary-lighter')}
-          >
-            <Text variant="label2" color={'text-subtler'}>
-              기본정보
-            </Text>
-          </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+            <div className={'bg-element-white absolute top-16 right-4 h-2 w-2 rotate-45'} />
+            <Flex direction="column" className={cn('bg-element-white border-border-subtler shadow-1 absolute top-16 right-4 z-10 w-55.5 gap-1.5 rounded-lg border px-5 py-3')}>
+              <button
+                type="button"
+                onClick={() => basicInfoSectionUid && onSelectSection(basicInfoSectionUid)}
+                className={cn('flex w-full cursor-pointer items-center rounded-sm px-1.5 py-1 text-left', activeSectionUid === basicInfoSectionUid && 'bg-element-primary-lighter')}
+              >
+                <Text variant="label2" color={'text-subtler'}>
+                  기본정보
+                </Text>
+              </button>
 
-          <Divider />
+              <Divider />
 
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragStart={(e) => setActiveId(String(e.active.id))}
-            onDragEnd={(e) => {
-              handleSectionDragEnd(e)
-              setActiveId(null)
-            }}
-            onDragCancel={() => setActiveId(null)}
-          >
-            <SortableContext items={bodyEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
-              <Flex direction="column" className={'-ml-4 max-h-130 gap-1.5 overflow-y-auto pl-4'}>
-                {bodyEntries.map(({ id, index, section }) => (
-                  <SortableSectionRow key={id} id={id} sectionIndex={index} section={section} isActive={activeSectionUid === section.uid} onSelect={() => onSelectSection(section.uid)} />
-                ))}
-              </Flex>
-            </SortableContext>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                modifiers={[restrictToVerticalAxis]}
+                onDragStart={(e) => setActiveId(String(e.active.id))}
+                onDragEnd={(e) => {
+                  handleSectionDragEnd(e)
+                  setActiveId(null)
+                }}
+                onDragCancel={() => setActiveId(null)}
+              >
+                <SortableContext items={bodyEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+                  <Flex direction="column" className={'-ml-4 max-h-130 gap-1.5 overflow-y-auto pl-4'}>
+                    {bodyEntries.map(({ id, index, section }) => (
+                      <SortableSectionRow key={id} id={id} sectionIndex={index} section={section} isActive={activeSectionUid === section.uid} onSelect={() => onSelectSection(section.uid)} />
+                    ))}
+                  </Flex>
+                </SortableContext>
 
-            {/* 드래그 중인 섹션을 리스트 흐름에서 떼어내 떠 있는 복제본으로 렌더 → 높이 차로 인한 뭉개짐 방지 */}
-            <DragOverlay>{activeEntry ? <SectionDragOverlay section={activeEntry.section} /> : null}</DragOverlay>
-          </DndContext>
+                {/* 드래그 중인 섹션을 리스트 흐름에서 떼어내 떠 있는 복제본으로 렌더 → 높이 차로 인한 뭉개짐 방지 */}
+                <DragOverlay>{activeEntry ? <SectionDragOverlay section={activeEntry.section} /> : null}</DragOverlay>
+              </DndContext>
 
-          <Divider />
+              <Divider />
 
-          <SetCategoryModal />
-        </Flex>
-      )}
+              <SetCategoryModal />
+            </Flex>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Flex>
   )
 }

@@ -1,4 +1,4 @@
-import { Children } from 'react'
+import { useEffect, useRef, Children } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Divider, Spacing, Text } from '@shared/ui'
 
@@ -9,8 +9,17 @@ interface SectionProps {
 }
 
 export const Section = ({ title, actionButton, children }: SectionProps) => {
-  // 넘어온 아이템(children)이 하나도 없으면 공통 빈 상태를 대신 보여준다.
-  const isEmpty = Children.count(children) === 0
+  const count = Children.count(children)
+  const isEmpty = count === 0
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const prevCount = useRef(count)
+  useEffect(() => {
+    if (count > prevCount.current) {
+      scrollRef.current?.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+    prevCount.current = count
+  }, [count])
 
   return (
     <Flex direction="column" className={'w-full px-8 pb-6'}>
@@ -21,7 +30,7 @@ export const Section = ({ title, actionButton, children }: SectionProps) => {
       <Divider color={'gray-60'} />
       <Spacing size={32} />
 
-      <Flex direction={'column'} className={'flex-1 gap-12 overflow-y-auto px-1'}>
+      <Flex ref={scrollRef} direction={'column'} className={'flex-1 gap-12 overflow-y-auto px-1'}>
         {isEmpty ? <SectionEmpty /> : children}
       </Flex>
     </Flex>

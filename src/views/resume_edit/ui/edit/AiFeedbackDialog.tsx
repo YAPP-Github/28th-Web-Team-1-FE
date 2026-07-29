@@ -196,7 +196,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
                       {target.label}
                     </Text>
                     {target.multiline ? (
-                      <Flex direction={'column'} gap={'2'} className={`border-border-subtle my-auto h-60 rounded-lg border p-4`}>
+                      <Flex direction={'column'} gap={'2'} className={`border-border-subtle my-auto h-70 rounded-lg border p-4`}>
                         {Array.from({ length: 4 }).map((_, index) => (
                           <Skeleton key={`${target.name}-skeleton-${index}`} height={'14px'} width={index % 2 ? '60%' : '100%'} />
                         ))}
@@ -208,7 +208,12 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
                     )}
                   </>
                 ) : target.multiline ? (
-                  <Textarea label={target.label} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} className={'h-60'} />
+                  <Textarea
+                    label={target.label}
+                    value={drafts[target.name] ?? ''}
+                    onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))}
+                    className={'h-70 max-h-70'}
+                  />
                 ) : (
                   <Input label={target.label} clearable={false} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} />
                 )}
