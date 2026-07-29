@@ -25,7 +25,7 @@ const CoreSkillItem = ({ sectionIndex, index, targetJdId }: { sectionIndex: numb
 
   return (
     <Flex direction={'column'} className={'gap-5 py-1'}>
-      <FormTextarea name={contentName} label={'내용'} onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { section_name: 'core_competency' })} />
+      <FormTextarea name={contentName} label={'내용'} sectionName="core_competency" onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { section_name: 'core_competency' })} />
       <AiFeedbackDialog targets={[{ name: contentName, label: '내용', kind: 'CORE_COMPETENCY', multiline: true }]} jdId={targetJdId} />
     </Flex>
   )

@@ -82,7 +82,7 @@ const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove }: { 
       <Spacing size={16} />
 
       <Flex direction={'column'} className={'gap-5 py-1'}>
-        <FormTextarea name={`${base}.contents`} label={'세부내용'} onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { section_name: 'experience' })} />
+        <FormTextarea name={`${base}.contents`} label={'세부내용'} sectionName="experience" onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { section_name: 'experience' })} />
 
         <AiFeedbackDialog
           jdId={targetJdId}

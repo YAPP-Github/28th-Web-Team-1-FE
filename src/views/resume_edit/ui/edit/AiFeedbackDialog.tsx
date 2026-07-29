@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useState } from 'react'
+import { Suspense, useRef, useState } from 'react'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { useFormContext, type FieldPath } from 'react-hook-form'
 import { Flex, Skeleton } from '@radix-ui/themes'
@@ -62,6 +62,24 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
   const [isGenerating, setIsGenerating] = useState(false)
   /** 우측 편집 필드의 현재 값. key = target.name. 열 때 폼 값으로 초기화한다. */
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+
+  /** Amplitude 이벤트 전송용: 필드별 포커스 시점 값. key = target.name. (multiline 대상만 사용) */
+  const editFocusValueRef = useRef<Record<string, string>>({})
+
+  /** Amplitude 이벤트 전송용: 포커스 시점 값을 기준으로 저장해, 실제로 값이 바뀌는 첫 onChange에서만 Amplitude 이벤트를 1회 전송한다. */
+  const handleFieldFocus = (target: AiFeedbackTarget, currentValue: string) => {
+    editFocusValueRef.current[target.name] = currentValue
+  }
+
+  /** Amplitude 이벤트 전송용: 포커스 시점 값과 달라지는 첫 onChange에서만 1회 전송. */
+  const handleFieldChange = (target: AiFeedbackTarget, nextValue: string) => {
+    const baseline = editFocusValueRef.current[target.name]
+    if (baseline !== undefined && nextValue !== baseline) {
+      amplitude.track(AMPLITUDE_EVENTS.SECTION_EDITED, { section_name: SECTION_NAME_BY_KIND[target.kind], location: 'ai_modal' })
+      delete editFocusValueRef.current[target.name]
+    }
+    setDrafts((prev) => ({ ...prev, [target.name]: nextValue }))
+  }
 
   const readValue = (name: string) => String(getValues(name as FieldPath<ResumeFormValues>) ?? '')
 
@@ -213,7 +231,14 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
                     )}
                   </>
                 ) : target.multiline ? (
-                  <Textarea label={target.label} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} className={'h-60'} />
+                  <Textarea
+                    label={target.label}
+                    value={drafts[target.name] ?? ''}
+                    // Amplitude 이벤트 전송용: 포커스 시점 값과 달라지는 첫 onChange에서만 1회 전송
+                    onFocus={(event) => handleFieldFocus(target, event.target.value)}
+                    onChange={(event) => handleFieldChange(target, event.target.value)}
+                    className={'h-60'}
+                  />
                 ) : (
                   <Input label={target.label} clearable={false} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} />
                 )}
