@@ -50,9 +50,10 @@ export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSecti
   )
 
   useEffect(() => {
-    setTimeout(() => {
+    const id = setTimeout(() => {
       setIsOpen(false)
     }, 1500)
+    return () => clearTimeout(id)
   }, [])
 
   return (
