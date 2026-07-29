@@ -16,5 +16,7 @@ export const AMPLITUDE_EVENTS = {
   EXPERIENCE_SELECTION_COMPLETED: 'experience_selection_completed',
   RESUME_DRAFT_VIEWED: 'resume_draft_viewed',
   TEXT_COPIED: 'text_copied',
-  EDIT_MODAL_OPENED: 'edit_modal_opened'
+  EDIT_MODAL_OPENED: 'edit_modal_opened',
+  AI_EDIT_STARTED: 'ai_edit_started',
+  EDIT_APPLIED: 'edit_applied'
 } as const

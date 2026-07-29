@@ -16,6 +16,9 @@ import { useWorkspaceId } from '@entities/user'
 import type { PolishProfileTextRequest, PolishStructure, ProfilePolishKind } from '@shared/lib/gql/graphql'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/lib'
+
 /** 첨삭 대상 필드 하나. `name`은 RHF 필드 경로(동적 문자열). */
 export interface AiFeedbackTarget {
   /** 예: `sections.0.items.0.payload.experience.contents` */
@@ -78,6 +81,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
 
   const handleGenerate = async () => {
     // 경험 세부내용을 다듬을 때 맥락으로 넘길 경험명 값(있으면).
+    amplitude.track(AMPLITUDE_EVENTS.AI_EDIT_STARTED, { edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
     const titleTarget = targets.find((target) => target.kind === 'EXPERIENCE_TITLE')
     const title = titleTarget ? drafts[titleTarget.name] : undefined
 
@@ -105,6 +109,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
 
   /** 편집값을 폼에 되쓰고 닫는다. */
   const handleApply = () => {
+    amplitude.track(AMPLITUDE_EVENTS.EDIT_APPLIED, { section_name: SECTION_NAME_BY_KIND[targets[0].kind], edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
     targets.forEach((target) => {
       setValue(target.name as FieldPath<ResumeFormValues>, (drafts[target.name] ?? '') as never, { shouldDirty: true, shouldValidate: true })
     })
@@ -114,7 +119,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'}>
+        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'} onClick={() => amplitude.track(AMPLITUDE_EVENTS.EDIT_MODAL_OPENED)}>
           <PencilSparkles size={16} data-icon={'inline-start'} />
           AI 첨삭
         </Button>
@@ -262,3 +267,21 @@ const JdStrategyLoading = () => (
     <Skeleton height={'14px'} width={'80%'} />
   </Flex>
 )
+
+/** Amplitude 이벤트 전송 시 사용.
+ * EXPERIENCE_TITLE과  EXPERIENCE_DESCRIPTION은 배열의 첫 번째 항목만 전송한다.
+ * (경험=experience, 핵심역량=core_competency, 경력=career)
+ */
+const SECTION_NAME_BY_KIND: Record<ProfilePolishKind, string> = {
+  EXPERIENCE_TITLE: 'experience',
+  EXPERIENCE_DESCRIPTION: 'experience',
+  CORE_COMPETENCY: 'core_competency',
+  CAREER_DESCRIPTION: 'career'
+}
+
+/** Amplitude 이벤트 전송 시 사용. 서버 PolishStructure → Amplitude edit_mode 값. */
+const EDIT_MODE_BY_STRUCTURE: Record<PolishStructure, string> = {
+  BULLET: 'bullet',
+  PROBLEM_SOLUTION_RESULT: 'problem_solution',
+  PROSE: 'paragraph'
+}

@@ -39,7 +39,6 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
       <ExperiencePickerDialog
         isOpen={isPickerOpen}
         jdId={targetJdId ?? ''}
-        actionType="reselect"
         onOpenChange={setIsPickerOpen}
         onComplete={(experiences) => {
           replace(experiencesToFormItems(experiences))
