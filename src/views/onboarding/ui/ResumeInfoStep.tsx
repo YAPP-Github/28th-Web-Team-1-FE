@@ -10,7 +10,7 @@ import { DatePicker } from '@shared/ui/date_picker'
 import { MonthPicker } from '@shared/ui/month_picker'
 import { Popover, PopoverTrigger, PopoverContent } from '@shared/ui/popover'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
-import { formatDate, formatPhoneNumber, parsePeriodInput } from '@shared/lib'
+import { formatDate, formatPhoneNumber, parsePeriodInput, AMPLITUDE_EVENTS } from '@shared/lib'
 import { useProfile, useUpdateProfile } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import { ADDABLE_SECTION_TYPES, RESUME_SECTIONS, type ResumeField, type ResumeFieldSpan, type ResumeSectionInstance, type ResumeSectionType } from '../model/resumeSections'
@@ -18,6 +18,7 @@ import { profileToSections, sectionsToUpdateRequest } from '../model/profileMapp
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
+
 import * as amplitude from '@amplitude/unified'
 
 const createInstance = (type: ResumeSectionType): ResumeSectionInstance => ({ id: crypto.randomUUID(), type, values: {} })
@@ -55,7 +56,7 @@ export const ResumeInfoStep = ({ onDone, onPrev }: OnboardingStepProps) => {
 
   useEffect(() => {
     // Amplitude 이벤트 전송
-    amplitude.track('resume_confirm_viewed')
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_CONFIRM_VIEWED)
   }, [])
 
   return (

@@ -10,6 +10,7 @@ import { useNotionPages, useNotionConnectionId, useImportNotionExperiences } fro
 import { NotionPageCard } from '@features/notion_connect'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
+import { AMPLITUDE_EVENTS } from '@shared/lib'
 import * as amplitude from '@amplitude/unified'
 
 const MAX_NOTION_PAGES = 3
@@ -38,7 +39,7 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
 
   useEffect(() => {
     // Amplitude 이벤트 전송
-    amplitude.track('notion_selected_viewed')
+    amplitude.track(AMPLITUDE_EVENTS.NOTION_SELECTED_VIEWED)
   }, [])
 
   const toggle = useCallback((id: string) => {
@@ -54,6 +55,11 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
 
   const handleImport = () => {
     if (!connectionId || pageIds.length === 0) return
+
+    // 버튼 클릭 시 Amplitude 이벤트 전송(유저 속성 업데이트 포함)
+    amplitude.identify(new amplitude.Identify().set('has_notion', true))
+    amplitude.track(AMPLITUDE_EVENTS.NOTION_STATUS_SELECTED, { has_notion: true, location: 'onboarding' })
+
     const toastId = toast.loading('경험을 가져오고 있어요...', { position: 'top-center' })
     importPages(
       { connectionId, pageIds },

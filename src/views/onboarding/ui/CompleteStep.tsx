@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
+import { AMPLITUDE_EVENTS } from '@shared/lib'
 import * as amplitude from '@amplitude/unified'
 
 interface CompleteStepProps {
@@ -26,7 +27,7 @@ export const CompleteStep = ({ hasConnected }: CompleteStepProps) => {
       }
 
   const handleCtaClick = useCallback(() => {
-    if (!hasConnected) amplitude.track('direct_write_entered')
+    if (!hasConnected) amplitude.track(AMPLITUDE_EVENTS.DIRECT_WRITE_ENTERED)
   }, [hasConnected])
 
   return (

@@ -8,6 +8,7 @@ import { profileKeys } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
+import { AMPLITUDE_EVENTS } from '@shared/lib'
 import * as amplitude from '@amplitude/unified'
 
 /**
@@ -22,6 +23,10 @@ export const ResumeUploadStep = ({ onDone, onPrev, onSkip }: OnboardingStepProps
   const handleNext = () => {
     if (!file) return
 
+    // 버튼 클릭 시 Amplitude 이벤트 전송(유저 속성 업데이트 포함)
+    amplitude.identify(new amplitude.Identify().set('has_resume', true))
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_STATUS_SELECTED, { has_resume: true, location: 'onboarding' })
+
     const toastId = toast.loading('이력서를 분석하고 있어요...', { position: 'top-center' })
     uploadPdf(file, {
       onSuccess: () => {
@@ -34,7 +39,8 @@ export const ResumeUploadStep = ({ onDone, onPrev, onSkip }: OnboardingStepProps
   }
   useEffect(() => {
     // Amplitude 이벤트 전송
-    amplitude.track('resume_upload_viewed')
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_UPLOAD_VIEWED)
+    amplitude.identify(new amplitude.Identify().set('has_resume', true))
   }, [])
 
   return (
