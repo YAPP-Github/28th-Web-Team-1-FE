@@ -16,40 +16,38 @@ const COLOR = {
   basic: '#1e2124', // text-basic (이름·아이템 제목·본문)
   subtler: '#6d7882', // gray-50 (섹션 제목)
   meta: '#8a949e', // gray-40 (연락처·부제)
-  divider: '#cdd1d5' // gray-20
+  divider: '#cdd1d5' // gray-10
 }
 
 const styles = StyleSheet.create({
   page: {
     fontFamily: FONT_FAMILY,
-    paddingVertical: 44,
-    paddingHorizontal: 40,
+    padding: 40,
     color: COLOR.basic
   },
 
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  name: { fontSize: 20, fontWeight: 700 },
-  contact: { flexDirection: 'column', gap: 3, alignItems: 'flex-end' },
-  contactText: { fontSize: 9, color: COLOR.meta },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: 12 },
+  name: { fontSize: 32, fontWeight: 700 },
+  contact: { flexDirection: 'column', gap: 8, alignItems: 'flex-end' },
+  contactText: { fontSize: 12, color: COLOR.meta },
+  divider: { borderBottomWidth: 1, borderBottomColor: COLOR.divider, marginTop: 12, marginBottom: 24 },
 
-  divider: { borderBottomWidth: 1, borderBottomColor: COLOR.divider, marginVertical: 16 },
-
-  sections: { flexDirection: 'column', gap: 40 },
-  section: { flexDirection: 'row', gap: 50 },
-  sectionTitle: { width: 64, flexShrink: 0, fontSize: 10, color: COLOR.subtler },
+  sections: { flexDirection: 'column', gap: 44 },
+  section: { flexDirection: 'row', gap: 48 },
+  sectionTitle: { width: 72, flexShrink: 0, fontSize: 13, color: COLOR.subtler },
   sectionBody: { flex: 1, flexDirection: 'column', gap: 24 },
 
-  item: { flexDirection: 'column', gap: 3 },
-  itemTitle: { fontSize: 11, fontWeight: 600 },
-  subtitle: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  subtitleDivider: { width: 1, height: 9, backgroundColor: COLOR.divider },
-  itemSubtitle: { fontSize: 9, color: COLOR.meta },
-  itemContent: { fontSize: 9.5, color: COLOR.basic, lineHeight: 1.6, marginTop: 6 },
+  item: { flexDirection: 'column', gap: 8 },
+  itemTitle: { fontSize: 14, fontWeight: 600 },
+  subtitle: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  subtitleDivider: { width: 1, height: 10, backgroundColor: COLOR.divider },
+  itemSubtitle: { fontSize: 11, color: COLOR.meta },
+  itemContent: { fontSize: 10, color: COLOR.basic, lineHeight: 1.8 },
 
   skillGrid: { flexDirection: 'row', flexWrap: 'wrap' },
-  skillCell: { width: '50%', flexDirection: 'row', alignItems: 'baseline', paddingRight: 24, marginBottom: 3 },
-  skillName: { fontSize: 9.5, flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0, maxLines: 1, textOverflow: 'ellipsis', marginRight: 8 },
-  skillLevel: { fontSize: 9.5, color: COLOR.subtler, flexShrink: 0 }
+  skillCell: { width: '50%', flexDirection: 'row', alignItems: 'baseline', paddingRight: 40, marginBottom: 6 },
+  skillName: { fontSize: 12, flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0, maxLines: 1, textOverflow: 'ellipsis', marginRight: 8 },
+  skillLevel: { fontSize: 12, color: COLOR.subtler, flexShrink: 0 }
 })
 
 /** `{ startAt, endAt }` 기간을 `2025.03 - 2025.06` 형태로. 둘 다 없으면 null. (미리보기 periodText와 동일 규약) */

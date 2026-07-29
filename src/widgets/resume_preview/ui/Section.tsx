@@ -42,7 +42,7 @@ export const SectionItemSubtitle = ({ parts }: { parts: Array<string | null | un
 }
 
 export const SectionItemContent = ({ children }: { children: ReactNode }) => (
-  <Text as={'p'} className={'text-gray-90 text-[10px] whitespace-break-spaces'}>
+  <Text as={'p'} className={'text-gray-90 text-[10px] leading-[1.8] whitespace-break-spaces'}>
     {children}
   </Text>
 )
