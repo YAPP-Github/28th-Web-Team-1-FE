@@ -68,8 +68,11 @@ const stepVariants = {
 }
 
 const OnboardingFlow = () => {
-  const { connectionId } = useNotionReturn('/onboarding')
-  const { step, direction, next, skip, back, hasPrev, hasSkip, hasConnected } = useOnboardingFlow(connectionId ? 'notion-page-select' : undefined)
+  const { connectionId, hasError } = useNotionReturn('/onboarding')
+  let initialStep: OnboardingStep | undefined
+  if (connectionId) initialStep = 'notion-page-select'
+  else if (hasError) initialStep = 'notion-connect'
+  const { step, direction, next, skip, back, hasPrev, hasSkip, hasConnected } = useOnboardingFlow(initialStep)
   const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [notionSelection, setNotionSelection] = useState<NotionSelection | null>(null)
 
