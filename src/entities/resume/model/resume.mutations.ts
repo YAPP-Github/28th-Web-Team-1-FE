@@ -43,8 +43,8 @@ export const useUpdateResume = (workspaceId: string, resumeId: string) => {
       const { updateResume } = await resumeAPI.updateResume({ workspaceId, resumeId, input })
       return updateResume
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: resumeKeys.detail(workspaceId, resumeId) })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: resumeKeys.detail(workspaceId, resumeId) })
       queryClient.invalidateQueries({ queryKey: resumeKeys.lists() })
       queryClient.invalidateQueries({ queryKey: resumeKeys.counts(workspaceId) })
     }
