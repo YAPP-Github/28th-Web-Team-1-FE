@@ -7,7 +7,7 @@ import { useImportNotionExperiences } from '@entities/notion'
 import { useWorkspaceId } from '@entities/user'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 
-const STEPS = ['Notion 페이지 불러오는 중', '경험 정리하는 중']
+const STEPS = ['노션 페이지 불러오는 중', '경험만 뽑아내는 중', '거의 다 됐어요!']
 
 interface NotionProcessingStepProps extends OnboardingStepProps {
   /** 이전 스텝(`NotionPageSelectStep`)에서 고른 연결·페이지 목록. */
@@ -43,7 +43,7 @@ export const NotionProcessingStep = ({ connectionId, pageIds, onDone, onPrev }: 
         <ProcessingView
           isComplete={isSuccess}
           steps={STEPS}
-          title="Notion 페이지를 가져오고 있어요."
+          title="노션 페이지를 가져오고 있어요."
           description="잠시만 기다려 주세요"
           successTitle="경험을 모두 가져왔어요!"
           successDescription="정리된 경험을 확인해 보세요."

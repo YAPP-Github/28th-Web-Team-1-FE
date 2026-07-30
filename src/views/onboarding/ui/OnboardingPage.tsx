@@ -1,6 +1,5 @@
 'use client'
 import { Suspense, useState, type ReactNode } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
 import { useNotionReturn } from '@features/notion_connect'
 import { HasResumeStep } from './HasResumeStep'
@@ -13,7 +12,7 @@ import { NotionPageSelectStep } from './NotionPageSelectStep'
 import { NotionProcessingStep } from './NotionProcessingStep'
 import { CompleteStep } from './CompleteStep'
 import { useOnboardingFlow } from '../model/useOnboardingFlow'
-import { ONBOARDING_FLOW, type OnboardingStep, type OnboardingStepProps } from '../model/onboardingFlow'
+import { type OnboardingStep, type OnboardingStepProps } from '../model/onboardingFlow'
 
 /** `NotionPageSelectStep`에서 고른 연결·페이지 목록. `NotionProcessingStep`으로 넘긴다. */
 interface NotionSelection {
@@ -68,22 +67,9 @@ const stepVariants = {
   exit: ({ direction, isModal }: StepTransitionCustom) => (isModal ? { opacity: 0 } : { x: direction > 0 ? -32 : 32, opacity: 0 })
 }
 
-/**
- * 개발 중 특정 스텝을 바로 확인하기 위한 디버그 진입점.
- * `?debugStep=resume-info`처럼 URL에 붙이면 해당 스텝부터 시작한다(프로덕션에서는 무시).
- * 앞 스텝을 거치지 않고 바로 열기 때문에 "이전" 버튼은 뜨지 않는다.
- */
-const useDebugStep = (): OnboardingStep | undefined => {
-  const searchParams = useSearchParams()
-  if (process.env.NODE_ENV === 'production') return undefined
-  const value = searchParams.get('debugStep')
-  return value && value in ONBOARDING_FLOW ? (value as OnboardingStep) : undefined
-}
-
 const OnboardingFlow = () => {
   const { connectionId } = useNotionReturn('/onboarding')
-  const debugStep = useDebugStep()
-  const { step, direction, next, skip, back, hasPrev, hasSkip, hasConnected } = useOnboardingFlow(connectionId ? 'notion-page-select' : debugStep)
+  const { step, direction, next, skip, back, hasPrev, hasSkip, hasConnected } = useOnboardingFlow(connectionId ? 'notion-page-select' : undefined)
   const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [notionSelection, setNotionSelection] = useState<NotionSelection | null>(null)
 
