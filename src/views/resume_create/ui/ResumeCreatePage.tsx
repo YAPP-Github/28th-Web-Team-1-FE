@@ -222,7 +222,7 @@ const ResumeCreateContent = () => {
               await queryClient.prefetchQuery(resumeQueries.detail(workspaceId, resumeId))
               // Amplitude 이벤트 전송용: 선택된 경험 ID를 쿼리 파라미터로 붙여, 이전 경험과 새로 선택된 경험을 짝지어 previous_experience_id로 보낼 수 있게 한다.
               const initialExperienceIds = selectedExperiences.map((experience) => experience.experienceId).join(',')
-              router.push(`/home/resume/${resumeId}?initialExperienceIds=${encodeURIComponent(initialExperienceIds)}`)
+              router.push(`/resumes/edit/${resumeId}?initialExperienceIds=${encodeURIComponent(initialExperienceIds)}`)
             },
             onError: (error) => {
               setIsNavigating(false)
