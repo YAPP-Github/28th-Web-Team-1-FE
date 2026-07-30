@@ -40,8 +40,9 @@ export const ExperiencePickerDialog = ({ isOpen, jdId, isCompleting = false, act
 
   useEffect(() => {
     // 페이지 진입 시 Amplitude 이벤트 전송
+    if (!isOpen) return
     amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_VIEWED)
-  }, [])
+  }, [isOpen])
 
   // Amplitude 이벤트 전송용: 추천 경험 순위 맵 생성
   const { data: matchedPages } = useInfiniteQuery(experienceQueries.matched(workspaceId, jdId))

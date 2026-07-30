@@ -30,12 +30,14 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
   const searchParams = useSearchParams()
   const [previousExperienceIds, setPreviousExperienceIds] = useState<string[]>(() => searchParams.get('initialExperienceIds')?.split(',').filter(Boolean) ?? [])
 
-  // 한 번 시드로 소비한 뒤엔 주소창에서 지운다. Next 라우팅(router.replace)을 타지 않고 브라우저 History API로 주소만 바꿔
-  // 서버 컴포넌트 재요청/재렌더 없이 조용히 정리한다(새로고침 시 매번 first 값으로 되돌아가지 않도록).
+  // 한 번 시드로 소비한 뒤엔 주소창에서 initialExperienceIds만 지운다(다른 쿼리·해시는 보존).
+  // 마운트 시 1회만 실행한다.
   useEffect(() => {
     if (!searchParams.has('initialExperienceIds')) return
-    window.history.replaceState(null, '', pathname)
-    // 마운트 시 1회만 실행한다.
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('initialExperienceIds')
+    const query = params.toString()
+    window.history.replaceState(null, '', `${pathname}${query ? `?${query}` : ''}${window.location.hash}`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
