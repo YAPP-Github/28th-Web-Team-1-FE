@@ -184,7 +184,15 @@ const ProjectSelectPopover = ({ projects, selectedName, onSelect }: ProjectSelec
           <ChevronDown className="shrink-0" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} align="start" className="shadow-1 max-w-60 overflow-hidden rounded-sm">
+      <PopoverContent
+        sideOffset={10}
+        align="start"
+        className="shadow-1 bg-element-gray-lighter max-h-[min(--spacing(60),var(--radix-popover-content-available-height))] max-w-60 overflow-x-hidden overflow-y-auto rounded-sm"
+        // Dialog 안에 중첩된 Popover라 react-remove-scroll이 document 캡처 단계에서 wheel을 먼저 막아버림 → scrollTop을 직접 옮겨 우회
+        onWheel={(e) => {
+          e.currentTarget.scrollTop += e.deltaY
+        }}
+      >
         {projects.map((project) => (
           <button
             key={project.id}
@@ -193,7 +201,7 @@ const ProjectSelectPopover = ({ projects, selectedName, onSelect }: ProjectSelec
               onSelect(project.id)
               setIsOpen(false)
             }}
-            className="text-text-subtle hover:text-text-basic bg-element-gray-lighter hover:bg-element-gray-light px-3 py-2.5 text-start"
+            className="text-text-subtle hover:text-text-basic hover:bg-element-gray-light px-3 py-2.5 text-start"
           >
             <Text variant="body2">{project.name}</Text>
           </button>
