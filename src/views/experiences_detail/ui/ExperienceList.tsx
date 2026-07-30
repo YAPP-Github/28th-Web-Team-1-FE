@@ -54,7 +54,7 @@ const AddExperienceButton = () => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [content, setContent] = useState('')
-  const { mutate: createExperience, isPending } = useCreateExperience(workspaceId, projectId)
+  const { mutate: createExperience, isPending } = useCreateExperience(workspaceId)
 
   const handleOpenChange = (next: boolean) => {
     if (next) setContent('')
@@ -62,13 +62,12 @@ const AddExperienceButton = () => {
   }
 
   const handleSubmit = () => {
-    const trimmed = content.trim()
-    if (!trimmed) {
+    if (!content.trim()) {
       toast.warning('경험 내용을 입력해 주세요.', { id: 'experience-content-required', position: 'top-center' })
       return
     }
     createExperience(
-      { projectId, title: trimmed, contents: { type: 'FREE', free: { content: content } } },
+      { projectId, title: '', contents: { type: 'FREE', free: { content: content } } },
       {
         onSuccess: () => {
           toast.success('경험이 추가되었어요.', { id: 'experience-created', position: 'top-center' })

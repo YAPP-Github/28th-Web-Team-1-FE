@@ -413,8 +413,8 @@ type Mutation {
   ): Boolean!
 
   """
-  프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성합니다.
-  생성 결과는 응답으로만 반환하고, 이력서에는 생성 성공 여부만 기록합니다.
+  프로필 정보와 이력서에서 선택한 경험을 바탕으로 핵심역량을 AI로 생성합니다.
+  생성 결과는 응답으로만 반환합니다.
   """
   generateCoreCompetency(
     """
@@ -422,7 +422,7 @@ type Mutation {
     """
     jdId: ID = null
 
-    """생성 여부를 기록할 이력서 ID입니다."""
+    """선택된 경험을 조회할 이력서 ID입니다."""
     resumeId: ID!
 
     """워크스페이스 ID입니다."""
@@ -450,14 +450,19 @@ type Mutation {
     workspaceId: ID!
   ): Jd!
 
-  """프로필 텍스트(핵심역량/경력 세부/경험명/STAR 설명)를 AI로 다듬습니다. 결과만 반환하고 저장하지 않습니다."""
+  """
+  프로필 텍스트와 경험을 AI로 다듬습니다.
+  kind가 EXPERIENCE이면 title이 필수이며 응답 title에 다듬은 경험명이 채워집니다.
+  나머지 kind에서는 입력 title을 무시하고 응답 title은 null입니다.
+  입력은 최대 2000자이며 결과는 항목별 500자 제한에 맞춰 압축됩니다. 결과만 반환하고 저장하지 않습니다.
+  """
   polishProfileText(
     """텍스트 다듬기 입력입니다."""
     request: PolishProfileTextRequest!
 
     """워크스페이스 ID입니다. request.jdId로 지원 전략을 반영할 때 필수입니다."""
     workspaceId: ID = null
-  ): String!
+  ): PolishedProfileText!
 
   """
   JD를 URL(크롤) 또는 붙여넣기(본문)로 등록합니다.
@@ -598,22 +603,22 @@ input PeriodInput {
 
 """프로필 텍스트 AI 다듬기 입력입니다."""
 input PolishProfileTextRequest {
+  """다듬을 원문입니다. (최대 2000자) 결과는 항목별 제한 이내로 압축됩니다."""
+  description: String!
+
   """직접 작성 지침입니다. 어투, 강조할 수치 등을 자유롭게 적습니다. (최대 200자)"""
   instruction: String = null
 
   """JD ID입니다. 주면 해당 JD의 지원 전략을 반영해 다듬습니다. workspaceId와 함께 사용합니다."""
   jdId: ID = null
 
-  """다듬기 대상 항목입니다. 항목별 글자수 제한에 맞춰 다듬습니다."""
+  """다듬기 대상 항목입니다. 항목별 결과 글자수 제한에 맞춰 다듬습니다."""
   kind: ProfilePolishKind!
 
   """작성 구조입니다. (불렛형/문제-해결-성과/산문형, 미지정 시 원문 형식 유지)"""
   structure: PolishStructure = null
 
-  """다듬을 원문입니다. (최대 500자)"""
-  text: String!
-
-  """경험명입니다. 경험 세부 내용을 다듬을 때 맥락으로 사용됩니다. (최대 100자)"""
+  """경험명입니다. kind가 EXPERIENCE이면 필수이며 최대 150자입니다. 나머지 kind에서는 무시합니다."""
   title: String = null
 }
 
@@ -627,6 +632,22 @@ enum PolishStructure {
 
   """산문형"""
   PROSE
+}
+
+"""AI로 다듬은 프로필 텍스트입니다."""
+type PolishedProfileText {
+  """
+  다듬은 프로필 텍스트 또는 경험 내용입니다. 입력이 결과 제한보다 길면 핵심을 남겨 압축합니다. (최대 500자)
+  결과만 반환하고 저장하지 않습니다.
+  """
+  description: String!
+
+  """
+  kind가 EXPERIENCE일 때만 다듬은 경험명이 채워집니다. 추가 지침이 비어 있으면 원문 그대로 반환됩니다.
+  추가 지침이 있지만 경험명과 무관하면 AI가 원문 유지를 시도하지만 이를 보장하지 않습니다. (최대 150자)
+  결과만 반환하고 저장하지 않습니다.
+  """
+  title: String
 }
 
 """이력서 기본 정보 프로필입니다. 이력서에 들어가는 정보의 원본을 워크스페이스당 1개 관리합니다."""
@@ -805,17 +826,14 @@ input ProfileLanguageTestRequest {
 
 """프로필 텍스트 다듬기 대상 항목입니다."""
 enum ProfilePolishKind {
-  """경력 세부 내용 (최대 500자)"""
+  """경력 세부 내용 첨삭 결과 (최대 500자)"""
   CAREER_DESCRIPTION
 
-  """핵심역량 (최대 500자)"""
+  """핵심역량 첨삭 결과 (최대 500자)"""
   CORE_COMPETENCY
 
-  """경험 STAR 설명 (최대 500자)"""
-  EXPERIENCE_DESCRIPTION
-
-  """경험명 (최대 48자)"""
-  EXPERIENCE_TITLE
+  """경험명과 경험 내용 첨삭입니다. title이 필수이며 경험 내용 결과는 최대 500자입니다."""
+  EXPERIENCE
 }
 
 """스킬입니다."""
@@ -1007,9 +1025,6 @@ type Query {
 
 """이력서 상세 응답입니다."""
 type Resume {
-  """PROFILE_CORE_COMPETENCY_GENERATION을 성공적으로 수행했는지 여부입니다."""
-  coreCompetencyGenerated: Boolean!
-
   """생성 시각입니다."""
   createdAt: String!
 
@@ -1152,7 +1167,7 @@ input ResumeCoreSkillPayloadInput {
   content: String
 
   """이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다."""
-  isInitialItem: Boolean! = false
+  isInitialItem: Boolean! = true
 }
 
 """학력 payload 응답입니다."""
@@ -1424,9 +1439,6 @@ enum ResumeStatusType {
 
 """이력서 목록용 요약 응답입니다."""
 type ResumeSummary {
-  """PROFILE_CORE_COMPETENCY_GENERATION을 성공적으로 수행했는지 여부입니다."""
-  coreCompetencyGenerated: Boolean!
-
   """생성 시각입니다."""
   createdAt: String!
 
