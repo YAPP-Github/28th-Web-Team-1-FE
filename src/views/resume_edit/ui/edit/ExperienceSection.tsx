@@ -3,6 +3,8 @@ import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-f
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { RotateCcw, Trash2 } from 'lucide-react'
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { ExperiencePickerDialog } from '@views/resume_create'
 import { Section } from './Section'
 import { AiFeedbackDialog } from './AiFeedbackDialog'
@@ -11,6 +13,7 @@ import { FormInput } from '../form/FormInput'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
 import { FormTextarea } from '../form/FormTextarea'
 import { experiencesToFormItems } from '../../model/experiencesToFormItems'
+import { usePreviousExperienceIdsTracking } from '../../hooks/usePreviousExperienceIdsTracking'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 
 /**
@@ -21,6 +24,9 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
   const { control } = useFormContext<ResumeFormValues>()
   const { fields, remove, replace } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
   const [isPickerOpen, setIsPickerOpen] = useState(false)
+
+  // Amplitude 이벤트 전송용 훅. 경험 재선택 시 이전에 선택된 경험 ID들을 추적해 `previous_experience_id`로 보낸다.
+  const { previousExperienceIds, setPreviousExperienceIds } = usePreviousExperienceIdsTracking()
 
   return (
     <Section
@@ -39,9 +45,12 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
       <ExperiencePickerDialog
         isOpen={isPickerOpen}
         jdId={targetJdId ?? ''}
+        actionType={'reselect'}
+        previousExperienceIds={previousExperienceIds}
         onOpenChange={setIsPickerOpen}
         onComplete={(experiences) => {
           replace(experiencesToFormItems(experiences))
+          setPreviousExperienceIds(experiences.map((experience) => experience.experienceId))
           setIsPickerOpen(false)
         }}
       />
@@ -80,7 +89,7 @@ const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove }: { 
       <Spacing size={16} />
 
       <Flex direction={'column'} className={'gap-5 py-1'}>
-        <FormTextarea name={`${base}.contents`} label={'세부내용'} />
+        <FormTextarea name={`${base}.contents`} label={'세부내용'} sectionName="experience" onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { section_name: 'experience' })} />
 
         <AiFeedbackDialog
           jdId={targetJdId}

@@ -1,16 +1,18 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Flex, Grid } from '@radix-ui/themes'
 import { Pencil } from 'lucide-react'
 import { Button, Text } from '@shared/ui'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { useProfile, useUpdateProfile } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import { FIELD_SPAN_CLASS, RESUME_SECTIONS, type ResumeSectionInstance } from '../model/resumeSections'
 import { profileToSections, sectionsToUpdateRequest } from '../model/profileMapping'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
+import * as amplitude from '@amplitude/unified'
 import { AddSectionCard } from './AddSectionCard'
 import { ResumeFieldInput } from './ResumeFieldInput'
 
@@ -36,6 +38,11 @@ export const ResumeInfoStep = ({ onDone, onPrev }: OnboardingStepProps) => {
   const addSections = (instances: ResumeSectionInstance[]) => {
     setSections((prev) => [...prev, ...instances])
   }
+
+  useEffect(() => {
+    // Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_CONFIRM_VIEWED)
+  }, [])
 
   return (
     <OnboardingStepShell

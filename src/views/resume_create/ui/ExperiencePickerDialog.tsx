@@ -10,6 +10,7 @@ import { useJdInsight } from '@entities/jd'
 import { ExperienceCard } from './ExperienceCard'
 import { ExperienceSearchPanel } from './ExperienceSearchPanel'
 import { useMultiSelect } from '@shared/hooks/useMultiSelect'
+import { useExperiencePickerTracking, type ExperiencePickerActionType } from '../hooks/useExperiencePickerTracking'
 import type { Experience } from '../model/experience.types'
 
 const MAX_SELECT = 5
@@ -20,12 +21,24 @@ interface Props {
   isCompleting?: boolean
   onComplete: (experiences: Experience[]) => void
   onOpenChange?: (isOpen: boolean) => void
+
+  // Amplitude 이벤트 전송용 (ResumeCreatePage에서 호출 시 first, ExperienceSection에서 호출 시 reselect)
+  actionType?: ExperiencePickerActionType
+  // Amplitude 이벤트 전송용 (reselect 시 이전에 선택된 경험 ID들을 전달해, 새로 선택된 경험과 짝지어 previous_experience_id로 보낸다)
+  previousExperienceIds?: string[]
 }
 
-export const ExperiencePickerDialog = ({ isOpen, jdId, isCompleting = false, onOpenChange, onComplete }: Props) => {
+export const ExperiencePickerDialog = ({ isOpen, jdId, isCompleting = false, actionType = 'first', previousExperienceIds, onOpenChange, onComplete }: Props) => {
   const workspaceId = useWorkspaceId()
-
   const { selectedItems, isSelected, toggle, isFull, count } = useMultiSelect((experience: Experience) => experience.experienceId, MAX_SELECT)
+
+  // Amplitude 이벤트 전송용 훅. 경험 선택 완료 시 선택된 경험들을 추적해 EXPERIENCE_SELECTED 이벤트를 보낸다.
+  const { trackSelected } = useExperiencePickerTracking({ workspaceId, jdId, isOpen, actionType, previousExperienceIds })
+
+  const handleComplete = () => {
+    trackSelected(selectedItems)
+    onComplete(selectedItems)
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -78,7 +91,7 @@ export const ExperiencePickerDialog = ({ isOpen, jdId, isCompleting = false, onO
 
           <Spacing size={16} />
 
-          <Button size={'md'} className={'mt-auto'} disabled={count === 0 || isCompleting} onClick={() => onComplete(selectedItems)}>
+          <Button size={'md'} className={'mt-auto'} disabled={count === 0 || isCompleting} onClick={handleComplete}>
             {isCompleting ? <Loader2Icon className={'animate-spin'} strokeWidth={1.5} /> : '선택 완료'}
           </Button>
         </Flex>

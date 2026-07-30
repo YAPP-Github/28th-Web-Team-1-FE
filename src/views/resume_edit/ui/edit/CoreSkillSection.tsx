@@ -1,5 +1,7 @@
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { Section } from './Section'
 import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { FormTextarea } from '../form/FormTextarea'
@@ -23,7 +25,7 @@ const CoreSkillItem = ({ sectionIndex, index, targetJdId }: { sectionIndex: numb
 
   return (
     <Flex direction={'column'} className={'gap-5 py-1'}>
-      <FormTextarea name={contentName} label={'내용'} />
+      <FormTextarea name={contentName} label={'내용'} sectionName="core_competency" onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { section_name: 'core_competency' })} />
       <AiFeedbackDialog targets={[{ name: contentName, label: '내용', kind: 'CORE_COMPETENCY', multiline: true }]} jdId={targetJdId} />
     </Flex>
   )
