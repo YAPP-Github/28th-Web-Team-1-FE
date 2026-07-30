@@ -30,7 +30,7 @@ const STEP_RENDERERS: Record<OnboardingStep, (props: OnboardingStepProps, ctx: S
   'resume-processing': (props, ctx) => <ResumeProcessingStep {...props} file={ctx.resumeFile} />,
   'resume-info': (props) => <ResumeInfoStep {...props} />,
   'notion-connect': (props) => <NotionConnectStep {...props} />,
-  'notion-redirecting': (props) => <NotionRedirectStep {...props} />,
+  'notion-redirecting': () => <NotionRedirectStep />,
   'notion-page-select': (props, ctx) => <NotionPageSelectStep {...props} connectionId={ctx.connectionId} />,
   complete: (_props, ctx) => <CompleteStep hasConnected={ctx.hasConnected} />
 }
