@@ -95,7 +95,12 @@ const LinkButton = ({ icon: Icon, href, label, isExpanded }: LinkButtonProps) =>
   return (
     <Link
       href={href}
-      className={cn('flex h-11 items-center gap-3 rounded-md p-3.5', isActive && 'bg-element-white text-text-primary-basic shadow-shadow-1 shadow-md', !isExpanded && 'w-fit')}
+      className={cn(
+        'hover:shadow-1 hover:bg-element-white',
+        'text-text-subtler flex h-11 items-center gap-3 rounded-md p-3.5',
+        isActive && 'bg-element-white text-text-primary-basic shadow-1',
+        !isExpanded && 'w-fit'
+      )}
       aria-label={!isExpanded ? label : undefined}
       title={!isExpanded ? label : undefined}
     >
