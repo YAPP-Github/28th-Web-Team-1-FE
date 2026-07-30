@@ -6,7 +6,7 @@ import { Chip } from '@shared/ui/chip'
 import { useDebounce } from '@shared/hooks/useDebounce'
 import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
 import { useWorkspaceId } from '@entities/user'
-import { useNotionPages, useNotionConnectionId, useImportNotionExperiences } from '@entities/notion'
+import { useNotionPages, useNotionConnectionId } from '@entities/notion'
 import { NotionPageCard } from '@features/notion_connect'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
@@ -16,17 +16,18 @@ const MAX_NOTION_PAGES = 3
 interface NotionPageSelectStepProps extends OnboardingStepProps {
   /** OAuth 콜백이 URL로 넘긴 Notion 연결 ID. 없으면 연결 목록의 첫 연결로 폴백한다. */
   connectionId?: string
+  /** "경험 추출하기" 클릭 시 고른 연결·페이지 목록을 다음 스텝(`NotionProcessingStep`)에 전달한다. */
+  onNotionSelected: (selection: { connectionId: string; pageIds: string[] }) => void
 }
 
-/** 온보딩 스텝: 연동된 Notion에서 가져온 페이지 중 이력서로 만들 페이지 검색·선택(다중, 최대 3개) 후 경험으로 추출 */
-export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: connectionIdFromUrl }: NotionPageSelectStepProps) => {
+/** 온보딩 스텝: 연동된 Notion에서 가져온 페이지 중 이력서로 만들 페이지 검색·선택(다중, 최대 3개) */
+export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: connectionIdFromUrl, onNotionSelected }: NotionPageSelectStepProps) => {
   const [pageIds, setPageIds] = useState<string[]>([])
   const [keyword, setKeyword] = useState('')
   const workspaceId = useWorkspaceId()
   const connectionId = useNotionConnectionId(workspaceId, connectionIdFromUrl)
   const debouncedKeyword = useDebounce(keyword.trim(), 300)
   const { pages, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useNotionPages(workspaceId, connectionId, debouncedKeyword)
-  const { mutate: importPages, isPending } = useImportNotionExperiences(workspaceId)
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useIntersectionObserver<HTMLDivElement>({
@@ -48,17 +49,8 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
 
   const handleImport = () => {
     if (!connectionId || pageIds.length === 0) return
-    const toastId = toast.loading('경험을 가져오고 있어요...', { position: 'top-center' })
-    importPages(
-      { connectionId, pageIds },
-      {
-        onSuccess: () => {
-          toast.dismiss(toastId)
-          onDone()
-        },
-        onError: () => toast.error('경험 가져오기에 실패했어요. 다시 시도해 주세요.', { id: toastId, position: 'top-center' })
-      }
-    )
+    onNotionSelected({ connectionId, pageIds })
+    onDone()
   }
 
   return (
@@ -66,8 +58,8 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
       title="노션 페이지를 선택해주세요."
       description="SCOOP의 경험정리에 가져올 이력서/경험정리 페이지를 선택해 주세요."
       onNext={handleImport}
-      nextDisabled={pageIds.length === 0 || !connectionId || isPending}
-      nextLabel={isPending ? '가져오는 중...' : '경험 추출하기'}
+      nextDisabled={pageIds.length === 0 || !connectionId}
+      nextLabel="경험 추출하기"
       onPrev={onPrev}
       prevLabel="취소"
       onSkip={onSkip}
