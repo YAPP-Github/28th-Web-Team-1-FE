@@ -92,6 +92,10 @@ export const AddProjectDialog = () => {
 
   // 기존 프로젝트에 경험 추가: 로딩 화면으로 전환한 뒤 생성하고, 완료는 생성 응답(isExperienceDone)으로 판정한다.
   const handleAddExperience = (input: CreateExperienceInput) => {
+    // 버튼 클릭 시 Amplitude 이벤트 전송(유저 속성 업데이트 포함)
+    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_WRITE_SELECTED)
+    amplitude.identify(new amplitude.Identify().set('is_direct_write', true))
+
     setView('progress')
     createExperience(input, {
       onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.lists() }),
