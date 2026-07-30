@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
@@ -9,11 +9,18 @@ import { startNotionOAuth } from '@features/notion_connect'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
+import { AMPLITUDE_EVENTS } from '@shared/config'
+import * as amplitude from '@amplitude/unified'
 
 /** 온보딩 스텝: 경험 정리해 둔 Notion 페이지 보유 여부 선택. "있어요"면 Notion OAuth 동의 화면으로 이탈한다. */
 export const NotionConnectStep = ({ onDone, onPrev, onSkip }: OnboardingStepProps) => {
   const [hasNotion, setHasNotion] = useState<boolean | null>(null)
   const workspaceId = useWorkspaceId()
+
+  useEffect(() => {
+    // Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.NOTION_VIEWED)
+  }, [])
 
   return (
     <OnboardingStepShell

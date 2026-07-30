@@ -14,6 +14,9 @@ import { AddProjectManualView } from './AddProjectManualView'
 import { AddProjectNotionView } from './AddProjectNotionView'
 import { AddProjectProgressView } from './AddProjectProgressView'
 
+import { AMPLITUDE_EVENTS } from '@shared/config'
+import * as amplitude from '@amplitude/unified'
+
 type DialogView = 'default' | 'manual' | 'notion-select' | 'progress'
 
 /** Notion OAuth 콜백이 이 페이지로 돌아올 때 붙이는 재진입 파라미터가 가리킬 경로 */
@@ -58,11 +61,20 @@ export const AddProjectDialog = () => {
   // PDF 업로드: 진행 화면으로 전환한 뒤 업로드하고, 완료는 업로드 응답(isPdfDone)으로 판정한다.
   const handleExtractPdf = (file: File) => {
     setView('progress')
+
+    // 버튼 클릭 시 Amplitude 이벤트 전송(유저 속성 업데이트 포함)
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_STATUS_SELECTED, { has_resume: true, location: 'ex_tab' })
+    amplitude.identify(new amplitude.Identify().set('has_resume', true))
+
     uploadPdf(file, { onError: handleExtractError })
   }
 
   // 직접 입력: 진행 화면으로 전환한 뒤 생성하고, 완료는 생성 응답(isManualDone)으로 판정한다.
   const handleExtractManual = (input: CreateProjectInput) => {
+    // 버튼 클릭 시 Amplitude 이벤트 전송(유저 속성 업데이트 포함)
+    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_WRITE_SELECTED)
+    amplitude.identify(new amplitude.Identify().set('is_direct_write', true))
+
     setView('progress')
     createProject(input, { onError: handleExtractError })
   }
@@ -70,6 +82,11 @@ export const AddProjectDialog = () => {
   // Notion: 진행 화면으로 전환한 뒤 선택한 페이지들을 가져오고, 완료는 가져오기 응답(isNotionDone)으로 판정한다.
   const handleExtractNotion = (pageIds: string[]) => {
     if (!connectionId || pageIds.length === 0) return
+
+    // 버튼 클릭 시 Amplitude 이벤트 전송(유저 속성 업데이트 포함)
+    amplitude.track(AMPLITUDE_EVENTS.NOTION_STATUS_SELECTED, { has_notion: true, location: 'ex_tab' })
+    amplitude.identify(new amplitude.Identify().set('has_notion', true))
+
     setView('progress')
     importNotionPages(
       { connectionId: connectionId, pageIds },

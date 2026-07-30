@@ -1,6 +1,10 @@
+'use client'
+import { useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
+import { AMPLITUDE_EVENTS } from '@shared/config'
+import * as amplitude from '@amplitude/unified'
 
 export const CompleteStep = ({ hasConnected }: { hasConnected: boolean }) => {
   // TODO : 라이팅은 추후에 수정될 수 있음.
@@ -18,6 +22,14 @@ export const CompleteStep = ({ hasConnected }: { hasConnected: boolean }) => {
         cta: '경험정리 하러가기'
       }
 
+  const handleCtaClick = useCallback(() => {
+    if (!hasConnected) amplitude.track(AMPLITUDE_EVENTS.DIRECT_WRITE_ENTERED)
+  }, [hasConnected])
+
+  useEffect(() => {
+    amplitude.track(AMPLITUDE_EVENTS.ONBOARDING_COMPLETE_VIEWED, { has_connected: hasConnected })
+  }, [hasConnected])
+
   return (
     <Flex direction="column" gap="7" className="w-125 max-w-full">
       <Flex direction="column" align="center" gap="2" className="w-full text-center">
@@ -28,7 +40,7 @@ export const CompleteStep = ({ hasConnected }: { hasConnected: boolean }) => {
           {content.description}
         </Text>
       </Flex>
-      <Button asChild variant="primary" size="xl" fullWidth>
+      <Button asChild variant="primary" size="xl" fullWidth onClick={handleCtaClick}>
         <Link href={content.href}>{content.cta}</Link>
       </Button>
     </Flex>

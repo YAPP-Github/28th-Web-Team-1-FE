@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { FileCheckCorner, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { formatDate } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { useIntervalAutosave } from '@shared/hooks/useIntervalAutosave'
 import type { ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
 import { useResumeDetail, useUpdateResume } from '@entities/resume'
@@ -21,7 +22,14 @@ import { CoreSkillPreviewSection } from './CoreSkillPreviewSection'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
 import { useRouter } from 'next/navigation'
 
+import * as amplitude from '@amplitude/unified'
+
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
+  useEffect(() => {
+    // 페이지 진입 시 Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_DRAFT_VIEWED)
+  }, [])
+
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
       <ErrorBoundary fallback={<ResumeFallback>이력서를 불러오는 데 실패했습니다.</ResumeFallback>}>
@@ -122,6 +130,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   )
 
   const handleSave = form.handleSubmit((values) => {
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED)
     updateResume(buildSaveInput(values, 'COMPLETED'), {
       onSuccess: () => {
         setLastSavedAt(new Date())
