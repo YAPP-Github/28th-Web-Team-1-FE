@@ -4,6 +4,7 @@ import type { ResumeBasicInfoFieldsFragment } from '@shared/lib/gql/graphql'
 import { formatDate, formatYYYYMM } from '@shared/lib'
 import { payloadsOf, visibleItems, type ResumeSectionData } from '@entities/resume'
 import { FONT_FAMILY } from '../lib/registerPdfFonts'
+import { buildResumeBaseName } from '../lib/resumeFileName'
 
 /**
  * 이력서 상세 미리보기(`@widgets/resume_preview`)를 react-pdf primitive로 옮긴 PDF 문서.
@@ -194,10 +195,13 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
 export interface ResumePdfDocumentProps {
   basicInfo: ResumeBasicInfoFieldsFragment | null
   sections: ResumeSectionData[]
+  // 브라우저 탭 제목(Document title)에 사용 — 다운로드 파일명과 동일한 베이스로 맞춘다.
+  companyName?: string | null
+  positionTitle?: string | null
 }
 
-export const ResumePdfDocument = ({ basicInfo, sections }: ResumePdfDocumentProps) => (
-  <Document title={basicInfo?.name ? `${basicInfo.name} 이력서` : '이력서'}>
+export const ResumePdfDocument = ({ basicInfo, sections, companyName, positionTitle }: ResumePdfDocumentProps) => (
+  <Document title={buildResumeBaseName(companyName, positionTitle)}>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
         <Text style={styles.name}>{basicInfo?.name ?? ''}</Text>
