@@ -5,23 +5,22 @@ import { experienceKeys } from './experience.keys'
 import type { CreateExperienceInput, UpdateExperienceInput } from './experience.types'
 
 /**
- * 경험을 생성한다. 성공 시 해당 프로젝트의 경험 목록 캐시를 무효화한다.
+ * 경험을 생성한다. 성공 시 해당 프로젝트의 경험 목록 캐시를 무효화한다. (projectId는 요청 본문에서 가져온다)
  * @param workspaceId 라우트에서 확정된 워크스페이스 ID
- * @param projectId 경험을 추가할 프로젝트 ID
  * @example
  * ```tsx
- * const { mutate } = useCreateExperience(workspaceId, projectId)
+ * const { mutate } = useCreateExperience(workspaceId)
  * mutate({ projectId, title: '경험 제목', contents: { type: 'STAR', star: emptyStar } })
  * ```
  */
-export const useCreateExperience = (workspaceId: string, projectId: string) => {
+export const useCreateExperience = (workspaceId: string) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (request: CreateExperienceInput) => {
       const { createExperience } = await experienceAPI.createExperience({ workspaceId, request })
       return createExperience
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: experienceKeys.listByProject(workspaceId, projectId) })
+    onSuccess: (_data, variables) => queryClient.invalidateQueries({ queryKey: experienceKeys.listByProject(workspaceId, variables.projectId) })
   })
 }
 
