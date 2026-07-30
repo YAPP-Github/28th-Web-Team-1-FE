@@ -3,6 +3,14 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
+import * as amplitude from '@amplitude/unified'
+
+const amplitudeApiKey = process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY
+if (!amplitudeApiKey) {
+  console.warn('Amplitude API key missing — analytics disabled')
+} else {
+  amplitude.initAll(amplitudeApiKey, { analytics: { autocapture: true }, sessionReplay: { sampleRate: 1 } })
+}
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,

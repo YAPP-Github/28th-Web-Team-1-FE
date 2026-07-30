@@ -1,17 +1,19 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Flex, Grid } from '@radix-ui/themes'
 import { Award, Book, BookMarked, BookType, ClipboardPen, GraduationCap, Pencil, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react'
 import { Button, Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { useProfile, useUpdateProfile } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import { FIELD_SPAN_CLASS, RESUME_SECTIONS, type ResumeSectionInstance, type ResumeSectionType } from '../model/resumeSections'
 import { profileToSections, sectionsToUpdateRequest } from '../model/profileMapping'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
+import * as amplitude from '@amplitude/unified'
 import { AddSectionCard } from './AddSectionCard'
 import { ResumeFieldInput, SelectDropdown } from './ResumeFieldInput'
 
@@ -40,6 +42,10 @@ export const ResumeInfoStep = ({ onDone, onPrev }: OnboardingStepProps) => {
 
   // 기술은 여러 개여도 카드 하나(태그 목록)로 묶어서 보여준다.
   const skillSections = sections.filter((section) => section.type === 'skill')
+  useEffect(() => {
+    // Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_CONFIRM_VIEWED)
+  }, [])
 
   return (
     <OnboardingStepShell

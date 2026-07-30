@@ -1,8 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PdfUpload } from '@features/pdf_upload'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
+import { AMPLITUDE_EVENTS } from '@shared/config'
+import * as amplitude from '@amplitude/unified'
 
 interface ResumeUploadStepProps extends OnboardingStepProps {
   /** 선택한 파일을 다음 스텝(분석 진행 화면)에 넘긴다. */
@@ -20,7 +22,15 @@ export const ResumeUploadStep = ({ onDone, onPrev, onSkip, onFileReady }: Resume
     if (!file) return
     onFileReady(file)
     onDone()
+    amplitude.identify(new amplitude.Identify().set('has_resume', true))
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_STATUS_SELECTED, { has_resume: true, location: 'onboarding' })
+
   }
+  useEffect(() => {
+    // Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_UPLOAD_VIEWED)
+    amplitude.identify(new amplitude.Identify().set('has_resume', true))
+  }, [])
 
   return (
     <OnboardingStepShell
