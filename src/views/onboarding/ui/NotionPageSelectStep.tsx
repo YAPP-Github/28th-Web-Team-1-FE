@@ -58,7 +58,7 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
     if (!connectionId || pageIds.length === 0) return
     onNotionSelected({ connectionId, pageIds })
     onDone()
-   amplitude.identify(new amplitude.Identify().set('has_notion', true))
+    amplitude.identify(new amplitude.Identify().set('has_notion', true))
     amplitude.track(AMPLITUDE_EVENTS.NOTION_STATUS_SELECTED, { has_notion: true, location: 'onboarding' })
   }
 

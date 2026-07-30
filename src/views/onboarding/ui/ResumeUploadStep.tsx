@@ -24,7 +24,6 @@ export const ResumeUploadStep = ({ onDone, onPrev, onSkip, onFileReady }: Resume
     onDone()
     amplitude.identify(new amplitude.Identify().set('has_resume', true))
     amplitude.track(AMPLITUDE_EVENTS.RESUME_STATUS_SELECTED, { has_resume: true, location: 'onboarding' })
-
   }
   useEffect(() => {
     // Amplitude 이벤트 전송
