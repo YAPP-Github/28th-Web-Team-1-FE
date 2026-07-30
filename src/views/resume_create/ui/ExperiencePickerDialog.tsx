@@ -1,25 +1,19 @@
 'use client'
 
-import { Suspense, useEffect, useMemo } from 'react'
+import { Suspense } from 'react'
 import { Loader2Icon } from 'lucide-react'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { Dialog, DialogContent } from '@shared/ui/dialog'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { useWorkspaceId } from '@entities/user'
 import { useJdInsight } from '@entities/jd'
-import { experienceQueries } from '@entities/experience'
 import { ExperienceCard } from './ExperienceCard'
 import { ExperienceSearchPanel } from './ExperienceSearchPanel'
 import { useMultiSelect } from '@shared/hooks/useMultiSelect'
+import { useExperiencePickerTracking, type ExperiencePickerActionType } from '../hooks/useExperiencePickerTracking'
 import type { Experience } from '../model/experience.types'
 
-import * as amplitude from '@amplitude/unified'
-import { AMPLITUDE_EVENTS } from '@shared/config'
-
 const MAX_SELECT = 5
-
-type ActionType = 'first' | 'reselect'
 
 interface Props {
   isOpen: boolean
@@ -29,7 +23,7 @@ interface Props {
   onOpenChange?: (isOpen: boolean) => void
 
   // Amplitude 이벤트 전송용 (ResumeCreatePage에서 호출 시 first, ExperienceSection에서 호출 시 reselect)
-  actionType?: ActionType
+  actionType?: ExperiencePickerActionType
   // Amplitude 이벤트 전송용 (reselect 시 이전에 선택된 경험 ID들을 전달해, 새로 선택된 경험과 짝지어 previous_experience_id로 보낸다)
   previousExperienceIds?: string[]
 }
@@ -38,18 +32,11 @@ export const ExperiencePickerDialog = ({ isOpen, jdId, isCompleting = false, act
   const workspaceId = useWorkspaceId()
   const { selectedItems, isSelected, toggle, isFull, count } = useMultiSelect((experience: Experience) => experience.experienceId, MAX_SELECT)
 
-  useEffect(() => {
-    // 페이지 진입 시 Amplitude 이벤트 전송
-    if (!isOpen) return
-    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_VIEWED)
-  }, [isOpen])
-
-  // Amplitude 이벤트 전송용: 추천 경험 순위 맵 생성
-  const { data: matchedPages } = useInfiniteQuery(experienceQueries.matched(workspaceId, jdId))
-  const recommendationRankMap = useMemo(() => buildRecommendationRankMap(matchedPages?.pages.flatMap((page) => page.experiences.experiences) ?? []), [matchedPages])
+  // Amplitude 이벤트 전송용 훅. 경험 선택 완료 시 선택된 경험들을 추적해 EXPERIENCE_SELECTED 이벤트를 보낸다.
+  const { trackSelected } = useExperiencePickerTracking({ workspaceId, jdId, isOpen, actionType, previousExperienceIds })
 
   const handleComplete = () => {
-    trackExperienceSelected(selectedItems, actionType, { previousExperienceIds, rankMap: recommendationRankMap })
+    trackSelected(selectedItems)
     onComplete(selectedItems)
   }
 
@@ -165,34 +152,3 @@ const JdInsightLoading = () => (
     ))}
   </Flex>
 )
-
-/**
- * Amplitude 이벤트 전송용
- *  추천(recommendedReason 보유) 경험만 matchRate 내림차순으로 정렬해 1부터 순위를 매긴다. 비추천 경험은 맵에 없다.
- */
-const buildRecommendationRankMap = (experiences: Experience[]): Map<string, number> => {
-  const recommended = experiences.filter((experience) => Boolean(experience.recommendedReason)).sort((a, b) => (b.matchRate ?? 0) - (a.matchRate ?? 0))
-  return new Map(recommended.map((experience, index) => [experience.experienceId, index + 1]))
-}
-
-/**
- * Amplitude 이벤트 전송용
- * '선택 완료' 클릭 시 선택된 경험 수만큼 experience_selected 이벤트를 전송한다.
- * 'reselect'에서는 새로 고른 경험과 같은 인덱스의 previousExperienceIds를 짝지어 previous_experience_id로 보내고,
- * previousExperienceIds가 더 길면 넘치는 뒤쪽 id는 버린다(짝이 없으므로).
- */
-const trackExperienceSelected = (selected: Experience[], actionType: ActionType, options: { previousExperienceIds?: string[]; rankMap: Map<string, number> }) => {
-  const { previousExperienceIds, rankMap } = options
-  selected.forEach((experience, index) => {
-    const rank = rankMap.get(experience.experienceId)
-
-    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTED, {
-      experience_id: experience.experienceId,
-      is_recommended: Boolean(experience.recommendedReason), // 추천 이유가 있다면 추천 경험으로 간주
-      ...(rank !== undefined && { recommendation_rank: rank }),
-      action_type: actionType,
-      new_experience_id: actionType === 'reselect' ? experience.experienceId : null,
-      previous_experience_id: actionType === 'reselect' ? (previousExperienceIds?.[index] ?? null) : null
-    })
-  })
-}

@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
-import { usePathname, useSearchParams } from 'next/navigation'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { RotateCcw, Trash2 } from 'lucide-react'
@@ -14,6 +13,7 @@ import { FormInput } from '../form/FormInput'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
 import { FormTextarea } from '../form/FormTextarea'
 import { experiencesToFormItems } from '../../model/experiencesToFormItems'
+import { usePreviousExperienceIdsTracking } from '../../hooks/usePreviousExperienceIdsTracking'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 
 /**
@@ -25,21 +25,8 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
   const { fields, remove, replace } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
   const [isPickerOpen, setIsPickerOpen] = useState(false)
 
-  // Amplitude 이벤트 추적을 위해 이전에 선택된 경험 ID들을 상태로 관리한다.
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const [previousExperienceIds, setPreviousExperienceIds] = useState<string[]>(() => searchParams.get('initialExperienceIds')?.split(',').filter(Boolean) ?? [])
-
-  // 한 번 시드로 소비한 뒤엔 주소창에서 initialExperienceIds만 지운다(다른 쿼리·해시는 보존).
-  // 마운트 시 1회만 실행한다.
-  useEffect(() => {
-    if (!searchParams.has('initialExperienceIds')) return
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('initialExperienceIds')
-    const query = params.toString()
-    window.history.replaceState(null, '', `${pathname}${query ? `?${query}` : ''}${window.location.hash}`)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // Amplitude 이벤트 전송용 훅. 경험 재선택 시 이전에 선택된 경험 ID들을 추적해 `previous_experience_id`로 보낸다.
+  const { previousExperienceIds, setPreviousExperienceIds } = usePreviousExperienceIdsTracking()
 
   return (
     <Section
