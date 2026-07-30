@@ -75,7 +75,7 @@ const ResumeToolbar = ({ resumeId, targetJd, basicInfo, sections }: ResumeToolba
 
       <Flex align={'center'} gap="4">
         <Button asChild variant="secondary" size={'md'} className={'leading-0'}>
-          <Link href={`/home/resume/${resumeId}`}>
+          <Link href={`/resumes/edit/${resumeId}`}>
             <Pencil size={18} className="inline-block" data-icon="inline-start" />
             수정
           </Link>
