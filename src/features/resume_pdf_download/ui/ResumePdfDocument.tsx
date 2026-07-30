@@ -1,5 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
-import { Fragment, type ReactNode } from 'react'
+import { Children, Fragment, type ReactNode } from 'react'
 import type { ResumeBasicInfoFieldsFragment } from '@shared/lib/gql/graphql'
 import { formatDate, formatYYYYMM } from '@shared/lib'
 import { payloadsOf, visibleItems, type ResumeSectionData } from '@entities/resume'
@@ -33,7 +33,9 @@ const styles = StyleSheet.create({
   divider: { borderBottomWidth: 1, borderBottomColor: COLOR.divider, marginTop: 12, marginBottom: 24 },
 
   sections: { flexDirection: 'column', gap: 44 },
-  section: { flexDirection: 'row', gap: 48 },
+  // 섹션 = [제목+첫 항목 줄] + [빈 열+나머지 항목 줄]을 세로로 쌓음. 세로 gap은 항목 간격(24)과 동일.
+  section: { flexDirection: 'column', gap: 24 },
+  sectionLine: { flexDirection: 'row', gap: 48 }, // 제목(또는 빈 열) | 본문
   sectionTitle: { width: 72, flexShrink: 0, fontSize: 13, color: COLOR.subtler },
   sectionBody: { flex: 1, flexDirection: 'column', gap: 24 },
 
@@ -74,12 +76,25 @@ const Subtitle = ({ parts }: { parts: Array<string | null | undefined> }) => {
   )
 }
 
-const SectionRow = ({ title, children }: { title: string; children: ReactNode }) => (
-  <View style={styles.section}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <View style={styles.sectionBody}>{children}</View>
-  </View>
-)
+const SectionRow = ({ title, children }: { title: string; children: ReactNode }) => {
+  const [first, ...rest] = Children.toArray(children)
+  return (
+    // '제목 + 첫 항목'을 wrap={false}로 묶어, 페이지 경계에서 제목만 홀로 남는 분리를 막는다(묶음은 항목 하나 크기라
+    // 항상 한 페이지에 들어감 → 겹침 없음). 나머지 항목은 자유롭게 나뉘어(빈 좌측 열로 정렬 유지) 큰 섹션도 이어진다.
+    <View style={styles.section}>
+      <View style={styles.sectionLine} wrap={false}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <View style={styles.sectionBody}>{first}</View>
+      </View>
+      {rest.length > 0 && (
+        <View style={styles.sectionLine}>
+          <View style={styles.sectionTitle} />
+          <View style={styles.sectionBody}>{rest}</View>
+        </View>
+      )}
+    </View>
+  )
+}
 
 /**
  * 제목 + 부제(+ 선택적 본문) 구조의 공통 아이템 블록.

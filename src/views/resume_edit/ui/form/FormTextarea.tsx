@@ -34,6 +34,7 @@ export const FormTextarea = ({ name, sectionName, ...props }: FormTextareaProps)
             field.onChange(e)
           }}
           onBlur={field.onBlur}
+          maxLength={500}
         />
       )}
     />
