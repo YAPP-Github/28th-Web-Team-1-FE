@@ -85,7 +85,7 @@ interface SelectDropdownProps {
 }
 
 /** 값 하나를 고르는 드롭다운. Popover를 트리거+목록 형태로 조립한다(예: 기술 숙련도). */
-const SelectDropdown = ({ value, onChange, options, placeholder = '선택 안 함' }: SelectDropdownProps) => {
+export const SelectDropdown = ({ value, onChange, options, placeholder = '선택 안 함' }: SelectDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (

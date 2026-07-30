@@ -23,7 +23,7 @@ const INFO_SECTIONS: Array<{ value: string; label: string; Component: ComponentT
   { value: 'basic', label: '기본 정보', Component: BasicSection },
   { value: 'competency', label: '핵심 역량', Component: CoreCompetencySection },
   { value: 'education', label: '학력', Component: EducationSection },
-  { value: 'career', label: '경력 / 활동', Component: CareerSection },
+  { value: 'career', label: '경력/활동', Component: CareerSection },
   { value: 'language', label: '어학', Component: LanguageSection },
   { value: 'award', label: '수상', Component: AwardSection },
   { value: 'certificate', label: '자격증', Component: CertificateSection },

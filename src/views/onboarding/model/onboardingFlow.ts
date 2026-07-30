@@ -1,4 +1,4 @@
-export type OnboardingStep = 'has-resume' | 'resume-upload' | 'resume-info' | 'notion-connect' | 'notion-page-select' | 'complete'
+export type OnboardingStep = 'has-resume' | 'resume-upload' | 'resume-processing' | 'resume-info' | 'notion-connect' | 'notion-redirecting' | 'notion-page-select' | 'notion-processing' | 'complete'
 
 export const INITIAL_STEP: OnboardingStep = 'has-resume'
 
@@ -19,10 +19,13 @@ interface FlowNode {
 
 export const ONBOARDING_FLOW: Record<OnboardingStep, FlowNode> = {
   'has-resume': { next: (hasResume) => (hasResume ? 'resume-upload' : 'notion-connect') },
-  'resume-upload': { next: 'resume-info', skip: 'notion-connect' },
+  'resume-upload': { next: 'resume-processing', skip: 'notion-connect' },
+  'resume-processing': { next: 'resume-info' },
   'resume-info': { next: 'notion-connect' },
-  'notion-connect': { next: (hasNotion) => (hasNotion ? 'notion-page-select' : 'complete'), skip: 'complete' },
-  'notion-page-select': { next: 'complete', skip: 'complete' },
+  'notion-connect': { next: (hasNotion) => (hasNotion ? 'notion-redirecting' : 'complete'), skip: 'complete' },
+  'notion-redirecting': { next: 'notion-page-select' },
+  'notion-page-select': { next: 'notion-processing', skip: 'complete' },
+  'notion-processing': { next: 'complete' },
   complete: { next: null }
 }
 

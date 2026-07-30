@@ -31,7 +31,7 @@ export const ExperiencesSearchField = () => {
         if (!e.currentTarget.contains(e.relatedTarget)) setIsFocused(false)
       }}
     >
-      <SearchField placeholder="경험 이름, 태그로 검색하세요" className="w-full" value={keyword} onChange={(e) => setKeyword(e.target.value)} rounded={isOpen ? 'top' : 'full'} />
+      <SearchField placeholder="경험 이름이나 태그로 검색해 보세요" className="w-full" value={keyword} onChange={(e) => setKeyword(e.target.value)} rounded={isOpen ? 'top' : 'full'} />
       {isOpen && (
         <Flex direction="column" className="bg-element-white shadow-2 absolute top-full left-0 z-10 w-full overflow-hidden rounded-b-2xl">
           {results.length > 0 ? (

@@ -23,12 +23,14 @@ export const CareerSection = ({ profile }: { profile: Profile }) => {
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       {fields.map((arrayField, index) => (
         <Flex key={arrayField.id} direction="column" gap="4">
-          <RepeatableItemHeader title={`경력 / 활동 ${index + 1}`} onRemove={() => remove(index)} />
+          <RepeatableItemHeader title={`경력/활동 ${index + 1}`} onRemove={() => remove(index)} />
 
           <Controller
             control={control}
             name={`items.${index}.company`}
-            render={({ field }) => <Input label="회사명" clearable={false} placeholder="회사명을 입력해주세요." value={field.value ?? ''} onChange={field.onChange} onBlur={field.onBlur} />}
+            render={({ field }) => (
+              <Input label="회사 / 단체명" clearable={false} placeholder="회사 / 단체명을 입력해주세요." value={field.value ?? ''} onChange={field.onChange} onBlur={field.onBlur} />
+            )}
           />
 
           <Flex className="w-full gap-4">

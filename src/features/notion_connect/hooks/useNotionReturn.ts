@@ -13,8 +13,9 @@ import { NOTION_PAGE_SELECT_STEP, NOTION_CONNECT_ERROR } from '../constants/noti
  * @param returnPath 파라미터를 지운 뒤 남길 경로
  * @example
  * ```tsx
- * const { connectionId } = useNotionReturn('/experiences')
+ * const { connectionId, hasError } = useNotionReturn('/experiences')
  * if (connectionId) setView('notion-select')
+ * if (hasError) setView('notion-connect')
  * ```
  */
 export const useNotionReturn = (returnPath: string) => {
@@ -35,5 +36,5 @@ export const useNotionReturn = (returnPath: string) => {
     }
   }, [initial, router, returnPath])
 
-  return { connectionId: initial.connectionId }
+  return { connectionId: initial.connectionId, hasError: initial.hasError }
 }
