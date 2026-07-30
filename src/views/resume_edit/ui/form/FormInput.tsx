@@ -22,7 +22,7 @@ export const FormInput = ({ name, ...props }: FormInputProps) => {
     <Controller
       control={control}
       name={name as FieldPath<ResumeFormValues>}
-      render={({ field }) => <Input {...props} value={typeof field.value === 'string' ? field.value : ''} onChange={field.onChange} onBlur={field.onBlur} />}
+      render={({ field }) => <Input {...props} value={typeof field.value === 'string' ? field.value : ''} onChange={field.onChange} onBlur={field.onBlur} maxLength={150} />}
     />
   )
 }
