@@ -16,6 +16,9 @@ import { useJdMeta } from '@entities/jd'
 import { ExperiencePickerDialog } from './ExperiencePickerDialog'
 import { buildResumeInput } from '../model/buildResumeInput'
 
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
+
 export const ResumeCreatePage = () => {
   return (
     // 다이얼로그 뒤로 이력서 편집 화면과 같은 배경을 깔아, 경험 선택이 이력서 위에서 이뤄지는 것처럼 보이게 한다.
@@ -209,13 +212,17 @@ const ResumeCreateContent = () => {
         jdId={jdId}
         isCompleting={isPending || isNavigating}
         onComplete={(selectedExperiences) => {
+          // 경험 선택 완료 시 Amplitude 이벤트 전송
+          amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_COMPLETED, { selected_experience_count: selectedExperiences.length })
           setIsNavigating(true)
           createResume(buildResumeInput(selectedExperiences, jdId), {
             onSuccess: async ({ resumeId }) => {
               // 편집 화면의 useResumeDetail(Suspense)이 첫 진입에서 fallback으로 번쩍이지 않도록,
               // 이동 전에 이력서 상세를 미리 캐시에 채워 둔다(warm cache). 모달은 페이지가 바뀌며 자연히 사라진다.
               await queryClient.prefetchQuery(resumeQueries.detail(workspaceId, resumeId))
-              router.push(`/resumes/edit/${resumeId}`)
+              // Amplitude 이벤트 전송용: 선택된 경험 ID를 쿼리 파라미터로 붙여, 이전 경험과 새로 선택된 경험을 짝지어 previous_experience_id로 보낼 수 있게 한다.
+              const initialExperienceIds = selectedExperiences.map((experience) => experience.experienceId).join(',')
+              router.push(`/resumes/edit/${resumeId}?initialExperienceIds=${encodeURIComponent(initialExperienceIds)}`)
             },
             onError: (error) => {
               setIsNavigating(false)

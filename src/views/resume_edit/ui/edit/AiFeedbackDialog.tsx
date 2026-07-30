@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useState } from 'react'
+import { Suspense, useRef, useState } from 'react'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { useFormContext, type FieldPath } from 'react-hook-form'
 import { Flex, Skeleton } from '@radix-ui/themes'
@@ -15,6 +15,9 @@ import { useJdInsight } from '@entities/jd'
 import { useWorkspaceId } from '@entities/user'
 import type { PolishProfileTextRequest, PolishStructure, ProfilePolishKind } from '@shared/lib/gql/graphql'
 import type { ResumeFormValues } from '../../model/resume-form.types'
+
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 
 /** 첨삭 대상 필드 하나. `name`은 RHF 필드 경로(동적 문자열). */
 export interface AiFeedbackTarget {
@@ -60,6 +63,24 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
   /** 우측 편집 필드의 현재 값. key = target.name. 열 때 폼 값으로 초기화한다. */
   const [drafts, setDrafts] = useState<Record<string, string>>({})
 
+  /** Amplitude 이벤트 전송용: 필드별 포커스 시점 값. key = target.name. (multiline 대상만 사용) */
+  const editFocusValueRef = useRef<Record<string, string>>({})
+
+  /** Amplitude 이벤트 전송용: 포커스 시점 값을 기준으로 저장해, 실제로 값이 바뀌는 첫 onChange에서만 Amplitude 이벤트를 1회 전송한다. */
+  const handleFieldFocus = (target: AiFeedbackTarget, currentValue: string) => {
+    editFocusValueRef.current[target.name] = currentValue
+  }
+
+  /** Amplitude 이벤트 전송용: 포커스 시점 값과 달라지는 첫 onChange에서만 1회 전송. */
+  const handleFieldChange = (target: AiFeedbackTarget, nextValue: string) => {
+    const baseline = editFocusValueRef.current[target.name]
+    if (baseline !== undefined && nextValue !== baseline) {
+      amplitude.track(AMPLITUDE_EVENTS.SECTION_EDITED, { section_name: SECTION_NAME_BY_KIND[target.kind], location: 'ai_modal' })
+      delete editFocusValueRef.current[target.name]
+    }
+    setDrafts((prev) => ({ ...prev, [target.name]: nextValue }))
+  }
+
   const readValue = (name: string) => String(getValues(name as FieldPath<ResumeFormValues>) ?? '')
 
   /** 대상들의 현재 폼 값 스냅샷. 초기화·재오픈 시 이 값으로 되돌린다. */
@@ -78,6 +99,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
 
   const handleGenerate = async () => {
     // 경험 세부내용을 다듬을 때 맥락으로 넘길 경험명 값(있으면).
+    amplitude.track(AMPLITUDE_EVENTS.AI_EDIT_STARTED, { edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
     const titleTarget = targets.find((target) => target.kind === 'EXPERIENCE_TITLE')
     const title = titleTarget ? drafts[titleTarget.name] : undefined
 
@@ -105,6 +127,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
 
   /** 편집값을 폼에 되쓰고 닫는다. */
   const handleApply = () => {
+    amplitude.track(AMPLITUDE_EVENTS.EDIT_APPLIED, { section_name: SECTION_NAME_BY_KIND[targets[0].kind], edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
     targets.forEach((target) => {
       setValue(target.name as FieldPath<ResumeFormValues>, (drafts[target.name] ?? '') as never, { shouldDirty: true, shouldValidate: true })
     })
@@ -114,7 +137,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'}>
+        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'} onClick={() => amplitude.track(AMPLITUDE_EVENTS.EDIT_MODAL_OPENED)}>
           <PencilSparkles size={16} data-icon={'inline-start'} />
           AI 첨삭
         </Button>
@@ -211,7 +234,9 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
                   <Textarea
                     label={target.label}
                     value={drafts[target.name] ?? ''}
-                    onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))}
+                    // Amplitude 이벤트 전송용: 포커스 시점 값과 달라지는 첫 onChange에서만 1회 전송
+                    onFocus={(event) => handleFieldFocus(target, event.target.value)}
+                    onChange={(event) => handleFieldChange(target, event.target.value)}
                     className={'h-70 max-h-70'}
                   />
                 ) : (
@@ -267,3 +292,21 @@ const JdStrategyLoading = () => (
     <Skeleton height={'14px'} width={'80%'} />
   </Flex>
 )
+
+/** Amplitude 이벤트 전송 시 사용.
+ * EXPERIENCE_TITLE과  EXPERIENCE_DESCRIPTION은 배열의 첫 번째 항목만 전송한다.
+ * (경험=experience, 핵심역량=core_competency, 경력=career)
+ */
+const SECTION_NAME_BY_KIND: Record<ProfilePolishKind, string> = {
+  EXPERIENCE_TITLE: 'experience',
+  EXPERIENCE_DESCRIPTION: 'experience',
+  CORE_COMPETENCY: 'core_competency',
+  CAREER_DESCRIPTION: 'career'
+}
+
+/** Amplitude 이벤트 전송 시 사용. 서버 PolishStructure → Amplitude edit_mode 값. */
+const EDIT_MODE_BY_STRUCTURE: Record<PolishStructure, string> = {
+  BULLET: 'bullet',
+  PROBLEM_SOLUTION_RESULT: 'problem_solution',
+  PROSE: 'paragraph'
+}

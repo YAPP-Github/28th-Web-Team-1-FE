@@ -14,6 +14,9 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Dialog, DialogContent } from '@shared/ui/dialog'
 
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
+
 type AnalysisPhase = 'INPUT' | 'SELECT_POSITION'
 
 export const JDAnalysisForm = () => {
@@ -36,6 +39,8 @@ export const JDAnalysisForm = () => {
   }, [isPending])
 
   const handleRegister = (request: JdRegisterInput) => {
+    // 버튼 클릭 또는 제출 시 Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.JD_URL_ENTERED)
     registerJd(request, {
       onSuccess: (res) => {
         if (res.jd) {

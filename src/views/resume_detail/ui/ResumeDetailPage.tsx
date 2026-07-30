@@ -81,7 +81,7 @@ const ResumeToolbar = ({ resumeId, targetJd, basicInfo, sections }: ResumeToolba
           </Link>
         </Button>
 
-        <ResumeDownloadButton basicInfo={basicInfo} sections={sections} />
+        <ResumeDownloadButton basicInfo={basicInfo} sections={sections} companyName={targetJd?.companyName} positionTitle={targetJd?.positionTitle} />
       </Flex>
     </header>
   )

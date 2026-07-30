@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Flex, Grid } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { Text, SearchField } from '@shared/ui'
@@ -10,6 +10,8 @@ import { useNotionPages, useNotionConnectionId } from '@entities/notion'
 import { NotionPageCard } from '@features/notion_connect'
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
+import { AMPLITUDE_EVENTS } from '@shared/config'
+import * as amplitude from '@amplitude/unified'
 
 const MAX_NOTION_PAGES = 3
 
@@ -36,6 +38,11 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
     onIntersect: fetchNextPage
   })
 
+  useEffect(() => {
+    // Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.NOTION_SELECTED_VIEWED)
+  }, [])
+
   const toggle = useCallback((id: string) => {
     setPageIds((prev) => {
       if (prev.includes(id)) return prev.filter((pageId) => pageId !== id)
@@ -51,6 +58,8 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
     if (!connectionId || pageIds.length === 0) return
     onNotionSelected({ connectionId, pageIds })
     onDone()
+   amplitude.identify(new amplitude.Identify().set('has_notion', true))
+    amplitude.track(AMPLITUDE_EVENTS.NOTION_STATUS_SELECTED, { has_notion: true, location: 'onboarding' })
   }
 
   return (
