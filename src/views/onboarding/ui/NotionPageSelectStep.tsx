@@ -104,12 +104,12 @@ export const NotionPageSelectStep = ({ onDone, onPrev, onSkip, connectionId: con
             </Text>
           </Flex>
         )}
-        <Flex align="center" className="shrink-0 gap-1.5">
-          <Chip size="sm" className="bg-element-primary-lighter text-text-primary-basic">
+        <Flex align="center" className="shrink-0 gap-2">
+          <Chip size="sm" className="bg-element-primary-lighter text-text-primary-basic text-label1">
             TIP
           </Chip>
-          <Text variant="caption1" color="text-basic">
-            이력서로 만들고 싶은 실제 본문 내용이 담긴 하위 페이지를 <span className="text-text-primary-basic">직접 검색</span>해서 선택해 주세요.
+          <Text variant="label1" color="text-basic">
+            경험이 정리된 <span className="text-text-primary-basic">페이지 명을 직접 검색</span>하면 AI가 더 잘 분석할 수 있어요.
           </Text>
         </Flex>
       </Flex>

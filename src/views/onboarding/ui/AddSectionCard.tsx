@@ -64,7 +64,7 @@ export const AddSectionCard = ({ onAdd }: { onAdd: (instances: ResumeSectionInst
         >
           <Plus size={20} />
           <Text variant="headline2" color="text-primary-basic">
-            항목 추가하기
+            카테고리 추가하기
           </Text>
         </button>
       </DialogTrigger>

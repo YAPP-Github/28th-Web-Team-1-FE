@@ -10,7 +10,7 @@ export const HasResumeStep = ({ onDone }: OnboardingStepProps) => {
   return (
     <OnboardingStepShell
       title="이미 만들어둔 이력서가 있으신가요?"
-      description="기본 정보와 경력 사항을 자동으로 불러와 빠르게 이력서를 완성할 수 있어요."
+      description="이력서를 등록해 두면 기본 정보와 경력을 불러와서, 이력서 초안을 만들 때 활용해요."
       onNext={() => hasResume !== null && onDone(hasResume)}
       nextDisabled={hasResume === null}
     >

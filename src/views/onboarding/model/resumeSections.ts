@@ -63,15 +63,6 @@ const selectInput = (key: string, label: string, opts: { options: readonly strin
 /** 입력 중 자동으로 하이픈이 들어가는(`010-1234-5678`) 전화번호 필드. */
 const phoneInput = (key: string, label: string, opts?: { span?: ResumeFieldSpan }): ResumeField => ({ key, label, placeholder: '010-1234-5678', span: opts?.span, kind: 'phone' })
 
-/** 여러 줄 `Textarea`로 렌더링되는 필드(최대 500자, 마이페이지와 동일). */
-const textareaInput = (key: string, label: string, opts?: { placeholder?: string; span?: ResumeFieldSpan }): ResumeField => ({
-  key,
-  label,
-  placeholder: opts?.placeholder ?? `${label}를 입력해 주세요.`,
-  span: opts?.span,
-  kind: 'textarea'
-})
-
 /**
  * 이력서 섹션 타입별 구성(제목 + 필드 스키마).
  * 카드 표시와 편집 모달이 모두 이 스키마를 데이터 소스로 사용한다.
@@ -88,21 +79,16 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
     title: '학력',
     fields: [
       input('school', '학교', { placeholder: '학교명을 입력해주세요.' }),
-      selectInput('status', '상태', { options: EDUCATION_STATUSES, span: 2 }),
-      periodInput('period', '기간'),
       input('major', '전공', { placeholder: '전공명', span: 2 }),
-      selectInput('degree', '학위', { options: DEGREE_LEVELS, span: 2 })
+      selectInput('degree', '학위', { options: DEGREE_LEVELS, span: 2 }),
+      selectInput('status', '상태', { options: EDUCATION_STATUSES, span: 2 }),
+      periodInput('period', '기간')
     ]
   },
   career: {
     type: 'career',
     title: '경력 / 활동',
-    fields: [
-      input('company', '회사명'),
-      input('position', '직책', { placeholder: '직책을 입력해주세요.', span: 2 }),
-      periodInput('period', '기간'),
-      textareaInput('description', '세부 내용', { placeholder: '세부 내용을 입력해 주세요.' })
-    ]
+    fields: [input('company', '회사 / 단체명'), input('position', '직책', { placeholder: '직책을 입력해주세요.', span: 2 }), periodInput('period', '기간')]
   },
   award: {
     type: 'award',
