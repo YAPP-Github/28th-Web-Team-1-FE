@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { RotateCcw, Trash2 } from 'lucide-react'
@@ -24,6 +25,20 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
   const { fields, remove, replace } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
   const [isPickerOpen, setIsPickerOpen] = useState(false)
 
+  // Amplitude 이벤트 추적을 위해 이전에 선택된 경험 ID들을 상태로 관리한다.
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [previousExperienceIds, setPreviousExperienceIds] = useState<string[]>(() => searchParams.get('initialExperienceIds')?.split(',').filter(Boolean) ?? [])
+
+  // 한 번 시드로 소비한 뒤엔 주소창에서 지운다. Next 라우팅(router.replace)을 타지 않고 브라우저 History API로 주소만 바꿔
+  // 서버 컴포넌트 재요청/재렌더 없이 조용히 정리한다(새로고침 시 매번 first 값으로 되돌아가지 않도록).
+  useEffect(() => {
+    if (!searchParams.has('initialExperienceIds')) return
+    window.history.replaceState(null, '', pathname)
+    // 마운트 시 1회만 실행한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <Section
       title={title}
@@ -41,9 +56,12 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
       <ExperiencePickerDialog
         isOpen={isPickerOpen}
         jdId={targetJdId ?? ''}
+        actionType={'reselect'}
+        previousExperienceIds={previousExperienceIds}
         onOpenChange={setIsPickerOpen}
         onComplete={(experiences) => {
           replace(experiencesToFormItems(experiences))
+          setPreviousExperienceIds(experiences.map((experience) => experience.experienceId))
           setIsPickerOpen(false)
         }}
       />

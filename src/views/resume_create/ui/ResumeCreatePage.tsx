@@ -220,7 +220,9 @@ const ResumeCreateContent = () => {
               // 편집 화면의 useResumeDetail(Suspense)이 첫 진입에서 fallback으로 번쩍이지 않도록,
               // 이동 전에 이력서 상세를 미리 캐시에 채워 둔다(warm cache). 모달은 페이지가 바뀌며 자연히 사라진다.
               await queryClient.prefetchQuery(resumeQueries.detail(workspaceId, resumeId))
-              router.push(`/home/resume/${resumeId}`)
+              // Amplitude 이벤트 전송용: 선택된 경험 ID를 쿼리 파라미터로 붙여, 이전 경험과 새로 선택된 경험을 짝지어 previous_experience_id로 보낼 수 있게 한다.
+              const initialExperienceIds = selectedExperiences.map((experience) => experience.experienceId).join(',')
+              router.push(`/home/resume/${resumeId}?initialExperienceIds=${encodeURIComponent(initialExperienceIds)}`)
             },
             onError: (error) => {
               setIsNavigating(false)
