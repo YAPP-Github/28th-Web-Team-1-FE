@@ -3,10 +3,11 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { Flex, Grid } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
+import { ArrowRight } from 'lucide-react'
 import { useProjectList } from '@entities/project'
 import { useWorkspaceId } from '@entities/user'
 import { formatPeriod } from '@shared/lib'
-import { Text } from '@shared/ui'
+import { Button, Text } from '@shared/ui'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
 import { AddProjectDialog } from './AddProjectDialog'
 
@@ -76,6 +77,33 @@ const ExperiencesProjectGrid = () => {
           </Flex>
         </Link>
       ))}
+      <ResumeCtaCard />
     </Grid>
   )
 }
+
+const ResumeCtaCard = () => (
+  <Link href="/home" className="w-full">
+    <Flex direction="column" align="end" p="3" className="group border-border-subtler bg-element-white hover:border-btn-secondary-border gap-0.5 rounded-lg border transition-colors">
+      <Flex direction="column" className="w-full gap-0.5">
+        <Text variant="label1" color="text-subtle">
+          정리한 경험을 바탕으로
+        </Text>
+        <Flex align="center">
+          <Text variant="label1" color="text-primary-basic">
+            이력서
+          </Text>
+          <Text variant="label1" color="text-subtle">
+            를 만들어 보세요.
+          </Text>
+        </Flex>
+      </Flex>
+      <Button variant="tertiary" size="xs" asChild className="group-hover:bg-btn-tertiary-fill-hovered transition-colors">
+        <span>
+          이력서 만들기
+          <ArrowRight data-icon="inline-end" className="transition-transform group-hover:translate-x-0.5" />
+        </span>
+      </Button>
+    </Flex>
+  </Link>
+)

@@ -99,7 +99,7 @@ export const AddProjectDialog = () => {
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="secondary" size="md">
-          프로젝트 추가하기
+          경험 추가하기
         </Button>
       </DialogTrigger>
       <DialogContent showCloseButton={view !== 'progress'} className={cn(view === 'progress' ? 'w-150' : 'w-200')}>

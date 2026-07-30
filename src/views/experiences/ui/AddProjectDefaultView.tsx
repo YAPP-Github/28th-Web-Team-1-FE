@@ -13,7 +13,7 @@ export const AddProjectDefaultView = ({ onManualClick, onNotionClick, onExtract 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-title3 text-text-basic font-bold">프로젝트 추가하기</DialogTitle>
+        <DialogTitle className="text-title3 text-text-basic font-bold">경험 추가하기</DialogTitle>
         <DialogDescription className="text-body1 text-text-subtler">한 번 정리해 두면 언제든 이력서에 불러와 사용할 수 있어요.</DialogDescription>
       </DialogHeader>
       <Flex direction="column" className="gap-4">
@@ -28,12 +28,12 @@ export const AddProjectDefaultView = ({ onManualClick, onNotionClick, onExtract 
               onExtract(file)
             }}
           >
-            경험 추출하기
+            경험 정리하기
           </Button>
         ) : (
           <DialogFooter>
-            <AddProjectExperienceButton title="직접 정리" description="STAR 방식으로 직접 정리하기" icon={<Pencil size={18} />} onClick={() => onManualClick()} />
-            <AddProjectExperienceButton title="Notion" description="페이지, 워크스페이스 가져오기" icon={<NotionIcon size={20} />} onClick={() => onNotionClick()} />
+            <AddProjectExperienceButton title="직접 정리" description="AI와 함께 STAR로 정리해보세요." icon={<Pencil size={18} />} onClick={() => onManualClick()} />
+            <AddProjectExperienceButton title="Notion" description="경험이 정리된 페이지를 직접 검색해주세요." icon={<NotionIcon size={20} />} onClick={() => onNotionClick()} />
           </DialogFooter>
         )}
       </Flex>
