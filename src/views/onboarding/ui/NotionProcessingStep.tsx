@@ -43,7 +43,7 @@ export const NotionProcessingStep = ({ connectionId, pageIds, onDone, onPrev }: 
         <ProcessingView
           isComplete={isSuccess}
           steps={STEPS}
-          title="노션 페이지를 가져오고 있어요."
+          title="노션 경험을 가져오고 있어요."
           description="잠시만 기다려 주세요"
           successTitle="경험을 모두 가져왔어요!"
           successDescription="정리된 경험을 확인해 보세요."
