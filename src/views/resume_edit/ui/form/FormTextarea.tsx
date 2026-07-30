@@ -19,7 +19,7 @@ export const FormTextarea = ({ name, ...props }: FormTextareaProps) => {
     <Controller
       control={control}
       name={name as FieldPath<ResumeFormValues>}
-      render={({ field }) => <Textarea {...props} value={typeof field.value === 'string' ? field.value : ''} onChange={field.onChange} onBlur={field.onBlur} />}
+      render={({ field }) => <Textarea {...props} value={typeof field.value === 'string' ? field.value : ''} onChange={field.onChange} onBlur={field.onBlur} maxLength={500} />}
     />
   )
 }
