@@ -17,7 +17,7 @@ export const useLogout = ({ redirectTo = '/' }: UseLogoutOptions = {}) => {
   const handleLogout = async () => {
     await logout()
     queryClient.removeQueries({ queryKey: userKeys.all })
-    amplitude.reset()
+    amplitude.setUserId(undefined)
     replace(redirectTo)
   }
 
