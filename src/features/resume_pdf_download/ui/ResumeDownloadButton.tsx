@@ -9,6 +9,9 @@ import type { ResumeSectionData } from '@entities/resume'
 interface ResumeDownloadButtonProps {
   basicInfo: ResumeBasicInfoFieldsFragment | null
   sections: ResumeSectionData[]
+  // 다운로드 파일명 `{기업명}_{직무명}_이력서.pdf`에 사용
+  companyName?: string | null
+  positionTitle?: string | null
 }
 
 /**
@@ -17,7 +20,7 @@ interface ResumeDownloadButtonProps {
  * `@react-pdf/renderer`는 브라우저 전용이자 번들이 무거워, 초기 로드에 포함하지 않고
  * 클릭 시점에 생성 로직을 동적 import 한다(코드 스플리팅 + SSR 회피).
  */
-export const ResumeDownloadButton = ({ basicInfo, sections }: ResumeDownloadButtonProps) => {
+export const ResumeDownloadButton = ({ basicInfo, sections, companyName, positionTitle }: ResumeDownloadButtonProps) => {
   const [isGenerating, setIsGenerating] = useState(false)
 
   const handleDownload = async () => {
@@ -25,7 +28,7 @@ export const ResumeDownloadButton = ({ basicInfo, sections }: ResumeDownloadButt
     setIsGenerating(true)
     try {
       const { generateResumePdf } = await import('../lib/generateResumePdf')
-      await generateResumePdf({ basicInfo, sections })
+      await generateResumePdf({ basicInfo, sections, companyName, positionTitle })
     } catch (error) {
       console.error('이력서 PDF 생성 실패', error)
       toast.error('PDF를 만드는 중 문제가 발생했어요. 잠시 후 다시 시도해 주세요.')
