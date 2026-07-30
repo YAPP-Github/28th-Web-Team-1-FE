@@ -70,18 +70,20 @@ const Input = ({ className, label, description, error, disabled, onChange, id, c
 
   return (
     <Flex direction="column" gap={'2'} className={className}>
-      <Flex direction="row" justify="between" gap={'2'}>
-        {label && (
-          <Text variant="label1" as="label" htmlFor={inputId} weight="semibold" className="truncate">
-            {label}
-          </Text>
-        )}
-        {description && (
-          <Text variant="label2" weight="regular" color={error ? 'text-danger' : 'text-subtler'} className="shrink-999 truncate">
-            {description}
-          </Text>
-        )}
-      </Flex>
+      {(label || description) && (
+        <Flex direction="row" justify="between" gap={'2'}>
+          {label && (
+            <Text variant="label1" as="label" htmlFor={inputId} weight="semibold" className="truncate">
+              {label}
+            </Text>
+          )}
+          {description && (
+            <Text variant="label2" weight="regular" color={error ? 'text-danger' : 'text-subtler'} className="shrink-999 truncate">
+              {description}
+            </Text>
+          )}
+        </Flex>
+      )}
 
       <div className="relative">
         <input

@@ -108,7 +108,7 @@ export const RESUME_SECTIONS: Record<ResumeSectionType, ResumeSectionConfig> = {
   skill: {
     type: 'skill',
     title: '기술',
-    fields: [input('name', '기술/도구명', { span: 3 }), selectInput('level', '숙련도', { options: SKILL_LEVELS, span: 1 })]
+    fields: [input('name', '기술/도구', { span: 3 }), selectInput('level', '숙련도', { options: SKILL_LEVELS, span: 1 })]
   }
 }
 

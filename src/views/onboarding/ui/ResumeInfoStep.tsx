@@ -2,9 +2,9 @@
 import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Flex, Grid } from '@radix-ui/themes'
-import { Award, Book, BookMarked, BookType, ClipboardPen, GraduationCap, Pencil, ShieldCheck, X, type LucideIcon } from 'lucide-react'
+import { Award, Book, BookMarked, BookType, ClipboardPen, GraduationCap, Pencil, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react'
 import { Button, Text } from '@shared/ui'
-import { Divider } from '@shared/ui/divider'
+import { Input } from '@shared/ui/input'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
 import { useProfile, useUpdateProfile } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
@@ -13,7 +13,7 @@ import { profileToSections, sectionsToUpdateRequest } from '../model/profileMapp
 import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { AddSectionCard } from './AddSectionCard'
-import { ResumeFieldInput } from './ResumeFieldInput'
+import { ResumeFieldInput, SelectDropdown } from './ResumeFieldInput'
 
 /** 온보딩 스텝: 가져온 이력서 정보 확인 (카드 그리드 + 편집/추가 모달). 업로드로 파싱된 프로필을 시드하고, 확인/편집 후 저장한다. */
 export const ResumeInfoStep = ({ onDone, onPrev }: OnboardingStepProps) => {
@@ -107,9 +107,9 @@ const ResumeSectionCard = ({ instance, onSave, onDelete }: ResumeSectionCardProp
                 {config.title}
               </Text>
             </Flex>
-            <Pencil size={18} className="text-icon-gray-lighter shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+            <Pencil size={18} className="text-icon-primary-border shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
           </Flex>
-          <Flex direction="column" className="w-full gap-1.5">
+          <Flex direction="column" className="w-full gap-1">
             {config.fields.map((field) => {
               const value = instance.values[field.key]
               return (
@@ -193,7 +193,7 @@ const SkillSectionCard = ({ instances, onSave, onDelete }: SkillSectionCardProps
                 {config.title}
               </Text>
             </Flex>
-            <Pencil size={18} className="text-icon-gray-lighter shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+            <Pencil size={18} className="text-icon-primary-border shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
           </Flex>
           <Flex wrap="wrap" className="min-h-0 w-full flex-1 content-start gap-x-1.5 gap-y-2.5 overflow-y-auto">
             {instances.map((instance) => (
@@ -207,31 +207,39 @@ const SkillSectionCard = ({ instances, onSave, onDelete }: SkillSectionCardProps
       </DialogTrigger>
       <DialogContent className="w-150 gap-6">
         <DialogTitle className="text-heading2 text-text-basic font-semibold">{config.title}</DialogTitle>
-        <Flex direction="column" gap="4" className="max-h-[60vh] w-full overflow-y-auto">
-          {instances.map((instance, index) => (
-            <div key={instance.id}>
-              {index > 0 && <Divider className="mb-4" color="gray-10" />}
-              <Flex align="center" justify="between" className="mb-3 w-full">
-                <Text variant="headline1" weight="semibold" color="text-basic">
-                  기술 {index + 1}
-                </Text>
-                <button type="button" onClick={() => onDelete(instance.id)} aria-label="삭제" className="text-icon-gray-lighter hover:text-text-danger transition-colors outline-none">
-                  <X size={16} />
-                </button>
+        <Flex direction="column" gap="2" className="w-full">
+          <Flex align="end" gap="2" className="w-full pr-2">
+            <Text variant="label1" weight="semibold" color="text-basic" className="flex-1">
+              {config.fields.find((field) => field.key === 'name')?.label}
+            </Text>
+            <Text variant="label1" weight="semibold" color="text-basic" className="w-45 shrink-0">
+              {config.fields.find((field) => field.key === 'level')?.label}
+            </Text>
+            <div aria-hidden className="w-11.25 shrink-0" />
+          </Flex>
+          <Flex direction="column" gap="2" className="max-h-64.25 w-full scrollbar-gutter-stable overflow-y-auto">
+            {instances.map((instance) => (
+              <Flex key={instance.id} align="start" gap="2" className="w-full">
+                <Input
+                  className="flex-1"
+                  clearable={false}
+                  placeholder={config.fields.find((field) => field.key === 'name')?.placeholder}
+                  value={values[instance.id]?.name ?? ''}
+                  onChange={(e) => setValues((prev) => ({ ...prev, [instance.id]: { ...prev[instance.id], name: e.target.value } }))}
+                />
+                <div className="w-45 shrink-0">
+                  <SelectDropdown
+                    value={values[instance.id]?.level ?? ''}
+                    onChange={(value) => setValues((prev) => ({ ...prev, [instance.id]: { ...prev[instance.id], level: value } }))}
+                    options={config.fields.find((field) => field.key === 'level')?.options ?? []}
+                  />
+                </div>
+                <Button variant="tertiary" size="icon-md" onClick={() => onDelete(instance.id)} aria-label="삭제" className="size-11.25">
+                  <Trash2 size={18} />
+                </Button>
               </Flex>
-              <Grid columns="4" gap="4" className="w-full">
-                {config.fields.map((field) => (
-                  <div key={field.key} className={FIELD_SPAN_CLASS[field.span ?? 4]}>
-                    <ResumeFieldInput
-                      field={field}
-                      value={values[instance.id]?.[field.key] ?? ''}
-                      onChange={(value) => setValues((prev) => ({ ...prev, [instance.id]: { ...prev[instance.id], [field.key]: value } }))}
-                    />
-                  </div>
-                ))}
-              </Grid>
-            </div>
-          ))}
+            ))}
+          </Flex>
         </Flex>
         <DialogClose asChild>
           <Button variant="primary" size="lg" fullWidth onClick={handleSave}>
