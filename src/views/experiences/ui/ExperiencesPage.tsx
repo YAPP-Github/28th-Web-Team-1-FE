@@ -54,7 +54,7 @@ const ExperiencesProjectGrid = () => {
           아직 작성된 프로젝트가 없어요.
         </Text>
         <Text variant="body2" color="text-subtler">
-          {"오른쪽 상단의 '프로젝트 추가하기'를 눌러 첫 프로젝트를 만들어 보세요."}
+          {"오른쪽 상단의 '경험 추가하기'를 눌러 첫 프로젝트를 만들어 보세요."}
         </Text>
       </Flex>
     )

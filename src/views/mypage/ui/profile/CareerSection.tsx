@@ -28,7 +28,9 @@ export const CareerSection = ({ profile }: { profile: Profile }) => {
           <Controller
             control={control}
             name={`items.${index}.company`}
-            render={({ field }) => <Input label="회사 / 단체명" clearable={false} placeholder="회사명을 입력해주세요." value={field.value ?? ''} onChange={field.onChange} onBlur={field.onBlur} />}
+            render={({ field }) => (
+              <Input label="회사 / 단체명" clearable={false} placeholder="회사 / 단체명을 입력해주세요." value={field.value ?? ''} onChange={field.onChange} onBlur={field.onBlur} />
+            )}
           />
 
           <Flex className="w-full gap-4">
