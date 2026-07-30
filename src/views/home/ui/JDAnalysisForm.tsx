@@ -1,17 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowRightIcon, ChevronLeft } from 'lucide-react'
 import { motion, AnimatePresence } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { SelectedControl, SelectedControlItem } from '@shared/ui/selected_control'
-import { Text, Button } from '@shared/ui'
+import { Text, Button, ProcessingView } from '@shared/ui'
 import { RadioGroup, RadioGroupItem } from '@shared/ui/radio_group'
 import { useWorkspaceId } from '@entities/user'
 import { useRegisterJd, type JdRegisterInput, type JdCandidate } from '@entities/jd'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { Dialog, DialogContent } from '@shared/ui/dialog'
 
 type AnalysisPhase = 'INPUT' | 'SELECT_POSITION'
 
@@ -21,15 +22,22 @@ export const JDAnalysisForm = () => {
   const [candidates, setCandidates] = useState<JdCandidate[]>([])
 
   const workspaceId = useWorkspaceId()
-  const { mutate: registerJd, isPending } = useRegisterJd(workspaceId)
+  const { mutate: registerJd, isPending, isSuccess } = useRegisterJd(workspaceId)
+
+  const [showProgress, setShowProgress] = useState(false)
+  // 분석이 250ms 넘게 걸릴 때만 진행 모달을 띄운다. (빠르게 실패하는 요청은 모달 없이 toast만)
+  useEffect(() => {
+    if (!isPending) return
+    const timer = setTimeout(() => setShowProgress(true), 250)
+    return () => {
+      clearTimeout(timer)
+      setShowProgress(false)
+    }
+  }, [isPending])
 
   const handleRegister = (request: JdRegisterInput) => {
-    const toastId = toast.loading('채용공고를 분석하고 있어요', {
-      position: 'top-center'
-    })
     registerJd(request, {
       onSuccess: (res) => {
-        toast.dismiss(toastId)
         if (res.jd) {
           router.push(`/home/resume/create?jdId=${res.jd.jdId}`)
         } else if (res.candidates?.length) {
@@ -39,7 +47,6 @@ export const JDAnalysisForm = () => {
       },
       onError: (err) => {
         toast.error(err.message, {
-          id: toastId,
           position: 'top-center'
         })
       }
@@ -52,21 +59,25 @@ export const JDAnalysisForm = () => {
   }
 
   return (
-    <div className="flex min-h-105 w-full justify-center">
-      <AnimatePresence mode="wait">
-        {phase === 'INPUT' && (
-          <motion.div key="input" exit={{ opacity: 0 }} animate={{ opacity: 1 }} className={'w-full'}>
-            <JDInputStep onSubmit={handleRegister} isPending={isPending} />
-          </motion.div>
-        )}
+    <>
+      <JDAnalysisProgressDialog isOpen={showProgress} isComplete={isSuccess} />
 
-        {phase === 'SELECT_POSITION' && (
-          <motion.div key="select" exit={{ opacity: 0 }} animate={{ opacity: 1 }} className={'w-full'}>
-            <JDSelectStep candidates={candidates} onSubmit={handleRegister} onBack={handleReset} isPending={isPending} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      <div className="flex min-h-105 w-full justify-center">
+        <AnimatePresence mode="wait">
+          {phase === 'INPUT' && (
+            <motion.div key="input" exit={{ opacity: 0 }} animate={{ opacity: 1 }} className={'w-full'}>
+              <JDInputStep onSubmit={handleRegister} isPending={isPending} />
+            </motion.div>
+          )}
+
+          {phase === 'SELECT_POSITION' && (
+            <motion.div key="select" exit={{ opacity: 0 }} animate={{ opacity: 1 }} className={'w-full'}>
+              <JDSelectStep candidates={candidates} onSubmit={handleRegister} onBack={handleReset} isPending={isPending} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
   )
 }
 
@@ -75,10 +86,21 @@ const JDInputStep = ({ onSubmit, isPending }: { onSubmit: (request: JdRegisterIn
   const [inputValue, setInputValue] = useState('')
   const placeholder = inputType === 'url' ? 'https:// 채용 공고 링크를 입력하세요' : '채용 공고 원문을 복사해 붙여넣어 주세요. 회사명, 직무 요건, 우대사항이 포함될수록 분석 정확도가 높아져요.'
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const submit = () => {
     if (!inputValue.trim() || isPending) return
     onSubmit(inputType === 'url' ? { sourceUrl: inputValue.trim() } : { body: inputValue.trim() })
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    submit()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+      e.preventDefault()
+      submit()
+    }
   }
 
   return (
@@ -92,6 +114,7 @@ const JDInputStep = ({ onSubmit, isPending }: { onSubmit: (request: JdRegisterIn
         <textarea
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={cn(
             'field-sizing-content',
@@ -147,3 +170,17 @@ const JDSelectStep = ({ candidates, onSubmit, onBack, isPending }: { candidates:
     </form>
   )
 }
+
+const STEPS = ['채용 공고 읽는 중', '내 경험 분석 중', '지원 전략 생성 중']
+
+interface JDAnalysisProgressDialogProps {
+  isOpen: boolean
+  isComplete: boolean
+}
+export const JDAnalysisProgressDialog = ({ isOpen, isComplete }: JDAnalysisProgressDialogProps) => (
+  <Dialog open={isOpen}>
+    <DialogContent showCloseButton={false} className="w-150">
+      <ProcessingView isComplete={isComplete} steps={STEPS} title="채용공고를 분석하고 있어요" description="잠시만 기다려주세요" successTitle="" successDescription="" />
+    </DialogContent>
+  </Dialog>
+)
