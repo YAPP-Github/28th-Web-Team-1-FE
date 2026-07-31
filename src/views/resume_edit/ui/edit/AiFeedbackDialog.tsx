@@ -126,7 +126,7 @@ export const AiFeedbackDialog = ({ target, jdId }: AiFeedbackDialogProps) => {
 
   /** 편집값을 폼에 되쓰고 닫는다. */
   const handleApply = () => {
-    amplitude.track(AMPLITUDE_EVENTS.EDIT_APPLIED, { jd_id: jdId, section_name: SECTION_NAME_BY_KIND[targets[0].kind], edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
+    amplitude.track(AMPLITUDE_EVENTS.EDIT_APPLIED, { jd_id: jdId, section_name: SECTION_NAME_BY_KIND[kind], edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
     writeField(description)
     if (title) writeField(title)
     handleOpenChange(false)
