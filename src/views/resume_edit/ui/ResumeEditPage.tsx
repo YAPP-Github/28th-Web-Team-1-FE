@@ -4,7 +4,7 @@ import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { FormProvider, useForm, useFormContext, useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
-import { FileCheckCorner, FilePenLine, RefreshCcw } from 'lucide-react'
+import { FileCheckCorner, FileClock, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { formatDate } from '@shared/lib'
 import { AMPLITUDE_EVENTS } from '@shared/config'
@@ -237,15 +237,17 @@ const ResumeToolbar = ({ targetJd, onSave, onDraftSave, isSaving, lastSavedAt }:
           {lastSavedAt ? `${formatDate(lastSavedAt, 'HH:mm:ss')} 저장되었습니다.` : '변경 사항은 자동으로 저장됩니다.'}
         </Text>
 
-        <Button variant="outline" size={'md'} className={'leading-0'} onClick={onDraftSave} disabled={isSaving}>
-          <FilePenLine size={18} className="inline-block" data-icon="inline-start" />
-          임시저장
-        </Button>
+        <Flex gap="2">
+          <Button variant="secondary" size={'md'} className={'leading-0'} onClick={onDraftSave} disabled={isSaving}>
+            <FileClock size={18} className="inline-block" data-icon="inline-start" />
+            임시저장
+          </Button>
 
-        <Button variant="primary" size={'md'} className={'leading-0'} onClick={onSave} disabled={isSaving}>
-          <FileCheckCorner size={18} className="inline-block" data-icon="inline-start" />
-          이력서 완료
-        </Button>
+          <Button variant="primary" size={'md'} className={'leading-0'} onClick={onSave} disabled={isSaving}>
+            <FileCheckCorner size={18} className="inline-block" data-icon="inline-start" />
+            완료
+          </Button>
+        </Flex>
       </Flex>
     </header>
   )
