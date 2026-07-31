@@ -19,21 +19,26 @@ import type { ResumeFormValues } from '../../model/resume-form.types'
 import * as amplitude from '@amplitude/unified'
 import { AMPLITUDE_EVENTS } from '@shared/config'
 
-/** 첨삭 대상 필드 하나. `name`은 RHF 필드 경로(동적 문자열). */
-export interface AiFeedbackTarget {
+/** 첨삭 결과가 반영되는 편집 필드 하나. `name`은 RHF 필드 경로(동적 문자열). */
+export interface AiFeedbackField {
   /** 예: `sections.0.items.0.payload.experience.contents` */
   name: string
   /** 우측 결과 패널에 표시할 라벨. 예: '경험명' | '세부내용' | '내용' */
   label: string
-  /** 첨삭 대상 항목 종류. 서버가 항목별 글자수 제한·프롬프트에 사용한다. */
+}
+
+export interface AiFeedbackTarget {
+  /** 첨삭 대상 항목 종류. */
   kind: ProfilePolishKind
-  /** 편집 필드 유형. 경험명처럼 한 줄이면 false(Input), 세부내용처럼 여러 줄이면 true(Textarea). */
-  multiline: boolean
+  /** 다듬을 본문 필드. 요청 `description`이자 결과 `description`이 되쓰이는 곳. */
+  description: AiFeedbackField
+  /** 경험명 필드. kind가 EXPERIENCE일 때만 사용 — 요청 `title`(필수)이자 결과 `title`이 되쓰이는 곳. */
+  title?: AiFeedbackField
 }
 
 interface AiFeedbackDialogProps {
-  /** 첨삭 대상 필드들. 경험=2개(경험명+세부내용), 핵심역량·경력=1개(세부내용). */
-  targets: AiFeedbackTarget[]
+  /** 첨삭 대상. 경험은 경험명+세부내용, 핵심역량·경력은 세부내용만 다룬다. */
+  target: AiFeedbackTarget
   /** 대상 채용공고 ID. 주면 해당 JD의 지원 전략을 반영해 다듬는다(경험 섹션 등). */
   jdId?: string | null
 }
@@ -47,44 +52,46 @@ const WRITING_STRUCTURES = [
 
 /**
  * 이력서 편집 화면의 'AI 첨삭' 다이얼로그.
- * 경험·핵심역량·경력 섹션이 공용으로 쓰며, 대상 필드는 `targets`로 주입한다(1~2개).
+ * 경험·핵심역량·경력 섹션이 공용으로 쓰며, 대상은 `target`으로 주입한다(경험은 두 필드).
  * 폼과의 연결은 RHF `name` 기반 — 열 때 현재 값을 우측 필드에 채우고, '적용' 시 편집값을 되쓴다.
  * 우측 필드는 항상 직접 타이핑할 수 있고, 'AI 수정 시작'은 그 값을 AI 결과로 덮어쓴다.
  */
-export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
+export const AiFeedbackDialog = ({ target, jdId }: AiFeedbackDialogProps) => {
+  const { kind, title, description } = target
   const { getValues, setValue } = useFormContext<ResumeFormValues>()
   const workspaceId = useWorkspaceId()
-  const { mutateAsync: polish } = usePolishProfileText()
+  const { mutateAsync: polish, isPending } = usePolishProfileText()
 
   const [isOpen, setIsOpen] = useState(false)
   const [structure, setStructure] = useState<PolishStructure>('PROBLEM_SOLUTION_RESULT')
   const [instruction, setInstruction] = useState('')
-  const [isGenerating, setIsGenerating] = useState(false)
-  /** 우측 편집 필드의 현재 값. key = target.name. 열 때 폼 값으로 초기화한다. */
+  /** 우측 편집 필드의 현재 값. key = field.name. 열 때 폼 값으로 초기화한다. */
   const [drafts, setDrafts] = useState<Record<string, string>>({})
 
-  /** Amplitude 이벤트 전송용: 필드별 포커스 시점 값. key = target.name. (multiline 대상만 사용) */
-  const editFocusValueRef = useRef<Record<string, string>>({})
+  /** Amplitude 이벤트 전송용: 세부내용 편집을 시작한 포커스 시점 값. (세부내용 Textarea만 추적) */
+  const editBaselineRef = useRef<string | null>(null)
 
-  /** Amplitude 이벤트 전송용: 포커스 시점 값을 기준으로 저장해, 실제로 값이 바뀌는 첫 onChange에서만 Amplitude 이벤트를 1회 전송한다. */
-  const handleFieldFocus = (target: AiFeedbackTarget, currentValue: string) => {
-    editFocusValueRef.current[target.name] = currentValue
+  /** 포커스 시점의 세부내용 값을 기준값으로 저장한다. */
+  const handleDescriptionFocus = (value: string) => {
+    editBaselineRef.current = value
   }
 
-  /** Amplitude 이벤트 전송용: 포커스 시점 값과 달라지는 첫 onChange에서만 1회 전송. */
-  const handleFieldChange = (target: AiFeedbackTarget, nextValue: string) => {
-    const baseline = editFocusValueRef.current[target.name]
-    if (baseline !== undefined && nextValue !== baseline) {
+  /** Amplitude 이벤트 전송용: 기준값과 달라지는 첫 onChange에서만 1회 전송하고, draft를 갱신한다. */
+  const handleDescriptionChange = (value: string) => {
+    if (editBaselineRef.current !== null && value !== editBaselineRef.current) {
       amplitude.track(AMPLITUDE_EVENTS.SECTION_EDITED, { jd_id: jdId ?? null, section_name: SECTION_NAME_BY_KIND[target.kind], location: 'ai_modal' })
-      delete editFocusValueRef.current[target.name]
+      editBaselineRef.current = null
     }
-    setDrafts((prev) => ({ ...prev, [target.name]: nextValue }))
+    setDrafts((prev) => ({ ...prev, [description.name]: value }))
   }
 
   const readValue = (name: string) => String(getValues(name as FieldPath<ResumeFormValues>) ?? '')
 
-  /** 대상들의 현재 폼 값 스냅샷. 초기화·재오픈 시 이 값으로 되돌린다. */
-  const snapshotFromForm = () => Object.fromEntries(targets.map((target) => [target.name, readValue(target.name)]))
+  /** 대상 필드들의 현재 폼 값 스냅샷. 초기화·재오픈 시 이 값으로 되돌린다. */
+  const snapshotFromForm = () => ({
+    [description.name]: readValue(description.name),
+    ...(title && { [title.name]: readValue(title.name) })
+  })
 
   /** 열 때 폼 값으로 채우고, 닫을 때 임시 상태를 정리한다. */
   const handleOpenChange = (next: boolean) => {
@@ -93,44 +100,35 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
       setDrafts(snapshotFromForm())
     } else {
       setInstruction('')
-      setIsGenerating(false)
     }
   }
 
   const handleGenerate = async () => {
-    // 경험 세부내용을 다듬을 때 맥락으로 넘길 경험명 값(있으면).
     amplitude.track(AMPLITUDE_EVENTS.AI_EDIT_STARTED, { jd_id: jdId, edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
-    const titleTarget = targets.find((target) => target.kind === 'EXPERIENCE_TITLE')
-    const title = titleTarget ? drafts[titleTarget.name] : undefined
 
-    setIsGenerating(true)
-    try {
-      const entries = await Promise.all(
-        targets.map(async (target) => {
-          const request: PolishProfileTextRequest = {
-            kind: target.kind,
-            text: drafts[target.name] ?? '',
-            structure,
-            instruction: instruction || null,
-            jdId: jdId || null,
-            title: target.kind === 'EXPERIENCE_DESCRIPTION' ? (title ?? null) : null
-          }
-          const polished = await polish({ request, workspaceId })
-          return [target.name, polished] as const
-        })
-      )
-      setDrafts((prev) => ({ ...prev, ...Object.fromEntries(entries) }))
-    } finally {
-      setIsGenerating(false)
+    const request: PolishProfileTextRequest = {
+      kind,
+      description: drafts[description.name] ?? '',
+      structure,
+      instruction: instruction || null,
+      jdId: jdId || null,
+      title: title ? (drafts[title.name] ?? '') : null
     }
+    const polished = await polish({ request, workspaceId })
+    setDrafts((prev) => ({
+      ...prev,
+      [description.name]: polished.description,
+      ...(title && polished.title !== null ? { [title.name]: polished.title } : {})
+    }))
   }
+
+  const writeField = (field: AiFeedbackField) => setValue(field.name as FieldPath<ResumeFormValues>, (drafts[field.name] ?? '') as never, { shouldDirty: true, shouldValidate: true })
 
   /** 편집값을 폼에 되쓰고 닫는다. */
   const handleApply = () => {
     amplitude.track(AMPLITUDE_EVENTS.EDIT_APPLIED, { jd_id: jdId, section_name: SECTION_NAME_BY_KIND[targets[0].kind], edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
-    targets.forEach((target) => {
-      setValue(target.name as FieldPath<ResumeFormValues>, (drafts[target.name] ?? '') as never, { shouldDirty: true, shouldValidate: true })
-    })
+    writeField(description)
+    if (title) writeField(title)
     handleOpenChange(false)
   }
 
@@ -197,7 +195,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
 
             <Spacing size={12} />
 
-            <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'} onClick={handleGenerate} disabled={isGenerating}>
+            <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'} onClick={handleGenerate} disabled={isPending}>
               AI 수정 시작
               <ArrowRight data-icon="inline-end" />
             </Button>
@@ -211,46 +209,38 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
           <Spacing size={16} />
 
           <Flex direction={'column'} gap={'4'} className={'min-h-0 flex-1 overflow-y-auto'}>
-            {targets.map((target) => (
-              <Flex key={target.name} direction={'column'} gap={'2'}>
-                {isGenerating ? (
-                  <>
-                    <Text variant={'label1'} weight={'semibold'} className={'truncate'}>
-                      {target.label}
-                    </Text>
-                    {target.multiline ? (
-                      <Flex direction={'column'} gap={'2'} className={`border-border-subtle my-auto h-70 rounded-lg border p-4`}>
-                        {Array.from({ length: 4 }).map((_, index) => (
-                          <Skeleton key={`${target.name}-skeleton-${index}`} height={'14px'} width={index % 2 ? '60%' : '100%'} />
-                        ))}
-                      </Flex>
-                    ) : (
-                      <Flex direction={'column'} justify={'center'} className={`border-border-subtle my-auto h-11.75 rounded-lg border px-4 py-3`}>
-                        <Skeleton height={'14px'} width={'100%'} />
-                      </Flex>
-                    )}
-                  </>
-                ) : target.multiline ? (
-                  <Textarea
-                    label={target.label}
-                    value={drafts[target.name] ?? ''}
-                    // Amplitude 이벤트 전송용: 포커스 시점 값과 달라지는 첫 onChange에서만 1회 전송
-                    onFocus={(event) => handleFieldFocus(target, event.target.value)}
-                    onChange={(event) => handleFieldChange(target, event.target.value)}
-                    className={'h-70 max-h-70'}
-                  />
+            {title && (
+              <Flex direction={'column'} gap={'2'}>
+                {isPending ? (
+                  <FieldSkeleton label={title.label} />
                 ) : (
-                  <Input label={target.label} clearable={false} value={drafts[target.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [target.name]: event.target.value }))} />
+                  <Input label={title.label} clearable={false} value={drafts[title.name] ?? ''} onChange={(event) => setDrafts((prev) => ({ ...prev, [title.name]: event.target.value }))} />
                 )}
               </Flex>
-            ))}
+            )}
+
+            <Flex direction={'column'} gap={'2'}>
+              {isPending ? (
+                <FieldSkeleton label={description.label} multiline />
+              ) : (
+                <Textarea
+                  label={description.label}
+                  value={drafts[description.name] ?? ''}
+                  // Amplitude 이벤트 전송용: 포커스 시점 값과 달라지는 첫 onChange에서만 1회 전송
+                  onFocus={(event) => handleDescriptionFocus(event.target.value)}
+                  onChange={(event) => handleDescriptionChange(event.target.value)}
+                  className={'h-70 max-h-70'}
+                  maxLength={500}
+                />
+              )}
+            </Flex>
           </Flex>
 
           <Flex className={'mt-auto w-full gap-2'}>
-            <Button variant={'tertiary'} size={'md'} className={'flex-1'} onClick={() => setDrafts(snapshotFromForm())} disabled={isGenerating}>
+            <Button variant={'tertiary'} size={'md'} className={'flex-1'} onClick={() => setDrafts(snapshotFromForm())} disabled={isPending}>
               초기화
             </Button>
-            <Button size={'md'} className={'flex-1'} onClick={handleApply} disabled={isGenerating}>
+            <Button size={'md'} className={'flex-1'} onClick={handleApply} disabled={isPending}>
               적용
             </Button>
           </Flex>
@@ -259,6 +249,29 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
     </Dialog>
   )
 }
+
+/**
+ * 다듬는 중 편집 필드 자리에 표시하는 로딩 스켈레톤(라벨 + 박스).
+ * `multiline`이면 Textarea 높이(4줄), 아니면 Input 높이(1줄)로 맞춘다.
+ */
+const FieldSkeleton = ({ label, multiline }: { label: string; multiline?: boolean }) => (
+  <>
+    <Text variant={'label1'} weight={'semibold'} className={'truncate'}>
+      {label}
+    </Text>
+    {multiline ? (
+      <Flex direction={'column'} gap={'2'} className={`border-border-subtle my-auto h-70 rounded-lg border p-4`}>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton key={`skeleton-${index}`} height={'14px'} width={index % 2 ? '60%' : '100%'} />
+        ))}
+      </Flex>
+    ) : (
+      <Flex direction={'column'} justify={'center'} className={`border-border-subtle my-auto h-11.75 rounded-lg border px-4 py-3`}>
+        <Skeleton height={'14px'} width={'100%'} />
+      </Flex>
+    )}
+  </>
+)
 
 /**
  * 대상 JD의 지원 전략(서술형 문단)을 Suspense로 조회해 보여준다. `jdId`가 있을 때만 렌더한다.
@@ -294,12 +307,10 @@ const JdStrategyLoading = () => (
 )
 
 /** Amplitude 이벤트 전송 시 사용.
- * EXPERIENCE_TITLE과  EXPERIENCE_DESCRIPTION은 배열의 첫 번째 항목만 전송한다.
  * (경험=experience, 핵심역량=core_competency, 경력=career)
  */
 const SECTION_NAME_BY_KIND: Record<ProfilePolishKind, string> = {
-  EXPERIENCE_TITLE: 'experience',
-  EXPERIENCE_DESCRIPTION: 'experience',
+  EXPERIENCE: 'experience',
   CORE_COMPETENCY: 'core_competency',
   CAREER_DESCRIPTION: 'career'
 }

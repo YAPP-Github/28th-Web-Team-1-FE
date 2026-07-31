@@ -82,7 +82,7 @@ const CareerSectionItem = ({ sectionIndex, index, onRemove, targetJdId }: { sect
           onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { jd_id: targetJdId, section_name: 'career' })}
         />
 
-        <AiFeedbackDialog targets={[{ name: `${base}.contents`, label: '세부내용', kind: 'CAREER_DESCRIPTION', multiline: true }]} jdId={targetJdId} />
+        <AiFeedbackDialog target={{ kind: 'CAREER_DESCRIPTION', description: { name: `${base}.contents`, label: '세부내용' } }} jdId={targetJdId} />
       </Flex>
     </Flex>
   )
