@@ -128,17 +128,17 @@ export type PeriodInput = {
 
 /** 프로필 텍스트 AI 다듬기 입력입니다. */
 export type PolishProfileTextRequest = {
+  /** 다듬을 원문입니다. (최대 2000자) 결과는 항목별 제한 이내로 압축됩니다. */
+  description: string;
   /** 직접 작성 지침입니다. 어투, 강조할 수치 등을 자유롭게 적습니다. (최대 200자) */
   instruction?: string | null | undefined;
   /** JD ID입니다. 주면 해당 JD의 지원 전략을 반영해 다듬습니다. workspaceId와 함께 사용합니다. */
   jdId?: string | number | null | undefined;
-  /** 다듬기 대상 항목입니다. 항목별 글자수 제한에 맞춰 다듬습니다. */
+  /** 다듬기 대상 항목입니다. 항목별 결과 글자수 제한에 맞춰 다듬습니다. */
   kind: ProfilePolishKind;
   /** 작성 구조입니다. (불렛형/문제-해결-성과/산문형, 미지정 시 원문 형식 유지) */
   structure?: PolishStructure | null | undefined;
-  /** 다듬을 원문입니다. (최대 500자) */
-  text: string;
-  /** 경험명입니다. 경험 세부 내용을 다듬을 때 맥락으로 사용됩니다. (최대 100자) */
+  /** 경험명입니다. kind가 EXPERIENCE이면 필수이며 최대 150자입니다. 나머지 kind에서는 무시합니다. */
   title?: string | null | undefined;
 };
 
@@ -209,14 +209,12 @@ export type ProfileLanguageTestRequest = {
 
 /** 프로필 텍스트 다듬기 대상 항목입니다. */
 export type ProfilePolishKind =
-  /** 경력 세부 내용 (최대 500자) */
+  /** 경력 세부 내용 첨삭 결과 (최대 500자) */
   | 'CAREER_DESCRIPTION'
-  /** 핵심역량 (최대 500자) */
+  /** 핵심역량 첨삭 결과 (최대 500자) */
   | 'CORE_COMPETENCY'
-  /** 경험 STAR 설명 (최대 500자) */
-  | 'EXPERIENCE_DESCRIPTION'
-  /** 경험명 (최대 48자) */
-  | 'EXPERIENCE_TITLE';
+  /** 경험명과 경험 내용 첨삭입니다. title이 필수이며 경험 내용 결과는 최대 500자입니다. */
+  | 'EXPERIENCE';
 
 /** 스킬 입력입니다. */
 export type ProfileSkillRequest = {
@@ -662,7 +660,7 @@ export type PolishProfileTextMutationVariables = Exact<{
 }>;
 
 
-export type PolishProfileTextMutation = { polishProfileText: string };
+export type PolishProfileTextMutation = { polishProfileText: { title: string | null, description: string } };
 
 export type GenerateCoreCompetencyMutationVariables = Exact<{
   workspaceId: string | number;
@@ -1208,7 +1206,10 @@ export const UpdateProfileDocument = new TypedDocumentString(`
     `) as unknown as TypedDocumentString<UpdateProfileMutation, UpdateProfileMutationVariables>;
 export const PolishProfileTextDocument = new TypedDocumentString(`
     mutation PolishProfileText($request: PolishProfileTextRequest!, $workspaceId: ID) {
-  polishProfileText(request: $request, workspaceId: $workspaceId)
+  polishProfileText(request: $request, workspaceId: $workspaceId) {
+    title
+    description
+  }
 }
     `) as unknown as TypedDocumentString<PolishProfileTextMutation, PolishProfileTextMutationVariables>;
 export const GenerateCoreCompetencyDocument = new TypedDocumentString(`

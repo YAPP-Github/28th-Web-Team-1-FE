@@ -99,10 +99,11 @@ const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove }: { 
 
         <AiFeedbackDialog
           jdId={targetJdId}
-          targets={[
-            { name: `${base}.name`, label: '경험명', kind: 'EXPERIENCE_TITLE', multiline: false },
-            { name: `${base}.contents`, label: '세부내용', kind: 'EXPERIENCE_DESCRIPTION', multiline: true }
-          ]}
+          target={{
+            kind: 'EXPERIENCE',
+            title: { name: `${base}.name`, label: '경험명' },
+            description: { name: `${base}.contents`, label: '세부내용' }
+          }}
         />
       </Flex>
     </Flex>
