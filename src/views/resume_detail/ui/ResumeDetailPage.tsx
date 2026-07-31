@@ -2,7 +2,7 @@
 import { Suspense, useState, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
-import { Button, Spacing, Text } from '@shared/ui'
+import { Button, ErrorFallback, Spacing, Text } from '@shared/ui'
 import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
 import { useResumeDetail, toPreviewSections, type ResumeSectionData } from '@entities/resume'
 import { useJdDetail, useJdInsight } from '@entities/jd'
@@ -15,7 +15,7 @@ import { SelectedControl, SelectedControlItem } from '@shared/ui/selected_contro
 export const ResumeDetailPage = ({ resumeId }: { resumeId: string }) => {
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
-      <ErrorBoundary fallback={<ResumeFallback>이력서 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</ResumeFallback>}>
+      <ErrorBoundary fallback={<ErrorFallback title="이력서 정보를 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="flex-1" />}>
         <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
           <ResumeDetail resumeId={resumeId} />
         </Suspense>
@@ -111,7 +111,7 @@ const JDInfo = ({ workspaceId, jdId }: { workspaceId: string; jdId: string | nul
         {jdId === null ? (
           <JDPlaceholder>연결된 채용공고가 없어요.</JDPlaceholder>
         ) : (
-          <ErrorBoundary fallback={<JDPlaceholder>채용 공고 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</JDPlaceholder>}>
+          <ErrorBoundary fallback={<ErrorFallback title="채용 공고 정보를 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="flex-1 py-20" />}>
             <Suspense fallback={<JDPlaceholder>불러오는 중...</JDPlaceholder>}>
               {tab === JD_SOURCE_TAB ? <JDSource workspaceId={workspaceId} jdId={jdId} /> : <JDInsight workspaceId={workspaceId} jdId={jdId} />}
             </Suspense>

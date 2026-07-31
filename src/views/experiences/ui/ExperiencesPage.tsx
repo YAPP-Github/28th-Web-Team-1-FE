@@ -2,14 +2,14 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { Flex, Grid } from '@radix-ui/themes'
-import { ErrorBoundary } from '@sentry/nextjs'
 import { ArrowRight } from 'lucide-react'
 import { useProjectList } from '@entities/project'
 import { useWorkspaceId } from '@entities/user'
 import { formatPeriod } from '@shared/lib'
-import { Button, Text } from '@shared/ui'
+import { Button, ErrorFallback, Text } from '@shared/ui'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
 import { AddProjectDialog } from './AddProjectDialog'
+import { ErrorBoundary } from '@sentry/nextjs'
 
 export const ExperiencesPage = () => {
   return (
@@ -22,18 +22,7 @@ export const ExperiencesPage = () => {
           경험을 정리해서 이력서 소재로 활용해요.
         </Text>
       </Flex>
-      <ErrorBoundary
-        fallback={
-          <Flex direction="column" align="center" justify="center" className="py-20" gap="1">
-            <Text variant="headline2" color="text-basic">
-              프로젝트 목록을 불러오지 못했어요.
-            </Text>
-            <Text variant="body2" color="text-subtler">
-              잠시 후 다시 시도해주세요.
-            </Text>
-          </Flex>
-        }
-      >
+      <ErrorBoundary fallback={<ErrorFallback title="프로젝트 목록을 불러오지 못했어요." description="잠시 후 다시 시도해주세요." className="flex-1" />}>
         <Suspense fallback={null}>
           <Flex direction="row" gap="4" justify="between">
             <ExperiencesSearchField />

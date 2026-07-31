@@ -5,7 +5,7 @@ import { ErrorBoundary } from '@sentry/nextjs'
 import { FormProvider, useForm, useFormContext, useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import { FileCheckCorner, RefreshCcw } from 'lucide-react'
-import { Button, Divider, Spacing, Text } from '@shared/ui'
+import { Button, Divider, ErrorFallback, Spacing, Text } from '@shared/ui'
 import { formatDate } from '@shared/lib'
 import { AMPLITUDE_EVENTS } from '@shared/config'
 import { useIntervalAutosave } from '@shared/hooks/useIntervalAutosave'
@@ -32,7 +32,7 @@ export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
 
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
-      <ErrorBoundary fallback={<ResumeFallback>이력서 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</ResumeFallback>}>
+      <ErrorBoundary fallback={<ErrorFallback title="이력서 정보를 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="flex-1" />}>
         <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
           <ResumeWorkspace resumeId={resumeId} />
         </Suspense>

@@ -8,25 +8,14 @@ import { useProject } from '@entities/project'
 import { useProjectExperiences } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { cn } from '@shared/lib/cn'
-import { Text } from '@shared/ui'
+import { ErrorFallback, Text } from '@shared/ui'
 import { ProjectInfo } from './ProjectInfo'
 import { ExperienceList } from './ExperienceList'
 import { ExperienceDetailPanel } from './ExperienceDetailPanel'
 
 export const ExperienceDetailPage = () => {
   return (
-    <ErrorBoundary
-      fallback={
-        <Flex align="center" justify="center" className="h-screen" gap="1">
-          <Text variant="headline2" color="text-basic">
-            경험을 불러오지 못했어요.
-          </Text>
-          <Text variant="body2" color="text-subtler">
-            잠시 후 다시 시도해주세요.
-          </Text>
-        </Flex>
-      }
-    >
+    <ErrorBoundary fallback={<ErrorFallback title="경험을 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="h-screen" />}>
       <Suspense fallback={null}>
         <ExperienceDetailContent />
       </Suspense>

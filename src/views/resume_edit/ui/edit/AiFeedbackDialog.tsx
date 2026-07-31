@@ -4,7 +4,7 @@ import { ErrorBoundary } from '@sentry/nextjs'
 import { useFormContext, type FieldPath } from 'react-hook-form'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { ArrowRight, PencilSparkles } from 'lucide-react'
-import { Button, Divider, Spacing, Text } from '@shared/ui'
+import { Button, Divider, ErrorFallback, Spacing, Text } from '@shared/ui'
 import { Dialog, DialogContent, DialogTrigger } from '@shared/ui/dialog'
 import { SelectedControl, SelectedControlItem } from '@shared/ui/selected_control'
 import { HelpTooltip } from '@shared/ui/tooltip'
@@ -149,13 +149,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
           <Flex direction={'column'} gap={'4'} flexShrink={'0'}>
             <Text variant={'headline1'}>지원전략</Text>
             {jdId ? (
-              <ErrorBoundary
-                fallback={
-                  <Text variant={'label2'} color={'text-subtler'}>
-                    지원 전략을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
-                  </Text>
-                }
-              >
+              <ErrorBoundary fallback={<ErrorFallback title="지원 전략을 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." />}>
                 <Suspense fallback={<JdStrategyLoading />}>
                   <JdStrategy workspaceId={workspaceId} jdId={jdId} />
                 </Suspense>

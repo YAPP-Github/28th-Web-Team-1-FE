@@ -3,7 +3,7 @@
 import { Suspense, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
-import { Divider, Heading, Spacing, Text } from '@shared/ui'
+import { Divider, ErrorFallback, Heading, Spacing, Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
 import { GoogleIcon, NotionIcon } from '@shared/icon'
 import { WithdrawButton } from '@features/authenticate'
@@ -17,13 +17,7 @@ export const MyAccountPage = () => {
       <Spacing size={32} />
 
       <Flex direction="column" className="w-full max-w-158.5">
-        <ErrorBoundary
-          fallback={
-            <Text variant="label1" color="text-subtler">
-              계정 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
-            </Text>
-          }
-        >
+        <ErrorBoundary fallback={<ErrorFallback title="계정 정보를 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." />}>
           <Suspense
             fallback={
               <Text variant="label1" color="text-subtler">
