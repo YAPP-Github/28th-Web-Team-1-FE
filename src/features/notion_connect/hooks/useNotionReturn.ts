@@ -29,7 +29,7 @@ export const useNotionReturn = (returnPath: string) => {
 
   useEffect(() => {
     if (initial.hasError) {
-      toast.error('Notion 연결에 실패했어요. Notion을 다시 연결해 주세요.', { id: 'notion-connect-error', position: 'top-center' })
+      toast.error('Notion 연결에 실패했어요.\nNotion을 다시 연결해 주세요.', { id: 'notion-connect-error', position: 'top-center' })
     }
     if (initial.connectionId || initial.hasError) {
       router.replace(returnPath)

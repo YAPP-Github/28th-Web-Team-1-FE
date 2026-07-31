@@ -110,7 +110,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
 
     void generateCoreCompetency({ workspaceId, resumeId, jdId: resume.targetJd?.jdId ?? null })
       .then(({ coreCompetency }) => applyCoreCompetencyToForm(form, coreCompetency))
-      .catch(() => toast.error('핵심역량 생성에 실패했어요. 잠시 후 다시 시도해주세요.'))
+      .catch(() => toast.error('핵심역량 생성에 실패했어요.\n잠시 후 다시 시도해주세요.'))
     // 페이지 진입 시 1회만 실행한다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

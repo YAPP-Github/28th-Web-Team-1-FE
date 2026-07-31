@@ -73,7 +73,7 @@ const AddExperienceButton = () => {
           toast.success('경험이 추가되었어요.', { id: 'experience-created', position: 'top-center' })
           setIsOpen(false)
         },
-        onError: () => toast.error('경험 추가에 실패했어요. 입력한 내용은 그대로 있으니 다시 시도해 주세요.', { id: 'experience-create-error', position: 'top-center' })
+        onError: () => toast.error('경험 추가에 실패했어요.\n입력한 내용은 그대로 있으니 다시 시도해 주세요.', { id: 'experience-create-error', position: 'top-center' })
       }
     )
   }

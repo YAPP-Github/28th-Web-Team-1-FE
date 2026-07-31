@@ -34,7 +34,7 @@ export const ResumeProcessingStep = ({ file, onDone, onPrev }: ResumeProcessingS
       },
       onError: () => {
         onPrev?.()
-        toast.error('PDF를 업로드하지 못했어요. 다시 시도해 주세요.', { position: 'top-center' })
+        toast.error('PDF를 업로드하지 못했어요.\n다시 시도해 주세요.', { position: 'top-center' })
       }
     })
   }, [file, uploadPdf, queryClient, workspaceId, onPrev, onDone])

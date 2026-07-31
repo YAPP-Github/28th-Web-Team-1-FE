@@ -19,7 +19,7 @@ export const useProfileSectionForm = <T extends FieldValues>(seed: T, toRequest:
         toast.success('저장되었어요', { id: 'profile-save', position: 'top-center' })
         methods.reset(values)
       },
-      onError: () => toast.error('저장에 실패했어요. 입력한 내용은 그대로 있으니 다시 시도해 주세요.', { id: 'profile-save-error', position: 'top-center' })
+      onError: () => toast.error('저장에 실패했어요.\n입력한 내용은 그대로 있으니 다시 시도해 주세요.', { id: 'profile-save-error', position: 'top-center' })
     })
   })
 

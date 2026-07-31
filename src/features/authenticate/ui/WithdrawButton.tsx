@@ -34,7 +34,7 @@ export const WithdrawButton = () => {
         toast.success('계정 탈퇴가 완료되었어요.', { id: 'withdraw-success', position: 'top-center' })
         router.replace('/login')
       },
-      onError: () => toast.error('탈퇴에 실패했어요. 다시 시도해 주세요.', { id: 'withdraw-error', position: 'top-center' })
+      onError: () => toast.error('탈퇴에 실패했어요.\n다시 시도해 주세요.', { id: 'withdraw-error', position: 'top-center' })
     })
   }
 

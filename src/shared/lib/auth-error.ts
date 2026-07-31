@@ -15,12 +15,12 @@ export type AuthErrorCode = (typeof AUTH_ERROR)[keyof typeof AUTH_ERROR]
 
 /** 각 오류 코드에 대응하는 사용자 노출 메시지. 리다이렉트(`?error=`)·토스트 등에서 공통으로 사용한다. */
 export const AUTH_ERROR_MESSAGE: Record<AuthErrorCode | 'DEFAULT', string> = {
-  [AUTH_ERROR.AUTH]: '로그인에 실패했어요. 다시 시도해 주세요',
-  [AUTH_ERROR.TOKEN_EXPIRED]: '로그인이 만료됐어요. 다시 로그인해 주세요.',
-  [AUTH_ERROR.REQUIRED]: '로그인이 필요한 페이지예요. 로그인 후 이어서 진행해 주세요.',
-  [AUTH_ERROR.INTERNAL]: '일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.',
+  [AUTH_ERROR.AUTH]: '로그인에 실패했어요.\n다시 시도해 주세요.',
+  [AUTH_ERROR.TOKEN_EXPIRED]: '로그인이 만료됐어요.\n다시 로그인해 주세요.',
+  [AUTH_ERROR.REQUIRED]: '로그인이 필요한 페이지예요.\n로그인 후 이어서 진행해 주세요.',
+  [AUTH_ERROR.INTERNAL]: '일시적인 오류가 생겼어요.\n잠시 후 다시 시도해 주세요.',
   /** 알 수 없는 코드가 들어왔을 때 보여줄 기본 메시지. */
-  DEFAULT: '문제가 발생했어요. 잠시 후 다시 시도해 주세요.'
+  DEFAULT: '문제가 발생했어요.\n잠시 후 다시 시도해 주세요.'
 }
 
 /**
