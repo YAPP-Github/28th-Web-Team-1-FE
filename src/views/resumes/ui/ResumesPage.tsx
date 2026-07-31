@@ -33,7 +33,7 @@ export const ResumesPage = () => {
 
       <Spacing size={32} />
 
-      <ErrorBoundary fallback={<ResumesFallback>이력서를 불러오는 데 실패했습니다.</ResumesFallback>}>
+      <ErrorBoundary fallback={<ResumesFallback>이력서 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</ResumesFallback>}>
         <Suspense fallback={<ResumesFallback>불러오는 중...</ResumesFallback>}>
           <ResumeSections />
         </Suspense>

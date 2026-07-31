@@ -29,11 +29,10 @@ const UserProfileContent = () => {
 
 export const UserProfile = () => {
   return (
-    // Todo: Error fallback, Loading fallback 구현 필요
     <ErrorBoundary
       fallback={
         <Text className={'overflow-hidden text-center whitespace-nowrap'} variant={'caption2'}>
-          사용자 정보를 불러오는데 실패했습니다.
+          사용자 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
         </Text>
       }
     >

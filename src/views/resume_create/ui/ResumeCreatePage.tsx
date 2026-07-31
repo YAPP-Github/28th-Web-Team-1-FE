@@ -27,7 +27,7 @@ export const ResumeCreatePage = () => {
       <ErrorBoundary
         fallback={
           <Text variant={'label1'} color={'text-subtle'} className={'block p-8 text-center'}>
-            경험을 불러오는 데 실패했습니다.
+            경험을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
           </Text>
         }
       >

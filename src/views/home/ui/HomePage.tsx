@@ -19,7 +19,7 @@ export const HomePage = () => {
         fallback={
           <Flex align="center" justify="center" className="min-h-105">
             <Text variant="body1" color="text-subtler">
-              불러오는데 실패했습니다.
+              채용공고 입력창을 불러오지 못했어요. 새로고침 후 다시 시도해 주세요.
             </Text>
           </Flex>
         }

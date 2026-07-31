@@ -152,7 +152,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
               <ErrorBoundary
                 fallback={
                   <Text variant={'label2'} color={'text-subtler'}>
-                    지원전략을 불러오지 못했어요.
+                    지원 전략을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
                   </Text>
                 }
               >

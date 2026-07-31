@@ -15,7 +15,7 @@ import { SelectedControl, SelectedControlItem } from '@shared/ui/selected_contro
 export const ResumeDetailPage = ({ resumeId }: { resumeId: string }) => {
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
-      <ErrorBoundary fallback={<ResumeFallback>이력서를 불러오는 데 실패했습니다.</ResumeFallback>}>
+      <ErrorBoundary fallback={<ResumeFallback>이력서 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</ResumeFallback>}>
         <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
           <ResumeDetail resumeId={resumeId} />
         </Suspense>
@@ -111,7 +111,7 @@ const JDInfo = ({ workspaceId, jdId }: { workspaceId: string; jdId: string | nul
         {jdId === null ? (
           <JDPlaceholder>연결된 채용공고가 없어요.</JDPlaceholder>
         ) : (
-          <ErrorBoundary fallback={<JDPlaceholder>채용공고 정보를 불러오지 못했어요.</JDPlaceholder>}>
+          <ErrorBoundary fallback={<JDPlaceholder>채용 공고 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</JDPlaceholder>}>
             <Suspense fallback={<JDPlaceholder>불러오는 중...</JDPlaceholder>}>
               {tab === JD_SOURCE_TAB ? <JDSource workspaceId={workspaceId} jdId={jdId} /> : <JDInsight workspaceId={workspaceId} jdId={jdId} />}
             </Suspense>

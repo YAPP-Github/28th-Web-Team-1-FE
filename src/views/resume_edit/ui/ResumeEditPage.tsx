@@ -32,7 +32,7 @@ export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
 
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
-      <ErrorBoundary fallback={<ResumeFallback>이력서를 불러오는 데 실패했습니다.</ResumeFallback>}>
+      <ErrorBoundary fallback={<ResumeFallback>이력서 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</ResumeFallback>}>
         <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
           <ResumeWorkspace resumeId={resumeId} />
         </Suspense>

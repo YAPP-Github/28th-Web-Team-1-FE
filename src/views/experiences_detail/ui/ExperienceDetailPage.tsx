@@ -17,9 +17,12 @@ export const ExperienceDetailPage = () => {
   return (
     <ErrorBoundary
       fallback={
-        <Flex align="center" justify="center" className="h-screen">
-          <Text variant="body1" color="text-subtler">
-            프로젝트를 불러오는데 실패했습니다.
+        <Flex align="center" justify="center" className="h-screen" gap="1">
+          <Text variant="headline2" color="text-basic">
+            경험을 불러오지 못했어요.
+          </Text>
+          <Text variant="body2" color="text-subtler">
+            잠시 후 다시 시도해주세요.
           </Text>
         </Flex>
       }
