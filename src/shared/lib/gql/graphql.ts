@@ -660,7 +660,7 @@ export type PolishProfileTextMutationVariables = Exact<{
 }>;
 
 
-export type PolishProfileTextMutation = { polishProfileText: { description: string, title: string | null } };
+export type PolishProfileTextMutation = { polishProfileText: { title: string | null, description: string } };
 
 export type GenerateCoreCompetencyMutationVariables = Exact<{
   workspaceId: string | number;
@@ -1207,8 +1207,8 @@ export const UpdateProfileDocument = new TypedDocumentString(`
 export const PolishProfileTextDocument = new TypedDocumentString(`
     mutation PolishProfileText($request: PolishProfileTextRequest!, $workspaceId: ID) {
   polishProfileText(request: $request, workspaceId: $workspaceId) {
-    description
     title
+    description
   }
 }
     `) as unknown as TypedDocumentString<PolishProfileTextMutation, PolishProfileTextMutationVariables>;

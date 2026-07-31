@@ -143,11 +143,12 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
 
   const saveDraft = () => updateResumeAsync(buildSaveInput(form.getValues(), 'DRAFT')).then(() => setLastSavedAt(new Date()))
 
-  // 30초(AUTOSAVE_INTERVAL_MS)마다 변경분이 있으면 조용히 저장한다(실패 시 다음 주기에 재시도).
-  const markDirty = useIntervalAutosave(saveDraft, { intervalMs: AUTOSAVE_INTERVAL_MS })
+  // 자동(30초 주기)·수동 임시저장이 같은 실행 경로를 쓰도록 통합한다. 두 요청이 겹치지 않고 직렬화된다.
+  const { markDirty, saveNow } = useIntervalAutosave(saveDraft, { intervalMs: AUTOSAVE_INTERVAL_MS })
 
+  // 수동 임시저장: 자동저장과 동일한 상태 머신(saveNow)을 거치고 성공/실패 토스트만 덧붙인다.
   const handleDraftSave = () => {
-    void saveDraft()
+    void saveNow()
       .then(() => toast.success('이력서가 임시저장되었습니다.', { position: 'top-center' }))
       .catch((error: unknown) => toast.error(error instanceof Error ? error.message : '임시저장에 실패했어요.', { position: 'top-center' }))
   }
