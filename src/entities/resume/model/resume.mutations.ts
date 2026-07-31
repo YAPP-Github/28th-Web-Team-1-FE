@@ -39,6 +39,8 @@ export const useUpdateResume = (workspaceId: string, resumeId: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
+    // 같은 이력서에 대한 저장(자동/수동 임시저장·완료)을 순차 실행해 요청이 겹치지 않게 한다(오래된 스냅샷이 최신을 덮어쓰는 것 방지).
+    scope: { id: `resume-save-${resumeId}` },
     mutationFn: async (input: SaveResumeInput) => {
       const { updateResume } = await resumeAPI.updateResume({ workspaceId, resumeId, input })
       return updateResume
