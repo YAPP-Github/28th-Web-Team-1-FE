@@ -20,7 +20,7 @@ export const AUTH_ERROR_MESSAGE: Record<AuthErrorCode | 'DEFAULT', string> = {
   [AUTH_ERROR.REQUIRED]: '로그인이 필요한 페이지예요. 로그인 후 이어서 진행해 주세요.',
   [AUTH_ERROR.INTERNAL]: '일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.',
   /** 알 수 없는 코드가 들어왔을 때 보여줄 기본 메시지. */
-  DEFAULT: '문제가 발생했어요. 잠시 후 다시 시도해 주세요'
+  DEFAULT: '문제가 발생했어요. 잠시 후 다시 시도해 주세요.'
 }
 
 /**

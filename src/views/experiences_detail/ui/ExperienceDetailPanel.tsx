@@ -174,7 +174,7 @@ const DeleteExperienceButton = ({ workspaceId, experienceId, onClose }: { worksp
         toast.success('경험이 삭제되었어요.', { id: 'experience-deleted', position: 'top-center' })
         onClose()
       },
-      onError: () => toast.error('삭제에 실패했어요. 다시 시도해 주세요.', { id: 'experience-delete-error', position: 'top-center' })
+      onError: () => toast.error('삭제에 실패했어요. 잠시 후 다시 시도해 주세요.', { id: 'experience-delete-error', position: 'top-center' })
     })
   }
 
@@ -254,7 +254,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
           toast.success('경험이 수정되었어요.', { id: 'experience-updated', position: 'top-center' })
           setIsOpen(false)
         },
-        onError: () => toast.error('경험 수정에 실패했어요. 다시 시도해 주세요.', { id: 'experience-update-error', position: 'top-center' })
+        onError: () => toast.error('경험 수정에 실패했어요. 입력한 내용은 그대로 있으니 다시 시도해 주세요.', { id: 'experience-update-error', position: 'top-center' })
       }
     )
   }
