@@ -209,7 +209,7 @@ const ResumeCreateContent = () => {
         isCompleting={isPending || isNavigating}
         onComplete={(selectedExperiences) => {
           // 경험 선택 완료 시 Amplitude 이벤트 전송
-          amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_COMPLETED, { selected_experience_count: selectedExperiences.length })
+          amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_COMPLETED, { selected_experience_count: selectedExperiences.length, jd_id: jdId })
           setIsNavigating(true)
           createResume(buildResumeInput(selectedExperiences, jdId), {
             onSuccess: async ({ resumeId }) => {

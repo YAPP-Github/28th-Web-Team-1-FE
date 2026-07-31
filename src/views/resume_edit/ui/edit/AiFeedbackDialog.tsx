@@ -79,7 +79,7 @@ export const AiFeedbackDialog = ({ target, jdId }: AiFeedbackDialogProps) => {
   /** Amplitude 이벤트 전송용: 기준값과 달라지는 첫 onChange에서만 1회 전송하고, draft를 갱신한다. */
   const handleDescriptionChange = (value: string) => {
     if (editBaselineRef.current !== null && value !== editBaselineRef.current) {
-      amplitude.track(AMPLITUDE_EVENTS.SECTION_EDITED, { section_name: SECTION_NAME_BY_KIND[kind], location: 'ai_modal' })
+      amplitude.track(AMPLITUDE_EVENTS.SECTION_EDITED, { jd_id: jdId ?? null, section_name: SECTION_NAME_BY_KIND[target.kind], location: 'ai_modal' })
       editBaselineRef.current = null
     }
     setDrafts((prev) => ({ ...prev, [description.name]: value }))
@@ -104,7 +104,7 @@ export const AiFeedbackDialog = ({ target, jdId }: AiFeedbackDialogProps) => {
   }
 
   const handleGenerate = async () => {
-    amplitude.track(AMPLITUDE_EVENTS.AI_EDIT_STARTED, { edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
+    amplitude.track(AMPLITUDE_EVENTS.AI_EDIT_STARTED, { jd_id: jdId, edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
 
     const request: PolishProfileTextRequest = {
       kind,
@@ -126,7 +126,7 @@ export const AiFeedbackDialog = ({ target, jdId }: AiFeedbackDialogProps) => {
 
   /** 편집값을 폼에 되쓰고 닫는다. */
   const handleApply = () => {
-    amplitude.track(AMPLITUDE_EVENTS.EDIT_APPLIED, { section_name: SECTION_NAME_BY_KIND[kind], edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
+    amplitude.track(AMPLITUDE_EVENTS.EDIT_APPLIED, { jd_id: jdId, section_name: SECTION_NAME_BY_KIND[kind], edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
     writeField(description)
     if (title) writeField(title)
     handleOpenChange(false)
@@ -135,7 +135,7 @@ export const AiFeedbackDialog = ({ target, jdId }: AiFeedbackDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'} onClick={() => amplitude.track(AMPLITUDE_EVENTS.EDIT_MODAL_OPENED)}>
+        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'} onClick={() => amplitude.track(AMPLITUDE_EVENTS.EDIT_MODAL_OPENED, { jd_id: jdId })}>
           <PencilSparkles size={16} data-icon={'inline-start'} />
           AI 첨삭
         </Button>

@@ -28,8 +28,8 @@ interface UseExperiencePickerTrackingParams {
 export const useExperiencePickerTracking = ({ workspaceId, jdId, isOpen, actionType, previousExperienceIds }: UseExperiencePickerTrackingParams) => {
   useEffect(() => {
     if (!isOpen) return
-    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_VIEWED)
-  }, [isOpen])
+    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_VIEWED, { jd_id: jdId })
+  }, [isOpen, jdId])
 
   const { data: matchedPages } = useInfiniteQuery(experienceQueries.matched(workspaceId, jdId))
   const recommendationRankMap = useMemo(() => buildRecommendationRankMap(matchedPages?.pages.flatMap((page) => page.experiences.experiences) ?? []), [matchedPages])
@@ -44,7 +44,8 @@ export const useExperiencePickerTracking = ({ workspaceId, jdId, isOpen, actionT
         ...(rank !== undefined && { recommendation_rank: rank }),
         action_type: actionType,
         new_experience_id: actionType === 'reselect' ? experience.experienceId : null,
-        previous_experience_id: actionType === 'reselect' ? (previousExperienceIds?.[index] ?? null) : null
+        previous_experience_id: actionType === 'reselect' ? (previousExperienceIds?.[index] ?? null) : null,
+        jd_id: jdId
       })
     })
   }

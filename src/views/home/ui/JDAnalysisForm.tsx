@@ -39,11 +39,11 @@ export const JDAnalysisForm = () => {
   }, [isPending])
 
   const handleRegister = (request: JdRegisterInput) => {
-    // 버튼 클릭 또는 제출 시 Amplitude 이벤트 전송
-    amplitude.track(AMPLITUDE_EVENTS.JD_URL_ENTERED)
     registerJd(request, {
       onSuccess: (res) => {
         if (res.jd) {
+          // JD 등록 성공 시 Amplitude 이벤트 전송. 후보 선택 단계(candidates)에서는 아직 jd_id가 없어 보내지 않는다.
+          amplitude.track(AMPLITUDE_EVENTS.JD_URL_ENTERED, { jd_id: res.jd.jdId })
           router.push(`/resumes/create?jdId=${res.jd.jdId}`)
         } else if (res.candidates?.length) {
           setCandidates(res.candidates)
