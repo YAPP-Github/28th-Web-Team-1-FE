@@ -1,13 +1,10 @@
 import { Flex } from '@radix-ui/themes'
-import { Button } from '@shared/ui/button'
 import { Text } from '@shared/ui/typography'
 import { cn } from '@shared/lib/cn'
 
 interface ErrorFallbackProps {
   title: string
   description?: string
-  /** 넘기면 안내 문구 아래에 '다시 시도' 버튼이 뜬다. `QueryErrorBoundary`의 `resetError`를 그대로 연결하면 된다. */
-  onRetry?: () => void
   className?: string
 }
 
@@ -20,18 +17,13 @@ interface ErrorFallbackProps {
  * <ErrorBoundary fallback={<ErrorFallback title="프로젝트 목록을 불러오지 못했어요." description="잠시 후 다시 시도해주세요." className="flex-1" />}>
  * ```
  */
-export const ErrorFallback = ({ title, description, onRetry, className }: ErrorFallbackProps) => {
+export const ErrorFallback = ({ title, description, className }: ErrorFallbackProps) => {
   if (!description) {
     return (
       <Flex direction="column" align="center" justify="center" gap="3" className={cn(className)}>
         <Text variant="body1" color="text-subtler">
           {title}
         </Text>
-        {onRetry && (
-          <Button variant="secondary" size="sm" onClick={onRetry}>
-            다시 시도
-          </Button>
-        )}
       </Flex>
     )
   }
@@ -44,11 +36,6 @@ export const ErrorFallback = ({ title, description, onRetry, className }: ErrorF
       <Text variant="body2" color="text-subtler">
         {description}
       </Text>
-      {onRetry && (
-        <Button variant="secondary" size="sm" onClick={onRetry} className="mt-2">
-          다시 시도
-        </Button>
-      )}
     </Flex>
   )
 }

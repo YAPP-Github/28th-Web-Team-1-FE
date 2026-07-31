@@ -40,7 +40,7 @@ export const PdfUpload = ({ file, onChange, className }: PdfUploadProps) => {
       return
     }
     if (selected.size > MAX_FILE_SIZE) {
-      toast.warning('파일은 최대 4.5MB까지 업로드할 수 있어요. 용량를 줄여 다시 업로드해 주세요.', { id: 'pdf-size', position: 'top-center' })
+      toast.warning('파일은 최대 4.5MB까지 업로드할 수 있어요.\n용량을 줄여 다시 업로드해 주세요.', { id: 'pdf-size', position: 'top-center' })
       return
     }
     onChange(selected)
