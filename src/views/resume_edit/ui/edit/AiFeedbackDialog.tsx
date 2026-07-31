@@ -75,7 +75,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
   const handleFieldChange = (target: AiFeedbackTarget, nextValue: string) => {
     const baseline = editFocusValueRef.current[target.name]
     if (baseline !== undefined && nextValue !== baseline) {
-      amplitude.track(AMPLITUDE_EVENTS.SECTION_EDITED, { section_name: SECTION_NAME_BY_KIND[target.kind], location: 'ai_modal' })
+      amplitude.track(AMPLITUDE_EVENTS.SECTION_EDITED, { jd_id: jdId ?? null, section_name: SECTION_NAME_BY_KIND[target.kind], location: 'ai_modal' })
       delete editFocusValueRef.current[target.name]
     }
     setDrafts((prev) => ({ ...prev, [target.name]: nextValue }))
@@ -99,7 +99,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
 
   const handleGenerate = async () => {
     // 경험 세부내용을 다듬을 때 맥락으로 넘길 경험명 값(있으면).
-    amplitude.track(AMPLITUDE_EVENTS.AI_EDIT_STARTED, { edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
+    amplitude.track(AMPLITUDE_EVENTS.AI_EDIT_STARTED, { jd_id: jdId, edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
     const titleTarget = targets.find((target) => target.kind === 'EXPERIENCE_TITLE')
     const title = titleTarget ? drafts[titleTarget.name] : undefined
 
@@ -127,7 +127,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
 
   /** 편집값을 폼에 되쓰고 닫는다. */
   const handleApply = () => {
-    amplitude.track(AMPLITUDE_EVENTS.EDIT_APPLIED, { section_name: SECTION_NAME_BY_KIND[targets[0].kind], edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
+    amplitude.track(AMPLITUDE_EVENTS.EDIT_APPLIED, { jd_id: jdId, section_name: SECTION_NAME_BY_KIND[targets[0].kind], edit_mode: EDIT_MODE_BY_STRUCTURE[structure] })
     targets.forEach((target) => {
       setValue(target.name as FieldPath<ResumeFormValues>, (drafts[target.name] ?? '') as never, { shouldDirty: true, shouldValidate: true })
     })
@@ -137,7 +137,7 @@ export const AiFeedbackDialog = ({ targets, jdId }: AiFeedbackDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'} onClick={() => amplitude.track(AMPLITUDE_EVENTS.EDIT_MODAL_OPENED)}>
+        <Button variant={'secondary'} size={'sm'} className={'ml-auto w-fit'} onClick={() => amplitude.track(AMPLITUDE_EVENTS.EDIT_MODAL_OPENED, { jd_id: jdId })}>
           <PencilSparkles size={16} data-icon={'inline-start'} />
           AI 첨삭
         </Button>

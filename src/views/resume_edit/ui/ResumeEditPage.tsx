@@ -25,11 +25,6 @@ import { useRouter } from 'next/navigation'
 import * as amplitude from '@amplitude/unified'
 
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
-  useEffect(() => {
-    // 페이지 진입 시 Amplitude 이벤트 전송
-    amplitude.track(AMPLITUDE_EVENTS.RESUME_DRAFT_VIEWED)
-  }, [])
-
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
       <ErrorBoundary fallback={<ResumeFallback>이력서를 불러오는 데 실패했습니다.</ResumeFallback>}>
@@ -95,6 +90,12 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
 
+  useEffect(() => {
+    // 페이지 진입 시 Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_DRAFT_VIEWED, { jd_id: resume.targetJd?.jdId ?? null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const defaultValues = useMemo(() => resumeToFormValues(resume), [resume])
   const form = useForm<ResumeFormValues>({ defaultValues })
   const { mutate: updateResume, mutateAsync: updateResumeAsync, isPending } = useUpdateResume(workspaceId, resumeId)
@@ -130,7 +131,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   )
 
   const handleSave = form.handleSubmit((values) => {
-    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED)
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED, { jd_id: resume.targetJd?.jdId })
     updateResume(buildSaveInput(values, 'COMPLETED'), {
       onSuccess: () => {
         setLastSavedAt(new Date())
