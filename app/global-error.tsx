@@ -19,7 +19,7 @@ export default function GlobalError({ error, unstable_retry }: { error: Error & 
           <Flex direction="column" align="center" justify="center" gap="6" className="h-screen px-6 text-center">
             <Flex direction="column" align="center" gap="2">
               <Heading variant="title3" color="text-basic">
-                일시적인 오류가 발생했어요.
+                일시적인 오류가 생겼어요.
               </Heading>
               <Text variant="body1" color="text-subtle">
                 잠시 후 다시 시도해 주세요.

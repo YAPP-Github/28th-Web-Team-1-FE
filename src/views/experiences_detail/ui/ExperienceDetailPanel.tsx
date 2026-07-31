@@ -3,10 +3,11 @@ import { Suspense, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Flex, Skeleton } from '@radix-ui/themes'
+import { ErrorBoundary } from '@sentry/nextjs'
 import { cn } from '@shared/lib/cn'
 import { ChevronsRight, Trash2 } from 'lucide-react'
 import { useDeleteExperience, useExperienceSuspense, useUpdateExperience, type ExperienceDetail } from '@entities/experience'
-import { Button, Text } from '@shared/ui'
+import { Button, ErrorFallback, Text } from '@shared/ui'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,9 +40,11 @@ export const ExperienceDetailPanel = ({ workspaceId, experienceId, onClose, clas
         <ChevronsRight size={24} className="text-icon-gray-lighter" />
       </button>
 
-      <Suspense fallback={<ExperienceDetailPanelSkeleton />}>
-        <ExperienceDetailPanelContent workspaceId={workspaceId} experienceId={experienceId} onClose={onClose} />
-      </Suspense>
+      <ErrorBoundary fallback={<ErrorFallback title="경험을 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="flex-1" />}>
+        <Suspense fallback={<ExperienceDetailPanelSkeleton />}>
+          <ExperienceDetailPanelContent workspaceId={workspaceId} experienceId={experienceId} onClose={onClose} />
+        </Suspense>
+      </ErrorBoundary>
     </Flex>
   )
 }
@@ -174,7 +177,7 @@ const DeleteExperienceButton = ({ workspaceId, experienceId, onClose }: { worksp
         toast.success('경험이 삭제되었어요.', { id: 'experience-deleted', position: 'top-center' })
         onClose()
       },
-      onError: () => toast.error('삭제에 실패했어요. 다시 시도해 주세요.', { id: 'experience-delete-error', position: 'top-center' })
+      onError: () => toast.error('삭제에 실패했어요.\n잠시 후 다시 시도해 주세요.', { id: 'experience-delete-error', position: 'top-center' })
     })
   }
 
@@ -254,7 +257,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
           toast.success('경험이 수정되었어요.', { id: 'experience-updated', position: 'top-center' })
           setIsOpen(false)
         },
-        onError: () => toast.error('경험 수정에 실패했어요. 다시 시도해 주세요.', { id: 'experience-update-error', position: 'top-center' })
+        onError: () => toast.error('경험 수정에 실패했어요.\n입력한 내용은 그대로 있으니 다시 시도해 주세요.', { id: 'experience-update-error', position: 'top-center' })
       }
     )
   }

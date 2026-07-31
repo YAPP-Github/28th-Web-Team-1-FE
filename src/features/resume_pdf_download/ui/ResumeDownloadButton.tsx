@@ -32,7 +32,7 @@ export const ResumeDownloadButton = ({ basicInfo, sections, companyName, positio
       toast.success('이력서 다운로드가 완료되었습니다.')
     } catch (error) {
       console.error('이력서 PDF 생성 실패', error)
-      toast.error('PDF를 만드는 중 문제가 발생했어요. 잠시 후 다시 시도해 주세요.')
+      toast.error('PDF를 만드는 중 문제가 발생했어요.\n잠시 후 다시 시도해 주세요.')
     } finally {
       setIsGenerating(false)
     }

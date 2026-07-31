@@ -120,7 +120,7 @@ const JdInsight = ({ workspaceId, jdId }: { workspaceId: string; jdId: string })
   if (!insight) {
     return (
       <Text variant={'label2'} color={'text-subtler'}>
-        공고 인사이트를 불러오지 못했어요.
+        공고 인사이트를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
       </Text>
     )
   }

@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
-import { Heading, Spacing, Text } from '@shared/ui'
+import { ErrorFallback, Heading, Spacing, Text } from '@shared/ui'
 import { JDAnalysisForm } from './JDAnalysisForm'
 
 export const HomePage = () => {
@@ -15,15 +15,7 @@ export const HomePage = () => {
 
       <Spacing size={40} />
 
-      <ErrorBoundary
-        fallback={
-          <Flex align="center" justify="center" className="min-h-105">
-            <Text variant="body1" color="text-subtler">
-              불러오는데 실패했습니다.
-            </Text>
-          </Flex>
-        }
-      >
+      <ErrorBoundary fallback={<ErrorFallback title="채용공고 입력창을 불러오지 못했어요." description="새로고침 후 다시 시도해 주세요." className="min-h-105" />}>
         <Suspense fallback={<div className="min-h-105 w-full" />}>
           <JDAnalysisForm />
         </Suspense>

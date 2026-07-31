@@ -48,7 +48,7 @@ export const AddProjectManualView = ({
 
   const handleExtract = () => {
     if (!selectedProject) {
-      toast.warning('프로젝트를 먼저 추가해 주세요.', { id: 'project-required', position: 'top-center' })
+      toast.warning('프로젝트 이름을 입력해 주세요.', { id: 'project-required', position: 'top-center' })
       return
     }
     if (!content.trim()) {

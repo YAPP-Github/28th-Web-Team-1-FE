@@ -4,7 +4,7 @@ import { Suspense, useRef, type ComponentProps, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
-import { Button, Divider, Heading, Spacing, Text } from '@shared/ui'
+import { Button, Divider, ErrorFallback, Heading, Spacing, Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
 import { formatDate } from '@shared/lib'
 import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
@@ -33,7 +33,7 @@ export const ResumesPage = () => {
 
       <Spacing size={32} />
 
-      <ErrorBoundary fallback={<ResumesFallback>이력서를 불러오는 데 실패했습니다.</ResumesFallback>}>
+      <ErrorBoundary fallback={<ErrorFallback title="이력서 정보를 불러오지 못했어요." description="잠시 후 다시 시도해주세요." className="flex-1" />}>
         <Suspense fallback={<ResumesFallback>불러오는 중...</ResumesFallback>}>
           <ResumeSections />
         </Suspense>
