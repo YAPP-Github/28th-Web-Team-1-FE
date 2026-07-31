@@ -66,12 +66,15 @@ const updateProfileDocument = graphql(`
   }
 `)
 
-/** 프로필 텍스트(핵심역량/경력 세부/경험명+세부내용)를 AI로 다듬는다. { description, title } 결과만 반환하고 저장하지 않는다. */
+/**
+ * 프로필 텍스트(핵심역량/경력 세부/경험)를 AI로 다듬는다. 결과만 반환하고 저장하지 않는다.
+ * kind가 EXPERIENCE이면 title에 다듬은 경험명이 채워지고, 나머지 kind에선 title은 null이다.
+ */
 const polishProfileTextDocument = graphql(`
   mutation PolishProfileText($request: PolishProfileTextRequest!, $workspaceId: ID) {
     polishProfileText(request: $request, workspaceId: $workspaceId) {
-      description
       title
+      description
     }
   }
 `)
