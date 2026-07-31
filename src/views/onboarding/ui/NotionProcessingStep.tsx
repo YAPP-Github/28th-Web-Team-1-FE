@@ -29,9 +29,9 @@ export const NotionProcessingStep = ({ connectionId, pageIds, onDone, onPrev }: 
       { connectionId, pageIds },
       {
         onSuccess: () => onDone(),
-        onError: () => {
+        onError: (error) => {
           onPrev?.()
-          toast.error('경험 가져오기에 실패했어요. 다시 시도해 주세요.', { position: 'top-center' })
+          toast.error(error.message, { position: 'top-center' })
         }
       }
     )
