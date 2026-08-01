@@ -163,7 +163,7 @@ export const ProcessStepsSection = () => {
           {STEPS.map((step) => (
             <Flex key={step.number} align="center" className="shadow-2 w-full gap-[66px] rounded-[40px] bg-white p-16">
               <Flex direction="column" className="w-[500px] shrink-0 gap-8">
-                <div className="relative h-[110px] overflow-hidden opacity-90" aria-hidden>
+                <div className="relative h-[160px] overflow-hidden opacity-90" aria-hidden>
                   <p className="font-elms text-primary-10 text-[220px] leading-none font-bold tracking-[-0.025em]">{step.number}</p>
                 </div>
 
