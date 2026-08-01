@@ -7,6 +7,7 @@ import { DropdownMenu } from 'radix-ui'
 import { type LucideIcon, Home, Layers, PanelLeft, PencilLineIcon, Settings, UserRoundIcon, MessageCircleMore, LogOut } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Divider, Heading, Spacing, Text } from '@shared/ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@shared/ui/tooltip'
 import { UserProfile, UserAvatar } from '@entities/user'
 import { useActivePath } from '@shared/hooks/useActivePath'
 import { useLogout } from '@features/authenticate'
@@ -92,12 +93,15 @@ interface LinkButtonProps {
 const LinkButton = ({ icon: Icon, href, label, isExpanded }: LinkButtonProps) => {
   const isActive = useActivePath(href)
 
-  return (
+  const link = (
     <Link
       href={href}
-      className={cn('flex h-11 items-center gap-3 rounded-md p-3.5', isActive && 'bg-element-white text-text-primary-basic shadow-shadow-1 shadow-md', !isExpanded && 'w-fit')}
+      className={cn(
+        'hover:shadow-1 flex h-11 items-center gap-3 rounded-md p-3.5 transition-shadow',
+        isActive && 'bg-element-white text-text-primary-basic shadow-shadow-1 shadow-md',
+        !isExpanded && 'w-fit'
+      )}
       aria-label={!isExpanded ? label : undefined}
-      title={!isExpanded ? label : undefined}
     >
       <Icon size={16} className="shrink-0" />
       {isExpanded && (
@@ -106,6 +110,17 @@ const LinkButton = ({ icon: Icon, href, label, isExpanded }: LinkButtonProps) =>
         </Text>
       )}
     </Link>
+  )
+
+  if (isExpanded) return link
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{link}</TooltipTrigger>
+      <TooltipContent side="right" sideOffset={8}>
+        {label}
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
