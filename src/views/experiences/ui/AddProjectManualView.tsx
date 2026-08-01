@@ -83,7 +83,7 @@ export const AddProjectManualView = ({
           {projects.length > 0 && <ProjectSelectPopover projects={projects} selectedName={selectedProject?.name ?? ''} onSelect={setSelectedId} />}
           <ProjectCreatePopover projects={projects} onCreate={handleCreateProject} />
         </Flex>
-        <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />
+        <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={2000} value={content} onChange={(e) => setContent(e.target.value)} />
       </Flex>
       <Button variant="primary" size="xl" className="w-full" onClick={handleExtract}>
         경험 추출하기
