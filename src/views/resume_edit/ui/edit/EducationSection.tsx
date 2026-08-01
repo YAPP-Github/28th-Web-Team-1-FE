@@ -2,9 +2,11 @@ import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-f
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Plus, Trash2 } from 'lucide-react'
+import { DEGREE_OPTIONS, EDUCATION_STATUS_OPTIONS } from '@entities/profile'
 import { Section } from './Section'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
+import { FormSelect } from '../form/FormSelect'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
 import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
 
@@ -64,7 +66,7 @@ const EducationSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex:
       <Spacing size={16} />
 
       <Flex className={'w-full gap-4'}>
-        <FormInput name={`${base}.status`} label="상태" clearable={false} placeholder={'졸업예정'} className={'w-full'} />
+        <FormSelect name={`${base}.status`} label="상태" placeholder={'졸업예정'} options={EDUCATION_STATUS_OPTIONS} className={'w-full'} />
         <FormPeriodPicker name={`${base}.period`} label="기간" className={'w-full'} />
       </Flex>
 
@@ -72,7 +74,7 @@ const EducationSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex:
 
       <Flex className={'w-full gap-4'}>
         <FormInput name={`${base}.major`} label="전공" clearable={false} placeholder={'전공을 입력해주세요.'} className={'w-full'} />
-        <FormInput name={`${base}.degree`} label="학위" clearable={false} placeholder={'학위를 입력해주세요.'} className={'w-full'} />
+        <FormSelect name={`${base}.degree`} label="학위" placeholder={'학위를 선택해주세요.'} options={DEGREE_OPTIONS} className={'w-full'} />
       </Flex>
     </Flex>
   )

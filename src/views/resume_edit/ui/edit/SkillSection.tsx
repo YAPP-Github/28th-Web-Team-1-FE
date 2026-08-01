@@ -4,10 +4,9 @@ import { Flex } from '@radix-ui/themes'
 import { Text, Button } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { Chip } from '@shared/ui/chip'
-import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
-import { cn } from '@shared/lib/cn'
-import { Check, ChevronDown, X } from 'lucide-react'
-import { SKILL_LEVEL_LABELS, SKILL_LEVEL_OPTIONS, type SelectOption } from '@entities/profile'
+import { SelectBox } from '@shared/ui/select_box'
+import { X } from 'lucide-react'
+import { SKILL_LEVEL_LABELS, SKILL_LEVEL_OPTIONS } from '@entities/profile'
 import type { SkillLevel } from '@shared/lib/gql/graphql'
 import { Section } from './Section'
 import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
@@ -33,7 +32,7 @@ export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIn
         <Flex flexBasis={'1'} gap={'1'} align={'end'}>
           <Flex className={'w-full'} gap={'1'}>
             <Input label={'기술/도구'} placeholder={'기술명 또는 도구명'} className={'w-6/10'} value={name} onChange={(e) => setName(e.target.value)} />
-            <SkillLevelSelect label={'숙련도'} placeholder={'선택 안 함'} className={'w-4/10'} value={level} onChange={setLevel} />
+            <SelectBox label={'숙련도'} placeholder={'선택 안 함'} className={'w-4/10'} options={SKILL_LEVEL_OPTIONS} value={level} onChange={setLevel} />
           </Flex>
           <Button variant={'secondary'} size={'sm'} className={'h-11.75'} onClick={handleAdd}>
             추가
@@ -47,67 +46,6 @@ export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIn
         </Flex>
       </Flex>
     </Section>
-  )
-}
-
-const SKILL_LEVEL_NONE = '선택 안 함'
-// 값=enum 코드('HIGH'|'MEDIUM'|'LOW'), 라벨=한글('상'|'중'|'하'). 온보딩·마이페이지와 동일한 매핑을 재사용해
-// 폼에는 서버 enum 코드를 그대로 저장(왕복 일치)하고, 화면에만 한글 라벨을 보여준다.
-// '선택 안 함'은 빈 값('')으로 저장돼 저장 시 null 처리된다.
-const SKILL_LEVEL_SELECT_OPTIONS: SelectOption[] = [{ value: '', label: SKILL_LEVEL_NONE }, ...SKILL_LEVEL_OPTIONS]
-
-const SkillLevelSelect = ({ label, placeholder, className, value, onChange }: { label: string; placeholder: string; className?: string; value: string; onChange: (value: string) => void }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const selectedLabel = value ? SKILL_LEVEL_LABELS[value as SkillLevel] : ''
-
-  const handleSelect = (next: string) => {
-    onChange(next)
-    setIsOpen(false)
-  }
-
-  return (
-    <Flex direction={'column'} gap={'2'} className={className}>
-      <Text variant={'label1'} weight={'semibold'} className={'truncate'}>
-        {label}
-      </Text>
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild={true}>
-          <button
-            type={'button'}
-            className={cn(
-              // Input과 동일한 박스 스타일을 맞춰 나란히 놓았을 때 어색하지 않게 한다.
-              'text-body2 flex w-full min-w-0 items-center justify-between gap-2 rounded-lg border px-4 py-3 outline-none',
-              'bg-element-white border-border-subtle transition-[border-color,background-color] duration-150',
-              'hover:bg-element-gray-lighter',
-              'data-[state=open]:bg-element-white data-[state=open]:border-border-primary',
-              value ? 'text-text-basic' : 'text-text-subtler'
-            )}
-          >
-            <span className={'min-w-0 truncate'}>{selectedLabel || placeholder}</span>
-            <ChevronDown className={'text-icon-gray size-5 shrink-0'} strokeWidth={1.67} />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent sideOffset={6} align={'start'} className={'shadow-1 w-(--radix-popover-trigger-width) overflow-hidden rounded-sm'}>
-          {SKILL_LEVEL_SELECT_OPTIONS.map((option) => {
-            const isSelected = value === option.value
-            return (
-              <button
-                key={option.value || 'none'}
-                type={'button'}
-                onClick={() => handleSelect(option.value)}
-                className={cn(
-                  'bg-element-white hover:bg-element-gray-lighter shadow-1 flex items-center justify-between px-3 py-2.5 text-start',
-                  isSelected ? 'text-text-basic' : 'text-text-subtle hover:text-text-basic'
-                )}
-              >
-                <Text variant={'body2'}>{option.label}</Text>
-                {isSelected && <Check className={'text-icon-gray size-4'} />}
-              </button>
-            )
-          })}
-        </PopoverContent>
-      </Popover>
-    </Flex>
   )
 }
 
