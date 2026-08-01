@@ -17,7 +17,7 @@ export const LoginPage = () => {
           <Link href="/">주요기능</Link>
         </Button>
         <Button asChild variant="text" size="xl">
-          <Link href="https://tally.so/r/yPrQ4B" target="_blank" rel="noopener noreferrer">
+          <Link href="https://tally.so/r/zx497a" target="_blank" rel="noopener noreferrer">
             제보
           </Link>
         </Button>
