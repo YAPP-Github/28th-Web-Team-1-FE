@@ -1,8 +1,9 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { Children, Fragment, type ReactNode } from 'react'
-import type { ResumeBasicInfoFieldsFragment } from '@shared/lib/gql/graphql'
+import type { Degree, EducationStatus, ResumeBasicInfoFieldsFragment, SkillLevel } from '@shared/lib/gql/graphql'
 import { formatDate, formatYYYYMM } from '@shared/lib'
 import { payloadsOf, visibleItems, type ResumeSectionData } from '@entities/resume'
+import { DEGREE_LABELS, EDUCATION_STATUS_LABELS, SKILL_LEVEL_LABELS } from '@entities/profile'
 import { FONT_FAMILY } from '../lib/registerPdfFonts'
 
 /**
@@ -144,7 +145,16 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
       return (
         <SectionRow title={displayText}>
           {payloadsOf(items, 'education').map((item, i) => (
-            <ResumeItem key={i} title={[item.schoolName, item.major].filter(Boolean).join(' ')} subtitle={[periodText(item.period), item.degree, item.status]} />
+            <ResumeItem
+              key={i}
+              title={[item.schoolName, item.major].filter(Boolean).join(' ')}
+              // 서버가 enum 코드('BACHELOR'/'GRADUATED')로 내려주므로 표시용 한글 라벨로 변환한다.
+              subtitle={[
+                periodText(item.period),
+                item.degree ? (DEGREE_LABELS[item.degree as Degree] ?? item.degree) : null,
+                item.status ? (EDUCATION_STATUS_LABELS[item.status as EducationStatus] ?? item.status) : null
+              ]}
+            />
           ))}
         </SectionRow>
       )
@@ -179,7 +189,7 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
             {payloadsOf(items, 'skill').map((item, i) => (
               <View key={i} style={styles.skillCell}>
                 <Text style={styles.skillName}>{item.name}</Text>
-                {item.level && <Text style={styles.skillLevel}>{item.level}</Text>}
+                {item.level && <Text style={styles.skillLevel}>{SKILL_LEVEL_LABELS[item.level as SkillLevel] ?? item.level}</Text>}
               </View>
             ))}
           </View>
