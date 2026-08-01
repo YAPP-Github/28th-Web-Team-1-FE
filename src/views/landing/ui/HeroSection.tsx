@@ -10,9 +10,7 @@ export const HeroSection = () => {
       <Image src="/landing/background.png" alt="" fill priority sizes="100vw" className="object-cover" />
 
       <Flex direction="column" align="center" gap="6" className="relative mx-auto max-w-144.5 text-center">
-        <Text variant="display1" weight="bold" className="font-elms text-text-basic tracking-[-0.02em]">
-          SCOOP
-        </Text>
+        <img src="/landing/lading_logo.gif" alt="SCOOP" className="h-34 w-auto" />
         <Flex gap="3" direction="column" align="center">
           <Heading variant="title1" color="text-basic" className="text-balance whitespace-pre-wrap">
             {`경험이 담긴 자료를 업로드하면, \n이력서를 떠먹여 드려요`}

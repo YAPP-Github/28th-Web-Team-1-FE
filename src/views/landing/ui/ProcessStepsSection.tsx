@@ -34,7 +34,7 @@ const JobDescriptionMockup = () => {
   const tabs = ['URL 붙여넣기', '원문 붙여넣기']
 
   return (
-    <Flex direction="column" align="center" className="w-full max-w-[420px]">
+    <Flex direction="column" align="center" className="w-full max-w-105">
       <Flex direction="column" align="center" className="shadow-3 relative z-10 gap-1 rounded-xl bg-white px-4.5 py-3.5 text-center">
         <p className="text-text-basic text-base font-bold tracking-[-0.02em]">지원할 공고의 링크를 입력해주세요</p>
         <p className="text-caption1 text-text-subtle">공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.</p>
@@ -131,7 +131,7 @@ const MatchedExperienceMockup = () => {
 
   return (
     <Flex align="center" className="w-full gap-3">
-      <Flex direction="column" className="w-[210px] shrink-0 gap-2.5">
+      <Flex direction="column" className="w-52.5 shrink-0 gap-2.5">
         {experiences.map((experience) => (
           <ExperienceMatchCard key={experience} label={experience} />
         ))}
@@ -193,26 +193,26 @@ const STEPS = [
 export const ProcessStepsSection = () => {
   return (
     <section className="py-24">
-      <Flex direction="column" align="center" className="mx-auto max-w-[1245px] gap-[100px]">
+      <Flex direction="column" align="center" className="mx-auto max-w-311.25 gap-25">
         <Flex direction="column" align="center" className="gap-3">
-          <p className="font-elms text-primary-50 text-[36px] font-extrabold tracking-[-0.025em]">SCOOP</p>
-          <h2 className="text-text-basic text-[48px] font-bold tracking-[-0.025em]">3단계로 완성하는 맞춤 이력서</h2>
+          <p className="font-elms text-primary-50 text-[36px] font-extrabold tracking-tight">SCOOP</p>
+          <h2 className="text-text-basic text-[48px] font-bold tracking-tight">3단계로 완성하는 맞춤 이력서</h2>
         </Flex>
 
-        <Flex direction="column" className="w-full gap-[60px]">
+        <Flex direction="column" className="w-full gap-15">
           {STEPS.map((step) => (
-            <Flex key={step.number} align="center" className="shadow-2 w-full gap-[66px] rounded-[40px] bg-white p-16">
-              <Flex direction="column" className="w-[500px] shrink-0 gap-8">
-                <div className="relative h-[160px] overflow-hidden opacity-90" aria-hidden>
-                  <p className="font-elms text-primary-10 text-[220px] leading-none font-bold tracking-[-0.025em]">{step.number}</p>
+            <Flex key={step.number} align="center" className="shadow-2 w-full gap-16.5 rounded-[40px] bg-white p-16">
+              <Flex direction="column" className="w-125 shrink-0 gap-8">
+                <div className="relative h-40 overflow-hidden opacity-90" aria-hidden>
+                  <p className="font-elms text-primary-10 text-[220px] leading-none font-bold tracking-tight">{step.number}</p>
                 </div>
 
                 <Flex direction="column" className="gap-6">
                   <Flex direction="column" className="gap-2">
-                    <h3 className="text-text-basic text-[70px] leading-tight font-bold tracking-[-0.025em]">{step.titleEn}</h3>
-                    <p className="text-text-disabled text-[28px] font-semibold tracking-[-0.025em]">{step.titleKo}</p>
+                    <h3 className="text-text-basic text-[70px] leading-tight font-bold tracking-tight">{step.titleEn}</h3>
+                    <p className="text-text-disabled text-[28px] font-semibold tracking-tight">{step.titleKo}</p>
                   </Flex>
-                  <Flex direction="column" className="text-text-subtle text-[20px] leading-[1.5]">
+                  <Flex direction="column" className="text-text-subtle text-[20px] leading-normal">
                     {step.description.map((line) => (
                       <p key={line}>{line}</p>
                     ))}
@@ -220,7 +220,7 @@ export const ProcessStepsSection = () => {
                 </Flex>
               </Flex>
 
-              <Flex align="center" justify="center" className="bg-bg-gray-subtler w-[550px] shrink-0 rounded-[22px] p-10">
+              <Flex align="center" justify="center" className="bg-bg-gray-subtler w-137.5 shrink-0 rounded-[22px] p-10">
                 {step.mockup}
               </Flex>
             </Flex>

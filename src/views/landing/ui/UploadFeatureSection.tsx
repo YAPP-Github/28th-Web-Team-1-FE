@@ -13,8 +13,8 @@ const RESUME_CARDS = [
 export const UploadFeatureSection = () => {
   return (
     <section className="relative overflow-hidden bg-white pt-24 pb-16">
-      <Flex justify="center" className="mx-auto max-w-[1234px] gap-8">
-        <Flex direction="column" className="border-primary-20 shadow-3 flex-1 gap-5 rounded-[32px] border-2 bg-white p-9.5">
+      <Flex justify="center" className="mx-auto max-w-308.5 gap-8">
+        <Flex direction="column" className="border-primary-20 shadow-3 flex-1 gap-5 rounded-4xl border-2 bg-white p-9.5">
           <Flex align="center" className="gap-8">
             <div className="bg-primary-5 text-primary-50 flex size-20 shrink-0 items-center justify-center rounded-[23px]">
               <FilePlus2 size={32} />
@@ -34,16 +34,16 @@ export const UploadFeatureSection = () => {
         </Flex>
       </Flex>
 
-      <img src="/landing/upload-arrows.svg" alt="" className="mx-auto mt-4 block h-15 w-107 opacity-70" aria-hidden />
-
       <div className="relative mt-4 flex flex-col items-center overflow-hidden pt-32 pb-24">
-        <div className="bg-primary-30 absolute top-0 left-1/2 h-[1400px] w-[160%] max-w-[1600px] -translate-x-1/2 rounded-full" aria-hidden />
+        <div className="bg-primary-30 absolute top-0 left-1/2 h-350 w-[160%] max-w-400 -translate-x-1/2 rounded-full" aria-hidden />
 
-        <div className="relative mx-auto h-[320px] w-[1000px] max-w-full">
+        <img src="/landing/upload-arrows.svg" alt="" className="relative mt-2 block h-15 w-107" aria-hidden />
+
+        <div className="relative mx-auto mt-8 h-80 w-250 max-w-full">
           {RESUME_CARDS.map((card, index) => (
             <div
               key={card.label}
-              className={cn('shadow-2 absolute h-[260px] w-[216px] rounded-2xl border border-white bg-white px-6.5 py-6', card.rotate, card.offsetY, card.z)}
+              className={cn('shadow-2 absolute h-65 w-54 rounded-2xl border border-white bg-white px-6.5 py-6', card.rotate, card.offsetY, card.z)}
               style={{ left: `${index * 196}px` }}
             >
               <Flex align="center" justify="between">
@@ -67,7 +67,7 @@ export const UploadFeatureSection = () => {
           <div className="flex size-10 items-center justify-center rounded-full bg-white">
             <Check className="text-primary-50" size={22} />
           </div>
-          <p className="text-[40px] leading-[1.3] font-bold tracking-[-0.025em] text-white">이력서 자동 생성 완료</p>
+          <p className="text-[40px] leading-[1.3] font-bold tracking-tight text-white">이력서 자동 생성 완료</p>
         </Flex>
       </div>
     </section>

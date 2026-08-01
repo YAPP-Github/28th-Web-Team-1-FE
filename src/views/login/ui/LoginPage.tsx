@@ -23,17 +23,16 @@ export const LoginPage = () => {
         </Button>
       </header>
 
-      <Flex direction="column" gap="48px" align="center" justify="center" className="h-screen">
+      <Flex direction="column" gap="64px" align="center" justify="center" className="h-screen">
         <Flex gap="5" direction="column" align="center">
-          {/* TODO : 로고가 생기면 변경 필요 */}
-          <div className="bg-element-primary-lighter text-text-primary-basic flex h-20 w-20 items-center justify-center">LOGO</div>
+          <img src="/landing/login_logo.png" alt="SCOOP" className="w-19.5" />
           <Flex direction="column" gap="2">
             <Flex direction="column" gap="6px" align="center">
-              <Heading variant="display3" color="text-basic">
-                떠먹여주는 이력서, SCOOP
+              <Heading variant="display3" color="text-basic" className="text-center whitespace-pre-wrap">
+                {`채용 마감 하루 전, \n경쟁력 있는 맞춤 이력서를 5분 만에`}
               </Heading>
-              <Text variant="heading2" color="text-subtler">
-                한 번의 경험 정리로, 모든 지원을 더 쉽게
+              <Text variant="heading2" color="text-subtler" className="text-center whitespace-pre-wrap">
+                {`Notion, PDF 등 경험이 담긴 자료를 업로드하면 \n공고에 맞는 이력서로 만들어서 떠먹여 줄게요`}
               </Text>
             </Flex>
           </Flex>

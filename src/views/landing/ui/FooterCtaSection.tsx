@@ -22,8 +22,8 @@ export const FooterCtaSection = () => {
           </Button>
         </Flex>
 
-        <div className="relative h-[163px] w-100 shrink-0">
-          <Flex align="center" justify="center" className="h-[303px] w-67.5">
+        <div className="relative h-40.75 w-100 shrink-0">
+          <Flex align="center" justify="center" className="h-75.75 w-67.5">
             <div className="mt-8 rotate-[13.21deg]">
               <div className="shadow-2 h-65 w-54 rounded-2xl border border-white bg-white px-6.5 pt-6 pb-10">
                 <Flex align="center" justify="between">
@@ -31,7 +31,7 @@ export const FooterCtaSection = () => {
                     <span className="bg-primary-5 absolute inset-x-0 bottom-0.5 h-2.5 rounded-full" aria-hidden />
                     <p className="text-text-subtler relative text-[24px] leading-[1.35] font-bold tracking-[-0.02em]">이력서 A</p>
                   </div>
-                  <span className="bg-primary-10 size-[30px] shrink-0 rounded-full" aria-hidden />
+                  <span className="bg-primary-10 size-7.5 shrink-0 rounded-full" aria-hidden />
                 </Flex>
                 <Flex direction="column" className="mt-4 gap-5">
                   <div className="bg-primary-10 h-3.5 w-full rounded-full" />
@@ -46,7 +46,7 @@ export const FooterCtaSection = () => {
           <Sparkle className="absolute top-13 left-82 text-white" size={41} fill="currentColor" />
           <Sparkle className="absolute top-5 left-94 text-white" size={25} fill="currentColor" />
 
-          <span className="bg-primary-30 shadow-3 absolute top-[118px] left-53 rounded-full px-3.5 py-1.5 text-xl font-semibold whitespace-nowrap text-white">90% 매칭</span>
+          <span className="bg-primary-30 shadow-3 absolute top-29.5 left-53 rounded-full px-3.5 py-1.5 text-xl font-semibold whitespace-nowrap text-white">90% 매칭</span>
         </div>
       </Flex>
     </section>
