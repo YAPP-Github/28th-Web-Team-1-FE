@@ -66,7 +66,7 @@ const EducationSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex:
       <Spacing size={16} />
 
       <Flex className={'w-full gap-4'}>
-        <FormSelect name={`${base}.status`} label="상태" placeholder={'졸업예정'} options={EDUCATION_STATUS_OPTIONS} className={'w-full'} />
+        <FormSelect name={`${base}.status`} label="상태" placeholder={'선택 안 함'} options={EDUCATION_STATUS_OPTIONS} className={'w-full'} />
         <FormPeriodPicker name={`${base}.period`} label="기간" className={'w-full'} />
       </Flex>
 
@@ -74,7 +74,7 @@ const EducationSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex:
 
       <Flex className={'w-full gap-4'}>
         <FormInput name={`${base}.major`} label="전공" clearable={false} placeholder={'전공을 입력해주세요.'} className={'w-full'} />
-        <FormSelect name={`${base}.degree`} label="학위" placeholder={'학위를 선택해주세요.'} options={DEGREE_OPTIONS} className={'w-full'} />
+        <FormSelect name={`${base}.degree`} label="학위" placeholder={'선택 안 함'} options={DEGREE_OPTIONS} className={'w-full'} />
       </Flex>
     </Flex>
   )
