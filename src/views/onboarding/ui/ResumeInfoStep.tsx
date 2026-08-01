@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Flex, Grid } from '@radix-ui/themes'
 import { Award, Book, BookMarked, BookType, ClipboardPen, GraduationCap, Pencil, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button, Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogClose } from '@shared/ui/dialog'
@@ -25,7 +26,10 @@ export const ResumeInfoStep = ({ onDone, onPrev }: OnboardingStepProps) => {
   const [sections, setSections] = useState<ResumeSectionInstance[]>(() => profileToSections(profile))
 
   const handleNext = () => {
-    updateProfile(sectionsToUpdateRequest(sections), { onSuccess: () => onDone() })
+    updateProfile(sectionsToUpdateRequest(sections), {
+      onSuccess: () => onDone(),
+      onError: (error) => toast.error(error.message, { position: 'top-center' })
+    })
   }
 
   const updateSection = (id: string, values: Record<string, string>) => {
