@@ -37,8 +37,8 @@ export const Sidebar = () => {
       <header className={cn('flex h-10', isEffectiveExpanded ? 'justify-between' : 'justify-center')}>
         {isEffectiveExpanded && (
           <Link href="/home">
-            <Heading size={'6'} weight={'bold'} className={cn('border-border-subtle font-elms overflow-hidden rounded-sm border px-2 py-1 tracking-[-0.02em] whitespace-nowrap')}>
-              Scoop
+            <Heading size={'6'} weight={'bold'} className={cn('font-elms overflow-hidden whitespace-nowrap')}>
+              SCOOP
             </Heading>
           </Link>
         )}
