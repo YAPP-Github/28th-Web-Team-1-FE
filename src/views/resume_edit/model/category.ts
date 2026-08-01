@@ -9,7 +9,7 @@ export const SECTION_CATEGORY_LABELS: Record<ResumeSectionType, string> = {
   BASIC_INFO: '기본정보',
   CORE_SKILL: '핵심역량',
   EXPERIENCE: '경험',
-  CAREER: '경력',
+  CAREER: '경력 / 활동',
   EDUCATION: '학력',
   AWARD: '수상',
   CERTIFICATE: '자격증',

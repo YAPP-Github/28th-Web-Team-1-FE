@@ -1,4 +1,5 @@
 import type { ResumeFormSection } from '../../model/resume-form.types'
+import { SECTION_CATEGORY_LABELS } from '../../model/category'
 import { AwardSection } from './AwardSection'
 import { BasicInfoSection } from './BasicInfoSection'
 import { CareerSection } from './CarrerSection'
@@ -21,7 +22,7 @@ export const ResumeSectionEdit = ({ section, sectionIndex, targetJdId }: { secti
     case 'BASIC_INFO':
       return <BasicInfoSection title={displayText} sectionIndex={sectionIndex} />
     case 'CAREER':
-      return <CareerSection title={displayText} sectionIndex={sectionIndex} targetJdId={targetJdId} />
+      return <CareerSection title={SECTION_CATEGORY_LABELS.CAREER} sectionIndex={sectionIndex} targetJdId={targetJdId} />
     case 'CORE_SKILL':
       return <CoreSkillSection title={displayText} sectionIndex={sectionIndex} targetJdId={targetJdId} />
     case 'EXPERIENCE':

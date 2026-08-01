@@ -174,7 +174,7 @@ const SortableSectionRow = ({ id, sectionIndex, section, isActive, onSelect }: {
         </button>
 
         <Text variant="label2" color={'text-subtler'} className={'w-full truncate px-1.5 py-1'}>
-          {section.displayText}
+          {SECTION_CATEGORY_LABELS[section.type]}
         </Text>
       </Flex>
 
@@ -201,7 +201,7 @@ const SectionDragOverlay = ({ section }: { section: ResumeFormSection }) => {
         </div>
 
         <Text variant="label2" color={'text-subtler'} className={'w-full truncate px-1.5 py-1'}>
-          {section.displayText}
+          {SECTION_CATEGORY_LABELS[section.type]}
         </Text>
       </Flex>
       <Flex direction="column" gap="1">

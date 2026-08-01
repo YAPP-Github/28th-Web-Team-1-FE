@@ -31,7 +31,7 @@ export const CareerSection = ({ title, sectionIndex, targetJdId }: { title: stri
             append({ itemId: null, displayOrder: nextDisplayOrder(fields), visible: true, payload: { ...emptyItemPayload, career: { companyName: '', role: null, contents: '', period: null } } })
           }
         >
-          경력추가
+          경력 / 활동 추가
           <Plus size={16} data-icon="inline-end" />
         </Button>
       }
