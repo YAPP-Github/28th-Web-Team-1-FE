@@ -18,8 +18,8 @@ export const BasicInfoSection = ({ title, sectionIndex }: { title: string; secti
         <FormInput name={`${base}.name`} label="이름" clearable={false} placeholder={'이름을 입력해주세요.'} />
         <Spacing size={16} />
         <Flex className={'w-full gap-4'}>
-          <FormInput name={`${base}.email`} label="이메일" clearable={false} placeholder={'이메일을 입력해주세요.'} className={'w-full'} disabled={shouldHideContact} />
           <FormInput name={`${base}.phone`} label="전화번호" clearable={false} placeholder={'010-0000-0000'} className={'w-full'} disabled={shouldHideContact} />
+          <FormInput name={`${base}.email`} label="이메일" clearable={false} placeholder={'이메일을 입력해주세요.'} className={'w-full'} disabled={shouldHideContact} />
         </Flex>
 
         <Spacing size={16} />
