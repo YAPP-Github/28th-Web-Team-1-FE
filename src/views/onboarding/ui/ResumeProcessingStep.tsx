@@ -32,9 +32,9 @@ export const ResumeProcessingStep = ({ file, onDone, onPrev }: ResumeProcessingS
         onDone?.()
         queryClient.invalidateQueries({ queryKey: profileKeys.detail(workspaceId) })
       },
-      onError: () => {
+      onError: (error) => {
         onPrev?.()
-        toast.error('PDF를 업로드하지 못했어요.\n다시 시도해 주세요.', { position: 'top-center' })
+        toast.error(error.message, { position: 'top-center' })
       }
     })
   }, [file, uploadPdf, queryClient, workspaceId, onPrev, onDone])
