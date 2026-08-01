@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { ArrowRight, Check } from 'lucide-react'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
@@ -67,7 +68,9 @@ const ExperienceMatchCard = ({ label }: { label: string }) => (
   <Flex direction="column" className="shadow-2 w-full gap-2 rounded-lg bg-white p-2.5">
     <Flex align="center" justify="between">
       <Flex align="center" className="gap-1.5">
-        <div className="border-border-subtle size-3 rounded-[3px] border" />
+        <div className="border-border-subtle flex size-3 items-center justify-center rounded-[3px] border">
+          <Check className="text-text-subtler" size={8} strokeWidth={3} />
+        </div>
         <p className="text-text-bolder text-[11px] font-semibold">{label}</p>
       </Flex>
       <span className="bg-green-10 text-green-60 rounded-full px-1.5 py-0.5 text-[9px] font-medium">매칭 90%</span>
@@ -96,6 +99,33 @@ const ExperienceMatchCard = ({ label }: { label: string }) => (
   </Flex>
 )
 
+const ResumeSection = ({ label, children }: { label: string; children: ReactNode }) => (
+  <Flex className="gap-3">
+    <p className="text-text-subtler w-11 shrink-0 text-[9px]">{label}</p>
+    <Flex direction="column" className="flex-1 gap-2">
+      {children}
+    </Flex>
+  </Flex>
+)
+
+const ResumeEntry = ({ lines = 0 }: { lines?: number }) => (
+  <Flex direction="column" className="gap-1.5">
+    <div className="bg-bg-gray-subtle h-1.5 w-[45%] rounded-full" />
+    <Flex align="center" className="gap-1.5">
+      <div className="bg-bg-gray-subtler h-1 w-8 rounded-full" />
+      <div className="bg-border-subtler h-2 w-px" />
+      <div className="bg-bg-gray-subtler h-1 w-12 rounded-full" />
+    </Flex>
+    {lines > 0 && (
+      <Flex direction="column" className="gap-1 pt-0.5">
+        {Array.from({ length: lines }).map((_, index) => (
+          <div key={index} className="bg-bg-gray-subtler h-1.5 w-full rounded-full" />
+        ))}
+      </Flex>
+    )}
+  </Flex>
+)
+
 const MatchedExperienceMockup = () => {
   const experiences = ['경험 1', '경험 2', '경험 3']
 
@@ -109,18 +139,28 @@ const MatchedExperienceMockup = () => {
 
       <ArrowRight className="text-text-subtler shrink-0" size={18} />
 
-      <Flex direction="column" className="shadow-3 flex-1 gap-2.5 rounded-xl bg-white p-4">
+      <Flex direction="column" className="shadow-3 flex-1 gap-3 rounded-xl bg-white p-4">
         <Flex align="center" justify="between">
           <p className="text-text-basic text-sm font-bold">김스쿱</p>
-          <Check className="text-primary-50" size={14} />
+          <div className="bg-bg-gray-subtler h-1 w-14 rounded-full" />
         </Flex>
         <div className="border-border-subtler border-t" />
-        <Flex direction="column" className="gap-1.5">
-          <div className="bg-bg-gray-subtle h-1.5 w-1/3 rounded-full" />
-          <div className="bg-bg-gray-subtle h-1.5 w-full rounded-full" />
-          <div className="bg-bg-gray-subtle h-1.5 w-full rounded-full" />
-          <div className="bg-bg-gray-subtle h-1.5 w-2/3 rounded-full" />
-        </Flex>
+
+        <ResumeSection label="핵심 역량">
+          <div className="bg-bg-gray-subtler h-1.5 w-full rounded-full" />
+          <div className="bg-bg-gray-subtler h-1.5 w-[55%] rounded-full" />
+        </ResumeSection>
+
+        <ResumeSection label="경험">
+          <ResumeEntry lines={2} />
+          <ResumeEntry lines={2} />
+          <ResumeEntry lines={2} />
+        </ResumeSection>
+
+        <ResumeSection label="학력">
+          <ResumeEntry />
+          <ResumeEntry />
+        </ResumeSection>
       </Flex>
     </Flex>
   )
