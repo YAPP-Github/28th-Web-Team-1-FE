@@ -7,6 +7,8 @@ import { Chip } from '@shared/ui/chip'
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
 import { cn } from '@shared/lib/cn'
 import { Check, ChevronDown, X } from 'lucide-react'
+import { SKILL_LEVEL_LABELS, SKILL_LEVEL_OPTIONS, type SelectOption } from '@entities/profile'
+import type { SkillLevel } from '@shared/lib/gql/graphql'
 import { Section } from './Section'
 import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
 
@@ -49,14 +51,17 @@ export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIn
 }
 
 const SKILL_LEVEL_NONE = '선택 안 함'
-const SKILL_LEVELS = [SKILL_LEVEL_NONE, '상', '중', '하'] as const
+// 값=enum 코드('HIGH'|'MEDIUM'|'LOW'), 라벨=한글('상'|'중'|'하'). 온보딩·마이페이지와 동일한 매핑을 재사용해
+// 폼에는 서버 enum 코드를 그대로 저장(왕복 일치)하고, 화면에만 한글 라벨을 보여준다.
+// '선택 안 함'은 빈 값('')으로 저장돼 저장 시 null 처리된다.
+const SKILL_LEVEL_SELECT_OPTIONS: SelectOption[] = [{ value: '', label: SKILL_LEVEL_NONE }, ...SKILL_LEVEL_OPTIONS]
 
 const SkillLevelSelect = ({ label, placeholder, className, value, onChange }: { label: string; placeholder: string; className?: string; value: string; onChange: (value: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const selectedLabel = value ? SKILL_LEVEL_LABELS[value as SkillLevel] : ''
 
   const handleSelect = (next: string) => {
-    // '선택 안 함'을 고르면 빈 값으로 두어 저장 시 null 처리되게 한다.
-    onChange(next === SKILL_LEVEL_NONE ? '' : next)
+    onChange(next)
     setIsOpen(false)
   }
 
@@ -78,24 +83,24 @@ const SkillLevelSelect = ({ label, placeholder, className, value, onChange }: { 
               value ? 'text-text-basic' : 'text-text-subtler'
             )}
           >
-            <span className={'min-w-0 truncate'}>{value || placeholder}</span>
+            <span className={'min-w-0 truncate'}>{selectedLabel || placeholder}</span>
             <ChevronDown className={'text-icon-gray size-5 shrink-0'} strokeWidth={1.67} />
           </button>
         </PopoverTrigger>
         <PopoverContent sideOffset={6} align={'start'} className={'shadow-1 w-(--radix-popover-trigger-width) overflow-hidden rounded-sm'}>
-          {SKILL_LEVELS.map((option) => {
-            const isSelected = option === SKILL_LEVEL_NONE ? value === '' : value === option
+          {SKILL_LEVEL_SELECT_OPTIONS.map((option) => {
+            const isSelected = value === option.value
             return (
               <button
-                key={option}
+                key={option.value || 'none'}
                 type={'button'}
-                onClick={() => handleSelect(option)}
+                onClick={() => handleSelect(option.value)}
                 className={cn(
                   'bg-element-white hover:bg-element-gray-lighter shadow-1 flex items-center justify-between px-3 py-2.5 text-start',
                   isSelected ? 'text-text-basic' : 'text-text-subtle hover:text-text-basic'
                 )}
               >
-                <Text variant={'body2'}>{option}</Text>
+                <Text variant={'body2'}>{option.label}</Text>
                 {isSelected && <Check className={'text-icon-gray size-4'} />}
               </button>
             )
@@ -109,7 +114,9 @@ const SkillLevelSelect = ({ label, placeholder, className, value, onChange }: { 
 const SkillSectionItem = ({ sectionIndex, index, onRemove }: { sectionIndex: number; index: number; onRemove: () => void }) => {
   const { control } = useFormContext<ResumeFormValues>()
   const skill = useWatch({ control, name: `sections.${sectionIndex}.items.${index}.payload.skill` }) as { name?: string; level?: string | null } | undefined
-  const label = skill?.level ? `${skill.name} · ${skill.level}` : (skill?.name ?? '')
+  // 서버/폼에는 enum 코드가 담기므로 표시용 한글 라벨로 변환한다.
+  const levelLabel = skill?.level ? (SKILL_LEVEL_LABELS[skill.level as SkillLevel] ?? skill.level) : ''
+  const label = levelLabel ? `${skill?.name} · ${levelLabel}` : (skill?.name ?? '')
 
   return (
     <Chip asChild={true} variant={'tertiary'} size={'sm'} className={'max-w-50 rounded-full px-4 py-2'}>

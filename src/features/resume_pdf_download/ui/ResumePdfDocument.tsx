@@ -1,8 +1,9 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { Children, Fragment, type ReactNode } from 'react'
-import type { ResumeBasicInfoFieldsFragment } from '@shared/lib/gql/graphql'
+import type { ResumeBasicInfoFieldsFragment, SkillLevel } from '@shared/lib/gql/graphql'
 import { formatDate, formatYYYYMM } from '@shared/lib'
 import { payloadsOf, visibleItems, type ResumeSectionData } from '@entities/resume'
+import { SKILL_LEVEL_LABELS } from '@entities/profile'
 import { FONT_FAMILY } from '../lib/registerPdfFonts'
 
 /**
@@ -179,7 +180,7 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
             {payloadsOf(items, 'skill').map((item, i) => (
               <View key={i} style={styles.skillCell}>
                 <Text style={styles.skillName}>{item.name}</Text>
-                {item.level && <Text style={styles.skillLevel}>{item.level}</Text>}
+                {item.level && <Text style={styles.skillLevel}>{SKILL_LEVEL_LABELS[item.level as SkillLevel] ?? item.level}</Text>}
               </View>
             ))}
           </View>

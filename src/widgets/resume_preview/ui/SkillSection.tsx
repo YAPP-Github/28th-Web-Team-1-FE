@@ -1,5 +1,6 @@
 import { Flex, Grid } from '@radix-ui/themes'
-import type { ResumeSkillFieldsFragment } from '@shared/lib/gql/graphql'
+import type { ResumeSkillFieldsFragment, SkillLevel } from '@shared/lib/gql/graphql'
+import { SKILL_LEVEL_LABELS } from '@entities/profile'
 import { Text } from '@shared/ui'
 import { Section } from './Section'
 
@@ -14,7 +15,7 @@ export const SkillSection = ({ title, items }: { title: string; items: ResumeSki
             </Text>
             {item.level && (
               <Text variant="caption1" color={'text-subtle'}>
-                {item.level}
+                {SKILL_LEVEL_LABELS[item.level as SkillLevel] ?? item.level}
               </Text>
             )}
           </Flex>
