@@ -6,19 +6,18 @@ import { Button, Heading, Text } from '@shared/ui'
 export const FooterCtaSection = () => {
   return (
     <section className="py-24">
-      <Flex align="center" justify="between" className="bg-primary-50 relative mx-auto max-w-[1245px] overflow-hidden rounded-2xl px-16 py-16">
-        <Flex direction="column" gap="4" className="relative z-10">
+      <Flex align="center" justify="between" className="bg-primary-50 relative mx-auto overflow-hidden rounded-4xl px-14 py-14">
+        <Flex direction="column" gap="2" className="relative z-10">
           <Heading variant="title2" color="text-bolder-inverse">
             이력서 작성, 더 이상 혼자 고민하지 마세요
           </Heading>
-          <Text variant="headline2" color="primary-10">
+          <Text variant="heading2" color="primary-0">
             SCOOP이 채용공고에 맞는 맞춤 이력서를 5분 만에 만들어 드려요.
           </Text>
-          {/* TODO : 시작하기 라우트 연결 필요 */}
-          <Button asChild variant="secondary" size="lg" className="mt-4 w-fit rounded-full bg-white">
+          <Button asChild variant="secondary" size="xl" className="text-text-basic mt-8 w-fit bg-white px-8">
             <Link href="/login">
               이력서 만들기
-              <ArrowRight data-icon="inline-end" />
+              <ArrowRight size={20} data-icon="inline-end" />
             </Link>
           </Button>
         </Flex>

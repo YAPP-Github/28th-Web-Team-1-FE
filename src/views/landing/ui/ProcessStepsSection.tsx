@@ -11,14 +11,18 @@ const StarInputMockup = () => {
   ]
 
   return (
-    <Flex direction="column" className="w-full max-w-[420px] gap-4 rounded-2xl border border-border-subtler bg-white p-6 shadow-2">
+    <Flex direction="column" className="w-full gap-3.5">
       {fields.map((field) => (
-        <Flex key={field.en} align="center" className="gap-4">
-          <Flex direction="column" className="w-16 shrink-0">
-            <p className="text-label2 font-semibold text-text-basic">{field.en}</p>
-            <p className="text-caption2 text-text-subtler">{field.ko}</p>
+        <Flex key={field.en} className="gap-2.5">
+          <Flex direction="column" justify="center" className="w-17 shrink-0 gap-0.5">
+            <p className="text-text-basic text-[13px] font-semibold">{field.en}</p>
+            <p className="text-text-subtler text-[12px]">{field.ko}</p>
           </Flex>
-          <div className="h-2 w-full rounded-full bg-bg-gray-subtler" />
+          <Flex direction="column" justify="center" className="h-18 flex-1 gap-2 rounded-[11px] bg-white px-4">
+            <div className="bg-bg-gray-subtler h-1.5 w-[45%] rounded-full" />
+            <div className="bg-bg-gray-subtler h-1.5 w-[92%] rounded-full" />
+            <div className="bg-bg-gray-subtler h-1.5 w-[92%] rounded-full" />
+          </Flex>
         </Flex>
       ))}
     </Flex>
@@ -30,23 +34,27 @@ const JobDescriptionMockup = () => {
 
   return (
     <Flex direction="column" align="center" className="w-full max-w-[420px]">
-      <Flex direction="column" align="center" className="relative z-10 gap-1 rounded-xl bg-white px-4.5 py-3.5 text-center shadow-3">
-        <p className="text-base font-bold tracking-[-0.02em] text-text-basic">지원할 공고의 링크를 입력해주세요</p>
+      <Flex direction="column" align="center" className="shadow-3 relative z-10 gap-1 rounded-xl bg-white px-4.5 py-3.5 text-center">
+        <p className="text-text-basic text-base font-bold tracking-[-0.02em]">지원할 공고의 링크를 입력해주세요</p>
         <p className="text-caption1 text-text-subtle">공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.</p>
       </Flex>
       <div className="h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-white" aria-hidden />
 
-      <Flex direction="column" className="w-full gap-2.5 rounded-2xl border border-border-subtler bg-white p-2">
-        <Flex align="center" className="w-fit gap-1 rounded-lg bg-element-gray-lighter p-1">
+      <Flex direction="column" className="border-border-subtler w-full gap-2 rounded-xl border bg-white p-2">
+        <Flex align="center" className="bg-element-gray-light w-fit gap-1 rounded-lg p-1">
           {tabs.map((tab, index) => (
-            <span key={tab} className={cn('rounded-md px-3 py-1.5 text-label2 font-semibold', index === 0 ? 'bg-white text-text-basic shadow-1' : 'text-text-subtler')}>
+            <span key={tab} className={cn('rounded-md px-3 py-1.5 text-[10px] font-semibold', index === 0 ? 'text-text-basic shadow-1 bg-white' : 'text-text-subtler')}>
               {tab}
             </span>
           ))}
         </Flex>
-        <div className="h-10 w-full" />
+        <Flex direction="column" className="gap-2 px-1 py-1.5">
+          <div className="bg-bg-gray-subtler h-1 w-[40%] rounded-full" />
+          <div className="bg-bg-gray-subtler h-1 w-[88%] rounded-full" />
+          <div className="bg-bg-gray-subtler h-1 w-[88%] rounded-full" />
+        </Flex>
         <Flex justify="end">
-          <div className="flex size-8 items-center justify-center rounded-full bg-primary-50">
+          <div className="bg-primary-50 flex size-8 items-center justify-center rounded-full">
             <ArrowRight className="text-white" size={16} />
           </div>
         </Flex>
@@ -55,34 +63,63 @@ const JobDescriptionMockup = () => {
   )
 }
 
+const ExperienceMatchCard = ({ label }: { label: string }) => (
+  <Flex direction="column" className="shadow-2 w-full gap-2 rounded-lg bg-white p-2.5">
+    <Flex align="center" justify="between">
+      <Flex align="center" className="gap-1.5">
+        <div className="border-border-subtle size-3 rounded-[3px] border" />
+        <p className="text-text-bolder text-[11px] font-semibold">{label}</p>
+      </Flex>
+      <span className="bg-green-10 text-green-60 rounded-full px-1.5 py-0.5 text-[9px] font-medium">매칭 90%</span>
+    </Flex>
+
+    <Flex align="center" className="gap-2">
+      <p className="text-text-subtler w-13 shrink-0 text-[9px]">역할 및 기간</p>
+      <div className="bg-bg-gray-subtler h-1 flex-1 rounded-full" />
+    </Flex>
+
+    <Flex align="start" className="gap-2">
+      <p className="text-text-subtler w-13 shrink-0 text-[9px]">관련 역량</p>
+      <Flex className="flex-1 flex-wrap gap-1">
+        {[0, 1, 2, 3].map((chip) => (
+          <div key={chip} className="bg-bg-gray-subtler h-3 w-8 rounded-sm" />
+        ))}
+      </Flex>
+    </Flex>
+
+    <div className="border-border-subtler border-t" />
+
+    <Flex align="center" className="gap-2">
+      <p className="text-text-subtler w-13 shrink-0 text-[9px]">추천 이유</p>
+      <div className="bg-bg-gray-subtler h-1 flex-1 rounded-full" />
+    </Flex>
+  </Flex>
+)
+
 const MatchedExperienceMockup = () => {
   const experiences = ['경험 1', '경험 2', '경험 3']
 
   return (
-    <Flex align="center" className="w-full max-w-[420px] gap-4">
-      <Flex direction="column" className="flex-1 gap-3">
+    <Flex align="center" className="w-full gap-3">
+      <Flex direction="column" className="w-[210px] shrink-0 gap-2.5">
         {experiences.map((experience) => (
-          <Flex key={experience} align="center" justify="between" className="rounded-xl border border-border-subtler bg-white px-4 py-3 shadow-2">
-            <Flex align="center" className="gap-3">
-              <div className="size-4 rounded-sm border border-border-subtle" />
-              <p className="text-label1 font-semibold text-text-basic">{experience}</p>
-            </Flex>
-            <span className="rounded-full bg-green-10 px-2.5 py-1 text-xs font-semibold text-green-60">매칭 90%</span>
-          </Flex>
+          <ExperienceMatchCard key={experience} label={experience} />
         ))}
       </Flex>
 
-      <ArrowRight className="shrink-0 text-text-subtler" size={20} />
+      <ArrowRight className="text-text-subtler shrink-0" size={18} />
 
-      <Flex direction="column" className="w-[120px] shrink-0 gap-2 rounded-xl bg-white p-3 shadow-3">
+      <Flex direction="column" className="shadow-3 flex-1 gap-2.5 rounded-xl bg-white p-4">
         <Flex align="center" justify="between">
-          <p className="text-caption2 font-semibold text-text-subtler">이력서</p>
-          <Check className="text-primary-50" size={12} />
+          <p className="text-text-basic text-sm font-bold">김스쿱</p>
+          <Check className="text-primary-50" size={14} />
         </Flex>
-        <Flex direction="column" className="mt-2 gap-1.5">
-          <div className="h-1.5 w-full rounded-full bg-bg-gray-subtle" />
-          <div className="h-1.5 w-full rounded-full bg-bg-gray-subtle" />
-          <div className="h-1.5 w-3/4 rounded-full bg-bg-gray-subtle" />
+        <div className="border-border-subtler border-t" />
+        <Flex direction="column" className="gap-1.5">
+          <div className="bg-bg-gray-subtle h-1.5 w-1/3 rounded-full" />
+          <div className="bg-bg-gray-subtle h-1.5 w-full rounded-full" />
+          <div className="bg-bg-gray-subtle h-1.5 w-full rounded-full" />
+          <div className="bg-bg-gray-subtle h-1.5 w-2/3 rounded-full" />
         </Flex>
       </Flex>
     </Flex>
@@ -115,27 +152,27 @@ const STEPS = [
 
 export const ProcessStepsSection = () => {
   return (
-    <section className="bg-bg-gray-subtler py-24">
+    <section className="py-24">
       <Flex direction="column" align="center" className="mx-auto max-w-[1245px] gap-[100px]">
         <Flex direction="column" align="center" className="gap-3">
-          <p className="font-elms text-[36px] font-extrabold tracking-[-0.025em] text-primary-50">SCOOP</p>
-          <h2 className="text-[48px] font-bold tracking-[-0.025em] text-text-basic">3단계로 완성하는 맞춤 이력서</h2>
+          <p className="font-elms text-primary-50 text-[36px] font-extrabold tracking-[-0.025em]">SCOOP</p>
+          <h2 className="text-text-basic text-[48px] font-bold tracking-[-0.025em]">3단계로 완성하는 맞춤 이력서</h2>
         </Flex>
 
         <Flex direction="column" className="w-full gap-[60px]">
           {STEPS.map((step) => (
-            <Flex key={step.number} align="center" className="w-full gap-[66px] rounded-[40px] bg-white p-16 shadow-2">
+            <Flex key={step.number} align="center" className="shadow-2 w-full gap-[66px] rounded-[40px] bg-white p-16">
               <Flex direction="column" className="w-[500px] shrink-0 gap-8">
                 <div className="relative h-[110px] overflow-hidden opacity-90" aria-hidden>
-                  <p className="font-elms text-[220px] leading-none font-bold tracking-[-0.025em] text-primary-10">{step.number}</p>
+                  <p className="font-elms text-primary-10 text-[220px] leading-none font-bold tracking-[-0.025em]">{step.number}</p>
                 </div>
 
                 <Flex direction="column" className="gap-6">
                   <Flex direction="column" className="gap-2">
-                    <h3 className="text-[70px] leading-tight font-bold tracking-[-0.025em] text-text-basic">{step.titleEn}</h3>
-                    <p className="text-[28px] font-semibold tracking-[-0.025em] text-text-disabled">{step.titleKo}</p>
+                    <h3 className="text-text-basic text-[70px] leading-tight font-bold tracking-[-0.025em]">{step.titleEn}</h3>
+                    <p className="text-text-disabled text-[28px] font-semibold tracking-[-0.025em]">{step.titleKo}</p>
                   </Flex>
-                  <Flex direction="column" className="text-[20px] leading-[1.5] text-text-subtle">
+                  <Flex direction="column" className="text-text-subtle text-[20px] leading-[1.5]">
                     {step.description.map((line) => (
                       <p key={line}>{line}</p>
                     ))}
@@ -143,7 +180,7 @@ export const ProcessStepsSection = () => {
                 </Flex>
               </Flex>
 
-              <Flex align="center" justify="center" className="w-[550px] shrink-0 rounded-[22px] bg-bg-gray-subtler p-10">
+              <Flex align="center" justify="center" className="bg-bg-gray-subtler w-[550px] shrink-0 rounded-[22px] p-10">
                 {step.mockup}
               </Flex>
             </Flex>
