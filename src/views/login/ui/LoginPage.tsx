@@ -42,13 +42,15 @@ export const LoginPage = () => {
           <Text variant="label1" color="text-disabled-on" className="text-center">
             계속 진행함에 따라{' '}
             <Button asChild variant="text" size="sm">
-              {/* TODO : 이용약관 링크 추가 필요 */}
-              <Link href="/login#">이용약관</Link>
+              <Link href="https://available-snow-c5b.notion.site/3ac0173187fb80b583f4d497f1721bcc?source=copy_link" target="_blank" rel="noopener noreferrer">
+                이용약관
+              </Link>
             </Button>{' '}
             및{' '}
             <Button asChild variant="text" size="sm">
-              {/* TODO : 개인정보 처리방침 링크 추가 필요 */}
-              <Link href="/login#">개인정보 처리방침</Link>
+              <Link href="https://available-snow-c5b.notion.site/3ac0173187fb80a3af84fbb6bb20f150?source=copy_link" target="_blank" rel="noopener noreferrer">
+                개인정보 처리방침
+              </Link>
             </Button>
             에 동의합니다.
           </Text>

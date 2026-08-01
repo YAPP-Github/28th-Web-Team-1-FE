@@ -13,7 +13,7 @@ const RESUME_CARDS = [
 
 export const UploadFeatureSection = () => {
   return (
-    <section className="overflow-hidden bg-white px-16 pt-24">
+    <section className="overflow-hidden bg-white pt-24">
       <Flex justify="center" gap="6" className="mx-auto max-w-[1234px]">
         <Flex direction="column" gap="4" className="border-border-subtler flex-1 rounded-2xl border p-8">
           <div className="bg-primary-5 text-primary-50 flex size-14 items-center justify-center rounded-xl">

@@ -5,7 +5,7 @@ import { Button, Heading, Text } from '@shared/ui'
 
 export const FooterCtaSection = () => {
   return (
-    <section className="px-16 py-24">
+    <section className="py-24">
       <Flex align="center" justify="between" className="bg-primary-50 relative mx-auto max-w-[1245px] overflow-hidden rounded-2xl px-16 py-16">
         <Flex direction="column" gap="4" className="relative z-10">
           <Heading variant="title2" color="text-bolder-inverse">

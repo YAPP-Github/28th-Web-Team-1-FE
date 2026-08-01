@@ -8,7 +8,7 @@ import { UploadFeatureSection } from './UploadFeatureSection'
 
 export const LandingPage = () => {
   return (
-    <main>
+    <main className="mx-auto max-w-[1504px] px-8">
       <LandingHeader />
       <HeroSection />
       <TaglineSection />

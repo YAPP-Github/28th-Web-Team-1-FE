@@ -98,7 +98,7 @@ const STEPS = [
 
 export const ProcessStepsSection = () => {
   return (
-    <section className="bg-bg-gray-subtler px-16 py-24">
+    <section className="bg-bg-gray-subtler py-24">
       <Flex direction="column" align="center" gap="3">
         <Text variant="label1" color="text-primary-basic" weight="semibold">
           SCOOP

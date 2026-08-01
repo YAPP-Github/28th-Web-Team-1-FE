@@ -6,7 +6,7 @@ import { Button, Heading, Text } from '@shared/ui'
 
 export const HeroSection = () => {
   return (
-    <section className="relative overflow-hidden px-16 pt-20 pb-28">
+    <section className="relative overflow-hidden pt-20 pb-28">
       <Image src="/landing/background.png" alt="" fill priority sizes="100vw" className="object-cover" />
 
       <Flex direction="column" align="center" gap="6" className="relative mx-auto max-w-[578px] text-center">

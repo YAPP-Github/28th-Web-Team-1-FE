@@ -4,7 +4,7 @@ import { Logo } from '@shared/icon'
 
 export const LandingHeader = () => {
   return (
-    <header className="border-border-subtler flex h-26.5 items-center justify-between border-b px-16">
+    <header className="border-border-subtler flex h-26.5 items-center justify-between border-b">
       <div className="flex items-center gap-9">
         <Logo />
         {/* TODO : 주요기능 섹션 링크 연결 필요 */}

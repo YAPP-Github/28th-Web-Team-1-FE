@@ -4,7 +4,7 @@ import { Logo } from '@shared/icon'
 
 export const LandingFooter = () => {
   return (
-    <footer className="border-border-subtler flex h-23.75 items-center gap-8 border-t px-16">
+    <footer className="border-border-subtler flex h-23.75 items-center gap-8 border-t">
       <Logo />
       {/* TODO : 이용약관 링크 연결 필요 */}
       <Button asChild variant="text" size="sm">
