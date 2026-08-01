@@ -19,7 +19,6 @@ export const HeroSection = () => {
         <Text variant="headline2" color="text-subtle" className="text-balance">
           Notion, PDF 등 경험이 담긴 자료를 업로드하면 AI가 핵심 내용을 분석해 지원하는 채용공고에 맞는 이력서로 정리해 드려요.
         </Text>
-        {/* TODO : 시작하기 라우트 연결 필요 */}
         <Button asChild size="lg" className="rounded-full">
           <Link href="/login">
             무료로 시작하기

@@ -8,10 +8,10 @@ export const LandingHeader = () => {
       <div className="flex items-center gap-20">
         <Logo className="text-2xl font-extrabold" />
         {/* TODO : 주요기능 섹션 링크 연결 필요 */}
-        <Button asChild variant="text">
+        <Button asChild variant="text" className="text-text-basic">
           <Link href="#">주요기능</Link>
         </Button>
-        <Button asChild variant="text">
+        <Button asChild variant="text" className="text-text-basic">
           <Link href="https://tally.so/r/yPrQ4B" target="_blank" rel="noopener noreferrer">
             제보
           </Link>
