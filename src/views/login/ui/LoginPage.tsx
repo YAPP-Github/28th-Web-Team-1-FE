@@ -13,42 +13,44 @@ export const LoginPage = () => {
       </Suspense>
       <header className="absolute top-8 left-8 flex items-center gap-16">
         <Logo />
-        {/* TODO : 링크 연결 필요 */}
         <Button asChild variant="text" size="xl">
-          <Link href="/login#">주요기능</Link>
+          <Link href="/">주요기능</Link>
         </Button>
         <Button asChild variant="text" size="xl">
-          <Link href="/login#">제보</Link>
+          <Link href="https://tally.so/r/yPrQ4B" target="_blank" rel="noopener noreferrer">
+            제보
+          </Link>
         </Button>
       </header>
 
-      <Flex direction="column" gap="48px" align="center" justify="center" className="h-screen">
+      <Flex direction="column" gap="64px" align="center" justify="center" className="h-screen">
         <Flex gap="5" direction="column" align="center">
-          {/* TODO : 로고가 생기면 변경 필요 */}
-          <div className="bg-element-primary-lighter text-text-primary-basic flex h-20 w-20 items-center justify-center">LOGO</div>
+          <img src="/landing/login_logo.png" alt="SCOOP" className="w-19.5" />
           <Flex direction="column" gap="2">
             <Flex direction="column" gap="6px" align="center">
-              <Heading variant="display3" color="text-basic">
-                떠먹여주는 이력서, SCOOP
+              <Heading variant="display3" color="text-basic" className="text-center whitespace-pre-wrap">
+                {`채용 마감 하루 전, \n경쟁력 있는 맞춤 이력서를 5분 만에`}
               </Heading>
-              <Text variant="heading2" color="text-subtler">
-                한 번의 경험 정리로, 모든 지원을 더 쉽게
+              <Text variant="heading2" color="text-subtler" className="text-center whitespace-pre-wrap">
+                {`Notion, PDF 등 경험이 담긴 자료를 업로드하면 \n공고에 맞는 이력서로 만들어서 떠먹여 줄게요`}
               </Text>
             </Flex>
           </Flex>
         </Flex>
         <Flex direction="column" gap="4" align="center" className="w-100">
-          <GoogleLoginButton />
+          <GoogleLoginButton redirectTo="/home" />
           <Text variant="label1" color="text-disabled-on" className="text-center">
             계속 진행함에 따라{' '}
             <Button asChild variant="text" size="sm">
-              {/* TODO : 이용약관 링크 추가 필요 */}
-              <Link href="/login#">이용약관</Link>
+              <Link href="https://available-snow-c5b.notion.site/3ac0173187fb80b583f4d497f1721bcc?source=copy_link" target="_blank" rel="noopener noreferrer">
+                이용약관
+              </Link>
             </Button>{' '}
             및{' '}
             <Button asChild variant="text" size="sm">
-              {/* TODO : 개인정보 처리방침 링크 추가 필요 */}
-              <Link href="/login#">개인정보 처리방침</Link>
+              <Link href="https://available-snow-c5b.notion.site/3ac0173187fb80a3af84fbb6bb20f150?source=copy_link" target="_blank" rel="noopener noreferrer">
+                개인정보 처리방침
+              </Link>
             </Button>
             에 동의합니다.
           </Text>

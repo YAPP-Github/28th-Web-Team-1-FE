@@ -5,7 +5,8 @@ import { Flex, Grid } from '@radix-ui/themes'
 import { ArrowRight } from 'lucide-react'
 import { useProjectList } from '@entities/project'
 import { useWorkspaceId } from '@entities/user'
-import { formatPeriod } from '@shared/lib'
+import { ScoopIcon } from '@shared/icon'
+import { cn, formatPeriod } from '@shared/lib'
 import { Button, ErrorFallback, Text } from '@shared/ui'
 import { ExperiencesSearchField } from './ExperiencesSearchField'
 import { AddProjectDialog } from './AddProjectDialog'
@@ -54,21 +55,31 @@ const ExperiencesProjectGrid = () => {
 
   return (
     <Grid columns="4" gapX="4" gapY="6">
-      {projects.map((project) => (
-        <Link key={project.projectId} href={`/experiences/${project.projectId}`} className="w-full">
-          <Flex direction="column" gap="3" className="group pointer-cursor">
-            <div className="bg-element-primary-lighter group-hover:border-btn-secondary-border h-25 w-full rounded-lg transition-all group-hover:border" />
-            <Flex direction="column" gap="1">
-              <Text variant="caption1" color="text-subtler">
-                {formatPeriod(project.period?.startAt, project.period?.endAt, 'YYYY.MM') || '-'}
-              </Text>
-              <Text variant="headline2" className="text-text-basic group-hover:text-text-primary-basic transition-colors">
-                {project.name}
-              </Text>
+      {projects.map((project, index) => {
+        const isEven = index % 2 === 0
+
+        return (
+          <Link key={project.projectId} href={`/experiences/${project.projectId}`} className="w-full">
+            <Flex direction="column" gap="3" className="group pointer-cursor">
+              <Flex
+                align="center"
+                justify="center"
+                className={cn('group-hover:border-btn-secondary-border h-25 w-full overflow-hidden rounded-lg transition-all group-hover:border', isEven ? 'bg-primary-10' : 'bg-primary-5')}
+              >
+                <ScoopIcon size={120} className={isEven ? 'text-primary-0' : 'text-primary-10'} />
+              </Flex>
+              <Flex direction="column" gap="1">
+                <Text variant="caption1" color="text-subtler">
+                  {formatPeriod(project.period?.startAt, project.period?.endAt, 'YYYY.MM') || '-'}
+                </Text>
+                <Text variant="headline2" className="text-text-basic group-hover:text-text-primary-basic transition-colors">
+                  {project.name}
+                </Text>
+              </Flex>
             </Flex>
-          </Flex>
-        </Link>
-      ))}
+          </Link>
+        )
+      })}
       <ResumeCtaCard />
     </Grid>
   )
@@ -95,7 +106,7 @@ const ResumeCtaCard = () => (
           </Text>
         </Flex>
       </Flex>
-      <Button variant="tertiary" size="xs" asChild className="group-hover:bg-btn-primary-fill-hovered group-hover:text-text-bolder-inverse transition-colors">
+      <Button variant="tertiary" size="xs" asChild className="group-hover:bg-btn-primary-fill group-hover:text-text-bolder-inverse transition-colors">
         <span>
           이력서 만들기
           <ArrowRight data-icon="inline-end" />
