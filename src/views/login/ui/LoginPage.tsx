@@ -38,7 +38,7 @@ export const LoginPage = () => {
           </Flex>
         </Flex>
         <Flex direction="column" gap="4" align="center" className="w-100">
-          <GoogleLoginButton />
+          <GoogleLoginButton redirectTo="/home" />
           <Text variant="label1" color="text-disabled-on" className="text-center">
             계속 진행함에 따라{' '}
             <Button asChild variant="text" size="sm">
