@@ -13,12 +13,13 @@ export const LoginPage = () => {
       </Suspense>
       <header className="absolute top-8 left-8 flex items-center gap-16">
         <Logo />
-        {/* TODO : 링크 연결 필요 */}
         <Button asChild variant="text" size="xl">
-          <Link href="/login#">주요기능</Link>
+          <Link href="/">주요기능</Link>
         </Button>
         <Button asChild variant="text" size="xl">
-          <Link href="/login#">제보</Link>
+          <Link href="https://tally.so/r/yPrQ4B" target="_blank" rel="noopener noreferrer">
+            제보
+          </Link>
         </Button>
       </header>
 
