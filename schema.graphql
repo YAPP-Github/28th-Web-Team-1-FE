@@ -1,9 +1,15 @@
-"""This directive allows results to be deferred during execution"""
+"""
+This directive allows results to be deferred during execution
+"""
 directive @defer(
-  """Deferred behaviour is controlled by this argument"""
+  """
+  Deferred behaviour is controlled by this argument
+  """
   if: Boolean! = true
 
-  """A unique label that represents the fragment being deferred"""
+  """
+  A unique label that represents the fragment being deferred
+  """
   label: String
 ) on FRAGMENT_SPREAD | INLINE_FRAGMENT
 
@@ -12,288 +18,493 @@ This directive disables error propagation when a non nullable field returns null
 """
 directive @experimental_disableErrorPropagation on MUTATION | QUERY | SUBSCRIPTION
 
-"""Notion 연결 요청입니다."""
+"""
+Notion 연결 요청입니다.
+"""
 input ConnectNotionRequest {
-  """Notion OAuth authorization code입니다."""
+  """
+  Notion OAuth authorization code입니다.
+  """
   authorizationCode: String!
 
-  """Notion OAuth redirect URI입니다."""
+  """
+  Notion OAuth redirect URI입니다.
+  """
   redirectUri: String!
 }
 
-"""경험 프로젝트 생성 입력입니다."""
+"""
+경험 프로젝트 생성 입력입니다.
+"""
 input CreateExperienceProjectRequest {
-  """경험 프로젝트 이름입니다."""
+  """
+  경험 프로젝트 이름입니다.
+  """
   name: String!
 
-  """경험 프로젝트 진행 기간입니다."""
+  """
+  경험 프로젝트 진행 기간입니다.
+  """
   period: PeriodInput
 
-  """경험 프로젝트 역할입니다."""
+  """
+  경험 프로젝트 역할입니다.
+  """
   role: String
 
-  """경험 프로젝트 요약입니다."""
+  """
+  경험 프로젝트 요약입니다.
+  """
   summary: String!
 }
 
-"""경험 생성 입력입니다."""
+"""
+경험 생성 입력입니다.
+"""
 input CreateExperienceRequest {
-  """경험 상세 내용입니다."""
+  """
+  경험 상세 내용입니다.
+  """
   contents: ExperienceContentsRequest!
 
-  """경험 수행 기간입니다."""
+  """
+  경험 수행 기간입니다.
+  """
   period: PeriodInput
 
-  """연결할 경험 프로젝트 ID입니다."""
+  """
+  연결할 경험 프로젝트 ID입니다.
+  """
   projectId: ID!
 
-  """경험에서 맡은 역할입니다."""
+  """
+  경험에서 맡은 역할입니다.
+  """
   role: String
 
-  """경험에 부여할 태그 목록입니다."""
+  """
+  경험에 부여할 태그 목록입니다.
+  """
   tags: [String!] = []
 
-  """경험 제목입니다."""
+  """
+  경험 제목입니다.
+  """
   title: String!
 }
 
-"""이력서 생성에 사용하는 전체 스냅샷 입력입니다."""
+"""
+이력서 생성에 사용하는 전체 스냅샷 입력입니다.
+"""
 input CreateResumeInput {
-  """이력서 최적화 모드입니다. JOB_SPECIFIC은 대상 채용공고를 기준으로 경험 내용을 첨삭합니다."""
+  """
+  이력서 최적화 모드입니다. JOB_SPECIFIC은 대상 채용공고를 기준으로 경험 내용을 첨삭합니다.
+  """
   optimizationMode: ResumeOptimizationMode! = JOB_SPECIFIC
 
-  """저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다."""
+  """
+  저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다.
+  """
   sections: [SaveResumeSectionInput!]!
 
-  """생성할 이력서 상태입니다."""
+  """
+  생성할 이력서 상태입니다.
+  """
   status: ResumeStatusType!
 
-  """이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다."""
+  """
+  이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다.
+  """
   targetJdId: ID
 
-  """이력서 렌더링에 사용할 템플릿입니다."""
+  """
+  이력서 렌더링에 사용할 템플릿입니다.
+  """
   template: ResumeTemplate!
 }
 
-"""커서 정보입니다."""
+"""
+AI 기능 사용에 소모되는 크레딧입니다.
+"""
+type Credit {
+  """
+  오늘 남은 크레딧입니다.
+  """
+  remaining: Int!
+
+  """
+  하루에 지급되는 총 크레딧입니다.
+  """
+  total: Int!
+}
+
+"""
+커서 정보입니다.
+"""
 type Cursor {
-  """다음 페이지 존재 여부입니다."""
+  """
+  다음 페이지 존재 여부입니다.
+  """
   hasNext: Boolean!
 
-  """다음 페이지를 조회할 때 사용할 커서입니다. (다음 페이지가 없는 경우 null 응답)"""
+  """
+  다음 페이지를 조회할 때 사용할 커서입니다. (다음 페이지가 없는 경우 null 응답)
+  """
   nextCursor: String
 }
 
-"""학위입니다."""
+"""
+학위입니다.
+"""
 enum Degree {
-  """학사"""
+  """
+  학사
+  """
   BACHELOR
 
-  """박사"""
+  """
+  박사
+  """
   DOCTOR
 
-  """석사"""
+  """
+  석사
+  """
   MASTER
 }
 
-"""학적 상태입니다."""
+"""
+학적 상태입니다.
+"""
 enum EducationStatus {
-  """수료"""
+  """
+  수료
+  """
   COMPLETED
 
-  """재학"""
+  """
+  재학
+  """
   ENROLLED
 
-  """졸업예정"""
+  """
+  졸업예정
+  """
   EXPECTED_GRADUATION
 
-  """졸업"""
+  """
+  졸업
+  """
   GRADUATED
 
-  """휴학"""
+  """
+  휴학
+  """
   ON_LEAVE
 }
 
-"""경험입니다."""
+"""
+경험입니다.
+"""
 type Experience {
-  """경험 상세 내용입니다."""
+  """
+  경험 상세 내용입니다.
+  """
   contents: ExperienceContents!
 
-  """경험을 식별하는 ID입니다."""
+  """
+  경험을 식별하는 ID입니다.
+  """
   experienceId: ID!
 
-  """JD 기준 매칭률(0~100)입니다. experiences 조회에 jdId를 준 경우에만 채워집니다."""
+  """
+  JD 기준 매칭률(0~100)입니다. experiences 조회에 jdId를 준 경우에만 채워집니다.
+  """
   matchRate: Int
 
-  """경험 수행 기간입니다."""
+  """
+  경험 수행 기간입니다.
+  """
   period: Period
 
-  """경험이 연결된 프로젝트입니다."""
+  """
+  경험이 연결된 프로젝트입니다.
+  """
   project: ExperienceProject
 
-  """선정 이유입니다. 매칭률 상위 5개 경험에만 채워집니다. (그 외 null)"""
+  """
+  선정 이유입니다. 매칭률 상위 5개 경험에만 채워집니다. (그 외 null)
+  """
   recommendedReason: String
 
-  """경험에서 맡은 역할입니다."""
+  """
+  경험에서 맡은 역할입니다.
+  """
   role: String
 
-  """경험에 부여된 태그 목록입니다."""
+  """
+  경험에 부여된 태그 목록입니다.
+  """
   tags: [String!]!
 
-  """경험 제목입니다."""
+  """
+  경험 제목입니다.
+  """
   title: String!
 }
 
-"""경험 상세 내용입니다."""
+"""
+경험 상세 내용입니다.
+"""
 type ExperienceContents {
-  """FREE 형식의 상세 내용입니다."""
+  """
+  FREE 형식의 상세 내용입니다.
+  """
   free: FreeExperienceContents
 
-  """STAR 형식의 상세 내용입니다."""
+  """
+  STAR 형식의 상세 내용입니다.
+  """
   star: StarExperienceContents
 
-  """경험 상세 내용 타입입니다."""
+  """
+  경험 상세 내용 타입입니다.
+  """
   type: ExperienceContentsType!
 }
 
-"""경험 상세 내용 입력입니다."""
+"""
+경험 상세 내용 입력입니다.
+"""
 input ExperienceContentsRequest {
-  """FREE 형식의 상세 내용입니다."""
+  """
+  FREE 형식의 상세 내용입니다.
+  """
   free: FreeExperienceContentsRequest = null
 
-  """STAR 형식의 상세 내용입니다."""
+  """
+  STAR 형식의 상세 내용입니다.
+  """
   star: StarExperienceContentsRequest = null
 
-  """경험 상세 내용 타입입니다."""
+  """
+  경험 상세 내용 타입입니다.
+  """
   type: ExperienceContentsType!
 }
 
-"""경험 상세 내용 타입입니다."""
+"""
+경험 상세 내용 타입입니다.
+"""
 enum ExperienceContentsType {
-  """자유 서술 형식입니다."""
+  """
+  자유 서술 형식입니다.
+  """
   FREE
 
-  """Situation, Task, Action, Result로 구성된 형식입니다."""
+  """
+  Situation, Task, Action, Result로 구성된 형식입니다.
+  """
   STAR
 }
 
-"""경험 프로젝트입니다."""
+"""
+경험 프로젝트입니다.
+"""
 type ExperienceProject {
-  """경험 프로젝트에 연결된 활성 경험 개수입니다."""
+  """
+  경험 프로젝트에 연결된 활성 경험 개수입니다.
+  """
   experienceCount: Long
 
-  """경험 프로젝트 이름입니다."""
+  """
+  경험 프로젝트 이름입니다.
+  """
   name: String!
 
-  """경험 프로젝트 진행 기간입니다."""
+  """
+  경험 프로젝트 진행 기간입니다.
+  """
   period: Period
 
-  """경험 프로젝트를 식별하는 ID입니다."""
+  """
+  경험 프로젝트를 식별하는 ID입니다.
+  """
   projectId: ID!
 
-  """경험 프로젝트에서 맡은 역할입니다."""
+  """
+  경험 프로젝트에서 맡은 역할입니다.
+  """
   role: String
 
-  """경험 프로젝트 요약입니다."""
+  """
+  경험 프로젝트 요약입니다.
+  """
   summary: String!
 }
 
-"""경험 프로젝트 목록입니다."""
+"""
+경험 프로젝트 목록입니다.
+"""
 type ExperienceProjects {
-  """다음 페이지 조회에 사용하는 커서 정보입니다."""
+  """
+  다음 페이지 조회에 사용하는 커서 정보입니다.
+  """
   cursor: Cursor!
 
-  """조회된 경험 프로젝트 목록입니다."""
+  """
+  조회된 경험 프로젝트 목록입니다.
+  """
   projects: [ExperienceProject!]!
 }
 
-"""경험 목록입니다."""
+"""
+경험 목록입니다.
+"""
 type Experiences {
-  """다음 페이지 조회에 사용하는 커서 정보입니다."""
+  """
+  다음 페이지 조회에 사용하는 커서 정보입니다.
+  """
   cursor: Cursor!
 
-  """조회된 경험 목록입니다."""
+  """
+  조회된 경험 목록입니다.
+  """
   experiences: [Experience!]!
 }
 
-"""FREE 형식의 경험 상세 내용입니다."""
+"""
+FREE 형식의 경험 상세 내용입니다.
+"""
 type FreeExperienceContents {
-  """자유 내용입니다."""
+  """
+  자유 내용입니다.
+  """
   content: String!
 }
 
-"""FREE 형식의 경험 상세 내용 입력입니다."""
+"""
+FREE 형식의 경험 상세 내용 입력입니다.
+"""
 input FreeExperienceContentsRequest {
-  """자유 내용입니다."""
+  """
+  자유 내용입니다.
+  """
   content: String!
 }
 
-"""AI로 생성한 핵심역량입니다."""
+"""
+AI로 생성한 핵심역량입니다.
+"""
 type GeneratedCoreCompetency {
-  """생성된 핵심역량 문단입니다."""
+  """
+  생성된 핵심역량 문단입니다.
+  """
   coreCompetency: String!
 
-  """화면 표시용 JD 지원 전략입니다. jdId를 준 경우에만 채워지며, 핵심역량 생성 입력에는 사용되지 않습니다."""
+  """
+  화면 표시용 JD 지원 전략입니다. jdId를 준 경우에만 채워지며, 핵심역량 생성 입력에는 사용되지 않습니다.
+  """
   strategy: String
 }
 
-"""JD입니다."""
+"""
+JD입니다.
+"""
 type Jd {
-  """기업/팀 소개입니다."""
+  """
+  기업/팀 소개입니다.
+  """
   companyIntro: String!
 
-  """기업 이름입니다. (추출 실패 시 빈 문자열)"""
+  """
+  기업 이름입니다. (추출 실패 시 빈 문자열)
+  """
   companyName: String!
 
-  """핵심 역량 태그입니다. AI가 공고에서 추출한 상위 핵심 역량(최대 5개). 아카이브 카드용."""
+  """
+  핵심 역량 태그입니다. AI가 공고에서 추출한 상위 핵심 역량(최대 5개). 아카이브 카드용.
+  """
   coreCompetencies: [String!]!
 
-  """등록일입니다. (ISO-8601)"""
+  """
+  등록일입니다. (ISO-8601)
+  """
   createdAt: String
 
-  """전형 절차 목록입니다."""
+  """
+  전형 절차 목록입니다.
+  """
   hiringProcess: [String!]!
 
-  """JD 등록 시 워크스페이스 프로필을 기반으로 생성해 저장한 지원 전략입니다."""
+  """
+  JD 등록 시 워크스페이스 프로필을 기반으로 생성해 저장한 지원 전략입니다.
+  """
   insight: JdInsight!
 
-  """JD를 식별하는 ID입니다."""
+  """
+  JD를 식별하는 ID입니다.
+  """
   jdId: ID!
 
-  """포지션 이름입니다. (추출 실패 시 빈 문자열)"""
+  """
+  포지션 이름입니다. (추출 실패 시 빈 문자열)
+  """
   positionTitle: String!
 
-  """우대 경험 목록입니다."""
+  """
+  우대 경험 목록입니다.
+  """
   preferredExperiences: [String!]!
 
-  """필요 경험(자격요건) 목록입니다."""
+  """
+  필요 경험(자격요건) 목록입니다.
+  """
   requiredExperiences: [String!]!
 
-  """업무 내용 목록입니다."""
+  """
+  업무 내용 목록입니다.
+  """
   responsibilities: [String!]!
 
-  """등록에 사용된 공고 원문입니다. 원문 조회 화면용이며, 기능 이전에 등록된 JD는 null입니다."""
+  """
+  등록에 사용된 공고 원문입니다. 원문 조회 화면용이며, 기능 이전에 등록된 JD는 null입니다.
+  """
   sourceBody: String
 
-  """원본 공고 URL입니다. (붙여넣기 등록이면 null)"""
+  """
+  원본 공고 URL입니다. (붙여넣기 등록이면 null)
+  """
   sourceUrl: String
 
-  """이력서 생성 진행 상태입니다. (AR0001 진행 중/완료 섹션 구분)"""
+  """
+  이력서 생성 진행 상태입니다. (AR0001 진행 중/완료 섹션 구분)
+  """
   status: JdStatus!
 }
 
-"""다중 공고 후보입니다."""
+"""
+다중 공고 후보입니다.
+"""
 type JdCandidate {
-  """공고 원문 본문입니다. (재등록 시 body로 전달)"""
+  """
+  공고 원문 본문입니다. (재등록 시 body로 전달)
+  """
   body: String!
 
-  """공고 제목입니다. (없으면 빈 문자열)"""
+  """
+  공고 제목입니다. (없으면 빈 문자열)
+  """
   title: String!
 }
 
-"""JD의 AI 인사이트입니다."""
+"""
+JD의 AI 인사이트입니다.
+"""
 type JdInsight {
-  """지원 전략입니다. 어떤 경험을 어떻게 강조하면 좋을지 조언하는 서술형 문단입니다."""
+  """
+  지원 전략입니다. 어떤 경험을 어떻게 강조하면 좋을지 조언하는 서술형 문단입니다.
+  """
   strategy: String!
 }
 
@@ -302,119 +513,191 @@ JD 등록 입력입니다. sourceUrl 또는 body 중 하나는 필요합니다.
 body가 있으면 크롤 없이 body로 처리하고, sourceUrl은 출처 메타로만 저장됩니다.
 """
 input JdRegisterRequest {
-  """붙여넣은 JD 본문입니다. (붙여넣기 등록)"""
+  """
+  붙여넣은 JD 본문입니다. (붙여넣기 등록)
+  """
   body: String = null
 
-  """등록할 JD 공고의 URL입니다. (크롤 등록)"""
+  """
+  등록할 JD 공고의 URL입니다. (크롤 등록)
+  """
   sourceUrl: String = null
 }
 
-"""JD 등록 결과입니다. 단일 공고면 jd, 다중 공고면 candidates가 채워집니다."""
+"""
+JD 등록 결과입니다. 단일 공고면 jd, 다중 공고면 candidates가 채워집니다.
+"""
 type JdRegisterResult {
-  """저장되지 않은 공고 후보 목록입니다. (다중 공고 - 하나를 골라 body로 재등록)"""
+  """
+  저장되지 않은 공고 후보 목록입니다. (다중 공고 - 하나를 골라 body로 재등록)
+  """
   candidates: [JdCandidate!]
 
-  """등록된 JD입니다. (단일 공고)"""
+  """
+  등록된 JD입니다. (단일 공고)
+  """
   jd: Jd
 }
 
-"""JD 목록 정렬 기준입니다."""
+"""
+JD 목록 정렬 기준입니다.
+"""
 enum JdSortType {
-  """최신순(등록 역순)입니다."""
+  """
+  최신순(등록 역순)입니다.
+  """
   LATEST
 
-  """회사명 가나다순입니다."""
+  """
+  회사명 가나다순입니다.
+  """
   NAME
 }
 
-"""JD의 이력서 생성 진행 상태입니다."""
+"""
+JD의 이력서 생성 진행 상태입니다.
+"""
 enum JdStatus {
-  """연결된 이력서 생성 완료입니다."""
+  """
+  연결된 이력서 생성 완료입니다.
+  """
   COMPLETED
 
-  """이력서 미완성(등록 직후 기본)입니다."""
+  """
+  이력서 미완성(등록 직후 기본)입니다.
+  """
   IN_PROGRESS
 }
 
-"""64-bit signed integer"""
+"""
+64-bit signed integer
+"""
 scalar Long
 
 type Mutation {
-  """워크스페이스에 Notion을 연결합니다."""
+  """
+  워크스페이스에 Notion을 연결합니다.
+  """
   connectNotion(
-    """Notion 연결 요청입니다."""
+    """
+    Notion 연결 요청입니다.
+    """
     request: ConnectNotionRequest!
 
-    """Notion을 연결할 워크스페이스 ID입니다."""
+    """
+    Notion을 연결할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): NotionConnection!
 
-  """경험을 생성합니다."""
+  """
+  경험을 생성합니다.
+  """
   createExperience(
-    """생성할 경험 정보입니다."""
+    """
+    생성할 경험 정보입니다.
+    """
     request: CreateExperienceRequest!
 
-    """경험을 생성할 워크스페이스 ID입니다."""
+    """
+    경험을 생성할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Experience!
 
-  """경험 프로젝트를 생성합니다."""
+  """
+  경험 프로젝트를 생성합니다.
+  """
   createExperienceProject(
-    """생성할 경험 프로젝트 정보입니다."""
+    """
+    생성할 경험 프로젝트 정보입니다.
+    """
     input: CreateExperienceProjectRequest!
 
-    """경험 프로젝트를 생성할 워크스페이스 ID입니다."""
+    """
+    경험 프로젝트를 생성할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): ExperienceProject!
 
-  """새 이력서를 전체 스냅샷 단위로 생성합니다."""
+  """
+  새 이력서를 전체 스냅샷 단위로 생성합니다.
+  """
   createResume(
-    """생성할 이력서 전체 스냅샷입니다."""
+    """
+    생성할 이력서 전체 스냅샷입니다.
+    """
     input: CreateResumeInput!
 
-    """이력서를 생성할 워크스페이스 ID입니다."""
+    """
+    이력서를 생성할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Resume!
 
-  """경험을 삭제합니다."""
+  """
+  경험을 삭제합니다.
+  """
   deleteExperience(
-    """삭제할 경험 ID입니다."""
+    """
+    삭제할 경험 ID입니다.
+    """
     experienceId: ID!
 
-    """경험이 속한 워크스페이스 ID입니다."""
-    workspaceId: ID!
-  ): Boolean!
-
-  """경험 프로젝트를 삭제합니다."""
-  deleteExperienceProject(
-    """삭제할 경험 프로젝트 ID입니다."""
-    projectId: ID!
-
-    """경험 프로젝트가 속한 워크스페이스 ID입니다."""
-    workspaceId: ID!
-  ): Boolean!
-
-  """이력서를 삭제합니다."""
-  deleteResume(
-    """삭제할 이력서 ID입니다."""
-    resumeId: ID!
-
-    """이력서가 속한 워크스페이스 ID입니다."""
-    workspaceId: ID!
-  ): Boolean!
-
-  """워크스페이스에서 Notion 연결을 해제합니다."""
-  disconnectNotion(
-    """Notion 연결 ID입니다."""
-    connectionId: ID!
-
-    """Notion 연결이 속한 워크스페이스 ID입니다."""
+    """
+    경험이 속한 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Boolean!
 
   """
-  프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성합니다.
-  생성 결과는 응답으로만 반환하고, 이력서에는 생성 성공 여부만 기록합니다.
+  경험 프로젝트를 삭제합니다.
+  """
+  deleteExperienceProject(
+    """
+    삭제할 경험 프로젝트 ID입니다.
+    """
+    projectId: ID!
+
+    """
+    경험 프로젝트가 속한 워크스페이스 ID입니다.
+    """
+    workspaceId: ID!
+  ): Boolean!
+
+  """
+  이력서를 삭제합니다.
+  """
+  deleteResume(
+    """
+    삭제할 이력서 ID입니다.
+    """
+    resumeId: ID!
+
+    """
+    이력서가 속한 워크스페이스 ID입니다.
+    """
+    workspaceId: ID!
+  ): Boolean!
+
+  """
+  워크스페이스에서 Notion 연결을 해제합니다.
+  """
+  disconnectNotion(
+    """
+    Notion 연결 ID입니다.
+    """
+    connectionId: ID!
+
+    """
+    Notion 연결이 속한 워크스페이스 ID입니다.
+    """
+    workspaceId: ID!
+  ): Boolean!
+
+  """
+  프로필 정보와 이력서에서 선택한 경험을 바탕으로 핵심역량을 AI로 생성합니다.
+  생성 결과는 응답으로만 반환합니다.
   """
   generateCoreCompetency(
     """
@@ -422,19 +705,29 @@ type Mutation {
     """
     jdId: ID = null
 
-    """생성 여부를 기록할 이력서 ID입니다."""
+    """
+    선택된 경험을 조회할 이력서 ID입니다.
+    """
     resumeId: ID!
 
-    """워크스페이스 ID입니다."""
+    """
+    워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): GeneratedCoreCompetency!
 
-  """Notion 페이지 내용을 경험으로 가져옵니다."""
+  """
+  Notion 페이지 내용을 경험으로 가져옵니다.
+  """
   importNotionExperiences(
-    """Notion 경험 가져오기 요청입니다."""
+    """
+    Notion 경험 가져오기 요청입니다.
+    """
     request: NotionExperienceImportRequest!
 
-    """경험을 가져올 워크스페이스 ID입니다."""
+    """
+    경험을 가져올 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Boolean!
 
@@ -443,21 +736,34 @@ type Mutation {
   이미 완료면 그대로 반환하며, 워크스페이스 밖 JD면 오류를 반환합니다.
   """
   markJdCompleted(
-    """완료 처리할 JD의 ID입니다."""
+    """
+    완료 처리할 JD의 ID입니다.
+    """
     id: ID!
 
-    """JD가 속한 워크스페이스의 ID입니다."""
+    """
+    JD가 속한 워크스페이스의 ID입니다.
+    """
     workspaceId: ID!
   ): Jd!
 
-  """프로필 텍스트(핵심역량/경력 세부/경험명/STAR 설명)를 AI로 다듬습니다. 결과만 반환하고 저장하지 않습니다."""
+  """
+  프로필 텍스트와 경험을 AI로 다듬습니다.
+  kind가 EXPERIENCE이면 title이 필수이며 응답 title에 다듬은 경험명이 채워집니다.
+  나머지 kind에서는 입력 title을 무시하고 응답 title은 null입니다.
+  입력은 최대 2000자이며 결과는 항목별 500자 제한에 맞춰 압축됩니다. 결과만 반환하고 저장하지 않습니다.
+  """
   polishProfileText(
-    """텍스트 다듬기 입력입니다."""
+    """
+    텍스트 다듬기 입력입니다.
+    """
     request: PolishProfileTextRequest!
 
-    """워크스페이스 ID입니다. request.jdId로 지원 전략을 반영할 때 필수입니다."""
+    """
+    워크스페이스 ID입니다. request.jdId로 지원 전략을 반영할 때 필수입니다.
+    """
     workspaceId: ID = null
-  ): String!
+  ): PolishedProfileText!
 
   """
   JD를 URL(크롤) 또는 붙여넣기(본문)로 등록합니다.
@@ -472,31 +778,49 @@ type Mutation {
     """
     request: JdRegisterRequest!
 
-    """등록할 워크스페이스의 ID입니다."""
+    """
+    등록할 워크스페이스의 ID입니다.
+    """
     workspaceId: ID!
   ): JdRegisterResult!
 
-  """경험을 수정합니다."""
+  """
+  경험을 수정합니다.
+  """
   updateExperience(
-    """수정할 경험 ID입니다."""
+    """
+    수정할 경험 ID입니다.
+    """
     experienceId: ID!
 
-    """수정할 경험 정보입니다."""
+    """
+    수정할 경험 정보입니다.
+    """
     request: UpdateExperienceRequest!
 
-    """경험이 속한 워크스페이스 ID입니다."""
+    """
+    경험이 속한 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Experience!
 
-  """경험 프로젝트를 수정합니다."""
+  """
+  경험 프로젝트를 수정합니다.
+  """
   updateExperienceProject(
-    """수정할 경험 프로젝트 ID입니다."""
+    """
+    수정할 경험 프로젝트 ID입니다.
+    """
     projectId: ID!
 
-    """수정할 경험 프로젝트 정보입니다."""
+    """
+    수정할 경험 프로젝트 정보입니다.
+    """
     request: UpdateExperienceProjectRequest!
 
-    """경험 프로젝트가 속한 워크스페이스 ID입니다."""
+    """
+    경험 프로젝트가 속한 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): ExperienceProject!
 
@@ -504,372 +828,635 @@ type Mutation {
   이력서 기본 정보 프로필을 수정합니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다 (빈 리스트 = 비우기, 배열 순서 = 노출 순서).
   """
   updateProfile(
-    """수정할 프로필 정보입니다."""
+    """
+    수정할 프로필 정보입니다.
+    """
     request: UpdateProfileRequest!
 
-    """프로필이 속한 워크스페이스 ID입니다."""
+    """
+    프로필이 속한 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Profile!
 
-  """기존 이력서를 전체 스냅샷 단위로 수정합니다."""
+  """
+  기존 이력서를 전체 스냅샷 단위로 수정합니다.
+  """
   updateResume(
-    """수정할 이력서 전체 스냅샷입니다."""
+    """
+    수정할 이력서 전체 스냅샷입니다.
+    """
     input: SaveResumeInput!
 
-    """수정할 이력서 ID입니다."""
+    """
+    수정할 이력서 ID입니다.
+    """
     resumeId: ID!
 
-    """이력서가 속한 워크스페이스 ID입니다."""
+    """
+    이력서가 속한 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Resume!
 }
 
-"""Notion 연결입니다."""
+"""
+Notion 연결입니다.
+"""
 type NotionConnection {
-  """Notion 연결 ID입니다."""
+  """
+  Notion 연결 ID입니다.
+  """
   connectionId: ID!
 
-  """Notion 워크스페이스 아이콘 URL입니다."""
+  """
+  Notion 워크스페이스 아이콘 URL입니다.
+  """
   notionWorkspaceIcon: String
 
-  """Notion 워크스페이스 이름입니다."""
+  """
+  Notion 워크스페이스 이름입니다.
+  """
   notionWorkspaceName: String
 }
 
-"""Notion 연결 목록입니다."""
+"""
+Notion 연결 목록입니다.
+"""
 type NotionConnections {
-  """조회된 Notion 연결 목록입니다."""
+  """
+  조회된 Notion 연결 목록입니다.
+  """
   connections: [NotionConnection!]!
 
-  """다음 페이지 조회에 사용하는 커서 정보입니다."""
+  """
+  다음 페이지 조회에 사용하는 커서 정보입니다.
+  """
   cursor: Cursor!
 }
 
-"""Notion 경험 가져오기 요청입니다."""
+"""
+Notion 경험 가져오기 요청입니다.
+"""
 input NotionExperienceImportRequest {
-  """Notion 연결 ID입니다."""
+  """
+  Notion 연결 ID입니다.
+  """
   connectionId: ID!
 
-  """가져올 Notion 페이지 ID입니다."""
+  """
+  가져올 Notion 페이지 ID입니다.
+  """
   pageId: String!
 }
 
-"""Notion 페이지 요약입니다."""
+"""
+Notion 페이지 요약입니다.
+"""
 type NotionPageSummary {
-  """마지막 수정 시각입니다."""
+  """
+  마지막 수정 시각입니다.
+  """
   lastEditedTime: String
 
-  """Notion 페이지 ID입니다."""
+  """
+  Notion 페이지 ID입니다.
+  """
   pageId: ID!
 
-  """Notion 페이지 제목입니다."""
+  """
+  Notion 페이지 제목입니다.
+  """
   title: String!
 
-  """Notion 페이지 URL입니다."""
+  """
+  Notion 페이지 URL입니다.
+  """
   url: String
 }
 
-"""Notion 페이지 목록입니다."""
+"""
+Notion 페이지 목록입니다.
+"""
 type NotionPages {
-  """다음 페이지 조회에 사용하는 커서 정보입니다."""
+  """
+  다음 페이지 조회에 사용하는 커서 정보입니다.
+  """
   cursor: Cursor!
 
-  """조회된 Notion 페이지 목록입니다."""
+  """
+  조회된 Notion 페이지 목록입니다.
+  """
   pages: [NotionPageSummary!]!
 }
 
-"""기간입니다."""
+"""
+기간입니다.
+"""
 type Period {
-  """기간 종료일입니다."""
+  """
+  기간 종료일입니다.
+  """
   endAt: String
 
-  """기간 시작일입니다."""
+  """
+  기간 시작일입니다.
+  """
   startAt: String
 }
 
-"""기간 입력입니다."""
+"""
+기간 입력입니다.
+"""
 input PeriodInput {
-  """기간 종료일입니다."""
+  """
+  기간 종료일입니다.
+  """
   endAt: String
 
-  """기간 시작일입니다."""
+  """
+  기간 시작일입니다.
+  """
   startAt: String
 }
 
-"""프로필 텍스트 AI 다듬기 입력입니다."""
+"""
+프로필 텍스트 AI 다듬기 입력입니다.
+"""
 input PolishProfileTextRequest {
-  """직접 작성 지침입니다. 어투, 강조할 수치 등을 자유롭게 적습니다. (최대 200자)"""
+  """
+  다듬을 원문입니다. (최대 2000자) 결과는 항목별 제한 이내로 압축됩니다.
+  """
+  description: String!
+
+  """
+  직접 작성 지침입니다. 어투, 강조할 수치 등을 자유롭게 적습니다. (최대 200자)
+  """
   instruction: String = null
 
-  """JD ID입니다. 주면 해당 JD의 지원 전략을 반영해 다듬습니다. workspaceId와 함께 사용합니다."""
+  """
+  JD ID입니다. 주면 해당 JD의 지원 전략을 반영해 다듬습니다. workspaceId와 함께 사용합니다.
+  """
   jdId: ID = null
 
-  """다듬기 대상 항목입니다. 항목별 글자수 제한에 맞춰 다듬습니다."""
+  """
+  다듬기 대상 항목입니다. 항목별 결과 글자수 제한에 맞춰 다듬습니다.
+  """
   kind: ProfilePolishKind!
 
-  """작성 구조입니다. (불렛형/문제-해결-성과/산문형, 미지정 시 원문 형식 유지)"""
+  """
+  작성 구조입니다. (불렛형/문제-해결-성과/산문형, 미지정 시 원문 형식 유지)
+  """
   structure: PolishStructure = null
 
-  """다듬을 원문입니다. (최대 500자)"""
-  text: String!
-
-  """경험명입니다. 경험 세부 내용을 다듬을 때 맥락으로 사용됩니다. (최대 100자)"""
+  """
+  경험명입니다. kind가 EXPERIENCE이면 필수이며 최대 150자입니다. 나머지 kind에서는 무시합니다.
+  """
   title: String = null
 }
 
-"""첨삭 결과의 작성 구조입니다."""
+"""
+첨삭 결과의 작성 구조입니다.
+"""
 enum PolishStructure {
-  """불렛형"""
+  """
+  불렛형
+  """
   BULLET
 
-  """문제-해결-성과"""
+  """
+  문제-해결-성과
+  """
   PROBLEM_SOLUTION_RESULT
 
-  """산문형"""
+  """
+  산문형
+  """
   PROSE
 }
 
-"""이력서 기본 정보 프로필입니다. 이력서에 들어가는 정보의 원본을 워크스페이스당 1개 관리합니다."""
+"""
+AI로 다듬은 프로필 텍스트입니다.
+"""
+type PolishedProfileText {
+  """
+  다듬은 프로필 텍스트 또는 경험 내용입니다. 입력이 결과 제한보다 길면 핵심을 남겨 압축합니다. (최대 500자)
+  결과만 반환하고 저장하지 않습니다.
+  """
+  description: String!
+
+  """
+  kind가 EXPERIENCE일 때만 다듬은 경험명이 채워집니다. 추가 지침이 비어 있으면 원문 그대로 반환됩니다.
+  추가 지침이 있지만 경험명과 무관하면 AI가 원문 유지를 시도하지만 이를 보장하지 않습니다. (최대 150자)
+  결과만 반환하고 저장하지 않습니다.
+  """
+  title: String
+}
+
+"""
+이력서 기본 정보 프로필입니다. 이력서에 들어가는 정보의 원본을 워크스페이스당 1개 관리합니다.
+"""
 type Profile {
-  """수상 목록입니다."""
+  """
+  수상 목록입니다.
+  """
   awards: [ProfileAward!]!
 
-  """경력 목록입니다."""
+  """
+  경력 목록입니다.
+  """
   careers: [ProfileCareer!]!
 
-  """자격증 목록입니다."""
+  """
+  자격증 목록입니다.
+  """
   certifications: [ProfileCertification!]!
 
-  """핵심역량입니다. (최대 500자)"""
+  """
+  핵심역량입니다. (최대 500자)
+  """
   coreCompetency: String
 
-  """학력 목록입니다."""
+  """
+  학력 목록입니다.
+  """
   educations: [ProfileEducation!]!
 
-  """이메일입니다."""
+  """
+  이메일입니다.
+  """
   email: String
 
-  """어학 목록입니다."""
+  """
+  어학 목록입니다.
+  """
   languageTests: [ProfileLanguageTest!]!
 
-  """이름입니다."""
+  """
+  이름입니다.
+  """
   name: String
 
-  """전화번호입니다."""
+  """
+  전화번호입니다.
+  """
   phone: String
 
-  """프로필을 식별하는 ID입니다."""
+  """
+  프로필을 식별하는 ID입니다.
+  """
   profileId: ID!
 
-  """스킬 목록입니다."""
+  """
+  스킬 목록입니다.
+  """
   skills: [ProfileSkill!]!
 }
 
-"""수상입니다."""
+"""
+수상입니다.
+"""
 type ProfileAward {
-  """수상일입니다. (YYYY-MM-DD)"""
+  """
+  수상일입니다. (YYYY-MM-DD)
+  """
   awardedAt: String
 
-  """수여 기관명입니다."""
+  """
+  수여 기관명입니다.
+  """
   organization: String
 
-  """수상명입니다."""
+  """
+  수상명입니다.
+  """
   title: String
 }
 
-"""수상 입력입니다."""
+"""
+수상 입력입니다.
+"""
 input ProfileAwardRequest {
-  """수상일입니다. (YYYY-MM-DD)"""
+  """
+  수상일입니다. (YYYY-MM-DD)
+  """
   awardedAt: String
 
-  """수여 기관명입니다."""
+  """
+  수여 기관명입니다.
+  """
   organization: String
 
-  """수상명입니다."""
+  """
+  수상명입니다.
+  """
   title: String
 }
 
-"""경력입니다."""
+"""
+경력입니다.
+"""
 type ProfileCareer {
-  """회사명입니다."""
+  """
+  회사명입니다.
+  """
   company: String
 
-  """세부 내용입니다. (최대 500자)"""
+  """
+  세부 내용입니다. (최대 500자)
+  """
   description: String
 
-  """기간입니다."""
+  """
+  기간입니다.
+  """
   period: Period
 
-  """직책입니다."""
+  """
+  직책입니다.
+  """
   position: String
 }
 
-"""경력 입력입니다."""
+"""
+경력 입력입니다.
+"""
 input ProfileCareerRequest {
-  """회사명입니다."""
+  """
+  회사명입니다.
+  """
   company: String
 
-  """세부 내용입니다. (최대 500자)"""
+  """
+  세부 내용입니다. (최대 500자)
+  """
   description: String
 
-  """기간입니다."""
+  """
+  기간입니다.
+  """
   period: PeriodInput
 
-  """직책입니다."""
+  """
+  직책입니다.
+  """
   position: String
 }
 
-"""자격증입니다."""
+"""
+자격증입니다.
+"""
 type ProfileCertification {
-  """취득일입니다. (YYYY-MM-DD)"""
+  """
+  취득일입니다. (YYYY-MM-DD)
+  """
   acquiredAt: String
 
-  """발급 기관명입니다."""
+  """
+  발급 기관명입니다.
+  """
   issuer: String
 
-  """자격명입니다."""
+  """
+  자격명입니다.
+  """
   name: String
 }
 
-"""자격증 입력입니다."""
+"""
+자격증 입력입니다.
+"""
 input ProfileCertificationRequest {
-  """취득일입니다. (YYYY-MM-DD)"""
+  """
+  취득일입니다. (YYYY-MM-DD)
+  """
   acquiredAt: String
 
-  """발급 기관명입니다."""
+  """
+  발급 기관명입니다.
+  """
   issuer: String
 
-  """자격명입니다."""
+  """
+  자격명입니다.
+  """
   name: String
 }
 
-"""학력입니다."""
+"""
+학력입니다.
+"""
 type ProfileEducation {
-  """학위입니다. (학사/석사/박사)"""
+  """
+  학위입니다. (학사/석사/박사)
+  """
   degree: Degree
 
-  """전공명입니다."""
+  """
+  전공명입니다.
+  """
   major: String
 
-  """기간입니다."""
+  """
+  기간입니다.
+  """
   period: Period
 
-  """학교 또는 기관명입니다."""
+  """
+  학교 또는 기관명입니다.
+  """
   school: String
 
-  """학적 상태입니다. (재학/휴학/졸업/졸업예정/수료)"""
+  """
+  학적 상태입니다. (재학/휴학/졸업/졸업예정/수료)
+  """
   status: EducationStatus
 }
 
-"""학력 입력입니다."""
+"""
+학력 입력입니다.
+"""
 input ProfileEducationRequest {
-  """학위입니다. (학사/석사/박사)"""
+  """
+  학위입니다. (학사/석사/박사)
+  """
   degree: Degree
 
-  """전공명입니다."""
+  """
+  전공명입니다.
+  """
   major: String
 
-  """기간입니다."""
+  """
+  기간입니다.
+  """
   period: PeriodInput
 
-  """학교 또는 기관명입니다."""
+  """
+  학교 또는 기관명입니다.
+  """
   school: String
 
-  """학적 상태입니다. (재학/휴학/졸업/졸업예정/수료)"""
+  """
+  학적 상태입니다. (재학/휴학/졸업/졸업예정/수료)
+  """
   status: EducationStatus
 }
 
-"""어학입니다."""
+"""
+어학입니다.
+"""
 type ProfileLanguageTest {
-  """취득일입니다. (YYYY-MM-DD)"""
+  """
+  취득일입니다. (YYYY-MM-DD)
+  """
   acquiredAt: String
 
-  """점수 또는 등급입니다."""
+  """
+  점수 또는 등급입니다.
+  """
   score: String
 
-  """시험명입니다."""
+  """
+  시험명입니다.
+  """
   testName: String
 }
 
-"""어학 입력입니다."""
+"""
+어학 입력입니다.
+"""
 input ProfileLanguageTestRequest {
-  """취득일입니다. (YYYY-MM-DD)"""
+  """
+  취득일입니다. (YYYY-MM-DD)
+  """
   acquiredAt: String
 
-  """점수 또는 등급입니다."""
+  """
+  점수 또는 등급입니다.
+  """
   score: String
 
-  """시험명입니다."""
+  """
+  시험명입니다.
+  """
   testName: String
 }
 
-"""프로필 텍스트 다듬기 대상 항목입니다."""
+"""
+프로필 텍스트 다듬기 대상 항목입니다.
+"""
 enum ProfilePolishKind {
-  """경력 세부 내용 (최대 500자)"""
+  """
+  경력 세부 내용 첨삭 결과 (최대 500자)
+  """
   CAREER_DESCRIPTION
 
-  """핵심역량 (최대 500자)"""
+  """
+  핵심역량 첨삭 결과 (최대 500자)
+  """
   CORE_COMPETENCY
 
-  """경험 STAR 설명 (최대 500자)"""
-  EXPERIENCE_DESCRIPTION
-
-  """경험명 (최대 48자)"""
-  EXPERIENCE_TITLE
+  """
+  경험명과 경험 내용 첨삭입니다. title이 필수이며 경험 내용 결과는 최대 500자입니다.
+  """
+  EXPERIENCE
 }
 
-"""스킬입니다."""
+"""
+스킬입니다.
+"""
 type ProfileSkill {
-  """숙련도입니다. (상/중/하)"""
+  """
+  숙련도입니다. (상/중/하)
+  """
   level: SkillLevel
 
-  """기술 또는 도구명입니다."""
+  """
+  기술 또는 도구명입니다.
+  """
   name: String
 }
 
-"""스킬 입력입니다."""
+"""
+스킬 입력입니다.
+"""
 input ProfileSkillRequest {
-  """숙련도입니다. (상/중/하)"""
+  """
+  숙련도입니다. (상/중/하)
+  """
   level: SkillLevel
 
-  """기술 또는 도구명입니다."""
+  """
+  기술 또는 도구명입니다.
+  """
   name: String
 }
 
 type Query {
-  """경험 단건을 조회합니다."""
+  """
+  인증된 사용자의 오늘 잔여 크레딧을 조회합니다.
+  매일 KST 00:00 기준으로 total로 재초기화되며 이월되지 않습니다.
+  """
+  credit: Credit!
+
+  """
+  경험 단건을 조회합니다.
+  """
   experience(
-    """조회할 경험 ID입니다."""
+    """
+    조회할 경험 ID입니다.
+    """
     experienceId: ID!
 
-    """경험을 조회할 워크스페이스 ID입니다."""
+    """
+    경험을 조회할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Experience
 
-  """경험 프로젝트 단건을 조회합니다."""
+  """
+  경험 프로젝트 단건을 조회합니다.
+  """
   experienceProject(
-    """조회할 경험 프로젝트 ID입니다."""
+    """
+    조회할 경험 프로젝트 ID입니다.
+    """
     projectId: ID!
 
-    """경험 프로젝트가 속한 워크스페이스 ID입니다."""
+    """
+    경험 프로젝트가 속한 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): ExperienceProject!
 
-  """경험 프로젝트 목록을 조회합니다."""
+  """
+  경험 프로젝트 목록을 조회합니다.
+  """
   experienceProjects(
-    """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
+    """
+    다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)
+    """
     cursor: String = null
 
-    """한 번에 조회할 경험 프로젝트 개수입니다. (1 이상 30 이하)"""
+    """
+    한 번에 조회할 경험 프로젝트 개수입니다. (1 이상 30 이하)
+    """
     size: Int! = 10
 
-    """경험 프로젝트 목록을 조회할 워크스페이스 ID입니다."""
+    """
+    경험 프로젝트 목록을 조회할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): ExperienceProjects!
 
-  """경험 목록을 조회합니다 (프로젝트 ID가 있는 경우 특정 프로젝트 내로 한정)"""
+  """
+  경험 목록을 조회합니다 (프로젝트 ID가 있는 경우 특정 프로젝트 내로 한정)
+  """
   experiences(
-    """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
+    """
+    다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)
+    """
     cursor: String = null
 
     """
@@ -877,22 +1464,34 @@ type Query {
     """
     jdId: ID = null
 
-    """특정 프로젝트의 경험만 조회할 때 사용하는 프로젝트 ID입니다 (선택)"""
+    """
+    특정 프로젝트의 경험만 조회할 때 사용하는 프로젝트 ID입니다 (선택)
+    """
     projectId: ID = null
 
-    """한 번에 조회할 경험 개수입니다. (1 이상 30 이하)"""
+    """
+    한 번에 조회할 경험 개수입니다. (1 이상 30 이하)
+    """
     size: Int! = 10
 
-    """경험 목록을 조회할 워크스페이스 ID입니다."""
+    """
+    경험 목록을 조회할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Experiences!
 
-  """등록된 JD 단건을 조회합니다."""
+  """
+  등록된 JD 단건을 조회합니다.
+  """
   jd(
-    """조회할 JD의 ID입니다."""
+    """
+    조회할 JD의 ID입니다.
+    """
     id: ID!
 
-    """조회할 워크스페이스의 ID입니다."""
+    """
+    조회할 워크스페이스의 ID입니다.
+    """
     workspaceId: ID!
   ): Jd
 
@@ -901,590 +1500,968 @@ type Query {
   하위 호환을 위한 독립 조회 API이며, 신규 API에서는 jd.insight를 사용할 수 있습니다.
   """
   jdInsight(
-    """조회할 JD의 ID입니다."""
+    """
+    조회할 JD의 ID입니다.
+    """
     jdId: ID!
 
-    """조회할 워크스페이스의 ID입니다."""
+    """
+    조회할 워크스페이스의 ID입니다.
+    """
     workspaceId: ID!
   ): JdInsight
 
-  """워크스페이스의 JD 목록을 조회합니다."""
+  """
+  워크스페이스의 JD 목록을 조회합니다.
+  """
   jds(
-    """정렬 기준입니다. LATEST(최신순, 기본값) 또는 NAME(회사명 가나다순)."""
+    """
+    정렬 기준입니다. LATEST(최신순, 기본값) 또는 NAME(회사명 가나다순).
+    """
     sort: JdSortType! = LATEST
 
-    """상태 필터입니다. 생략하면 전체, IN_PROGRESS/COMPLETED면 해당 상태만. (AR0001 진행 중/완료 섹션)"""
+    """
+    상태 필터입니다. 생략하면 전체, IN_PROGRESS/COMPLETED면 해당 상태만. (AR0001 진행 중/완료 섹션)
+    """
     status: JdStatus = null
 
-    """조회할 워크스페이스의 ID입니다."""
+    """
+    조회할 워크스페이스의 ID입니다.
+    """
     workspaceId: ID!
   ): [Jd!]!
 
-  """인증된 사용자의 정보를 조회합니다."""
+  """
+  인증된 사용자의 정보를 조회합니다.
+  """
   me: User!
 
-  """워크스페이스에 연결된 Notion 연결 목록을 조회합니다."""
+  """
+  워크스페이스에 연결된 Notion 연결 목록을 조회합니다.
+  """
   notionConnections(
-    """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
+    """
+    다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)
+    """
     cursor: String = null
 
-    """한 번에 조회할 Notion 연결 개수입니다. (1 이상 30 이하)"""
+    """
+    한 번에 조회할 Notion 연결 개수입니다. (1 이상 30 이하)
+    """
     size: Int! = 10
 
-    """워크스페이스 ID입니다."""
+    """
+    워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): NotionConnections!
 
-  """연결된 Notion 워크스페이스에서 페이지를 검색합니다."""
+  """
+  연결된 Notion 워크스페이스에서 페이지를 검색합니다.
+  """
   notionPages(
-    """Notion 연결 ID입니다."""
+    """
+    Notion 연결 ID입니다.
+    """
     connectionId: ID!
 
-    """다음 페이지를 조회할 때 사용하는 Notion 커서입니다. (첫 페이지는 null)"""
+    """
+    다음 페이지를 조회할 때 사용하는 Notion 커서입니다. (첫 페이지는 null)
+    """
     cursor: String = null
 
-    """페이지 검색어입니다 (선택)"""
+    """
+    페이지 검색어입니다 (선택)
+    """
     query: String = null
 
-    """한 번에 조회할 Notion 페이지 개수입니다. (1 이상 100 이하)"""
+    """
+    한 번에 조회할 Notion 페이지 개수입니다. (1 이상 100 이하)
+    """
     size: Int! = 10
 
-    """워크스페이스 ID입니다."""
+    """
+    워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): NotionPages!
 
-  """이력서 기본 정보 프로필을 조회합니다. 프로필이 없으면 빈 프로필을 생성해 반환합니다. (워크스페이스당 1개)"""
+  """
+  이력서 기본 정보 프로필을 조회합니다. 프로필이 없으면 빈 프로필을 생성해 반환합니다. (워크스페이스당 1개)
+  """
   profile(
-    """프로필을 조회할 워크스페이스 ID입니다."""
+    """
+    프로필을 조회할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Profile!
 
-  """이력서 상세를 조회합니다."""
+  """
+  이력서 상세를 조회합니다.
+  """
   resume(
-    """조회할 이력서 ID입니다."""
+    """
+    조회할 이력서 ID입니다.
+    """
     resumeId: ID!
 
-    """이력서가 속한 워크스페이스 ID입니다."""
+    """
+    이력서가 속한 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Resume!
 
-  """워크스페이스의 이력서 수를 상태별로 조회합니다."""
+  """
+  워크스페이스의 이력서 수를 상태별로 조회합니다.
+  """
   resumeCounts(
-    """이력서 수를 조회할 워크스페이스 ID입니다."""
+    """
+    이력서 수를 조회할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): [ResumeStatusCount!]!
 
-  """워크스페이스의 이력서 목록을 조회합니다."""
+  """
+  워크스페이스의 이력서 목록을 조회합니다.
+  """
   resumes(
-    """다음 페이지를 조회할 때 사용할 커서입니다."""
+    """
+    다음 페이지를 조회할 때 사용할 커서입니다.
+    """
     cursor: String = null
 
-    """한 번에 조회할 이력서 개수입니다. (1 이상 30 이하)"""
+    """
+    한 번에 조회할 이력서 개수입니다. (1 이상 30 이하)
+    """
     size: Int! = 10
 
-    """조회할 이력서 상태 목록입니다 (생략하면 COMPLETED, DRAFT를 모두 조회)"""
+    """
+    조회할 이력서 상태 목록입니다 (생략하면 COMPLETED, DRAFT를 모두 조회)
+    """
     statuses: [ResumeStatusType!] = null
 
-    """이력서 목록을 조회할 워크스페이스 ID입니다."""
+    """
+    이력서 목록을 조회할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Resumes!
 
-  """키워드 기반으로 경험 목록을 검색합니다."""
+  """
+  키워드 기반으로 경험 목록을 검색합니다.
+  """
   searchExperiences(
-    """다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)"""
+    """
+    다음 페이지를 조회할 때 사용하는 커서입니다. (첫 페이지는 null)
+    """
     cursor: String = null
 
-    """검색어입니다."""
+    """
+    검색어입니다.
+    """
     keyword: String!
 
-    """한 번에 조회할 경험 개수입니다. (1 이상 30 이하)"""
+    """
+    한 번에 조회할 경험 개수입니다. (1 이상 30 이하)
+    """
     size: Int! = 10
 
-    """경험을 검색할 워크스페이스 ID입니다."""
+    """
+    경험을 검색할 워크스페이스 ID입니다.
+    """
     workspaceId: ID!
   ): Experiences!
 }
 
-"""이력서 상세 응답입니다."""
+"""
+이력서 상세 응답입니다.
+"""
 type Resume {
-  """PROFILE_CORE_COMPETENCY_GENERATION을 성공적으로 수행했는지 여부입니다."""
-  coreCompetencyGenerated: Boolean!
-
-  """생성 시각입니다."""
+  """
+  생성 시각입니다.
+  """
   createdAt: String!
 
-  """이력서 ID입니다."""
+  """
+  이력서 ID입니다.
+  """
   resumeId: ID!
 
-  """요청한 선택 필드에 따라 포함되는 섹션 목록입니다."""
+  """
+  요청한 선택 필드에 따라 포함되는 섹션 목록입니다.
+  """
   sections: [ResumeSection!]!
 
-  """이력서 상태입니다."""
+  """
+  이력서 상태입니다.
+  """
   status: ResumeStatusType!
 
-  """이력서의 대상 JD입니다."""
+  """
+  이력서의 대상 JD입니다.
+  """
   targetJd: Jd
 
-  """이력서 템플릿입니다."""
+  """
+  이력서 템플릿입니다.
+  """
   template: ResumeTemplate!
 }
 
-"""수상 payload 응답입니다."""
+"""
+수상 payload 응답입니다.
+"""
 type ResumeAwardPayload {
-  """수상일입니다."""
+  """
+  수상일입니다.
+  """
   awardedAt: String
 
-  """수상명입니다."""
+  """
+  수상명입니다.
+  """
   name: String
 
-  """수상 기관명입니다."""
+  """
+  수상 기관명입니다.
+  """
   organization: String
 }
 
-"""수상 payload 입력입니다."""
+"""
+수상 payload 입력입니다.
+"""
 input ResumeAwardPayloadInput {
-  """수상일입니다."""
+  """
+  수상일입니다.
+  """
   awardedAt: String
 
-  """수상명입니다."""
+  """
+  수상명입니다.
+  """
   name: String
 
-  """수상 기관명입니다."""
+  """
+  수상 기관명입니다.
+  """
   organization: String
 }
 
-"""기본 정보 payload 응답입니다."""
+"""
+기본 정보 payload 응답입니다.
+"""
 type ResumeBasicInfoPayload {
-  """이메일 주소입니다."""
+  """
+  이메일 주소입니다.
+  """
   email: String
 
-  """연락처 숨김 여부입니다."""
+  """
+  연락처 숨김 여부입니다.
+  """
   hideContact: Boolean!
 
-  """이름입니다."""
+  """
+  이름입니다.
+  """
   name: String
 
-  """전화번호입니다."""
+  """
+  전화번호입니다.
+  """
   phone: String
 }
 
-"""기본 정보 payload 입력입니다."""
+"""
+기본 정보 payload 입력입니다.
+"""
 input ResumeBasicInfoPayloadInput {
-  """이메일 주소입니다."""
+  """
+  이메일 주소입니다.
+  """
   email: String
 
-  """연락처 숨김 여부입니다."""
+  """
+  연락처 숨김 여부입니다.
+  """
   hideContact: Boolean! = false
 
-  """이름입니다."""
+  """
+  이름입니다.
+  """
   name: String
 
-  """전화번호입니다."""
+  """
+  전화번호입니다.
+  """
   phone: String
 }
 
-"""경력 payload 응답입니다."""
+"""
+경력 payload 응답입니다.
+"""
 type ResumeCareerPayload {
-  """회사명입니다."""
+  """
+  회사명입니다.
+  """
   companyName: String
 
-  """경력 상세 내용입니다."""
+  """
+  경력 상세 내용입니다.
+  """
   contents: String
 
-  """재직 기간입니다."""
+  """
+  재직 기간입니다.
+  """
   period: Period
 
-  """직무 또는 역할입니다."""
+  """
+  직무 또는 역할입니다.
+  """
   role: String
 }
 
-"""경력 payload 입력입니다."""
+"""
+경력 payload 입력입니다.
+"""
 input ResumeCareerPayloadInput {
-  """회사명입니다."""
+  """
+  회사명입니다.
+  """
   companyName: String
 
-  """경력 상세 내용입니다."""
+  """
+  경력 상세 내용입니다.
+  """
   contents: String
 
-  """재직 기간입니다."""
+  """
+  재직 기간입니다.
+  """
   period: PeriodInput
 
-  """직무 또는 역할입니다."""
+  """
+  직무 또는 역할입니다.
+  """
   role: String
 }
 
-"""자격증 payload 응답입니다."""
+"""
+자격증 payload 응답입니다.
+"""
 type ResumeCertificatePayload {
-  """취득일입니다."""
+  """
+  취득일입니다.
+  """
   acquiredAt: String
 
-  """자격증명입니다."""
+  """
+  자격증명입니다.
+  """
   name: String
 
-  """발급 기관입니다."""
+  """
+  발급 기관입니다.
+  """
   organization: String
 }
 
-"""자격증 payload 입력입니다."""
+"""
+자격증 payload 입력입니다.
+"""
 input ResumeCertificatePayloadInput {
-  """취득일입니다."""
+  """
+  취득일입니다.
+  """
   acquiredAt: String
 
-  """자격증명입니다."""
+  """
+  자격증명입니다.
+  """
   name: String
 
-  """발급 기관입니다."""
+  """
+  발급 기관입니다.
+  """
   organization: String
 }
 
-"""핵심 역량 payload 응답입니다."""
+"""
+핵심 역량 payload 응답입니다.
+"""
 type ResumeCoreSkillPayload {
-  """핵심 역량 내용입니다."""
+  """
+  핵심 역량 내용입니다.
+  """
   content: String
 
-  """이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다."""
+  """
+  이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다.
+  """
   isInitialItem: Boolean!
 }
 
-"""핵심 역량 payload 입력입니다."""
+"""
+핵심 역량 payload 입력입니다.
+"""
 input ResumeCoreSkillPayloadInput {
-  """핵심 역량 내용입니다."""
+  """
+  핵심 역량 내용입니다.
+  """
   content: String
 
-  """이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다."""
-  isInitialItem: Boolean! = false
+  """
+  이력서 최초 생성 과정에서 만들어진 아이템인지 여부입니다.
+  """
+  isInitialItem: Boolean! = true
 }
 
-"""학력 payload 응답입니다."""
+"""
+학력 payload 응답입니다.
+"""
 type ResumeEducationPayload {
-  """학위 또는 학력 구분입니다."""
+  """
+  학위 또는 학력 구분입니다.
+  """
   degree: String
 
-  """전공명입니다."""
+  """
+  전공명입니다.
+  """
   major: String
 
-  """재학 기간입니다."""
+  """
+  재학 기간입니다.
+  """
   period: Period
 
-  """학교명입니다."""
+  """
+  학교명입니다.
+  """
   schoolName: String
 
-  """학력 상태입니다. 예: 졸업 예정"""
+  """
+  학력 상태입니다. 예: 졸업 예정
+  """
   status: String
 }
 
-"""학력 payload 입력입니다."""
+"""
+학력 payload 입력입니다.
+"""
 input ResumeEducationPayloadInput {
-  """학위 또는 학력 구분입니다."""
+  """
+  학위 또는 학력 구분입니다.
+  """
   degree: String
 
-  """전공명입니다."""
+  """
+  전공명입니다.
+  """
   major: String
 
-  """재학 기간입니다."""
+  """
+  재학 기간입니다.
+  """
   period: PeriodInput
 
-  """학교명입니다."""
+  """
+  학교명입니다.
+  """
   schoolName: String
 
-  """학력 상태입니다. 예: 졸업 예정"""
+  """
+  학력 상태입니다. 예: 졸업 예정
+  """
   status: String
 }
 
-"""경험 payload 응답입니다."""
+"""
+경험 payload 응답입니다.
+"""
 type ResumeExperiencePayload {
-  """경험 상세 내용 목록입니다."""
+  """
+  경험 상세 내용 목록입니다.
+  """
   contents: String
 
-  """경험 이름입니다."""
+  """
+  경험 이름입니다.
+  """
   name: String
 
-  """경험 수행 기간입니다."""
+  """
+  경험 수행 기간입니다.
+  """
   period: Period
 
-  """경험에서 맡은 역할입니다."""
+  """
+  경험에서 맡은 역할입니다.
+  """
   role: String
 }
 
-"""경험 payload 입력입니다."""
+"""
+경험 payload 입력입니다.
+"""
 input ResumeExperiencePayloadInput {
-  """경험 상세 내용 목록입니다."""
+  """
+  경험 상세 내용 목록입니다.
+  """
   contents: String
 
-  """경험 이름입니다."""
+  """
+  경험 이름입니다.
+  """
   name: String
 
-  """경험 수행 기간입니다."""
+  """
+  경험 수행 기간입니다.
+  """
   period: PeriodInput
 
-  """경험에서 맡은 역할입니다."""
+  """
+  경험에서 맡은 역할입니다.
+  """
   role: String
 }
 
-"""어학 payload 응답입니다."""
+"""
+어학 payload 응답입니다.
+"""
 type ResumeLanguagePayload {
-  """어학 취득일입니다."""
+  """
+  어학 취득일입니다.
+  """
   acquiredAt: String
 
-  """어학 시험명입니다."""
+  """
+  어학 시험명입니다.
+  """
   examName: String
 
-  """어학 점수 또는 등급입니다."""
+  """
+  어학 점수 또는 등급입니다.
+  """
   scoreOrGrade: String
 }
 
-"""어학 payload 입력입니다."""
+"""
+어학 payload 입력입니다.
+"""
 input ResumeLanguagePayloadInput {
-  """어학 취득일입니다."""
+  """
+  어학 취득일입니다.
+  """
   acquiredAt: String
 
-  """어학 시험명입니다."""
+  """
+  어학 시험명입니다.
+  """
   examName: String
 
-  """어학 점수 또는 등급입니다."""
+  """
+  어학 점수 또는 등급입니다.
+  """
   scoreOrGrade: String
 }
 
-"""이력서 저장 시 경험 내용을 처리하는 방식입니다."""
+"""
+이력서 저장 시 경험 내용을 처리하는 방식입니다.
+"""
 enum ResumeOptimizationMode {
-  """대상 채용공고를 기준으로 경험 내용을 첨삭하여 저장합니다."""
+  """
+  대상 채용공고를 기준으로 경험 내용을 첨삭하여 저장합니다.
+  """
   JOB_SPECIFIC
 
-  """입력한 내용을 그대로 저장합니다."""
+  """
+  입력한 내용을 그대로 저장합니다.
+  """
   NONE
 }
 
-"""이력서 섹션 응답입니다."""
+"""
+이력서 섹션 응답입니다.
+"""
 type ResumeSection {
-  """생성 시각입니다."""
+  """
+  생성 시각입니다.
+  """
   createdAt: String!
 
-  """섹션 표시 순서입니다."""
+  """
+  섹션 표시 순서입니다.
+  """
   displayOrder: Float!
 
-  """화면에 표시할 섹션명입니다."""
+  """
+  화면에 표시할 섹션명입니다.
+  """
   displayText: String!
 
-  """섹션에 포함된 아이템 목록입니다."""
+  """
+  섹션에 포함된 아이템 목록입니다.
+  """
   items: [ResumeSectionItem!]!
 
-  """섹션 ID입니다."""
+  """
+  섹션 ID입니다.
+  """
   sectionId: ID!
 
-  """섹션 종류입니다."""
+  """
+  섹션 종류입니다.
+  """
   type: ResumeSectionType!
 
-  """섹션 노출 여부입니다."""
+  """
+  섹션 노출 여부입니다.
+  """
   visible: Boolean!
 }
 
-"""이력서 섹션 아이템 응답입니다."""
+"""
+이력서 섹션 아이템 응답입니다.
+"""
 type ResumeSectionItem {
-  """생성 시각입니다."""
+  """
+  생성 시각입니다.
+  """
   createdAt: String!
 
-  """아이템 표시 순서입니다."""
+  """
+  아이템 표시 순서입니다.
+  """
   displayOrder: Float!
 
-  """아이템 ID입니다."""
+  """
+  아이템 ID입니다.
+  """
   itemId: ID!
 
-  """아이템 상세 payload입니다."""
+  """
+  아이템 상세 payload입니다.
+  """
   payload: ResumeSectionItemPayload!
 
-  """아이템 노출 여부입니다."""
+  """
+  아이템 노출 여부입니다.
+  """
   visible: Boolean!
 }
 
-"""섹션 아이템 payload 응답입니다. 섹션 타입과 일치하는 필드 하나가 채워집니다."""
+"""
+섹션 아이템 payload 응답입니다. 섹션 타입과 일치하는 필드 하나가 채워집니다.
+"""
 type ResumeSectionItemPayload {
-  """수상 payload입니다."""
+  """
+  수상 payload입니다.
+  """
   award: ResumeAwardPayload
 
-  """기본 정보 payload입니다."""
+  """
+  기본 정보 payload입니다.
+  """
   basicInfo: ResumeBasicInfoPayload
 
-  """경력 payload입니다."""
+  """
+  경력 payload입니다.
+  """
   career: ResumeCareerPayload
 
-  """자격증 payload입니다."""
+  """
+  자격증 payload입니다.
+  """
   certificate: ResumeCertificatePayload
 
-  """핵심 역량 payload입니다."""
+  """
+  핵심 역량 payload입니다.
+  """
   coreSkill: ResumeCoreSkillPayload
 
-  """학력 payload입니다."""
+  """
+  학력 payload입니다.
+  """
   education: ResumeEducationPayload
 
-  """경험 payload입니다."""
+  """
+  경험 payload입니다.
+  """
   experience: ResumeExperiencePayload
 
-  """어학 payload입니다."""
+  """
+  어학 payload입니다.
+  """
   language: ResumeLanguagePayload
 
-  """기술 payload입니다."""
+  """
+  기술 payload입니다.
+  """
   skill: ResumeSkillPayload
 }
 
-"""섹션 아이템 payload 입력입니다. 정확히 하나의 필드만 채웁니다."""
+"""
+섹션 아이템 payload 입력입니다. 정확히 하나의 필드만 채웁니다.
+"""
 input ResumeSectionItemPayloadInput {
-  """수상 payload입니다."""
+  """
+  수상 payload입니다.
+  """
   award: ResumeAwardPayloadInput
 
-  """기본 정보 payload입니다."""
+  """
+  기본 정보 payload입니다.
+  """
   basicInfo: ResumeBasicInfoPayloadInput
 
-  """경력 payload입니다."""
+  """
+  경력 payload입니다.
+  """
   career: ResumeCareerPayloadInput
 
-  """자격증 payload입니다."""
+  """
+  자격증 payload입니다.
+  """
   certificate: ResumeCertificatePayloadInput
 
-  """핵심 역량 payload입니다."""
+  """
+  핵심 역량 payload입니다.
+  """
   coreSkill: ResumeCoreSkillPayloadInput
 
-  """학력 payload입니다."""
+  """
+  학력 payload입니다.
+  """
   education: ResumeEducationPayloadInput
 
-  """경험 payload입니다."""
+  """
+  경험 payload입니다.
+  """
   experience: ResumeExperiencePayloadInput
 
-  """어학 payload입니다."""
+  """
+  어학 payload입니다.
+  """
   language: ResumeLanguagePayloadInput
 
-  """기술 payload입니다."""
+  """
+  기술 payload입니다.
+  """
   skill: ResumeSkillPayloadInput
 }
 
-"""이력서 섹션 종류입니다."""
+"""
+이력서 섹션 종류입니다.
+"""
 enum ResumeSectionType {
-  """수상 섹션입니다."""
+  """
+  수상 섹션입니다.
+  """
   AWARD
 
-  """기본 정보 섹션입니다."""
+  """
+  기본 정보 섹션입니다.
+  """
   BASIC_INFO
 
-  """경력 섹션입니다."""
+  """
+  경력 섹션입니다.
+  """
   CAREER
 
-  """자격증 섹션입니다."""
+  """
+  자격증 섹션입니다.
+  """
   CERTIFICATE
 
-  """핵심 역량 섹션입니다."""
+  """
+  핵심 역량 섹션입니다.
+  """
   CORE_SKILL
 
-  """학력 섹션입니다."""
+  """
+  학력 섹션입니다.
+  """
   EDUCATION
 
-  """경험 섹션입니다."""
+  """
+  경험 섹션입니다.
+  """
   EXPERIENCE
 
-  """어학 섹션입니다."""
+  """
+  어학 섹션입니다.
+  """
   LANGUAGE
 
-  """기술 섹션입니다."""
+  """
+  기술 섹션입니다.
+  """
   SKILL
 }
 
-"""기술 payload 응답입니다."""
+"""
+기술 payload 응답입니다.
+"""
 type ResumeSkillPayload {
-  """숙련도 또는 수준입니다."""
+  """
+  숙련도 또는 수준입니다.
+  """
   level: String
 
-  """기술명입니다."""
+  """
+  기술명입니다.
+  """
   name: String
 }
 
-"""기술 payload 입력입니다."""
+"""
+기술 payload 입력입니다.
+"""
 input ResumeSkillPayloadInput {
-  """숙련도 또는 수준입니다."""
+  """
+  숙련도 또는 수준입니다.
+  """
   level: String
 
-  """기술명입니다."""
+  """
+  기술명입니다.
+  """
   name: String
 }
 
-"""이력서 상태별 개수 응답입니다."""
+"""
+이력서 상태별 개수 응답입니다.
+"""
 type ResumeStatusCount {
-  """해당 상태의 이력서 수입니다."""
+  """
+  해당 상태의 이력서 수입니다.
+  """
   count: Long!
 
-  """이력서 상태입니다."""
+  """
+  이력서 상태입니다.
+  """
   status: ResumeStatusType!
 }
 
-"""이력서 상태입니다."""
+"""
+이력서 상태입니다.
+"""
 enum ResumeStatusType {
-  """활성 이력서입니다."""
+  """
+  활성 이력서입니다.
+  """
   COMPLETED
 
-  """임시 저장된 이력서입니다."""
+  """
+  임시 저장된 이력서입니다.
+  """
   DRAFT
 }
 
-"""이력서 목록용 요약 응답입니다."""
+"""
+이력서 목록용 요약 응답입니다.
+"""
 type ResumeSummary {
-  """PROFILE_CORE_COMPETENCY_GENERATION을 성공적으로 수행했는지 여부입니다."""
-  coreCompetencyGenerated: Boolean!
-
-  """생성 시각입니다."""
+  """
+  생성 시각입니다.
+  """
   createdAt: String!
 
-  """이력서 ID입니다."""
+  """
+  이력서 ID입니다.
+  """
   resumeId: ID!
 
-  """이력서 상태입니다."""
+  """
+  이력서 상태입니다.
+  """
   status: ResumeStatusType!
 
-  """이력서의 대상 JD입니다."""
+  """
+  이력서의 대상 JD입니다.
+  """
   targetJd: Jd
 
-  """이력서 템플릿입니다."""
+  """
+  이력서 템플릿입니다.
+  """
   template: ResumeTemplate!
 }
 
-"""이력서 템플릿 종류입니다."""
+"""
+이력서 템플릿 종류입니다.
+"""
 enum ResumeTemplate {
-  """기본 이력서 템플릿입니다."""
+  """
+  기본 이력서 템플릿입니다.
+  """
   DEFAULT
 }
 
-"""이력서 목록과 커서 정보입니다."""
+"""
+이력서 목록과 커서 정보입니다.
+"""
 type Resumes {
   cursor: Cursor!
   resumes: [ResumeSummary!]!
 }
 
-"""이력서 수정에 사용하는 전체 스냅샷 입력입니다."""
+"""
+이력서 수정에 사용하는 전체 스냅샷 입력입니다.
+"""
 input SaveResumeInput {
-  """이력서 최적화 모드입니다. JOB_SPECIFIC은 대상 채용공고를 기준으로 경험 내용을 첨삭합니다."""
+  """
+  이력서 최적화 모드입니다. JOB_SPECIFIC은 대상 채용공고를 기준으로 경험 내용을 첨삭합니다.
+  """
   optimizationMode: ResumeOptimizationMode! = NONE
 
-  """저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다."""
+  """
+  저장할 섹션 목록입니다. 요청에 없는 기존 섹션은 삭제됩니다.
+  """
   sections: [SaveResumeSectionInput!]!
 
-  """생성할 이력서 상태입니다."""
+  """
+  생성할 이력서 상태입니다.
+  """
   status: ResumeStatusType!
 
-  """이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다."""
+  """
+  이력서가 맞춤 대상 채용공고와 연결되는 경우의 채용공고 ID입니다.
+  """
   targetJdId: ID
 
-  """이력서 렌더링에 사용할 템플릿입니다."""
+  """
+  이력서 렌더링에 사용할 템플릿입니다.
+  """
   template: ResumeTemplate!
 }
 
-"""이력서 섹션 저장 입력입니다."""
+"""
+이력서 섹션 저장 입력입니다.
+"""
 input SaveResumeSectionInput {
-  """섹션 표시 순서입니다."""
+  """
+  섹션 표시 순서입니다.
+  """
   displayOrder: Float!
 
-  """섹션에 포함할 아이템 목록입니다. 요청에 없는 기존 아이템은 삭제됩니다."""
+  """
+  섹션에 포함할 아이템 목록입니다. 요청에 없는 기존 아이템은 삭제됩니다.
+  """
   items: [SaveResumeSectionItemInput!]!
 
-  """기존 섹션을 수정할 때 사용하는 섹션 ID입니다. 없으면 새 섹션으로 생성됩니다."""
+  """
+  기존 섹션을 수정할 때 사용하는 섹션 ID입니다. 없으면 새 섹션으로 생성됩니다.
+  """
   sectionId: ID
 
-  """섹션 타입입니다. 하위 아이템 payload 타입과 일치해야 합니다."""
+  """
+  섹션 타입입니다. 하위 아이템 payload 타입과 일치해야 합니다.
+  """
   type: ResumeSectionType!
 
   """
@@ -1493,156 +2470,258 @@ input SaveResumeSectionInput {
   """
   useDefaultItems: Boolean! = false
 
-  """섹션 노출 여부입니다."""
+  """
+  섹션 노출 여부입니다.
+  """
   visible: Boolean!
 }
 
-"""이력서 섹션 아이템 저장 입력입니다."""
+"""
+이력서 섹션 아이템 저장 입력입니다.
+"""
 input SaveResumeSectionItemInput {
-  """아이템 표시 순서입니다."""
+  """
+  아이템 표시 순서입니다.
+  """
   displayOrder: Float!
 
-  """기존 아이템을 수정할 때 사용하는 아이템 ID입니다. 없으면 새 아이템으로 생성됩니다."""
+  """
+  기존 아이템을 수정할 때 사용하는 아이템 ID입니다. 없으면 새 아이템으로 생성됩니다.
+  """
   itemId: ID
 
-  """섹션 타입과 일치해야 하는 payload 입력입니다."""
+  """
+  섹션 타입과 일치해야 하는 payload 입력입니다.
+  """
   payload: ResumeSectionItemPayloadInput!
 
-  """아이템 노출 여부입니다."""
+  """
+  아이템 노출 여부입니다.
+  """
   visible: Boolean!
 }
 
-"""스킬 숙련도입니다."""
+"""
+스킬 숙련도입니다.
+"""
 enum SkillLevel {
-  """상"""
+  """
+  상
+  """
   HIGH
 
-  """하"""
+  """
+  하
+  """
   LOW
 
-  """중"""
+  """
+  중
+  """
   MEDIUM
 }
 
-"""STAR 형식의 경험 상세 내용입니다."""
+"""
+STAR 형식의 경험 상세 내용입니다.
+"""
 type StarExperienceContents {
-  """행동입니다."""
+  """
+  행동입니다.
+  """
   action: String!
 
-  """결과입니다."""
+  """
+  결과입니다.
+  """
   result: String!
 
-  """상황입니다."""
+  """
+  상황입니다.
+  """
   situation: String!
 
-  """과제입니다."""
+  """
+  과제입니다.
+  """
   task: String!
 }
 
-"""STAR 형식의 경험 상세 내용 입력입니다."""
+"""
+STAR 형식의 경험 상세 내용 입력입니다.
+"""
 input StarExperienceContentsRequest {
-  """A"""
+  """
+  A
+  """
   action: String!
 
-  """R"""
+  """
+  R
+  """
   result: String!
 
-  """S"""
+  """
+  S
+  """
   situation: String!
 
-  """T"""
+  """
+  T
+  """
   task: String!
 }
 
-"""경험 프로젝트 수정 입력입니다."""
+"""
+경험 프로젝트 수정 입력입니다.
+"""
 input UpdateExperienceProjectRequest {
-  """변경할 경험 프로젝트 이름입니다."""
+  """
+  변경할 경험 프로젝트 이름입니다.
+  """
   name: String!
 
-  """변경할 경험 프로젝트 진행 기간입니다."""
+  """
+  변경할 경험 프로젝트 진행 기간입니다.
+  """
   period: PeriodInput
 
-  """변경할 경험 프로젝트 역할입니다."""
+  """
+  변경할 경험 프로젝트 역할입니다.
+  """
   role: String
 
-  """변경할 경험 프로젝트 요약입니다."""
+  """
+  변경할 경험 프로젝트 요약입니다.
+  """
   summary: String!
 }
 
-"""경험 수정 입력입니다."""
+"""
+경험 수정 입력입니다.
+"""
 input UpdateExperienceRequest {
-  """변경할 경험 상세 내용입니다."""
+  """
+  변경할 경험 상세 내용입니다.
+  """
   contents: ExperienceContentsRequest!
 
-  """변경할 경험 수행 기간입니다."""
+  """
+  변경할 경험 수행 기간입니다.
+  """
   period: PeriodInput
 
-  """변경할 경험 프로젝트 ID입니다."""
+  """
+  변경할 경험 프로젝트 ID입니다.
+  """
   projectId: ID!
 
-  """변경할 경험 역할입니다."""
+  """
+  변경할 경험 역할입니다.
+  """
   role: String
 
-  """변경할 태그 목록입니다."""
+  """
+  변경할 태그 목록입니다.
+  """
   tags: [String!]!
 
-  """변경할 경험 제목입니다."""
+  """
+  변경할 경험 제목입니다.
+  """
   title: String!
 }
 
-"""프로필 수정 입력입니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다."""
+"""
+프로필 수정 입력입니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다.
+"""
 input UpdateProfileRequest {
-  """변경할 수상 목록입니다. (전체 교체)"""
+  """
+  변경할 수상 목록입니다. (전체 교체)
+  """
   awards: [ProfileAwardRequest!] = null
 
-  """변경할 경력 목록입니다. (전체 교체)"""
+  """
+  변경할 경력 목록입니다. (전체 교체)
+  """
   careers: [ProfileCareerRequest!] = null
 
-  """변경할 자격증 목록입니다. (전체 교체)"""
+  """
+  변경할 자격증 목록입니다. (전체 교체)
+  """
   certifications: [ProfileCertificationRequest!] = null
 
-  """변경할 핵심역량입니다. (최대 500자)"""
+  """
+  변경할 핵심역량입니다. (최대 500자)
+  """
   coreCompetency: String = null
 
-  """변경할 학력 목록입니다. (전체 교체)"""
+  """
+  변경할 학력 목록입니다. (전체 교체)
+  """
   educations: [ProfileEducationRequest!] = null
 
-  """변경할 이메일입니다."""
+  """
+  변경할 이메일입니다.
+  """
   email: String = null
 
-  """변경할 어학 목록입니다. (전체 교체)"""
+  """
+  변경할 어학 목록입니다. (전체 교체)
+  """
   languageTests: [ProfileLanguageTestRequest!] = null
 
-  """변경할 이름입니다."""
+  """
+  변경할 이름입니다.
+  """
   name: String = null
 
-  """변경할 전화번호입니다. (형식: 010-1234-5678, 빈 문자열 = 비우기)"""
+  """
+  변경할 전화번호입니다. (형식: 010-1234-5678, 빈 문자열 = 비우기)
+  """
   phone: String = null
 
-  """변경할 스킬 목록입니다. (전체 교체)"""
+  """
+  변경할 스킬 목록입니다. (전체 교체)
+  """
   skills: [ProfileSkillRequest!] = null
 }
 
-"""사용자 정보입니다."""
+"""
+사용자 정보입니다.
+"""
 type User {
-  """이메일입니다."""
+  """
+  이메일입니다.
+  """
   email: String!
 
-  """이름입니다."""
+  """
+  이름입니다.
+  """
   name: String!
 
-  """프로필 이미지 URL입니다."""
+  """
+  프로필 이미지 URL입니다.
+  """
   profileImageUrl: String
 
-  """사용자를 식별하는 ID입니다."""
+  """
+  사용자를 식별하는 ID입니다.
+  """
   userId: ID!
 
-  """사용자가 속한 워크스페이스 목록입니다."""
+  """
+  사용자가 속한 워크스페이스 목록입니다.
+  """
   workspaces: [Workspace!]!
 }
 
-"""워크스페이스 정보입니다."""
+"""
+워크스페이스 정보입니다.
+"""
 type Workspace {
-  """워크스페이스를 식별하는 ID입니다."""
+  """
+  워크스페이스를 식별하는 ID입니다.
+  """
   workspaceId: ID!
 }

@@ -84,7 +84,7 @@ const Toast = ({ ...props }: ToasterProps) => {
         toastOptions={{
           classNames: {
             toast: 'rounded-full! px-4! py-3! gap-2! w-fit! bg-bg-white! inset-ring!  border-none! inset-ring-border-subtler! shadow-[0_4px_16px_rgba(0,0,0,0.03),0_0_32px_rgba(0,0,0,0.05)]!',
-            title: 'text-label1! font-semibold! text-text-border!',
+            title: 'text-label1! font-semibold! text-text-border! whitespace-pre-line!',
             icon: '!size-4.5 !mx-0 !justify-center [&>svg]:!m-0',
             success: '[&_[data-icon]]:text-icon-success',
             error: '[&_[data-icon]]:text-icon-error',

@@ -54,7 +54,7 @@ const AddExperienceButton = () => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [content, setContent] = useState('')
-  const { mutate: createExperience, isPending } = useCreateExperience(workspaceId, projectId)
+  const { mutate: createExperience, isPending } = useCreateExperience(workspaceId)
 
   const handleOpenChange = (next: boolean) => {
     if (next) setContent('')
@@ -62,19 +62,18 @@ const AddExperienceButton = () => {
   }
 
   const handleSubmit = () => {
-    const trimmed = content.trim()
-    if (!trimmed) {
+    if (!content.trim()) {
       toast.warning('경험 내용을 입력해 주세요.', { id: 'experience-content-required', position: 'top-center' })
       return
     }
     createExperience(
-      { projectId, title: trimmed, contents: { type: 'FREE', free: { content: content } } },
+      { projectId, title: '', contents: { type: 'FREE', free: { content: content } } },
       {
         onSuccess: () => {
           toast.success('경험이 추가되었어요.', { id: 'experience-created', position: 'top-center' })
           setIsOpen(false)
         },
-        onError: () => toast.error('경험 추가에 실패했어요. 다시 시도해 주세요.', { id: 'experience-create-error', position: 'top-center' })
+        onError: () => toast.error('경험 추가에 실패했어요.\n입력한 내용은 그대로 있으니 다시 시도해 주세요.', { id: 'experience-create-error', position: 'top-center' })
       }
     )
   }
@@ -97,7 +96,7 @@ const AddExperienceButton = () => {
           <DialogDescription className="text-body1 text-text-subtler">떠오르는 경험을 자유롭게 작성해 주세요. AI가 이력서에 적합한 STAR 구조로 정리해 드려요.</DialogDescription>
         </DialogHeader>
         <div className="min-w-0">
-          <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />
+          <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={2000} value={content} onChange={(e) => setContent(e.target.value)} />
         </div>
         <Button variant="primary" size="xl" className="w-full" onClick={handleSubmit} disabled={isPending}>
           경험 추출하기

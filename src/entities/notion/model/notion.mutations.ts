@@ -29,7 +29,7 @@ export const useImportNotionExperiences = (workspaceId: string) => {
       const results = await Promise.allSettled(pageIds.map((pageId) => notionAPI.importExperience({ workspaceId, request: { connectionId, pageId } })))
       const succeeded = pageIds.filter((_, index) => results[index].status === 'fulfilled')
       const failed = pageIds.filter((_, index) => results[index].status === 'rejected')
-      if (succeeded.length === 0) throw new Error('Notion 경험 가져오기에 모두 실패했습니다.')
+      if (succeeded.length === 0) throw new Error('Notion에서 경험을 불러오지 못했어요. 연결한 페이지를 확인하고 다시 시도해 주세요.')
       return { succeeded, failed }
     }
   })

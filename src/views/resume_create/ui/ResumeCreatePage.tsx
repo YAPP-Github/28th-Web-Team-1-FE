@@ -6,7 +6,7 @@ import { ErrorBoundary } from '@sentry/nextjs'
 import { Flex } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { PencilSparkles, RotateCcw, Trash2 } from 'lucide-react'
-import { Button, Divider, Spacing, Text } from '@shared/ui'
+import { Button, Divider, ErrorFallback, Spacing, Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
 import { useQueryClient } from '@tanstack/react-query'
@@ -24,18 +24,14 @@ export const ResumeCreatePage = () => {
     // 다이얼로그 뒤로 이력서 편집 화면과 같은 배경을 깔아, 경험 선택이 이력서 위에서 이뤄지는 것처럼 보이게 한다.
     <Flex direction={'column'} className={'relative h-full flex-1 overflow-hidden'}>
       {/* Todo: Suspense fallback을 다이얼로그 모양의 스켈레톤으로 교체 (지금은 임시) */}
-      <ErrorBoundary
-        fallback={
-          <Text variant={'label1'} color={'text-subtle'} className={'block p-8 text-center'}>
-            경험을 불러오는 데 실패했습니다.
-          </Text>
-        }
-      >
+      <ErrorBoundary fallback={<ErrorFallback title="경험을 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="h-screen p-8" />}>
         <Suspense
           fallback={
-            <Text variant={'label1'} color={'text-subtle'} className={'block p-8 text-center'}>
-              불러오는 중...
-            </Text>
+            <Flex className={'h-screen w-full flex-col items-center justify-center'}>
+              <Text variant={'label1'} color={'text-subtle'} className={'block p-8 text-center'}>
+                불러오는 중...
+              </Text>
+            </Flex>
           }
         >
           <ResumeCreateContent />
@@ -213,7 +209,7 @@ const ResumeCreateContent = () => {
         isCompleting={isPending || isNavigating}
         onComplete={(selectedExperiences) => {
           // 경험 선택 완료 시 Amplitude 이벤트 전송
-          amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_COMPLETED, { selected_experience_count: selectedExperiences.length })
+          amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_SELECTION_COMPLETED, { selected_experience_count: selectedExperiences.length, jd_id: jdId })
           setIsNavigating(true)
           createResume(buildResumeInput(selectedExperiences, jdId), {
             onSuccess: async ({ resumeId }) => {

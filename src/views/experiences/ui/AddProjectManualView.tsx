@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronLeft, Plus } from 'lucide-react'
 import { Flex } from '@radix-ui/themes'
 import { useProjectOptions, type CreateProjectInput } from '@entities/project'
+import type { CreateExperienceInput } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { Button, Text } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
@@ -17,7 +18,15 @@ interface ProjectOption {
   name: string
 }
 
-export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void; onExtract: (input: CreateProjectInput) => void }) => {
+export const AddProjectManualView = ({
+  onBack,
+  onExtract,
+  onAddExperience
+}: {
+  onBack: () => void
+  onExtract: (input: CreateProjectInput) => void
+  onAddExperience: (input: CreateExperienceInput) => void
+}) => {
   const [selectedId, setSelectedId] = useState('')
   const [content, setContent] = useState('')
   const [createdProjects, setCreatedProjects] = useState<ProjectOption[]>([])
@@ -39,14 +48,23 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
 
   const handleExtract = () => {
     if (!selectedProject) {
-      toast.warning('프로젝트를 먼저 추가해 주세요.', { id: 'project-required', position: 'top-center' })
+      toast.warning('프로젝트 이름을 입력해 주세요.', { id: 'project-required', position: 'top-center' })
       return
     }
     if (!content.trim()) {
       toast.warning('경험 내용을 입력해 주세요.', { id: 'content-required', position: 'top-center' })
       return
     }
-    onExtract({ name: selectedProject.name, summary: content })
+
+    // 새로 추가한 프로젝트 이름을 고른 경우: 프로젝트 생성 + AI STAR 추출
+    if (selectedProject.id.startsWith('local:')) {
+      onExtract({ name: selectedProject.name, summary: content })
+      return
+    }
+
+    // 기존 프로젝트를 고른 경우: 그 프로젝트에 경험만 추가
+    // title은 빈값을 보내고, AI가 생성한다.
+    onAddExperience({ projectId: selectedProject.id, title: '', contents: { type: 'FREE', free: { content } } })
   }
 
   return (
@@ -65,7 +83,7 @@ export const AddProjectManualView = ({ onBack, onExtract }: { onBack: () => void
           {projects.length > 0 && <ProjectSelectPopover projects={projects} selectedName={selectedProject?.name ?? ''} onSelect={setSelectedId} />}
           <ProjectCreatePopover projects={projects} onCreate={handleCreateProject} />
         </Flex>
-        <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={null} value={content} onChange={(e) => setContent(e.target.value)} />
+        <Textarea label="경험내용" placeholder="텍스트를 입력해주세요." maxLength={2000} value={content} onChange={(e) => setContent(e.target.value)} />
       </Flex>
       <Button variant="primary" size="xl" className="w-full" onClick={handleExtract}>
         경험 추출하기
@@ -184,7 +202,15 @@ const ProjectSelectPopover = ({ projects, selectedName, onSelect }: ProjectSelec
           <ChevronDown className="shrink-0" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent sideOffset={10} align="start" className="shadow-1 max-w-60 overflow-hidden rounded-sm">
+      <PopoverContent
+        sideOffset={10}
+        align="start"
+        className="shadow-1 bg-element-gray-lighter max-h-[min(--spacing(60),var(--radix-popover-content-available-height))] max-w-60 overflow-x-hidden overflow-y-auto rounded-sm"
+        // Dialog 안에 중첩된 Popover라 react-remove-scroll이 document 캡처 단계에서 wheel을 먼저 막아버림 → scrollTop을 직접 옮겨 우회
+        onWheel={(e) => {
+          e.currentTarget.scrollTop += e.deltaY
+        }}
+      >
         {projects.map((project) => (
           <button
             key={project.id}
@@ -193,7 +219,7 @@ const ProjectSelectPopover = ({ projects, selectedName, onSelect }: ProjectSelec
               onSelect(project.id)
               setIsOpen(false)
             }}
-            className="text-text-subtle hover:text-text-basic bg-element-gray-lighter hover:bg-element-gray-light px-3 py-2.5 text-start"
+            className="text-text-subtle hover:text-text-basic hover:bg-element-gray-light px-3 py-2.5 text-start"
           >
             <Text variant="body2">{project.name}</Text>
           </button>

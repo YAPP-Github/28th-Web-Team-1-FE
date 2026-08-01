@@ -13,8 +13,9 @@ import { NOTION_PAGE_SELECT_STEP, NOTION_CONNECT_ERROR } from '../constants/noti
  * @param returnPath 파라미터를 지운 뒤 남길 경로
  * @example
  * ```tsx
- * const { connectionId } = useNotionReturn('/experiences')
+ * const { connectionId, hasError } = useNotionReturn('/experiences')
  * if (connectionId) setView('notion-select')
+ * if (hasError) setView('notion-connect')
  * ```
  */
 export const useNotionReturn = (returnPath: string) => {
@@ -28,12 +29,12 @@ export const useNotionReturn = (returnPath: string) => {
 
   useEffect(() => {
     if (initial.hasError) {
-      toast.error('Notion 연동에 실패했어요. 다시 시도해 주세요.', { id: 'notion-connect-error', position: 'top-center' })
+      toast.error('Notion 연결에 실패했어요.\nNotion을 다시 연결해 주세요.', { id: 'notion-connect-error', position: 'top-center' })
     }
     if (initial.connectionId || initial.hasError) {
       router.replace(returnPath)
     }
   }, [initial, router, returnPath])
 
-  return { connectionId: initial.connectionId }
+  return { connectionId: initial.connectionId, hasError: initial.hasError }
 }

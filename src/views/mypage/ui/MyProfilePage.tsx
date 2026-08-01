@@ -6,7 +6,7 @@ import { Accordion as AccordionPrimitive } from 'radix-ui'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
-import { Divider, Heading, Spacing, Text } from '@shared/ui'
+import { Divider, ErrorFallback, Heading, Spacing, Text } from '@shared/ui'
 import { Avatar } from '@shared/ui/avatar'
 import { useMe, useWorkspaceId } from '@entities/user'
 import { useProfile, type Profile } from '@entities/profile'
@@ -23,7 +23,7 @@ const INFO_SECTIONS: Array<{ value: string; label: string; Component: ComponentT
   { value: 'basic', label: '기본 정보', Component: BasicSection },
   { value: 'competency', label: '핵심 역량', Component: CoreCompetencySection },
   { value: 'education', label: '학력', Component: EducationSection },
-  { value: 'career', label: '경력 / 활동', Component: CareerSection },
+  { value: 'career', label: '경력/활동', Component: CareerSection },
   { value: 'language', label: '어학', Component: LanguageSection },
   { value: 'award', label: '수상', Component: AwardSection },
   { value: 'certificate', label: '자격증', Component: CertificateSection },
@@ -40,13 +40,7 @@ export const MyProfilePage = () => {
       <Spacing size={32} />
 
       <Flex direction="column" className="w-full max-w-158.5">
-        <ErrorBoundary
-          fallback={
-            <Text variant="label1" color="text-subtler">
-              정보를 불러오는 데 실패했습니다.
-            </Text>
-          }
-        >
+        <ErrorBoundary fallback={<ErrorFallback title="정보를 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." />}>
           <Suspense fallback={null}>
             <ProfileSummary />
           </Suspense>
@@ -56,13 +50,7 @@ export const MyProfilePage = () => {
         <Divider color="gray-10" />
         <Spacing size={32} />
 
-        <ErrorBoundary
-          fallback={
-            <Text variant="label1" color="text-subtler">
-              정보를 불러오는 데 실패했습니다.
-            </Text>
-          }
-        >
+        <ErrorBoundary fallback={<ErrorFallback title="정보를 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." />}>
           <Suspense fallback={null}>
             <ProfileSections />
           </Suspense>

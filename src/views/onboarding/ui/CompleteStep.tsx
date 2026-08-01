@@ -7,19 +7,18 @@ import { AMPLITUDE_EVENTS } from '@shared/config'
 import * as amplitude from '@amplitude/unified'
 
 export const CompleteStep = ({ hasConnected }: { hasConnected: boolean }) => {
-  // TODO : 라이팅은 추후에 수정될 수 있음.
   const content = hasConnected
     ? {
-        title: `이력서 준비가 끝났어요!\n이제 SCOOP을 시작해 보세요.`,
-        description: `가져온 정보를 바탕으로\n지원하는 직무에 맞는 이력서를 완성할 수 있어요.`,
+        title: `경험을 모두 등록했어요\nSCOOP과 함께 이력서를 만들어 보세요`,
+        description: `등록된 경험을 바탕으로\n채용 공고에 맞춰 이력서를 만들 수 있어요`,
         href: '/home',
-        cta: '홈으로 가기'
+        cta: '이력서 만들러 가기'
       }
     : {
-        title: `이력서와 경험 정리, 아직이라면\nSCOOP과 함께 처음부터 시작해 보세요.`,
-        description: `흩어져 있는 경험을 하나씩 정리해,\n지원하는 직무에 맞는 이력서로 완성할 수 있어요.`,
+        title: `경험 정리와 이력서,\n아직이라면 SCOOP과 함께 시작해 보세요`,
+        description: `채용 공고에 맞춰 이력서를 만들 수 있어요.\n흩어져 있는 경험을 정리하는 것부터 시작하면 돼요.`,
         href: '/experiences',
-        cta: '경험정리 하러가기'
+        cta: '경험 정리하러 가기'
       }
 
   const handleCtaClick = useCallback(() => {

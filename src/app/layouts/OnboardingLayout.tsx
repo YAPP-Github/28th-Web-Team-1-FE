@@ -16,7 +16,7 @@ import { Logo } from '@shared/icon'
 export const OnboardingLayout = ({ children }: PropsWithChildren) => {
   return (
     <main className="bg-element-white h-screen overflow-x-hidden">
-      <header className="border-border-subtle bg-element-white fixed inset-x-0 top-0 z-10 flex h-16 items-center justify-center border-b">
+      <header className="border-border-subtle bg-element-white fixed inset-x-0 top-0 z-10 flex items-center justify-center border-b py-4">
         <Logo />
       </header>
       {/* 헤더가 fixed라 그만큼(h-16) 상단 패딩으로 밀어내고, 콘텐츠가 화면보다 커지면 이 영역 전체가 스크롤된다(min-h-full이라 넘치는 순간부터 상단 정렬로 자연스럽게 전환). */}

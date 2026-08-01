@@ -4,7 +4,7 @@ import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { FormProvider, useForm, useFormContext, useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
-import { FileCheckCorner, RefreshCcw } from 'lucide-react'
+import { FileCheckCorner, FileClock, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { formatDate } from '@shared/lib'
 import { AMPLITUDE_EVENTS } from '@shared/config'
@@ -25,11 +25,6 @@ import { useRouter } from 'next/navigation'
 import * as amplitude from '@amplitude/unified'
 
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
-  useEffect(() => {
-    // 페이지 진입 시 Amplitude 이벤트 전송
-    amplitude.track(AMPLITUDE_EVENTS.RESUME_DRAFT_VIEWED)
-  }, [])
-
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
       <ErrorBoundary fallback={<ResumeFallback>이력서를 불러오는 데 실패했습니다.</ResumeFallback>}>
@@ -95,6 +90,12 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
 
+  useEffect(() => {
+    // 페이지 진입 시 Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_DRAFT_VIEWED, { jd_id: resume.targetJd?.jdId ?? null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const defaultValues = useMemo(() => resumeToFormValues(resume), [resume])
   const form = useForm<ResumeFormValues>({ defaultValues })
   const { mutate: updateResume, mutateAsync: updateResumeAsync, isPending } = useUpdateResume(workspaceId, resumeId)
@@ -130,7 +131,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   )
 
   const handleSave = form.handleSubmit((values) => {
-    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED)
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED, { jd_id: resume.targetJd?.jdId })
     updateResume(buildSaveInput(values, 'COMPLETED'), {
       onSuccess: () => {
         setLastSavedAt(new Date())
@@ -141,17 +142,24 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
     })
   })
 
-  // 30초(AUTOSAVE_INTERVAL_MS)마다 변경분이 있으면 조용히 저장하고 저장 성공 시점의 시간으로 갱신한다(실패 시 다음 주기에 재시도).
-  const markDirty = useIntervalAutosave(() => updateResumeAsync(buildSaveInput(form.getValues(), 'DRAFT')).then(() => setLastSavedAt(new Date())), {
-    intervalMs: AUTOSAVE_INTERVAL_MS
-  })
+  const saveDraft = () => updateResumeAsync(buildSaveInput(form.getValues(), 'DRAFT')).then(() => setLastSavedAt(new Date()))
+
+  // 자동(30초 주기)·수동 임시저장이 같은 실행 경로를 쓰도록 통합한다. 두 요청이 겹치지 않고 직렬화된다.
+  const { markDirty, saveNow } = useIntervalAutosave(saveDraft, { intervalMs: AUTOSAVE_INTERVAL_MS })
+
+  // 수동 임시저장: 자동저장과 동일한 상태 머신(saveNow)을 거치고 성공/실패 토스트만 덧붙인다.
+  const handleDraftSave = () => {
+    void saveNow()
+      .then(() => toast.success('이력서가 임시저장되었습니다.', { position: 'top-center' }))
+      .catch((error: unknown) => toast.error(error instanceof Error ? error.message : '임시저장에 실패했어요.', { position: 'top-center' }))
+  }
 
   // 폼 값이 바뀌면 '저장할 변경분 있음'으로 표시한다. 마운트 시에는 호출되지 않으므로 초기 저장은 발생하지 않는다.
   useEffect(() => form.subscribe({ formState: { values: true }, callback: () => markDirty() }), [form, markDirty])
 
   return (
     <FormProvider {...form}>
-      <ResumeToolbar targetJd={resume.targetJd} onSave={() => void handleSave()} isSaving={isPending} lastSavedAt={lastSavedAt} />
+      <ResumeToolbar targetJd={resume.targetJd} onSave={handleSave} onDraftSave={handleDraftSave} isSaving={isPending} lastSavedAt={lastSavedAt} />
       <main className="flex min-h-0 flex-1">
         <ResumeBoard activeSectionUid={activeSectionUid} onSelectSection={setActiveSectionUid} targetJdId={resume.targetJd?.jdId ?? null} />
       </main>
@@ -209,12 +217,13 @@ const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { active
 interface ResumeToolbarProps {
   targetJd: ResumeQuery['resume']['targetJd']
   onSave: () => void
+  onDraftSave: () => void
   isSaving: boolean
   lastSavedAt: Date | null
 }
 
 /** 편집 화면 상단 도구바. 이력서가 맞춤 대상으로 삼은 채용공고(targetJd)의 회사명·포지션과 저장 상태·액션을 보여준다. */
-const ResumeToolbar = ({ targetJd, onSave, isSaving, lastSavedAt }: ResumeToolbarProps) => {
+const ResumeToolbar = ({ targetJd, onSave, onDraftSave, isSaving, lastSavedAt }: ResumeToolbarProps) => {
   return (
     <header className={'flex justify-between px-8 py-5'}>
       <Flex direction="column" justify="center" className={'gap-0.5'}>
@@ -230,10 +239,17 @@ const ResumeToolbar = ({ targetJd, onSave, isSaving, lastSavedAt }: ResumeToolba
           {lastSavedAt ? `${formatDate(lastSavedAt, 'HH:mm:ss')} 저장되었습니다.` : '변경 사항은 자동으로 저장됩니다.'}
         </Text>
 
-        <Button variant="primary" size={'md'} className={'leading-0'} onClick={onSave} disabled={isSaving}>
-          <FileCheckCorner size={18} className="inline-block" data-icon="inline-start" />
-          이력서 저장
-        </Button>
+        <Flex gap="2">
+          <Button variant="secondary" size={'md'} className={'leading-0'} onClick={onDraftSave} disabled={isSaving}>
+            <FileClock size={18} className="inline-block" data-icon="inline-start" />
+            임시저장
+          </Button>
+
+          <Button variant="primary" size={'md'} className={'leading-0'} onClick={onSave} disabled={isSaving}>
+            <FileCheckCorner size={18} className="inline-block" data-icon="inline-start" />
+            완료
+          </Button>
+        </Flex>
       </Flex>
     </header>
   )

@@ -6,7 +6,7 @@ export const config = {
 }
 
 /** 비로그인 상태에서도 접근 가능한 경로. 나머지는 로그인 페이지로 튕긴다. */
-const PUBLIC_PATHS = new Set(['/', '/login'])
+const PUBLIC_PATHS = new Set(['/', '/login', '/robots.txt', '/sitemap.xml'])
 
 export const middleware = async (request: NextRequest) => {
   const { pathname } = request.nextUrl

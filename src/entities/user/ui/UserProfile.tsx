@@ -7,6 +7,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { userQueries } from '@entities/user'
 import { Suspense } from 'react'
 import { ErrorBoundary } from '@sentry/nextjs'
+import { UserRoundX } from 'lucide-react'
 
 const UserProfileContent = () => {
   const { data } = useSuspenseQuery(userQueries.me())
@@ -29,11 +30,10 @@ const UserProfileContent = () => {
 
 export const UserProfile = () => {
   return (
-    // Todo: Error fallback, Loading fallback 구현 필요
     <ErrorBoundary
       fallback={
-        <Text className={'overflow-hidden text-center whitespace-nowrap'} variant={'caption2'}>
-          사용자 정보를 불러오는데 실패했습니다.
+        <Text className={'overflow-hidden text-center whitespace-pre-line'} variant={'caption2'}>
+          {`사용자 정보를 불러오지 못했어요.\n잠시 후 다시 시도해 주세요.`}
         </Text>
       }
     >
@@ -73,9 +73,9 @@ export const UserAvatar = () => {
   return (
     <ErrorBoundary
       fallback={
-        <Text className={'text-center'} variant={'caption2'}>
-          실패
-        </Text>
+        <div className="bg-element-disabled flex size-10 items-center justify-center rounded-full">
+          <UserRoundX size={16} className="text-icon-gray-light" />
+        </div>
       }
     >
       <Suspense fallback={<Skeleton className="h-10 w-10 rounded-full" />}>
