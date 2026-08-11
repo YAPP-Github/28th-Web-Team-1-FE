@@ -1,7 +1,12 @@
+'use client'
 import type { ReactNode } from 'react'
+import { useRef, useState } from 'react'
 import { ArrowRight, Check } from 'lucide-react'
+import { motion, useMotionValueEvent, useScroll } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
+
+const EASE_EXPO_OUT = [0.16, 1, 0.3, 1] as const
 
 const StarInputMockup = () => {
   const fields = [
@@ -172,65 +177,144 @@ const STEPS = [
     titleEn: 'Experience',
     titleKo: '경험 정리',
     description: ['Notion, PDF 등 경험이 담긴 자료를 업로드해주세요.', '혹은 떠오르는 경험을 자유롭게 작성해 주시면,', 'AI가 이력서에 적합한 STAR 구조로 정리해 드려요.'],
-    mockup: <StarInputMockup />
+    mockup: <StarInputMockup />,
+    glowPosition: 'top-right' as const
   },
   {
     number: '02',
     titleEn: 'Job Description',
     titleKo: '채용 공고 분석',
     description: ['지원하고 싶은 채용공고를 입력해주세요.', '채용 공고를 분석해, 그에 맞는 경험을 추천해 드릴게요.'],
-    mockup: <JobDescriptionMockup />
+    mockup: <JobDescriptionMockup />,
+    glowPosition: 'bottom-left' as const
   },
   {
     number: '03',
     titleEn: 'Resume',
     titleKo: '이력서 생성',
     description: ['AI가 채용공고를 분석해 가장 적합한 경험을 선별하고,', '맞춤형 이력서를 자동으로 생성해 드려요.'],
-    mockup: <MatchedExperienceMockup />
+    mockup: <MatchedExperienceMockup />,
+    glowPosition: 'right' as const
   }
 ]
+
+type Step = (typeof STEPS)[number]
+
+const GLOW_POSITION_CLASSES: Record<Step['glowPosition'], string> = {
+  'top-right': 'top-0 right-0 -translate-y-1/4 translate-x-1/4',
+  'bottom-left': 'bottom-0 left-0 translate-y-1/4 -translate-x-1/4',
+  right: 'top-1/2 right-0 -translate-y-1/2 translate-x-1/4'
+}
+
+const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
+  <div
+    aria-hidden
+    className={cn('pointer-events-none absolute -z-10 size-56 rounded-full bg-[radial-gradient(circle,#DFDBFE_0%,transparent_70%)] blur-2xl md:size-125', GLOW_POSITION_CLASSES[position])}
+  />
+)
+
+const StepCard = ({ step }: { step: Step }) => (
+  <Flex direction={{ initial: 'column', md: 'row' }} align="center" className="shadow-2 w-full gap-6 rounded-3xl bg-white p-6 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
+    <Flex direction="column" className="w-full gap-4 md:w-125 md:shrink-0 md:gap-8">
+      <div className="relative h-14 overflow-hidden opacity-90 md:h-40" aria-hidden>
+        <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight md:text-[220px]">{step.number}</p>
+      </div>
+
+      <Flex direction="column" className="gap-3 md:gap-6">
+        <Flex direction="column" className="gap-1 md:gap-2">
+          <h3 className="text-text-basic text-[28px] leading-tight font-bold tracking-tight md:text-[70px]">{step.titleEn}</h3>
+          <p className="text-text-disabled text-[16px] font-semibold tracking-tight md:text-[28px]">{step.titleKo}</p>
+        </Flex>
+        <Flex direction="column" className="text-text-subtle text-[14px] leading-normal md:text-[20px]">
+          {step.description.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </Flex>
+      </Flex>
+    </Flex>
+
+    <Flex align="center" justify="center" className="bg-bg-gray-subtler h-full w-full rounded-2xl p-5 md:w-137.5 md:shrink-0 md:rounded-[22px] md:p-10">
+      {step.mockup}
+    </Flex>
+  </Flex>
+)
+
+const ProcessStepsMobile = () => (
+  <Flex direction="column" className="w-full gap-6 md:hidden">
+    {STEPS.map((step, index) => (
+      <motion.div
+        key={step.number}
+        className="relative"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7, ease: EASE_EXPO_OUT, delay: index * 0.1 }}
+      >
+        <StepGlow position={step.glowPosition} />
+        <StepCard step={step} />
+      </motion.div>
+    ))}
+  </Flex>
+)
+
+type StepPanelState = 'prev' | 'active' | 'next'
+
+const STEP_PANEL_VARIANTS: Record<StepPanelState, { opacity: number; y: number }> = {
+  prev: { opacity: 0, y: -40 },
+  active: { opacity: 1, y: 0 },
+  next: { opacity: 0, y: 40 }
+}
+
+const StepPanel = ({ step, state }: { step: Step; state: StepPanelState }) => (
+  <motion.div
+    className="absolute inset-0 flex items-center"
+    style={{ zIndex: state === 'active' ? 1 : 0, pointerEvents: state === 'active' ? 'auto' : 'none' }}
+    initial={false}
+    animate={STEP_PANEL_VARIANTS[state]}
+    transition={{ duration: 0.6, ease: EASE_EXPO_OUT }}
+  >
+    <StepGlow position={step.glowPosition} />
+    <StepCard step={step} />
+  </motion.div>
+)
+
+const SCROLL_VH_PER_STEP = 80
+
+const ProcessStepsDesktop = () => {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const { scrollYProgress } = useScroll({
+    target: trackRef,
+    offset: ['start start', 'end end']
+  })
+
+  useMotionValueEvent(scrollYProgress, 'change', (value) => {
+    const nextIndex = Math.min(STEPS.length - 1, Math.floor(value * STEPS.length))
+    setActiveIndex(nextIndex)
+  })
+
+  return (
+    <div ref={trackRef} className="relative hidden w-full md:block" style={{ height: `${STEPS.length * SCROLL_VH_PER_STEP}vh` }}>
+      <div className="sticky top-26.5 flex h-[calc(100vh-6.625rem)] items-center">
+        {STEPS.map((step, index) => (
+          <StepPanel key={step.number} step={step} state={index === activeIndex ? 'active' : index < activeIndex ? 'prev' : 'next'} />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export const ProcessStepsSection = () => {
   return (
     <section id="features" className="py-14 md:py-24">
-      <Flex direction="column" align="center" className="mx-auto max-w-311.25 gap-10 md:gap-25">
-        <Flex direction="column" align="center" className="gap-2 md:gap-3">
+      <Flex direction="column" align="center" className="w-full gap-10 md:gap-25">
+        <Flex direction="column" align="center" className="mx-auto max-w-311.25 gap-2 md:gap-3">
           <p className="font-elms text-primary-50 text-[20px] font-extrabold tracking-tight md:text-[36px]">SCOOP</p>
           <h2 className="text-text-basic px-4 text-center text-[26px] font-bold tracking-tight break-keep md:text-[48px]">3단계로 완성하는 맞춤 이력서</h2>
         </Flex>
 
-        <Flex direction="column" className="w-full gap-6 md:gap-15">
-          {STEPS.map((step) => (
-            <Flex
-              key={step.number}
-              direction={{ initial: 'column', md: 'row' }}
-              align="center"
-              className="shadow-2 w-full gap-6 rounded-3xl bg-white p-6 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16"
-            >
-              <Flex direction="column" className="w-full gap-4 md:w-125 md:shrink-0 md:gap-8">
-                <div className="relative h-14 overflow-hidden opacity-90 md:h-40" aria-hidden>
-                  <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight md:text-[220px]">{step.number}</p>
-                </div>
-
-                <Flex direction="column" className="gap-3 md:gap-6">
-                  <Flex direction="column" className="gap-1 md:gap-2">
-                    <h3 className="text-text-basic text-[28px] leading-tight font-bold tracking-tight md:text-[70px]">{step.titleEn}</h3>
-                    <p className="text-text-disabled text-[16px] font-semibold tracking-tight md:text-[28px]">{step.titleKo}</p>
-                  </Flex>
-                  <Flex direction="column" className="text-text-subtle text-[14px] leading-normal md:text-[20px]">
-                    {step.description.map((line) => (
-                      <p key={line}>{line}</p>
-                    ))}
-                  </Flex>
-                </Flex>
-              </Flex>
-
-              <Flex align="center" justify="center" className="bg-bg-gray-subtler h-full w-full rounded-2xl p-5 md:w-137.5 md:shrink-0 md:rounded-[22px] md:p-10">
-                {step.mockup}
-              </Flex>
-            </Flex>
-          ))}
-        </Flex>
+        <ProcessStepsMobile />
+        <ProcessStepsDesktop />
       </Flex>
     </section>
   )
