@@ -39,24 +39,24 @@ const JobDescriptionMockup = () => {
         <p className="text-text-basic text-base font-bold tracking-[-0.02em]">지원할 공고의 링크를 입력해주세요</p>
         <p className="text-caption1 text-text-subtle">공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.</p>
       </Flex>
-      <div className="h-0 w-0 border-x-8 border-t-14 border-x-transparent border-t-white" aria-hidden />
+      <div className="mb-4 h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-white" aria-hidden />
 
-      <Flex direction="column" className="border-border-subtler w-full gap-1.5 rounded-xl border bg-white p-2">
-        <Flex align="center" className="bg-element-gray-light w-fit gap-0.5 rounded-md p-0.5">
+      <Flex direction="column" className="border-border-subtler w-full gap-2 rounded-xl border bg-white p-2">
+        <Flex align="center" className="bg-element-gray-light w-fit gap-1 rounded-lg p-1">
           {tabs.map((tab, index) => (
-            <span key={tab} className={cn('rounded px-1.5 py-0.75 text-[7px] font-semibold', index === 0 ? 'text-text-basic shadow-1 bg-white' : 'text-text-subtler')}>
+            <span key={tab} className={cn('rounded-md px-3 py-1.5 text-[10px] font-semibold', index === 0 ? 'text-text-basic shadow-1 bg-white' : 'text-text-subtler')}>
               {tab}
             </span>
           ))}
         </Flex>
         <Flex direction="column" className="gap-2 px-1 py-1.5">
-          <div className="bg-bg-gray-subtler h-1 w-[40%] rounded-full" />
-          <div className="bg-bg-gray-subtler h-1 w-[88%] rounded-full" />
-          <div className="bg-bg-gray-subtler h-1 w-[88%] rounded-full" />
+          <div className="bg-gray-10 h-1 w-[40%] rounded-full" />
+          <div className="bg-gray-10 h-1 w-[88%] rounded-full" />
+          <div className="bg-gray-10 h-1 w-[88%] rounded-full" />
         </Flex>
         <Flex justify="end">
-          <div className="bg-primary-50 flex size-6 items-center justify-center rounded-lg">
-            <ArrowRight className="text-white" size={12} />
+          <div className="bg-primary-50 flex size-8 items-center justify-center rounded-sm">
+            <ArrowRight className="text-white" size={16} />
           </div>
         </Flex>
       </Flex>
@@ -225,7 +225,7 @@ export const ProcessStepsSection = () => {
                 </Flex>
               </Flex>
 
-              <Flex align="center" justify="center" className="bg-bg-gray-subtler w-full rounded-2xl p-5 md:w-137.5 md:shrink-0 md:rounded-[22px] md:p-10">
+              <Flex align="center" justify="center" className="bg-bg-gray-subtler h-full w-full rounded-2xl p-5 md:w-137.5 md:shrink-0 md:rounded-[22px] md:p-10">
                 {step.mockup}
               </Flex>
             </Flex>

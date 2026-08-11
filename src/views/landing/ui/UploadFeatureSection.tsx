@@ -17,7 +17,9 @@ const RESUME_CARDS = [
 
 export const UploadFeatureSection = () => {
   return (
-    <section className="relative overflow-hidden bg-white pt-16 pb-10 md:pt-24 md:pb-16">
+    <section className="relative isolate overflow-hidden bg-white pt-16 pb-10 md:pt-24 md:pb-16">
+      <div className="bg-primary-30 absolute top-112 left-1/2 -z-10 h-260 w-[160%] max-w-400 -translate-x-1/2 rounded-full sm:top-72 sm:h-360 md:top-80 md:h-470" aria-hidden />
+
       <Flex direction={{ initial: 'column', md: 'row' }} justify="center" className="mx-auto max-w-308.5 gap-4 md:gap-8">
         <motion.div
           className="border-primary-20 shadow-3 flex min-w-0 flex-1 flex-col gap-3 rounded-3xl border-2 bg-white p-6 md:gap-5 md:rounded-4xl md:p-9.5"
@@ -53,9 +55,7 @@ export const UploadFeatureSection = () => {
         </motion.div>
       </Flex>
 
-      <div className="relative mt-4 flex flex-col items-center overflow-hidden pt-16 pb-16 md:pt-32 md:pb-24">
-        <div className="bg-primary-30 absolute top-0 left-1/2 h-200 w-[160%] max-w-400 -translate-x-1/2 rounded-full sm:h-260 md:h-350" aria-hidden />
-
+      <div className="relative mt-4 flex flex-col items-center pt-16 pb-16 md:pt-32 md:pb-24">
         <motion.img
           src="/landing/upload-arrows.svg"
           alt=""
