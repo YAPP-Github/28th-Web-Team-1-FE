@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { cn } from '@shared/lib'
 import { Button } from '@shared/ui'
 import { Logo } from '@shared/icon'
 
@@ -8,10 +9,24 @@ export const LandingHeader = () => {
       <div className="mx-auto flex max-w-360 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-3 md:gap-20">
           <Logo className="text-xl font-extrabold md:text-2xl" />
-          <Button asChild variant="text" className="text-text-basic md:text-headline1 text-[13px]">
+          <Button
+            asChild
+            variant="text"
+            className={cn(
+              'text-text-basic md:text-headline1 hover:text-text-primary-basic relative px-0 text-[13px]',
+              "after:bg-text-primary-basic after:absolute after:bottom-0 after:left-0 after:h-[1.5px] after:w-0 after:transition-all after:duration-300 after:content-[''] hover:after:w-full"
+            )}
+          >
             <Link href="#features">주요기능</Link>
           </Button>
-          <Button asChild variant="text" className="text-text-basic md:text-headline1 text-[13px]">
+          <Button
+            asChild
+            variant="text"
+            className={cn(
+              'text-text-basic md:text-headline1 hover:text-text-primary-basic relative px-0 text-[13px]',
+              "after:bg-text-primary-basic after:absolute after:bottom-0 after:left-0 after:h-[1.5px] after:w-0 after:transition-all after:duration-300 after:content-[''] hover:after:w-full"
+            )}
+          >
             <Link href="https://tally.so/r/zx497a" target="_blank" rel="noopener noreferrer">
               제보
             </Link>

@@ -10,8 +10,8 @@ const EASE_EXPO_OUT = [0.16, 1, 0.3, 1] as const
 
 export const HeroSection = () => {
   return (
-    <section className="relative mt-6 overflow-hidden rounded-[24px] pt-14 md:mt-10 md:rounded-[40px] md:pt-20">
-      <Image src="/landing/background.png" alt="" fill priority sizes="100vw" className="object-cover" />
+    <section className="relative mt-6 overflow-hidden rounded-3xl pt-14 md:mt-10 md:rounded-[40px] md:pt-20">
+      <Image src="/landing/background.webp" alt="" fill priority sizes="100vw" className="object-cover" />
 
       <Flex direction="column" align="center" gap="6" className="relative mx-auto max-w-144.5 px-4 text-center">
         <motion.img
@@ -50,7 +50,7 @@ export const HeroSection = () => {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 1.25, ease: EASE_EXPO_OUT, delay: 0.74 }}
       >
-        <Image src="/landing/resume.png" alt="SCOOP으로 생성한 이력서 미리보기" width={2924} height={4278} sizes="(min-width: 768px) 480px, 90vw" className="h-auto w-full" priority />
+        <Image src="/landing/resume.webp" alt="SCOOP으로 생성한 이력서 미리보기" width={2924} height={4278} sizes="(min-width: 768px) 480px, 90vw" className="h-auto w-full" priority />
       </motion.div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-60 bg-linear-to-t from-white/60 to-white/0 md:h-120.25" aria-hidden />

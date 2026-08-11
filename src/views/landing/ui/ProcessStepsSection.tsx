@@ -20,9 +20,9 @@ const StarInputMockup = () => {
             <p className="text-text-subtler text-[12px]">{field.ko}</p>
           </Flex>
           <Flex direction="column" justify="center" className="h-18 min-w-0 flex-1 gap-2 rounded-[11px] bg-white px-4">
-            <div className="bg-bg-gray-subtler h-1.5 w-[45%] rounded-full" />
-            <div className="bg-bg-gray-subtler h-1.5 w-[92%] rounded-full" />
-            <div className="bg-bg-gray-subtler h-1.5 w-[92%] rounded-full" />
+            <div className="bg-gray-10 h-1.5 w-[45%] rounded-full" />
+            <div className="bg-gray-10 h-1.5 w-[92%] rounded-full" />
+            <div className="bg-gray-10 h-1.5 w-[92%] rounded-full" />
           </Flex>
         </Flex>
       ))}
@@ -39,12 +39,12 @@ const JobDescriptionMockup = () => {
         <p className="text-text-basic text-base font-bold tracking-[-0.02em]">지원할 공고의 링크를 입력해주세요</p>
         <p className="text-caption1 text-text-subtle">공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.</p>
       </Flex>
-      <div className="h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-white" aria-hidden />
+      <div className="h-0 w-0 border-x-8 border-t-14 border-x-transparent border-t-white" aria-hidden />
 
-      <Flex direction="column" className="border-border-subtler w-full gap-2 rounded-xl border bg-white p-2">
-        <Flex align="center" className="bg-element-gray-light w-fit gap-1 rounded-lg p-1">
+      <Flex direction="column" className="border-border-subtler w-full gap-1.5 rounded-xl border bg-white p-2">
+        <Flex align="center" className="bg-element-gray-light w-fit gap-0.5 rounded-md p-0.5">
           {tabs.map((tab, index) => (
-            <span key={tab} className={cn('rounded-md px-3 py-1.5 text-[10px] font-semibold', index === 0 ? 'text-text-basic shadow-1 bg-white' : 'text-text-subtler')}>
+            <span key={tab} className={cn('rounded px-1.5 py-0.75 text-[7px] font-semibold', index === 0 ? 'text-text-basic shadow-1 bg-white' : 'text-text-subtler')}>
               {tab}
             </span>
           ))}
@@ -55,8 +55,8 @@ const JobDescriptionMockup = () => {
           <div className="bg-bg-gray-subtler h-1 w-[88%] rounded-full" />
         </Flex>
         <Flex justify="end">
-          <div className="bg-primary-50 flex size-8 items-center justify-center rounded-full">
-            <ArrowRight className="text-white" size={16} />
+          <div className="bg-primary-50 flex size-6 items-center justify-center rounded-lg">
+            <ArrowRight className="text-white" size={12} />
           </div>
         </Flex>
       </Flex>
@@ -201,7 +201,12 @@ export const ProcessStepsSection = () => {
 
         <Flex direction="column" className="w-full gap-6 md:gap-15">
           {STEPS.map((step) => (
-            <Flex key={step.number} direction={{ initial: 'column', md: 'row' }} align="center" className="shadow-2 w-full gap-6 rounded-3xl bg-white p-6 md:gap-16.5 md:rounded-[40px] md:p-16">
+            <Flex
+              key={step.number}
+              direction={{ initial: 'column', md: 'row' }}
+              align="center"
+              className="shadow-2 w-full gap-6 rounded-3xl bg-white p-6 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16"
+            >
               <Flex direction="column" className="w-full gap-4 md:w-125 md:shrink-0 md:gap-8">
                 <div className="relative h-14 overflow-hidden opacity-90 md:h-40" aria-hidden>
                   <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight md:text-[220px]">{step.number}</p>

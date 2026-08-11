@@ -3,6 +3,7 @@ import { Check, FilePlus2 } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
+import { NotionIcon } from '@/src/shared/icon'
 
 const EASE_EXPO_OUT = [0.16, 1, 0.3, 1] as const
 
@@ -16,7 +17,7 @@ const RESUME_CARDS = [
 
 export const UploadFeatureSection = () => {
   return (
-    <section className="relative scroll-mt-20 overflow-hidden bg-white pt-16 pb-10 md:scroll-mt-26.5 md:pt-24 md:pb-16">
+    <section className="relative overflow-hidden bg-white pt-16 pb-10 md:pt-24 md:pb-16">
       <Flex direction={{ initial: 'column', md: 'row' }} justify="center" className="mx-auto max-w-308.5 gap-4 md:gap-8">
         <motion.div
           className="border-primary-20 shadow-3 flex min-w-0 flex-1 flex-col gap-3 rounded-3xl border-2 bg-white p-6 md:gap-5 md:rounded-4xl md:p-9.5"
@@ -26,7 +27,7 @@ export const UploadFeatureSection = () => {
           transition={{ duration: 1.05, ease: EASE_EXPO_OUT }}
         >
           <Flex align="center" className="gap-4 md:gap-8">
-            <div className="bg-primary-5 text-primary-50 flex size-14 shrink-0 items-center justify-center rounded-2xl md:size-20 md:rounded-[23px]">
+            <div className="bg-primary-5 text-icon-gray flex size-14 shrink-0 items-center justify-center rounded-2xl md:size-20 md:rounded-[23px]">
               <FilePlus2 size={32} className="size-6 md:size-8" />
             </div>
             <h3 className="text-text-basic text-[22px] leading-[1.3] font-bold tracking-tight md:text-[36px]">pdf 업로드</h3>
@@ -44,7 +45,7 @@ export const UploadFeatureSection = () => {
         >
           <Flex align="center" className="gap-4 md:gap-8">
             <div className="bg-primary-5 flex size-14 shrink-0 items-center justify-center rounded-2xl md:size-20 md:rounded-[23px]">
-              <img src="/landing/notion-mark.png" alt="" className="h-6 w-auto md:h-9" />
+              <NotionIcon className="size-6 md:size-9" />
             </div>
             <h3 className="text-text-basic text-[22px] leading-[1.3] font-bold tracking-tight md:text-[36px]">노션 연동</h3>
           </Flex>
@@ -107,7 +108,7 @@ export const UploadFeatureSection = () => {
             viewport={{ once: true, amount: 0.6 }}
             transition={{ type: 'spring', stiffness: 260, damping: 17, delay: 0.26 + RESUME_CARDS.length * 0.14 }}
           >
-            <Check className="text-primary-50 size-4.5 md:size-5.5" size={22} />
+            <Check className="text-primary-30 size-4.5 md:size-5.5" size={22} strokeWidth={4} />
           </motion.div>
           <motion.p
             className="text-[22px] leading-[1.3] font-bold tracking-tight text-white md:text-[40px]"
