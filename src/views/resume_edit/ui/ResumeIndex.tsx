@@ -1,6 +1,6 @@
 'use client'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { useFieldArray, useFormContext, useWatch, type FieldArrayPath } from 'react-hook-form'
+import { useFieldArray, useFormContext, useWatch, type FieldArrayPath, type UseFieldArrayReplace } from 'react-hook-form'
 import { closestCenter, DndContext, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
@@ -31,7 +31,7 @@ const makeDragEndHandler = (fieldIds: string[], move: (from: number, to: number)
  */
 export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSectionUid: string | null; onSelectSection: (sectionUid: string) => void }) => {
   const { control } = useFormContext<ResumeFormValues>()
-  const { fields: sectionFields, move: moveSection } = useFieldArray({ control, name: 'sections' })
+  const { fields: sectionFields, move: moveSection, replace: replaceSections } = useFieldArray({ control, name: 'sections' })
   const sections = useWatch({ control, name: 'sections' }) ?? []
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
 
@@ -125,7 +125,7 @@ export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSecti
 
               <Divider />
 
-              <SetCategoryModal />
+              <SetCategoryModal onReplaceSections={replaceSections} onClose={() => setIsOpen(false)} />
             </Flex>
           </motion.div>
         )}
@@ -265,9 +265,8 @@ const SortableItemRow = ({ id, label, onSelect }: { id: string; label: string; o
  * - ＋(추가): 숨겨둔 기존 섹션은 `visible:true`, 이력서에 없던 타입은 새 섹션 생성
  * 변경은 로컬에 스테이징되고 **저장**을 눌러야 폼에 반영된다(닫으면 취소).
  */
-const SetCategoryModal = () => {
-  const { control, getValues } = useFormContext<ResumeFormValues>()
-  const { replace } = useFieldArray({ control, name: 'sections' })
+const SetCategoryModal = ({ onReplaceSections, onClose }: { onReplaceSections: UseFieldArrayReplace<ResumeFormValues, 'sections'>; onClose: () => void }) => {
+  const { getValues } = useFormContext<ResumeFormValues>()
 
   const [isOpen, setIsOpen] = useState(false)
   const [staged, setStaged] = useState<ResumeFormSection[]>([])
@@ -296,8 +295,9 @@ const SetCategoryModal = () => {
 
   const handleSave = () => {
     const fixed = getValues('sections').filter((section) => section.type === 'BASIC_INFO')
-    replace([...fixed, ...staged])
+    onReplaceSections([...fixed, ...staged])
     setIsOpen(false)
+    onClose()
   }
 
   const visibleSections = staged.filter((section) => section.visible)
@@ -305,7 +305,13 @@ const SetCategoryModal = () => {
   const missingTypes = ADDABLE_CATEGORY_TYPES.filter((type) => !staged.some((section) => section.type === type))
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open)
+        if (!open) onClose() // 취소·ESC·바깥 클릭으로 닫혀도 미니맵을 함께 닫는다.
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant={'text'} size={'xs'} className={'ml-auto'} onClick={openModal}>
           카테고리 추가/삭제 <Settings />
