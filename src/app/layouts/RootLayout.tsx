@@ -39,7 +39,7 @@ export const RootLayout = ({
   children: React.ReactNode
 }>) => {
   return (
-    <html lang="ko" className={`${pretendard.className} ${pretendard.variable} ${elmsSans.variable} h-full antialiased`}>
+    <html lang="ko" data-scroll-behavior="smooth" className={`${pretendard.className} ${pretendard.variable} ${elmsSans.variable} h-full antialiased`}>
       <body className="flex h-full flex-col">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c') }} />
         <Providers>{children}</Providers>
