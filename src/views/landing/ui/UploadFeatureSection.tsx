@@ -12,7 +12,7 @@ const RESUME_CARDS = [
 
 export const UploadFeatureSection = () => {
   return (
-    <section className="relative overflow-hidden bg-white pt-16 pb-10 md:pt-24 md:pb-16">
+    <section className="relative scroll-mt-20 overflow-hidden bg-white pt-16 pb-10 md:scroll-mt-26.5 md:pt-24 md:pb-16">
       <Flex direction={{ initial: 'column', md: 'row' }} justify="center" className="mx-auto max-w-308.5 gap-4 md:gap-8">
         <Flex direction="column" className="border-primary-20 shadow-3 min-w-0 flex-1 gap-3 rounded-3xl border-2 bg-white p-6 md:gap-5 md:rounded-4xl md:p-9.5">
           <Flex align="center" className="gap-4 md:gap-8">

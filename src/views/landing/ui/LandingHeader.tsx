@@ -9,7 +9,7 @@ export const LandingHeader = () => {
         <div className="flex items-center gap-3 md:gap-20">
           <Logo className="text-xl font-extrabold md:text-2xl" />
           <Button asChild variant="text" className="text-text-basic md:text-headline1 text-[13px]">
-            <Link href="#">주요기능</Link>
+            <Link href="#features">주요기능</Link>
           </Button>
           <Button asChild variant="text" className="text-text-basic md:text-headline1 text-[13px]">
             <Link href="https://tally.so/r/zx497a" target="_blank" rel="noopener noreferrer">

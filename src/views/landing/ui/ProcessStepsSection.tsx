@@ -192,7 +192,7 @@ const STEPS = [
 
 export const ProcessStepsSection = () => {
   return (
-    <section className="py-14 md:py-24">
+    <section id="features" className="py-14 md:py-24">
       <Flex direction="column" align="center" className="mx-auto max-w-311.25 gap-10 md:gap-25">
         <Flex direction="column" align="center" className="gap-2 md:gap-3">
           <p className="font-elms text-primary-50 text-[20px] font-extrabold tracking-tight md:text-[36px]">SCOOP</p>

@@ -5,6 +5,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* ── Design System Spacing Override (radix-themes) ── */
 /*일관성을 위해 Tailwind CSS와 동일한 간격 사용 (4배수)*/
 .radix-themes {
