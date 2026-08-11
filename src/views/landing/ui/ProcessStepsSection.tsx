@@ -201,9 +201,9 @@ const STEPS = [
 type Step = (typeof STEPS)[number]
 
 const GLOW_POSITION_CLASSES: Record<Step['glowPosition'], string> = {
-  'top-right': 'top-0 right-0 -translate-y-1/4 translate-x-1/4',
-  'bottom-left': 'bottom-0 left-0 translate-y-1/4 -translate-x-1/4',
-  right: 'top-1/2 right-0 -translate-y-1/2 translate-x-1/4'
+  'top-right': 'top-0 right-0 md:-translate-y-1/4 md:translate-x-1/4',
+  'bottom-left': 'bottom-0 left-0 md:translate-y-1/4 md:-translate-x-1/4',
+  right: 'top-1/2 right-0 -translate-y-1/2 md:translate-x-1/4'
 }
 
 const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
