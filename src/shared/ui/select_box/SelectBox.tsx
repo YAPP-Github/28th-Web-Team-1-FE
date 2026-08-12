@@ -57,7 +57,7 @@ export const SelectBox = ({ value, onChange, options, label, placeholder = 'ì„ í
             <ChevronDown size={18} strokeWidth={1.67} className="text-icon-gray-light shrink-0" />
           </button>
         </PopoverTrigger>
-        <PopoverContent align="start" sideOffset={6} className="bg-bg-white shadow-2 w-(--radix-popover-trigger-width) overflow-hidden rounded-lg p-1">
+        <PopoverContent align="start" sideOffset={6} className="bg-bg-white shadow-2 w-(--radix-popover-trigger-width) overflow-hidden rounded-lg">
           {items.map((item) => {
             const isSelected = value === item.value
             return (
@@ -66,7 +66,7 @@ export const SelectBox = ({ value, onChange, options, label, placeholder = 'ì„ í
                 type="button"
                 onClick={() => handleSelect(item.value)}
                 className={cn(
-                  'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2.5 text-left outline-none',
+                  'flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left outline-none',
                   'hover:bg-element-gray-lighter',
                   isSelected ? 'text-text-basic' : 'text-text-subtle hover:text-text-basic'
                 )}
