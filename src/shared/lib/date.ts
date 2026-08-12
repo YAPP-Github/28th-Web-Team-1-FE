@@ -73,12 +73,25 @@ const formatPeriod = (startAt?: dayjs.ConfigType, endAt?: dayjs.ConfigType, form
  * ```ts
  * monthToApiDate('2025.05', 'start') // '2025-05-01'
  * monthToApiDate('2025.05', 'end')   // '2025-05-31'
+ * monthToApiDate(null, 'start')      // null  (MonthPicker '선택 안 함')
  * ```
  */
-const monthToApiDate = (value: string, boundary: 'start' | 'end'): string => {
+const monthToApiDate = (value: string | null, boundary: 'start' | 'end'): string | null => {
+  if (!value) return null
   const first = dayjs(`${value.replace(/\./g, '-')}-01`)
   return (boundary === 'start' ? first : first.endOf('month')).format('YYYY-MM-DD')
 }
+
+/**
+ * `DatePicker`가 주는 단일 날짜(`'YYYY.MM.DD'`)를 API 저장용 `'YYYY-MM-DD'`로 바꾼다.
+ * 미선택('선택 안 함')이면 `null`을 그대로 통과시킨다. (`monthToApiDate`의 일 단위 대응)
+ * @example
+ * ```ts
+ * dateToApiDate('2025.05.09') // '2025-05-09'
+ * dateToApiDate(null)         // null
+ * ```
+ */
+const dateToApiDate = (value: string | null): string | null => (value ? value.replace(/\./g, '-') : null)
 
 /**
  * 기간 입력 텍스트(`'2025.05 - 2025.08'` / `'2025.05'`)를 API 저장용 `{ startAt, endAt }`로 변환한다.
@@ -111,4 +124,4 @@ const parsePeriodInput = (value: string): { startAt: string | null; endAt: strin
   return { startAt: toApiDate(start, 'start'), endAt: toApiDate(end, 'end') }
 }
 
-export { formatDate, formatPeriod, parsePeriodInput, monthToApiDate }
+export { formatDate, formatPeriod, parsePeriodInput, monthToApiDate, dateToApiDate }

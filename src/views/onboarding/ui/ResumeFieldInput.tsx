@@ -8,7 +8,7 @@ import { Textarea } from '@shared/ui/textarea'
 import { DatePicker } from '@shared/ui/date_picker'
 import { MonthPicker } from '@shared/ui/month_picker'
 import { Popover, PopoverTrigger, PopoverContent } from '@shared/ui/popover'
-import { formatDate, formatPhoneNumber, parsePeriodInput } from '@shared/lib'
+import { formatDate, formatPhoneNumber, parsePeriodInput, dateToApiDate } from '@shared/lib'
 import type { ResumeField } from '../model/resumeSections'
 
 interface ResumeFieldInputProps {
@@ -31,7 +31,7 @@ export const ResumeFieldInput = ({ field, value, onChange }: ResumeFieldInputPro
           {field.label}
         </Text>
         {/* 현재 스키마상 단일 date 필드(수상일/취득일)는 항상 행의 오른쪽 절반에 놓이므로, 팝오버가 모달 밖으로 넘치지 않게 오른쪽 끝에 맞춘다. */}
-        <DatePicker value={picked} onChange={(next) => onChange(next.replace(/\./g, '-'))} placeholder={field.placeholder} align="end" />
+        <DatePicker value={picked} onChange={(next) => onChange(dateToApiDate(next) ?? '')} placeholder={field.placeholder} align="end" />
       </Flex>
     )
   }

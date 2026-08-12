@@ -4,7 +4,7 @@ import { Flex } from '@radix-ui/themes'
 import { Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { DatePicker } from '@shared/ui/date_picker'
-import { formatDate } from '@shared/lib'
+import { formatDate, dateToApiDate } from '@shared/lib'
 import type { Profile } from '@entities/profile'
 import { EMPTY_LANGUAGE, toLanguageForms, withLanguageTests, type LanguageForm } from '../../model/profileForm'
 import { AddItemButton, RepeatableItemHeader, SaveButton } from './sectionForm'
@@ -46,7 +46,7 @@ export const LanguageSection = ({ profile }: { profile: Profile }) => {
                   <Text variant="label1" weight="semibold">
                     취득일
                   </Text>
-                  <DatePicker value={formatDate(field.value || null, 'YYYY.MM.DD') || null} onChange={(date) => field.onChange(date.replace(/\./g, '-'))} align="end" />
+                  <DatePicker value={formatDate(field.value || null, 'YYYY.MM.DD') || null} onChange={(date) => field.onChange(dateToApiDate(date))} align="end" />
                 </Flex>
               )}
             />
