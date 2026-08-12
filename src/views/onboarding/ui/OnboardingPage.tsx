@@ -14,13 +14,11 @@ import { CompleteStep } from './CompleteStep'
 import { useOnboardingFlow } from '../model/useOnboardingFlow'
 import { type OnboardingStep, type OnboardingStepProps } from '../model/onboardingFlow'
 
-/** `NotionPageSelectStep`에서 고른 연결·페이지 목록. `NotionProcessingStep`으로 넘긴다. */
 interface NotionSelection {
   connectionId: string
   pageIds: string[]
 }
 
-/** 대부분의 스텝엔 필요 없고, 일부 스텝만 공통 props 밖의 값을 쓴다. */
 interface StepContext {
   connectionId?: string
   hasConnected: boolean

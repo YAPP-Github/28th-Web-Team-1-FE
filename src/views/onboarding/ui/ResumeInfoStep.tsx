@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { Flex, Grid } from '@radix-ui/themes'
 import { Award, Book, BookMarked, BookType, ClipboardPen, GraduationCap, Pencil, ShieldCheck, Trash2, type LucideIcon } from 'lucide-react'
 import { toast } from 'sonner'
@@ -99,12 +99,17 @@ const ResumeSectionCard = ({ instance, onSave, onDelete }: ResumeSectionCardProp
   const Icon = SECTION_ICONS[instance.type]
   const {
     control,
+    reset,
     getValues,
     formState: { isDirty }
   } = useForm<Record<string, string>>({ defaultValues: instance.values })
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) reset(instance.values)
+  }
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <button
           type="button"
@@ -176,17 +181,30 @@ interface SkillSectionCardProps {
   onSave: (id: string, values: Record<string, string>) => void
   onDelete: (id: string) => void
 }
+interface SkillFormValues {
+  skills: Array<{ id: string; name: string; level: string }>
+}
+
 const SkillSectionCard = ({ instances, onSave, onDelete }: SkillSectionCardProps) => {
   const config = RESUME_SECTIONS.skill
-  const [values, setValues] = useState<Record<string, Record<string, string>>>({})
+  const {
+    control,
+    reset,
+    getValues,
+    formState: { isDirty }
+  } = useForm<SkillFormValues>({ defaultValues: { skills: [] } })
+  const { fields, remove } = useFieldArray({ control, name: 'skills' })
 
-  // 다이얼로그를 열 때마다 현재 값으로 편집 상태를 새로 잡는다(그 사이 삭제/변경됐을 수 있으므로).
   const handleOpenChange = (open: boolean) => {
-    if (open) setValues(Object.fromEntries(instances.map((instance) => [instance.id, instance.values])))
+    // 이전 값으로 리셋
+    if (open) reset({ skills: instances.map((instance) => ({ id: instance.id, name: instance.values.name ?? '', level: instance.values.level ?? '' })) })
   }
 
   const handleSave = () => {
-    instances.forEach((instance) => onSave(instance.id, values[instance.id] ?? instance.values))
+    const skills = getValues('skills')
+    const remainingIds = new Set(skills.map((skill) => skill.id))
+    instances.filter((instance) => !remainingIds.has(instance.id)).forEach((instance) => onDelete(instance.id))
+    skills.forEach((skill) => onSave(skill.id, { name: skill.name, level: skill.level }))
   }
 
   return (
@@ -228,23 +246,23 @@ const SkillSectionCard = ({ instances, onSave, onDelete }: SkillSectionCardProps
             <div aria-hidden className="w-11.25 shrink-0" />
           </Flex>
           <Flex direction="column" gap="2" className="max-h-64.25 w-full scrollbar-gutter-stable overflow-y-auto">
-            {instances.map((instance) => (
-              <Flex key={instance.id} align="start" gap="2" className="w-full">
-                <Input
-                  className="flex-1"
-                  clearable={false}
-                  placeholder={config.fields.find((field) => field.key === 'name')?.placeholder}
-                  value={values[instance.id]?.name ?? ''}
-                  onChange={(e) => setValues((prev) => ({ ...prev, [instance.id]: { ...prev[instance.id], name: e.target.value } }))}
+            {fields.map((field, index) => (
+              <Flex key={field.id} align="start" gap="2" className="w-full">
+                <Controller
+                  control={control}
+                  name={`skills.${index}.name`}
+                  render={({ field: rhfField }) => (
+                    <Input className="flex-1" clearable={false} placeholder={config.fields.find((f) => f.key === 'name')?.placeholder} value={rhfField.value ?? ''} onChange={rhfField.onChange} />
+                  )}
                 />
                 <div className="w-45 shrink-0">
-                  <SelectDropdown
-                    value={values[instance.id]?.level ?? ''}
-                    onChange={(value) => setValues((prev) => ({ ...prev, [instance.id]: { ...prev[instance.id], level: value } }))}
-                    options={config.fields.find((field) => field.key === 'level')?.options ?? []}
+                  <Controller
+                    control={control}
+                    name={`skills.${index}.level`}
+                    render={({ field: rhfField }) => <SelectDropdown value={rhfField.value ?? ''} onChange={rhfField.onChange} options={config.fields.find((f) => f.key === 'level')?.options ?? []} />}
                   />
                 </div>
-                <Button variant="tertiary" size="icon-md" onClick={() => onDelete(instance.id)} aria-label="삭제" className="size-11.25">
+                <Button variant="tertiary" size="icon-md" onClick={() => remove(index)} aria-label="삭제" className="size-11.25">
                   <Trash2 size={18} />
                 </Button>
               </Flex>
@@ -252,7 +270,7 @@ const SkillSectionCard = ({ instances, onSave, onDelete }: SkillSectionCardProps
           </Flex>
         </Flex>
         <DialogClose asChild>
-          <Button variant="primary" size="lg" fullWidth onClick={handleSave}>
+          <Button variant="primary" size="lg" fullWidth disabled={!isDirty} onClick={handleSave}>
             저장
           </Button>
         </DialogClose>

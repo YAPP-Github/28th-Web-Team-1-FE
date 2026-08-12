@@ -51,12 +51,19 @@ export const useOnboardingFlow = (initialStep?: OnboardingStep) => {
     setHistory((prev) => prev.slice(0, -1))
   }, [history])
 
+  /** 플로우 맵을 무시하고 임의 스텝으로 바로 이동한다. 개발용(`DevSkipStepButton`) 전용이다. */
+  const goTo = useCallback((target: OnboardingStep) => {
+    setDirection(1)
+    setHistory((prev) => [...prev, target])
+  }, [])
+
   return {
     step,
     direction,
     next,
     skip,
     back,
+    goTo,
     hasPrev: history.length > 1,
     hasSkip: ONBOARDING_FLOW[step].skip !== undefined,
     /** 이력서(정보 확인까지) 또는 Notion(페이지 선택까지) 연동을 완료했는지 — 완료 화면 CTA 분기용 */
