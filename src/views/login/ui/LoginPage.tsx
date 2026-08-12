@@ -12,7 +12,7 @@ export const LoginPage = () => {
         <AuthErrorToast />
       </Suspense>
       <header className="absolute top-8 left-8 flex items-center gap-16">
-        <Logo />
+        <Logo href="/" />
         <Button asChild variant="text" size="xl">
           <Link href="/">주요기능</Link>
         </Button>

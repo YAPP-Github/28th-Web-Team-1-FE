@@ -106,7 +106,7 @@ const ResumeCtaCard = () => (
           </Text>
         </Flex>
       </Flex>
-      <Button variant="tertiary" size="xs" asChild className="group-hover:bg-btn-primary-fill group-hover:text-text-bolder-inverse transition-colors">
+      <Button variant="tertiary" size="xs" asChild className="hover:bg-btn-primary-fill group-hover:bg-btn-primary-fill group-hover:text-text-bolder-inverse transition-colors">
         <span>
           이력서 만들기
           <ArrowRight data-icon="inline-end" />

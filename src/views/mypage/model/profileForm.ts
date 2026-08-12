@@ -145,11 +145,11 @@ const profileToUpdateRequest = (profile: Profile): UpdateProfileRequest => ({
 
 export const withBasic = (profile: Profile, form: BasicForm): UpdateProfileRequest => ({
   ...profileToUpdateRequest(profile),
-  name: nullIfBlank(form.name),
-  email: nullIfBlank(form.email),
-  phone: nullIfBlank(form.phone)
+  name: form.name.trim(),
+  email: form.email.trim(),
+  phone: form.phone.trim()
 })
-export const withCoreCompetency = (profile: Profile, form: CoreCompetencyForm): UpdateProfileRequest => ({ ...profileToUpdateRequest(profile), coreCompetency: nullIfBlank(form.coreCompetency) })
+export const withCoreCompetency = (profile: Profile, form: CoreCompetencyForm): UpdateProfileRequest => ({ ...profileToUpdateRequest(profile), coreCompetency: form.coreCompetency.trim() })
 export const withEducations = (profile: Profile, items: EducationForm[]): UpdateProfileRequest => ({ ...profileToUpdateRequest(profile), educations: educationsToRequest(items) })
 export const withCareers = (profile: Profile, items: CareerForm[]): UpdateProfileRequest => ({ ...profileToUpdateRequest(profile), careers: careersToRequest(items) })
 export const withLanguageTests = (profile: Profile, items: LanguageForm[]): UpdateProfileRequest => ({ ...profileToUpdateRequest(profile), languageTests: languageTestsToRequest(items) })

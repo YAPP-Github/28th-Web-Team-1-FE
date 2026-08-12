@@ -43,9 +43,9 @@ export const sectionsToUpdateRequest = (sections: ResumeSectionInstance[]): Upda
   const basic = sections.find((section) => section.type === 'basic')?.values ?? {}
   const pick = (type: ResumeSectionType) => sections.filter((section) => section.type === type && Object.values(section.values).some((v) => v?.trim())).map((section) => section.values)
   return {
-    name: nullIfBlank(basic.name),
-    email: nullIfBlank(basic.email),
-    phone: nullIfBlank(basic.phone),
+    name: basic.name?.trim(),
+    email: basic.email?.trim(),
+    phone: basic.phone?.trim(),
     educations: pick('education').map((v) => ({
       school: nullIfBlank(v.school),
       major: nullIfBlank(v.major),

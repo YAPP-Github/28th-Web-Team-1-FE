@@ -1,6 +1,5 @@
 'use client'
 import { ChevronRight } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useWithdraw } from '@entities/user'
 import { Button } from '@shared/ui'
@@ -24,15 +23,13 @@ import {
  * ```
  */
 export const WithdrawButton = () => {
-  const router = useRouter()
   const { mutate: withdraw } = useWithdraw()
 
   const onWithdraw = () => {
     withdraw(undefined, {
       onSuccess: () => {
-        // TODO : 탈퇴 시 이동할 페이지를 정해야 함. 현재는 로그인 페이지로 이동하도록 설정
         toast.success('계정 탈퇴가 완료되었어요.', { id: 'withdraw-success', position: 'top-center' })
-        router.replace('/login')
+        window.location.href = '/login'
       },
       onError: () => toast.error('탈퇴에 실패했어요.\n다시 시도해 주세요.', { id: 'withdraw-error', position: 'top-center' })
     })
