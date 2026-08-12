@@ -44,9 +44,11 @@ export const buildResumeInput = (experiences: Experience[], jdId: string): Creat
   }))
 
   const sections = CREATE_SECTION_TYPES.map((type, displayOrder) => {
-    // EXPERIENCE와 CORE_SKILL은 값을 직접 채우고, 나머지는 서버 기본 아이템을 사용한다(useDefaultItems=true → items는 비어 있어야 함).
     if (type === 'EXPERIENCE') {
       return { type, displayOrder, visible: true, items: experienceItems }
+    }
+    if (type === 'CORE_SKILL') {
+      return { type, displayOrder, visible: true, items: [{ displayOrder: 0, visible: true, payload: { coreSkill: { content: '', isInitialItem: true } } }] }
     }
     return { type, displayOrder, visible: true, useDefaultItems: true, items: [] }
   })
