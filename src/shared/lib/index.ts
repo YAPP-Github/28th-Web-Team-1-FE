@@ -1,5 +1,5 @@
 export { cn } from './cn'
-export { formatDate, formatPeriod, parsePeriodInput, formatYYYYMM, monthToApiDate } from './date'
+export { formatDate, formatPeriod, parsePeriodInput, formatYYYYMM, monthToApiDate, dateToApiDate } from './date'
 export { formatPhoneNumber } from './phone'
 export { http, ApiError } from './http'
 export { execute } from './execute'

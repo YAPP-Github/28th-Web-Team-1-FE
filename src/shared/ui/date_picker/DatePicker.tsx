@@ -5,6 +5,7 @@ import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Text } from '../typography'
 import { Popover, PopoverContent, PopoverTrigger } from '../popover'
+import { Button, Spacing } from '@shared/ui'
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -18,8 +19,8 @@ const parseDate = (value: string | null) => {
 interface DatePickerProps {
   /** 선택 값. `'YYYY.MM.DD'` 형식(예: `'2025.05.09'`). 미선택은 `null`. */
   value: string | null
-  /** 날짜 선택 시 `'YYYY.MM.DD'` 문자열로 호출된다. */
-  onChange: (value: string) => void
+  /** 날짜 선택 시 `'YYYY.MM.DD'` 문자열로, '선택 안 함' 시 `null`로 호출된다. */
+  onChange: (value: string | null) => void
   placeholder?: string
   disabled?: boolean
   /** 트리거(필드)에 적용할 클래스. */
@@ -131,6 +132,20 @@ export const DatePicker = ({ value, onChange, placeholder = 'YYYY.MM.DD', disabl
             )
           })}
         </div>
+
+        <Spacing size={12} />
+
+        <Button
+          variant={'text'}
+          size={'sm'}
+          onClick={() => {
+            onChange(null)
+            setIsOpen(false)
+          }}
+          className={'text-text-subtle underline underline-offset-2'}
+        >
+          날짜 선택 안함
+        </Button>
       </PopoverContent>
     </Popover>
   )

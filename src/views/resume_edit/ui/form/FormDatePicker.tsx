@@ -1,9 +1,8 @@
-import dayjs from 'dayjs'
 import { Controller, useFormContext, type FieldPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Text } from '@shared/ui'
 import { DatePicker } from '@shared/ui/date_picker'
-import { formatDate } from '@shared/lib'
+import { formatDate, dateToApiDate } from '@shared/lib'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 
 interface FormDatePickerProps {
@@ -32,10 +31,7 @@ export const FormDatePicker = ({ name, label, className }: FormDatePickerProps) 
               {label}
             </Text>
           )}
-          <DatePicker
-            value={formatDate(typeof field.value === 'string' ? field.value : null, 'YYYY.MM.DD') || null}
-            onChange={(date) => field.onChange(dayjs(date.replace(/\./g, '-')).format('YYYY-MM-DD'))}
-          />
+          <DatePicker value={formatDate(typeof field.value === 'string' ? field.value : null, 'YYYY.MM.DD') || null} onChange={(date) => field.onChange(dateToApiDate(date))} />
         </Flex>
       )}
     />
