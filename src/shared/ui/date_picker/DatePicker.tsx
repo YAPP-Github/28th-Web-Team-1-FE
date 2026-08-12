@@ -137,7 +137,7 @@ export const DatePicker = ({ value, onChange, placeholder = 'YYYY.MM.DD', disabl
 
         <Button
           variant={'text'}
-          size={'xs'}
+          size={'sm'}
           onClick={() => {
             onChange(null)
             setIsOpen(false)

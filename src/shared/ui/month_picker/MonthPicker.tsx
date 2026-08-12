@@ -114,7 +114,7 @@ export const MonthPicker = ({ value, onChange, placeholder = 'YYYY.MM', disabled
 
         <Button
           variant={'text'}
-          size={'xs'}
+          size={'sm'}
           onClick={() => {
             onChange(null)
             setIsOpen(false)
