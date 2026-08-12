@@ -144,7 +144,7 @@ const ExperienceDetailPanelContent = ({ workspaceId, experienceId, onClose }: { 
               </Text>
             </Flex>
           </Flex>
-          <Flex align="center" gap="5">
+          <Flex align="start" gap="5">
             <Text variant="label2" color="text-subtler" className="w-16 shrink-0">
               관련 역량
             </Text>
