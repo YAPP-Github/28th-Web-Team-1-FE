@@ -20,7 +20,13 @@ export const middleware = async (request: NextRequest) => {
   const accessToken = request.cookies.get('access_token')?.value
   const refreshToken = request.cookies.get('refresh_token')?.value
 
-  if (accessToken) return NextResponse.next()
+  // 보호된 페이지는 브라우저 bfcache에 남으면 안 된다. 로그아웃·탈퇴 후 뒤로가기로 복원되면
+  // 미들웨어를 다시 타지 않아 이미 사라진 세션의 화면이 그대로 보이는 문제가 생긴다.
+  if (accessToken) {
+    const response = NextResponse.next()
+    if (!isPublicPath) response.headers.set('Cache-Control', 'no-store')
+    return response
+  }
 
   if (!refreshToken) {
     if (isPublicPath) return NextResponse.next()
@@ -39,5 +45,6 @@ export const middleware = async (request: NextRequest) => {
   const response = NextResponse.next({ request })
 
   response.cookies.set('access_token', tokens.accessToken, cookieOptions(ACCESS_TOKEN_MAX_AGE))
+  if (!isPublicPath) response.headers.set('Cache-Control', 'no-store')
   return response
 }
