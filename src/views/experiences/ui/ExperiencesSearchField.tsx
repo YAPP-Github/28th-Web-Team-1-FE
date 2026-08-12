@@ -56,19 +56,19 @@ const ExperiencesSearchItem = ({ experience }: { experience: ReturnType<typeof u
       href={`/experiences/${experience.project?.projectId}?experienceId=${experience.experienceId}`}
       className="group hover:bg-element-gray-light focus-visible:bg-element-gray-light flex w-full cursor-pointer items-center justify-between px-5 py-3 text-left transition-colors outline-none"
     >
-      <Flex direction="row" align="center" gap="3">
-        <Search size={18} className="text-icon-disabled group-hover:text-icon-gray-light group-focus-visible:text-icon-gray-light bg-btn-tertiary-fill box-content rounded-full p-1.75" />
-        <Flex direction="row" align="center" gap="6px">
-          <Text variant="headline2" color="text-subtler">
+      <Flex direction="row" align="center" gap="3" className="min-w-0 flex-1">
+        <Search size={18} className="text-icon-disabled group-hover:text-icon-gray-light group-focus-visible:text-icon-gray-light bg-btn-tertiary-fill box-content shrink-0 rounded-full p-1.75" />
+        <Flex direction="row" align="center" gap="6px" className="min-w-0 flex-1">
+          <Text variant="headline2" color="text-subtler" className="max-w-[40%] min-w-0 shrink truncate">
             {experience.project?.name}
           </Text>
-          <ChevronRight size={18} className="text-icon-gray-light" strokeWidth={1.5} />
-          <Text variant="headline2" color="text-primary-basic">
+          <ChevronRight size={18} className="text-icon-gray-light shrink-0" strokeWidth={1.5} />
+          <Text variant="headline2" color="text-primary-basic" className="min-w-0 flex-1 truncate">
             {experience.title}
           </Text>
         </Flex>
       </Flex>
-      <ArrowRight size={18} className="text-icon-disabled-on group-hover:text-icon-gray-light group-focus-visible:text-icon-gray-light" />
+      <ArrowRight size={18} className="text-icon-disabled-on group-hover:text-icon-gray-light group-focus-visible:text-icon-gray-light shrink-0" />
     </Link>
   )
 }
