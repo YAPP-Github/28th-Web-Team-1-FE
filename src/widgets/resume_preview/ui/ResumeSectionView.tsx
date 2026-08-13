@@ -21,7 +21,7 @@ export const ResumeSectionView = ({ section }: { section: ResumeSectionData }) =
     case 'CORE_SKILL':
       return <CoreSkillSection title={displayText} items={payloadsOf(items, 'coreSkill')} />
     case 'CAREER':
-      return <CareerSection title={`${displayText} / 활동`} items={payloadsOf(items, 'career')} />
+      return <CareerSection title={displayText} items={payloadsOf(items, 'career')} />
     case 'EXPERIENCE':
       return <ExperienceSection title={displayText} items={payloadsOf(items, 'experience')} />
     case 'EDUCATION':
