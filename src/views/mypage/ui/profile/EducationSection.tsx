@@ -1,9 +1,8 @@
 'use client'
 import { Controller, useFieldArray } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
-import { Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
-import { MonthPicker } from '@shared/ui/month_picker'
+import { MonthRangePicker } from '@shared/ui/month_range_picker'
 import { formatDate, monthToApiDate } from '@shared/lib'
 import { DEGREE_OPTIONS, EDUCATION_STATUS_OPTIONS, type Profile } from '@entities/profile'
 import { EMPTY_EDUCATION, toEducationForms, withEducations, type EducationForm } from '../../model/profileForm'
@@ -42,30 +41,15 @@ export const EducationSection = ({ profile }: { profile: Profile }) => {
               render={({ field }) => {
                 const period = field.value ?? { startAt: null, endAt: null }
                 return (
-                  <Flex direction="column" gap="2" className="w-full">
-                    <Text variant="label1" weight="semibold">
-                      기간
-                    </Text>
-                    <Flex align="center" gap="2">
-                      <MonthPicker
-                        value={formatDate(period.startAt, 'YYYY.MM') || null}
-                        onChange={(month) => field.onChange({ startAt: monthToApiDate(month, 'start'), endAt: period.endAt })}
-                        placeholder="시작"
-                        className="min-w-0 flex-1"
-                        align="start"
-                        max={formatDate(period.endAt, 'YYYY.MM') || null}
-                      />
-                      <span className="text-icon-gray-lighter">-</span>
-                      <MonthPicker
-                        value={formatDate(period.endAt, 'YYYY.MM') || null}
-                        onChange={(month) => field.onChange({ startAt: period.startAt, endAt: monthToApiDate(month, 'end') })}
-                        placeholder="종료"
-                        className="min-w-0 flex-1"
-                        align="end"
-                        min={formatDate(period.startAt, 'YYYY.MM') || null}
-                      />
-                    </Flex>
-                  </Flex>
+                  <MonthRangePicker
+                    label="기간"
+                    className="w-full"
+                    start={formatDate(period.startAt, 'YYYY.MM') || null}
+                    end={formatDate(period.endAt, 'YYYY.MM') || null}
+                    onChangeStart={(month) => field.onChange({ startAt: monthToApiDate(month, 'start'), endAt: period.endAt })}
+                    onChangeEnd={(month) => field.onChange({ startAt: period.startAt, endAt: monthToApiDate(month, 'end') })}
+                    separatorClassName="text-icon-gray-lighter"
+                  />
                 )
               }}
             />

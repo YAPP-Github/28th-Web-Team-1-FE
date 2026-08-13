@@ -6,7 +6,7 @@ import { Text } from '@shared/ui'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
 import { DatePicker } from '@shared/ui/date_picker'
-import { MonthPicker } from '@shared/ui/month_picker'
+import { MonthRangePicker } from '@shared/ui/month_range_picker'
 import { Popover, PopoverTrigger, PopoverContent } from '@shared/ui/popover'
 import { formatDate, formatPhoneNumber, parsePeriodInput, dateToApiDate } from '@shared/lib'
 import type { ResumeField } from '../model/resumeSections'
@@ -18,7 +18,6 @@ interface ResumeFieldInputProps {
 }
 
 /**
- * 필드 종류(`field.kind`)에 따라 텍스트 `Input` / `DatePicker` / 기간용 `MonthPicker` 두 개로 렌더링한다.
  * 값은 항상 문자열 하나(`values[field.key]`)로 저장되므로, date/period는 피커 포맷과 저장 포맷 사이를 이 컴포넌트에서 왕복 변환한다.
  */
 export const ResumeFieldInput = ({ field, value, onChange }: ResumeFieldInputProps) => {
@@ -42,16 +41,13 @@ export const ResumeFieldInput = ({ field, value, onChange }: ResumeFieldInputPro
     const start = formatDate(startAt, 'YYYY.MM') || null
     const end = formatDate(endAt, 'YYYY.MM') || null
     return (
-      <Flex direction="column" gap="2">
-        <Text variant="label1" weight="semibold" color="text-basic">
-          {field.label}
-        </Text>
-        <Flex align="center" gap="2">
-          <MonthPicker value={start} onChange={(next) => onChange([next, end].filter(Boolean).join(' - '))} placeholder="시작" className="min-w-0 flex-1" align="start" max={end} />
-          <span className="text-text-subtler">-</span>
-          <MonthPicker value={end} onChange={(next) => onChange([start, next].filter(Boolean).join(' - '))} placeholder="종료" className="min-w-0 flex-1" align="end" min={start} />
-        </Flex>
-      </Flex>
+      <MonthRangePicker
+        label={field.label}
+        start={start}
+        end={end}
+        onChangeStart={(next) => onChange([next, end].filter(Boolean).join(' - '))}
+        onChangeEnd={(next) => onChange([start, next].filter(Boolean).join(' - '))}
+      />
     )
   }
 
