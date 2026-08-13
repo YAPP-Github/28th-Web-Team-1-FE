@@ -43,6 +43,7 @@ export const FormPeriodPicker = ({ name, label, className }: FormPeriodPickerPro
                 value={formatDate(period?.startAt, 'YYYY.MM') || null}
                 onChange={(month) => field.onChange({ startAt: monthToApiDate(month, 'start'), endAt: period?.endAt ?? null })}
                 placeholder={'시작'}
+                max={formatDate(period?.endAt, 'YYYY.MM') || null}
               />
               <span className={'text-text-subtler'}>-</span>
               <MonthPicker
@@ -50,6 +51,7 @@ export const FormPeriodPicker = ({ name, label, className }: FormPeriodPickerPro
                 value={formatDate(period?.endAt, 'YYYY.MM') || null}
                 onChange={(month) => field.onChange({ startAt: period?.startAt ?? null, endAt: monthToApiDate(month, 'end') })}
                 placeholder={'종료'}
+                min={formatDate(period?.startAt, 'YYYY.MM') || null}
               />
             </Flex>
           </Flex>

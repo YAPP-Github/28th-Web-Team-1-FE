@@ -47,9 +47,9 @@ export const ResumeFieldInput = ({ field, value, onChange }: ResumeFieldInputPro
           {field.label}
         </Text>
         <Flex align="center" gap="2">
-          <MonthPicker value={start} onChange={(next) => onChange([next, end].filter(Boolean).join(' - '))} placeholder="시작" className="min-w-0 flex-1" align="start" />
+          <MonthPicker value={start} onChange={(next) => onChange([next, end].filter(Boolean).join(' - '))} placeholder="시작" className="min-w-0 flex-1" align="start" max={end} />
           <span className="text-text-subtler">-</span>
-          <MonthPicker value={end} onChange={(next) => onChange([start, next].filter(Boolean).join(' - '))} placeholder="종료" className="min-w-0 flex-1" align="end" />
+          <MonthPicker value={end} onChange={(next) => onChange([start, next].filter(Boolean).join(' - '))} placeholder="종료" className="min-w-0 flex-1" align="end" min={start} />
         </Flex>
       </Flex>
     )

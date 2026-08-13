@@ -53,6 +53,7 @@ export const EducationSection = ({ profile }: { profile: Profile }) => {
                         placeholder="시작"
                         className="min-w-0 flex-1"
                         align="start"
+                        max={formatDate(period.endAt, 'YYYY.MM') || null}
                       />
                       <span className="text-icon-gray-lighter">-</span>
                       <MonthPicker
@@ -61,6 +62,7 @@ export const EducationSection = ({ profile }: { profile: Profile }) => {
                         placeholder="종료"
                         className="min-w-0 flex-1"
                         align="end"
+                        min={formatDate(period.startAt, 'YYYY.MM') || null}
                       />
                     </Flex>
                   </Flex>
