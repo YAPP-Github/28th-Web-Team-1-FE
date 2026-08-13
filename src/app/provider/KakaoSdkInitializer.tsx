@@ -3,7 +3,6 @@ import Script from 'next/script'
 
 const KAKAO_JS_KEY = process.env.NEXT_PUBLIC_KAKAO_JS_KEY
 
-/** 카카오톡 공유(나에게 보내기) 기능을 위해 Kakao JS SDK를 로드하고 초기화한다. 키가 없으면 아무 것도 하지 않는다. */
 export const KakaoSdkInitializer = () => {
   if (!KAKAO_JS_KEY) return null
 
