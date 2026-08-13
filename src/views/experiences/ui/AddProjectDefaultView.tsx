@@ -47,7 +47,6 @@ const AddProjectExperienceButton = ({ title, description, icon, className, ...pr
       type="button"
       className={cn(
         'ring-btn-outline-border flex w-full flex-row items-center gap-2.5 rounded-sm px-2.5 py-2.5 ring-1 ring-inset',
-        // TODO : 인터렉션 추가 시 변경 필요
         //hover
         'hover:bg-element-primary-lighter hover:ring-btn-secondary-border',
         className

@@ -25,7 +25,6 @@ export const AuthErrorToast = () => {
     const message = getAuthErrorMessage(errorCode)
     if (!message) return
     toast.error(message, { id: 'auth-error', position: 'top-center' })
-    // TODO : 에러 발생 시 로그인 페이지로 이동하도록 설정. 추후 필요에 따라 다른 페이지로 이동하도록 변경 가능
     router.replace('/login')
   }, [errorCode, router])
 
