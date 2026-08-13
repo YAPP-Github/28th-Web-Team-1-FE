@@ -5,10 +5,14 @@ import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
+import { usePcOnlyDialog } from '../lib/usePcOnlyDialog'
+import { PcOnlyDialog } from './PcOnlyDialog'
 
 const EASE_EXPO_OUT = [0.16, 1, 0.3, 1] as const
 
 export const HeroSection = () => {
+  const { isOpen, setIsOpen, handleClick } = usePcOnlyDialog()
+
   return (
     <section className="relative mt-6 overflow-hidden rounded-3xl pt-14 md:mt-10 md:rounded-[40px] md:pt-20">
       <Image src="/landing/background.webp" alt="" fill priority sizes="100vw" className="object-cover" />
@@ -36,7 +40,7 @@ export const HeroSection = () => {
         </Flex>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EASE_EXPO_OUT, delay: 0.6 }}>
           <Button asChild size="xl" className="px-8">
-            <Link href="/login">
+            <Link href="/login" onClick={handleClick}>
               무료로 시작하기
               <ArrowRight size={24} data-icon="inline-end" className="transition-transform duration-300 group-hover/button:translate-x-1" />
             </Link>
@@ -54,6 +58,7 @@ export const HeroSection = () => {
       </motion.div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-60 bg-linear-to-t from-white/60 to-white/0 md:h-120.25" aria-hidden />
+      <PcOnlyDialog isOpen={isOpen} onOpenChange={setIsOpen} />
     </section>
   )
 }

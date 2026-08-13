@@ -4,8 +4,12 @@ import { ArrowRight, Sparkle } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
+import { usePcOnlyDialog } from '../lib/usePcOnlyDialog'
+import { PcOnlyDialog } from './PcOnlyDialog'
 
 export const FooterCtaSection = () => {
+  const { isOpen, setIsOpen, handleClick } = usePcOnlyDialog()
+
   return (
     <section className="py-14 md:py-24">
       <Flex
@@ -23,7 +27,7 @@ export const FooterCtaSection = () => {
             SCOOP이 채용공고에 맞는 맞춤 이력서를 5분 만에 만들어 드려요.
           </Text>
           <Button asChild variant="secondary" size="xl" className="text-text-basic mt-6 w-fit bg-white px-8 md:mt-8">
-            <Link href="/login">
+            <Link href="/login" onClick={handleClick}>
               이력서 만들기
               <ArrowRight size={20} data-icon="inline-end" className="transition-transform duration-300 group-hover/button:translate-x-1" />
             </Link>
@@ -85,6 +89,7 @@ export const FooterCtaSection = () => {
           </motion.span>
         </div>
       </Flex>
+      <PcOnlyDialog isOpen={isOpen} onOpenChange={setIsOpen} />
     </section>
   )
 }

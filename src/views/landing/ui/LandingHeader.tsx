@@ -1,9 +1,14 @@
+'use client'
 import Link from 'next/link'
 import { cn } from '@shared/lib'
 import { Button } from '@shared/ui'
 import { Logo } from '@shared/icon'
+import { usePcOnlyDialog } from '../lib/usePcOnlyDialog'
+import { PcOnlyDialog } from './PcOnlyDialog'
 
 export const LandingHeader = () => {
+  const { isOpen, setIsOpen, handleClick } = usePcOnlyDialog()
+
   return (
     <header className="border-border-subtler fixed inset-x-0 top-0 z-50 bg-white py-3 shadow-[0_4px_8px_rgba(0,0,0,0.08)] md:py-8">
       <div className="mx-auto flex max-w-360 items-center justify-between px-4 md:px-8">
@@ -33,9 +38,12 @@ export const LandingHeader = () => {
           </Button>
         </div>
         <Button asChild variant="secondary" size="sm" className="md:text-headline2 rounded-lg md:h-10.5 md:gap-1.5 md:px-5 md:py-2.5">
-          <Link href="/login">로그인</Link>
+          <Link href="/login" onClick={handleClick}>
+            로그인
+          </Link>
         </Button>
       </div>
+      <PcOnlyDialog isOpen={isOpen} onOpenChange={setIsOpen} />
     </header>
   )
 }
