@@ -3,7 +3,7 @@ import { Suspense, useState, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { Button, ErrorFallback, Spacing, Text } from '@shared/ui'
-import { isAccessDeniedError } from '@shared/lib'
+import { isAccessDeniedError, type GraphQLError } from '@shared/lib'
 import { useAccessDeniedRedirect } from '@shared/hooks/useAccessDeniedRedirect'
 import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
 import { useResumeDetail, toPreviewSections, type ResumeSectionData } from '@entities/resume'
@@ -19,7 +19,11 @@ export const ResumeDetailPage = ({ resumeId }: { resumeId: string }) => {
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
       <ErrorBoundary
         fallback={({ error }) =>
-          isAccessDeniedError(error) ? <ResumeAccessDeniedFallback /> : <ErrorFallback title="이력서 정보를 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="flex-1" />
+          isAccessDeniedError(error) ? (
+            <ResumeAccessDeniedFallback error={error} />
+          ) : (
+            <ErrorFallback title="이력서 정보를 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="flex-1" />
+          )
         }
       >
         <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
@@ -31,8 +35,8 @@ export const ResumeDetailPage = ({ resumeId }: { resumeId: string }) => {
 }
 
 // 다른 사람의 이력서 URL로 접근했을 때(존재하지 않는 이력서로 응답) 목록으로 돌려보낸다.
-const ResumeAccessDeniedFallback = () => {
-  useAccessDeniedRedirect('존재하지 않거나 접근 권한이 없는 이력서예요.', '/resumes')
+const ResumeAccessDeniedFallback = ({ error }: { error: GraphQLError }) => {
+  useAccessDeniedRedirect(error, '/resumes')
   return null
 }
 
