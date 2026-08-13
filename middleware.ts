@@ -8,6 +8,9 @@ export const config = {
 /** 비로그인 상태에서도 접근 가능한 경로. 나머지는 로그인 페이지로 튕긴다. */
 const PUBLIC_PATHS = new Set(['/', '/login', '/robots.txt', '/sitemap.xml'])
 
+/** 이미 로그인한 사용자가 볼 필요 없는 경로. 접근 시 /home으로 보낸다. (PUBLIC_PATHS의 부분집합이어야 함) */
+const GUEST_ONLY_PATHS = new Set(['/'])
+
 export const middleware = async (request: NextRequest) => {
   const { pathname } = request.nextUrl
 
@@ -20,7 +23,10 @@ export const middleware = async (request: NextRequest) => {
   const accessToken = request.cookies.get('access_token')?.value
   const refreshToken = request.cookies.get('refresh_token')?.value
 
-  if (accessToken) return NextResponse.next()
+  if (accessToken) {
+    if (GUEST_ONLY_PATHS.has(pathname)) return NextResponse.redirect(new URL('/home', request.url))
+    return NextResponse.next()
+  }
 
   if (!refreshToken) {
     if (isPublicPath) return NextResponse.next()
@@ -32,6 +38,12 @@ export const middleware = async (request: NextRequest) => {
   if (!tokens) {
     const response = isPublicPath ? NextResponse.next() : requireAuthRedirect(request)
     clearAuthCookies(response.cookies)
+    return response
+  }
+
+  if (GUEST_ONLY_PATHS.has(pathname)) {
+    const response = NextResponse.redirect(new URL('/home', request.url))
+    response.cookies.set('access_token', tokens.accessToken, cookieOptions(ACCESS_TOKEN_MAX_AGE))
     return response
   }
 
