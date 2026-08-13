@@ -6,9 +6,10 @@ import { FormProvider, useForm, useFormContext, useWatch, type UseFormReturn } f
 import { toast } from 'sonner'
 import { FileCheckCorner, FileClock, RefreshCcw } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { formatDate } from '@shared/lib'
+import { formatDate, isAccessDeniedError, type GraphQLError } from '@shared/lib'
 import { AMPLITUDE_EVENTS } from '@shared/config'
 import { useIntervalAutosave } from '@shared/hooks/useIntervalAutosave'
+import { useAccessDeniedRedirect } from '@shared/hooks/useAccessDeniedRedirect'
 import type { ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
 import { useResumeDetail, useUpdateResume } from '@entities/resume'
 import { useGenerateCoreCompetency } from '@entities/profile'
@@ -27,13 +28,19 @@ import * as amplitude from '@amplitude/unified'
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
-      <ErrorBoundary fallback={<ResumeFallback>이력서를 불러오는 데 실패했습니다.</ResumeFallback>}>
+      <ErrorBoundary fallback={({ error }) => (isAccessDeniedError(error) ? <ResumeAccessDeniedFallback error={error} /> : <ResumeFallback>이력서를 불러오는 데 실패했습니다.</ResumeFallback>)}>
         <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
           <ResumeWorkspace resumeId={resumeId} />
         </Suspense>
       </ErrorBoundary>
     </Flex>
   )
+}
+
+// 다른 사람의 이력서 URL로 접근했을 때(존재하지 않는 이력서로 응답) 목록으로 돌려보낸다.
+const ResumeAccessDeniedFallback = ({ error }: { error: GraphQLError }) => {
+  useAccessDeniedRedirect(error, '/resumes')
+  return null
 }
 
 // Todo: 로딩 스피너 교체

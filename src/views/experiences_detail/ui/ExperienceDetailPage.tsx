@@ -8,6 +8,8 @@ import { useProject } from '@entities/project'
 import { useProjectExperiences } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { cn } from '@shared/lib/cn'
+import { isAccessDeniedError, type GraphQLError } from '@shared/lib'
+import { useAccessDeniedRedirect } from '@shared/hooks/useAccessDeniedRedirect'
 import { ErrorFallback, Text } from '@shared/ui'
 import { ProjectInfo } from './ProjectInfo'
 import { ExperienceList } from './ExperienceList'
@@ -15,13 +17,24 @@ import { ExperienceDetailPanel } from './ExperienceDetailPanel'
 
 export const ExperienceDetailPage = () => {
   return (
-    <ErrorBoundary fallback={<ErrorFallback title="경험을 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="h-screen" />}>
+    <ErrorBoundary
+      fallback={({ error }) =>
+        isAccessDeniedError(error) ? <AccessDeniedFallback error={error} /> : <ErrorFallback title="경험을 불러오지 못했어요." description="잠시 후 다시 시도해 주세요." className="h-screen" />
+      }
+    >
       <Suspense fallback={null}>
         <ExperienceDetailContent />
       </Suspense>
     </ErrorBoundary>
   )
 }
+
+// 다른 사람의 프로젝트 URL로 접근했을 때(존재하지 않는 프로젝트로 응답) 목록으로 돌려보낸다.
+const AccessDeniedFallback = ({ error }: { error: GraphQLError }) => {
+  useAccessDeniedRedirect(error, '/experiences')
+  return null
+}
+
 const ExperienceDetailContent = () => {
   const workspaceId = useWorkspaceId()
   const { projectId } = useParams<{ projectId: string }>()

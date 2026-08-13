@@ -6,7 +6,6 @@ import { cn } from '@shared/lib/cn'
 const searchFieldVariants = cva(
   cn(
     // base
-    // TODO : 애니메이션이 정해지면 추후 수정 필요
     'group flex w-full items-center transition-[box-shadow,background-color] duration-150',
     // default
     'bg-element-gray-lighter ring-border-subtle ring-1 ring-inset',

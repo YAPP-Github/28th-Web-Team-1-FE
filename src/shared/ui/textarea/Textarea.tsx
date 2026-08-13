@@ -81,7 +81,6 @@ const Textarea = ({ className, label, description, error, maxLength = 2000, onCh
         className={cn(
           // label로 감싸 박스 어디를 클릭해도 textarea에 포커스되도록 함
           'group flex max-h-60 min-h-30 w-full min-w-60 cursor-text flex-col gap-3 rounded-lg border p-4',
-          // TODO : 애니메이션이 정해지면 추후 수정 필요
           'bg-element-white transition-[border-color,background-color] duration-150',
           // default
           'border-border-subtle',
