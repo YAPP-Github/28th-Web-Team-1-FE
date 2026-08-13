@@ -18,7 +18,7 @@ const meta = {
           '',
           "그리드 아래 '선택 안 함' 버튼으로 값을 비우면 `onChange(null)`이 호출됩니다.",
           '',
-          '기간(시작–종료)처럼 두 개가 필요하면 `MonthPicker`를 두 번 배치해 조합하세요.'
+          '기간(시작–종료)이 필요하면 이 컴포넌트를 두 번 배치하는 대신 `MonthRangePicker`를 쓰세요(역전 선택 방지가 내장돼 있습니다).'
         ].join('\n')
       }
     }
@@ -49,22 +49,6 @@ export const WithValue: Story = {
     return (
       <div className={'w-60'}>
         <MonthPicker value={value} onChange={setValue} />
-      </div>
-    )
-  }
-}
-
-export const Period: Story = {
-  args: { value: null, onChange: () => {} },
-  parameters: { docs: { description: { story: 'MonthPicker 두 개로 기간(시작–종료) 구성' } } },
-  render: () => {
-    const [start, setStart] = useState<string | null>(null)
-    const [end, setEnd] = useState<string | null>(null)
-    return (
-      <div className={'flex w-100 items-center gap-2'}>
-        <MonthPicker value={start} onChange={setStart} placeholder={'시작'} />
-        <span>-</span>
-        <MonthPicker value={end} onChange={setEnd} placeholder={'종료'} />
       </div>
     )
   }

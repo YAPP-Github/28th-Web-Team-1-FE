@@ -20,7 +20,7 @@ import {
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { Input } from '@shared/ui/input'
 import { Textarea } from '@shared/ui/textarea'
-import { MonthPicker } from '@shared/ui/month_picker'
+import { MonthRangePicker } from '@shared/ui/month_range_picker'
 import { formatDate, formatPeriod, monthToApiDate } from '@shared/lib'
 
 interface ProjectInfoCardProps {
@@ -181,11 +181,13 @@ const EditProjectButton = ({ workspaceId, project }: { workspaceId: string; proj
                 <Text variant="label1" weight="semibold" color="text-basic" className="w-6.25 shrink-0">
                   기간
                 </Text>
-                <Flex align="center" className="min-w-0 flex-1 gap-2">
-                  <MonthPicker value={form.periodStart} onChange={(month) => setForm((prev) => ({ ...prev, periodStart: month }))} placeholder="시작" className="min-w-0 flex-1" align="start" />
-                  <span className="text-text-subtler">-</span>
-                  <MonthPicker value={form.periodEnd} onChange={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))} placeholder="종료" className="min-w-0 flex-1" align="end" />
-                </Flex>
+                <MonthRangePicker
+                  start={form.periodStart}
+                  end={form.periodEnd}
+                  onChangeStart={(month) => setForm((prev) => ({ ...prev, periodStart: month }))}
+                  onChangeEnd={(month) => setForm((prev) => ({ ...prev, periodEnd: month }))}
+                  className="min-w-0 flex-1"
+                />
               </Flex>
             </Flex>
             <Flex align="start" className="gap-4">
