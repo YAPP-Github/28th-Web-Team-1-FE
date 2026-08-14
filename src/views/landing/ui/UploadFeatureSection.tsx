@@ -17,8 +17,8 @@ const RESUME_CARDS = [
 
 export const UploadFeatureSection = () => {
   return (
-    <section className="relative isolate overflow-hidden bg-white pb-10 md:pt-24 md:pb-16">
-      <div className="absolute inset-0 -z-10 -mx-5 overflow-hidden md:-mx-8" aria-hidden>
+    <section className="relative isolate bg-white pb-10 md:pt-24 md:pb-16">
+      <div className="absolute top-0 bottom-0 left-1/2 -z-10 w-screen -translate-x-1/2 overflow-hidden" aria-hidden>
         <div className="bg-primary-30 absolute top-50 left-1/2 h-260 w-[160%] max-w-400 -translate-x-1/2 scale-125 rounded-full sm:top-72 sm:h-360 sm:scale-110 md:top-80 md:h-470 md:scale-100" />
       </div>
 
