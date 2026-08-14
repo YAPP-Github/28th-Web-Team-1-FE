@@ -17,17 +17,17 @@ const StarInputMockup = () => {
   ]
 
   return (
-    <Flex direction="column" className="w-full gap-3.5">
+    <Flex direction="column" className="w-full gap-1.5 md:gap-3.5">
       {fields.map((field) => (
-        <Flex key={field.en} className="gap-2.5">
-          <Flex direction="column" justify="center" className="w-17 shrink-0 gap-0.5">
-            <p className="text-text-basic text-[13px] font-semibold">{field.en}</p>
-            <p className="text-text-subtler text-[12px]">{field.ko}</p>
+        <Flex key={field.en} className="gap-1 md:gap-2.5">
+          <Flex direction="column" justify="center" className="w-9 shrink-0 gap-0 md:w-17 md:gap-0.5">
+            <p className="text-text-basic text-[7px] leading-tight font-semibold md:text-[13px]">{field.en}</p>
+            <p className="text-text-subtler text-[6px] leading-tight md:text-[12px]">{field.ko}</p>
           </Flex>
-          <Flex direction="column" justify="center" className="h-18 min-w-0 flex-1 gap-2 rounded-[11px] bg-white px-4">
-            <div className="bg-gray-10 h-1.5 w-[45%] rounded-full" />
-            <div className="bg-gray-10 h-1.5 w-[92%] rounded-full" />
-            <div className="bg-gray-10 h-1.5 w-[92%] rounded-full" />
+          <Flex direction="column" justify="center" className="h-9 min-w-9 flex-1 gap-1 rounded-[6px] bg-white px-2 md:h-18 md:min-w-0 md:gap-2 md:rounded-[11px] md:px-4">
+            <div className="bg-gray-10 h-1 w-[45%] rounded-full md:h-1.5" />
+            <div className="bg-gray-10 h-1 w-[92%] rounded-full md:h-1.5" />
+            <div className="bg-gray-10 h-1 w-[92%] rounded-full md:h-1.5" />
           </Flex>
         </Flex>
       ))}
@@ -40,28 +40,34 @@ const JobDescriptionMockup = () => {
 
   return (
     <Flex direction="column" align="center" className="w-full max-w-105">
-      <Flex direction="column" align="center" className="shadow-3 relative z-10 gap-1 rounded-xl bg-white px-4.5 py-3.5 text-center">
-        <p className="text-text-basic text-base font-bold tracking-[-0.02em]">지원할 공고의 링크를 입력해주세요</p>
-        <p className="text-caption1 text-text-subtle">공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.</p>
+      <Flex direction="column" align="center" className="shadow-3 relative z-10 w-full gap-0.5 rounded-lg bg-white px-2.5 py-2 text-center md:w-auto md:gap-1 md:rounded-xl md:px-4.5 md:py-3.5">
+        <p className="text-text-basic text-[9px] leading-tight font-bold tracking-[-0.02em] text-balance md:text-base md:text-pretty">지원할 공고의 링크를 입력해주세요</p>
+        <p className="text-text-subtle text-[7px] leading-tight text-balance md:text-caption1 md:text-pretty">공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.</p>
       </Flex>
-      <div className="mb-4 h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-white" aria-hidden />
+      <div className="mb-2 h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-white md:mb-4 md:border-x-8 md:border-t-8" aria-hidden />
 
-      <Flex direction="column" className="border-border-subtler w-full gap-2 rounded-xl border bg-white p-2">
-        <Flex align="center" className="bg-element-gray-light w-fit gap-1 rounded-lg p-1">
+      <Flex direction="column" className="border-border-subtler w-full gap-1 rounded-lg border bg-white p-1.5 md:gap-2 md:rounded-xl md:p-2">
+        <Flex align="center" className="bg-element-gray-light w-fit gap-0.5 rounded-md p-0.5 md:gap-1 md:rounded-lg md:p-1">
           {tabs.map((tab, index) => (
-            <span key={tab} className={cn('rounded-md px-3 py-1.5 text-[10px] font-semibold', index === 0 ? 'text-text-basic shadow-1 bg-white' : 'text-text-subtler')}>
+            <span
+              key={tab}
+              className={cn(
+                'rounded-sm px-1.5 py-0.5 text-[6px] font-semibold whitespace-nowrap md:rounded-md md:px-3 md:py-1.5 md:text-[10px]',
+                index === 0 ? 'text-text-basic shadow-1 bg-white' : 'text-text-subtler'
+              )}
+            >
               {tab}
             </span>
           ))}
         </Flex>
-        <Flex direction="column" className="gap-2 px-1 py-1.5">
-          <div className="bg-gray-10 h-1 w-[40%] rounded-full" />
-          <div className="bg-gray-10 h-1 w-[88%] rounded-full" />
-          <div className="bg-gray-10 h-1 w-[88%] rounded-full" />
+        <Flex direction="column" className="gap-1 px-0.5 py-1 md:gap-2 md:px-1 md:py-1.5">
+          <div className="bg-gray-10 h-0.5 w-[40%] rounded-full md:h-1" />
+          <div className="bg-gray-10 h-0.5 w-[88%] rounded-full md:h-1" />
+          <div className="bg-gray-10 h-0.5 w-[88%] rounded-full md:h-1" />
         </Flex>
         <Flex justify="end">
-          <div className="bg-primary-50 flex size-8 items-center justify-center rounded-sm">
-            <ArrowRight className="text-white" size={16} />
+          <div className="bg-primary-50 flex size-4.5 items-center justify-center rounded-sm md:size-8">
+            <ArrowRight className="text-white size-2.5 md:size-4" size={16} />
           </div>
         </Flex>
       </Flex>
@@ -214,7 +220,7 @@ const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
 )
 
 const StepCard = ({ step }: { step: Step }) => (
-  <Flex direction={{ initial: 'column', md: 'row' }} align="center" className="shadow-2 w-full gap-6 rounded-3xl bg-white p-6 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
+  <Flex direction="row" align="center" className="shadow-2 w-full gap-6 rounded-3xl bg-white p-6 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
     <Flex direction="column" className="w-full gap-4 md:w-125 md:shrink-0 md:gap-8">
       <div className="relative h-14 overflow-hidden opacity-90 md:h-40" aria-hidden>
         <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight md:text-[220px]">{step.number}</p>
@@ -222,10 +228,10 @@ const StepCard = ({ step }: { step: Step }) => (
 
       <Flex direction="column" className="gap-3 md:gap-6">
         <Flex direction="column" className="gap-1 md:gap-2">
-          <h3 className="text-text-basic text-[28px] leading-tight font-bold tracking-tight md:text-[70px]">{step.titleEn}</h3>
-          <p className="text-text-disabled text-[16px] font-semibold tracking-tight md:text-[28px]">{step.titleKo}</p>
+          <h3 className="text-text-basic text-heading2 leading-tight font-bold tracking-tight md:text-[70px]">{step.titleEn}</h3>
+          <p className="text-text-disabled text-caption2 tracking-tight md:text-[28px] md:font-semibold">{step.titleKo}</p>
         </Flex>
-        <Flex direction="column" className="text-text-subtle text-[14px] leading-normal md:text-[20px]">
+        <Flex direction="column" className="text-text-subtle text-[7px] leading-normal md:text-[20px]">
           {step.description.map((line) => (
             <p key={line}>{line}</p>
           ))}
@@ -309,8 +315,8 @@ export const ProcessStepsSection = () => {
     <section id="features" className="py-14 md:py-24">
       <Flex direction="column" align="center" className="w-full gap-10 md:gap-25">
         <Flex direction="column" align="center" className="mx-auto max-w-311.25 gap-2 md:gap-3">
-          <p className="font-elms text-primary-50 text-[20px] font-extrabold tracking-tight md:text-[36px]">SCOOP</p>
-          <h2 className="text-text-basic px-4 text-center text-[26px] font-bold tracking-tight break-keep md:text-[48px]">3단계로 완성하는 맞춤 이력서</h2>
+          <p className="font-elms text-primary-50 text-[16px] font-extrabold tracking-tight md:text-[36px]">SCOOP</p>
+          <h2 className="text-text-basic text-heading2 px-4 text-center font-bold tracking-tight break-keep md:text-[48px]">3단계로 완성하는 맞춤 이력서</h2>
         </Flex>
 
         <ProcessStepsMobile />
