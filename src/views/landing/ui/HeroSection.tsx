@@ -5,13 +5,13 @@ import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
-import { usePcOnlyDialog } from '../lib/usePcOnlyDialog'
+import { useMobileBlockDialog } from '../lib/useMobileBlockDialog'
 import { PcOnlyDialog } from './PcOnlyDialog'
 
 const EASE_EXPO_OUT = [0.16, 1, 0.3, 1] as const
 
 export const HeroSection = () => {
-  const { isOpen, setIsOpen, handleClick } = usePcOnlyDialog()
+  const { isOpen, setIsOpen, handleClick } = useMobileBlockDialog()
 
   return (
     <section className="relative mt-6 overflow-hidden rounded-lg pt-14 md:mt-10 md:rounded-[40px] md:pt-20">

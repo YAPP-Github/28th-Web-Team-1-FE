@@ -3,7 +3,7 @@ import { useState, type MouseEvent } from 'react'
 
 const MOBILE_QUERY = '(max-width: 767px)'
 
-export const usePcOnlyDialog = () => {
+export const useMobileBlockDialog = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   const handleClick = (event: MouseEvent) => {

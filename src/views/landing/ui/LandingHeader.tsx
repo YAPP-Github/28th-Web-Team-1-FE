@@ -3,11 +3,11 @@ import Link from 'next/link'
 import { cn } from '@shared/lib'
 import { Button } from '@shared/ui'
 import { Logo } from '@shared/icon'
-import { usePcOnlyDialog } from '../lib/usePcOnlyDialog'
+import { useMobileBlockDialog } from '../lib/useMobileBlockDialog'
 import { PcOnlyDialog } from './PcOnlyDialog'
 
 export const LandingHeader = () => {
-  const { isOpen, setIsOpen, handleClick } = usePcOnlyDialog()
+  const { isOpen, setIsOpen, handleClick } = useMobileBlockDialog()
 
   return (
     <header className="border-border-subtler fixed inset-x-0 top-0 z-50 bg-white py-3 md:py-8 md:shadow-[0_4px_8px_rgba(0,0,0,0.08)]">

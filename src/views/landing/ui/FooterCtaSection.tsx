@@ -4,11 +4,11 @@ import { ArrowRight, Sparkle } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading } from '@shared/ui'
-import { usePcOnlyDialog } from '../lib/usePcOnlyDialog'
+import { useMobileBlockDialog } from '../lib/useMobileBlockDialog'
 import { PcOnlyDialog } from './PcOnlyDialog'
 
 export const FooterCtaSection = () => {
-  const { isOpen, setIsOpen, handleClick } = usePcOnlyDialog()
+  const { isOpen, setIsOpen, handleClick } = useMobileBlockDialog()
 
   return (
     <section className="py-14 md:py-24">
