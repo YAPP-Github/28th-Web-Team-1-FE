@@ -24,10 +24,10 @@ const StarInputMockup = () => {
             <p className="text-text-basic text-[7px] leading-tight font-semibold md:text-[13px]">{field.en}</p>
             <p className="text-text-subtler text-[6px] leading-tight md:text-[12px]">{field.ko}</p>
           </Flex>
-          <Flex direction="column" justify="center" className="h-9 min-w-9 flex-1 gap-1 rounded-[6px] bg-white px-2 md:h-18 md:min-w-0 md:gap-2 md:rounded-[11px] md:px-4">
-            <div className="bg-gray-10 h-1 w-[45%] rounded-full md:h-1.5" />
-            <div className="bg-gray-10 h-1 w-[92%] rounded-full md:h-1.5" />
-            <div className="bg-gray-10 h-1 w-[92%] rounded-full md:h-1.5" />
+          <Flex direction="column" justify="center" className="h-7 min-w-9 flex-1 gap-1 rounded-[6px] bg-white px-1 md:h-18 md:min-w-0 md:gap-2 md:rounded-[11px] md:px-4">
+            <div className="bg-gray-10 h-0.5 w-[45%] rounded-full md:h-1.5" />
+            <div className="bg-gray-10 h-0.5 w-[92%] rounded-full md:h-1.5" />
+            <div className="bg-gray-10 h-0.5 w-[92%] rounded-full md:h-1.5" />
           </Flex>
         </Flex>
       ))}
@@ -151,6 +151,23 @@ const CompactExperienceMatchCard = ({ label }: { label: string }) => (
   </Flex>
 )
 
+const CompactResumeSection = ({ label, children }: { label: string; children: ReactNode }) => (
+  <Flex className="gap-1.5">
+    <p className="text-text-subtler w-6.5 shrink-0 text-[4.5px] leading-tight">{label}</p>
+    <Flex direction="column" className="min-w-0 flex-1 gap-0.5">
+      {children}
+    </Flex>
+  </Flex>
+)
+
+const CompactResumeEntry = () => (
+  <Flex direction="column" className="gap-0.5">
+    <div className="bg-bg-gray-subtle h-0.5 w-[60%] rounded-full" />
+    <div className="bg-bg-gray-subtle h-0.5 w-[75%] rounded-full" />
+    <div className="bg-bg-gray-subtle h-0.5 w-[75%] rounded-full" />
+  </Flex>
+)
+
 const MatchedExperienceMockupMobile = () => {
   const experiences = ['경험 1', '경험 2']
 
@@ -162,25 +179,31 @@ const MatchedExperienceMockupMobile = () => {
         ))}
       </Flex>
 
-      <ArrowRight className="text-text-subtler shrink-0 rotate-90" size={16} />
+      <ArrowRight className="text-primary-30 size-2 shrink-0 rotate-90 md:size-4" />
 
-      <div className="shadow-3 h-28 w-full overflow-hidden rounded-xl bg-white p-3">
-        <Flex direction="column" className="gap-2">
+      <div className="shadow-3 w-[80%] rounded-xs bg-white p-1.5 md:rounded-xl md:p-2.5">
+        <Flex direction="column" className="gap-1.5">
           <Flex align="center" justify="between">
-            <p className="text-text-basic text-xs font-bold">김스쿱</p>
-            <div className="bg-bg-gray-subtler h-1 w-10 rounded-full" />
+            <p className="text-text-basic text-[7px] font-bold">김스쿱</p>
+            <div className="bg-bg-gray-subtle h-0.5 w-6 rounded-full" />
           </Flex>
           <div className="border-border-subtler border-t" />
 
-          <ResumeSection label="핵심 역량">
-            <div className="bg-bg-gray-subtler h-1.5 w-full rounded-full" />
-            <div className="bg-bg-gray-subtler h-1.5 w-[55%] rounded-full" />
-          </ResumeSection>
+          <CompactResumeSection label="핵심역량">
+            <div className="bg-bg-gray-subtle h-0.5 w-full rounded-full" />
+            <div className="bg-bg-gray-subtle h-0.5 w-full rounded-full" />
+            <div className="bg-bg-gray-subtle h-0.5 w-[55%] rounded-full" />
+          </CompactResumeSection>
 
-          <ResumeSection label="경험">
-            <ResumeEntry lines={2} />
-            <ResumeEntry lines={2} />
-          </ResumeSection>
+          <CompactResumeSection label="경험">
+            <CompactResumeEntry />
+            <CompactResumeEntry />
+            <CompactResumeEntry />
+          </CompactResumeSection>
+
+          <CompactResumeSection label="학력">
+            <CompactResumeEntry />
+          </CompactResumeSection>
         </Flex>
       </div>
     </Flex>
@@ -241,7 +264,8 @@ const STEPS = [
     titleKo: '경험 정리',
     description: ['Notion, PDF 등 경험이 담긴 자료를 업로드해주세요.', '혹은 떠오르는 경험을 자유롭게 작성해 주시면,', 'AI가 이력서에 적합한 STAR 구조로 정리해 드려요.'],
     mockup: <StarInputMockup />,
-    glowPosition: 'top-right' as const
+    glowPosition: 'top-right' as const,
+    clipMockupMobile: false
   },
   {
     number: '02',
@@ -249,7 +273,8 @@ const STEPS = [
     titleKo: '채용 공고 분석',
     description: ['지원하고 싶은 채용공고를 입력해주세요.', '채용 공고를 분석해, 그에 맞는 경험을 추천해 드릴게요.'],
     mockup: <JobDescriptionMockup />,
-    glowPosition: 'bottom-left' as const
+    glowPosition: 'bottom-left' as const,
+    clipMockupMobile: false
   },
   {
     number: '03',
@@ -257,7 +282,8 @@ const STEPS = [
     titleKo: '이력서 생성',
     description: ['AI가 채용공고를 분석해 가장 적합한 경험을 선별하고,', '맞춤형 이력서를 자동으로 생성해 드려요.'],
     mockup: <MatchedExperienceMockup />,
-    glowPosition: 'right' as const
+    glowPosition: 'right' as const,
+    clipMockupMobile: true
   }
 ]
 
@@ -277,7 +303,7 @@ const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
 )
 
 const StepCard = ({ step }: { step: Step }) => (
-  <Flex direction="row" align="center" className="shadow-2 w-full gap-4 rounded-3xl bg-white p-4 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
+  <Flex direction="row" align="center" className="shadow-2 w-full gap-4 rounded-lg bg-white p-4 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
     <Flex direction="column" className="min-w-0 flex-1 gap-3 md:w-125 md:flex-none md:shrink-0 md:gap-8">
       <div className="relative h-14 overflow-hidden opacity-90 md:h-40" aria-hidden>
         <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight md:text-[220px]">{step.number}</p>
@@ -296,7 +322,14 @@ const StepCard = ({ step }: { step: Step }) => (
       </Flex>
     </Flex>
 
-    <Flex align="center" justify="center" className="bg-bg-gray-subtler h-full min-w-0 flex-1 rounded-sm p-3 md:w-137.5 md:flex-none md:shrink-0 md:rounded-[22px] md:p-10">
+    <Flex
+      align={step.clipMockupMobile ? { initial: 'start', md: 'center' } : 'center'}
+      justify="center"
+      className={cn(
+        'bg-bg-gray-subtler min-w-0 flex-1 rounded-sm p-2.5 md:h-full md:w-137.5 md:flex-none md:shrink-0 md:rounded-[22px] md:p-10',
+        step.clipMockupMobile ? 'relative h-36 overflow-hidden' : 'h-full'
+      )}
+    >
       {step.mockup}
     </Flex>
   </Flex>

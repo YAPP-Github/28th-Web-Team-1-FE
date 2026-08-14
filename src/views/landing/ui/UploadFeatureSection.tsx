@@ -19,7 +19,7 @@ export const UploadFeatureSection = () => {
   return (
     <section className="relative isolate overflow-hidden bg-white pb-10 md:pt-24 md:pb-16">
       <div className="absolute inset-0 -z-10 -mx-5 overflow-hidden md:-mx-8" aria-hidden>
-        <div className="bg-primary-30 absolute top-112 left-1/2 h-260 w-[160%] max-w-400 -translate-x-1/2 scale-125 rounded-full sm:top-72 sm:h-360 sm:scale-110 md:top-80 md:h-470 md:scale-100" />
+        <div className="bg-primary-30 absolute top-50 left-1/2 h-260 w-[160%] max-w-400 -translate-x-1/2 scale-125 rounded-full sm:top-72 sm:h-360 sm:scale-110 md:top-80 md:h-470 md:scale-100" />
       </div>
 
       <Flex direction="row" justify="center" className="mx-auto max-w-308.5 gap-2 px-4 md:gap-8 md:px-0">
@@ -57,11 +57,11 @@ export const UploadFeatureSection = () => {
         </motion.div>
       </Flex>
 
-      <div className="relative mt-4 flex flex-col items-center pt-16 pb-16 md:pt-32 md:pb-24">
+      <div className="relative mt-4 flex flex-col items-center md:pt-32 md:pb-24">
         <motion.img
           src="/landing/upload-arrows.svg"
           alt=""
-          className="relative mt-2 block h-8 w-56 sm:h-11 sm:w-80 md:h-15 md:w-107"
+          className="relative mt-2 block h-4 w-32 sm:h-11 sm:w-80 md:h-15 md:w-107"
           aria-hidden
           initial={{ opacity: 0, y: -8 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -69,7 +69,7 @@ export const UploadFeatureSection = () => {
           transition={{ duration: 0.9, ease: EASE_EXPO_OUT }}
         />
 
-        <div className="relative mx-auto mt-6 h-44 w-full max-w-250 sm:h-56 md:mt-8 md:h-80">
+        <div className="relative mx-auto h-44 w-full max-w-250 sm:h-56 md:mt-8 md:h-80">
           {RESUME_CARDS.map((card, index) => (
             <motion.div
               key={card.label}
@@ -102,7 +102,7 @@ export const UploadFeatureSection = () => {
           ))}
         </div>
 
-        <Flex align="center" className="relative mt-6 gap-1.5 md:mt-8 md:gap-4" direction="column">
+        <Flex align="center" className="relative gap-1.5 md:mt-8 md:gap-4" direction="column">
           <motion.div
             className="flex size-3.5 items-center justify-center rounded-full bg-white md:size-10"
             initial={{ opacity: 0, scale: 0.4 }}
