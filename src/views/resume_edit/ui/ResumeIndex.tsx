@@ -86,7 +86,6 @@ export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSecti
       <AnimatePresence>
         {isOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-            <div className={'bg-element-white absolute top-16 right-4 h-2 w-2 rotate-45'} />
             <Flex direction="column" className={cn('bg-element-white border-border-subtler shadow-1 absolute top-16 right-4 z-10 w-55.5 gap-1.5 rounded-lg border px-5 py-3')}>
               <button
                 type="button"
@@ -173,7 +172,7 @@ const SortableSectionRow = ({ id, sectionIndex, section, isActive, onSelect }: {
           <Menu size={12} />
         </button>
 
-        <Text variant="label2" color={'text-subtler'} className={'w-full truncate px-1.5 py-1'}>
+        <Text variant="label2" className={cn('text-text-subtler w-full truncate px-1.5 py-1', isActive && 'text-text-basic')}>
           {SECTION_CATEGORY_LABELS[section.type]}
         </Text>
       </Flex>
@@ -182,7 +181,7 @@ const SortableSectionRow = ({ id, sectionIndex, section, isActive, onSelect }: {
         <SortableContext items={itemEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
           <Flex direction="column" gap="1" className={'rounded-sm'}>
             {itemEntries.map((e) => (
-              <SortableItemRow key={e.id} id={e.id} label={getItemLabel(e.item)} onSelect={onSelect} />
+              <SortableItemRow key={e.id} id={e.id} label={getItemLabel(e.item)} onSelect={onSelect} isActive={isActive} />
             ))}
           </Flex>
         </SortableContext>
@@ -221,7 +220,7 @@ const SectionDragOverlay = ({ section }: { section: ResumeFormSection }) => {
 }
 
 /** 정렬 가능한 아이템 행. grip을 드래그 핸들로 쓰고, 행을 클릭하면 부모 섹션으로 포커스를 옮긴다. */
-const SortableItemRow = ({ id, label, onSelect }: { id: string; label: string; onSelect: () => void }) => {
+const SortableItemRow = ({ id, label, onSelect, isActive }: { id: string; label: string; onSelect: () => void; isActive: boolean }) => {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id })
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : undefined }
 
@@ -244,7 +243,7 @@ const SortableItemRow = ({ id, label, onSelect }: { id: string; label: string; o
       >
         <Menu size={12} />
       </button>
-      <Text variant="caption2" color="text-subtler" className="w-full truncate">
+      <Text variant="caption2" className={cn('text-text-subtler w-full truncate', isActive && 'text-text-basic')}>
         {label}
       </Text>
     </Flex>

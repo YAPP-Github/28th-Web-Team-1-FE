@@ -9,7 +9,7 @@ export const Section = ({ title, children }: { title: string; children: ReactNod
       <Text variant={'label2'} color={'text-subtler'} className={'min-12 w-12 shrink-0 text-nowrap'}>
         {title}
       </Text>
-      <Flex direction={'column'} gap={'6'} className={'flex-1'}>
+      <Flex direction={'column'} gap={'6'} className={'min-w-0 flex-1'}>
         {children}
       </Flex>
     </section>
@@ -22,7 +22,11 @@ export const SectionItem = ({ children }: { children: ReactNode }) => (
   </Flex>
 )
 
-export const SectionItemTitle = ({ children }: { children: ReactNode }) => <Text variant={'label1'}>{children}</Text>
+export const SectionItemTitle = ({ children }: { children: ReactNode }) => (
+  <Text variant={'label1'} className={'break-words'}>
+    {children}
+  </Text>
+)
 
 /** 역할·기간·기관 등 메타 정보를 `·` 구분선으로 이어 붙인다. 비어 있는 값은 자동으로 제외된다. */
 export const SectionItemSubtitle = ({ parts }: { parts: Array<string | null | undefined> }) => {
@@ -30,7 +34,7 @@ export const SectionItemSubtitle = ({ parts }: { parts: Array<string | null | un
   if (visible.length === 0) return null
 
   return (
-    <Text variant={'caption2'} color={'gray-40'} className={'flex items-center gap-1'}>
+    <Text variant={'caption2'} color={'gray-40'} className={'flex flex-wrap items-center gap-1'}>
       {visible.map((part, index) => (
         <Fragment key={index}>
           {index > 0 && <Divider orientation={'vertical'} className={'h-2.5'} />}
@@ -52,5 +56,5 @@ export const periodText = (period?: { startAt?: string | null; endAt?: string | 
   const start = formatYYYYMM(period?.startAt)
   const end = formatYYYYMM(period?.endAt)
   if (!start && !end) return null
-  return `${start} - ${end}`
+  return `${start} ${end && '-'} ${end}`
 }

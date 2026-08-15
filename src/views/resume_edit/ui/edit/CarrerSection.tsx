@@ -62,12 +62,12 @@ const CareerSectionItem = ({ sectionIndex, index, onRemove, targetJdId }: { sect
       <Divider />
       <Spacing size={20} />
 
-      <FormInput name={`${base}.companyName`} label="회사 / 단체명 " clearable={false} placeholder={'회사명을 입력해주세요.'} />
+      <FormInput name={`${base}.companyName`} label="회사 / 단체명 " clearable={false} placeholder={'회사명을 입력해주세요.'} maxLength={20} />
 
       <Spacing size={16} />
 
       <Flex className={'w-full gap-4'}>
-        <FormInput name={`${base}.role`} label="직책" clearable={false} placeholder={'역할을 입력해주세요.'} className={'w-full'} />
+        <FormInput name={`${base}.role`} label="직책" clearable={false} placeholder={'역할을 입력해주세요.'} className={'w-full'} maxLength={20} />
         <FormPeriodPicker name={`${base}.period`} label="기간" className={'w-full'} />
       </Flex>
 
