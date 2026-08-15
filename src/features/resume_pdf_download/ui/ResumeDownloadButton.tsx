@@ -28,8 +28,9 @@ export const ResumeDownloadButton = ({ basicInfo, sections, companyName, positio
     setIsGenerating(true)
     try {
       const { generateResumePdf } = await import('../lib/generateResumePdf')
-      await generateResumePdf({ basicInfo, sections, companyName, positionTitle })
-      toast.success('이력서 다운로드가 완료되었습니다.')
+      const isSaved = await generateResumePdf({ basicInfo, sections, companyName, positionTitle })
+      // 사용자가 저장 위치 대화상자를 취소한 경우(isSaved === false)에는 완료 토스트를 띄우지 않는다.
+      if (isSaved) toast.success('이력서 다운로드가 완료되었습니다.')
     } catch (error) {
       console.error('이력서 PDF 생성 실패', error)
       toast.error('PDF를 만드는 중 문제가 발생했어요.\n잠시 후 다시 시도해 주세요.')
