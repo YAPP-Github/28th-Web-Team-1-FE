@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Flex, Grid } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { Button, Text, SearchField } from '@shared/ui'
@@ -15,14 +15,20 @@ interface AddProjectNotionViewProps {
   workspaceId: string
   connectionId: string
   onExtract: (pageIds: string[]) => void
+  /** 페이지 목록이 2열 그리드로 전환될 때(992px 폭 필요) 부모(다이얼로그)에 알려 너비를 넓히게 한다. */
+  onWideChange?: (wide: boolean) => void
 }
 
 /** Notion 단계: 연동된 Notion에서 페이지를 검색·다중 선택해(최대 3개) 프로젝트로 추출한다. */
-export const AddProjectNotionView = ({ workspaceId, connectionId, onExtract }: AddProjectNotionViewProps) => {
+export const AddProjectNotionView = ({ workspaceId, connectionId, onExtract, onWideChange }: AddProjectNotionViewProps) => {
   const [pageIds, setPageIds] = useState<string[]>([])
   const [keyword, setKeyword] = useState('')
   const debouncedKeyword = useDebounce(keyword.trim(), 300)
   const { pages, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useNotionPages(workspaceId, connectionId, debouncedKeyword)
+
+  useEffect(() => {
+    onWideChange?.(pages.length > 20)
+  }, [pages.length, onWideChange])
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useIntersectionObserver<HTMLDivElement>({

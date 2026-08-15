@@ -37,6 +37,7 @@ export const AddProjectDialog = () => {
 
   const [isOpen, setIsOpen] = useState(() => Boolean(connectionId))
   const [view, setView] = useState<DialogView>(() => (connectionId ? 'notion-select' : 'default'))
+  const [isNotionWide, setIsNotionWide] = useState(false)
 
   const MAX_PROJECTS = 20
 
@@ -47,6 +48,7 @@ export const AddProjectDialog = () => {
     }
     if (next) {
       setView('default')
+      setIsNotionWide(false)
       resetPdf()
       resetManual()
       resetNotion()
@@ -128,7 +130,7 @@ export const AddProjectDialog = () => {
       case 'manual':
         return <AddProjectManualView onBack={() => setView('default')} onExtract={handleExtractManual} onAddExperience={handleAddExperience} />
       case 'notion-select':
-        return connectionId ? <AddProjectNotionView workspaceId={workspaceId} connectionId={connectionId} onExtract={handleExtractNotion} /> : null
+        return connectionId ? <AddProjectNotionView workspaceId={workspaceId} connectionId={connectionId} onExtract={handleExtractNotion} onWideChange={setIsNotionWide} /> : null
       case 'progress':
         return <AddProjectProgressView isComplete={isPdfDone || isNotionDone || isExperienceDone} onCancel={() => handleOpenChange(false)} />
       default:
@@ -143,7 +145,7 @@ export const AddProjectDialog = () => {
           경험 추가하기
         </Button>
       </DialogTrigger>
-      <DialogContent showCloseButton={view !== 'progress'} className={cn(view === 'progress' ? 'w-150' : 'w-200')}>
+      <DialogContent showCloseButton={view !== 'progress'} className={cn(view === 'progress' ? 'w-150' : view === 'notion-select' && isNotionWide ? 'w-248' : 'w-200')}>
         {renderView()}
       </DialogContent>
     </Dialog>
