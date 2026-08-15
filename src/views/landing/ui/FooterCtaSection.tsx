@@ -5,19 +5,19 @@ import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading } from '@shared/ui'
 import { useMobileBlockDialog } from '../lib/useMobileBlockDialog'
-import { PcOnlyDialog } from './PcOnlyDialog'
+import { MobileBlockDialog } from './MobileBlockDialog'
 
 export const FooterCtaSection = () => {
   const { isOpen, setIsOpen, handleClick } = useMobileBlockDialog()
 
   return (
     <section className="py-14 md:py-24">
-      <Flex direction="row" align="center" justify="between" gap="8" className="bg-primary-50 relative mx-auto overflow-hidden rounded-sm p-4 md:rounded-4xl md:px-14 md:py-14">
-        <Flex direction="column" gap={{ initial: '1', md: '2' }} className="relative z-10 min-w-0 flex-1 text-left">
+      <Flex direction="row" align="center" justify="between" className="bg-primary-50 relative mx-auto overflow-hidden rounded-sm p-4 md:gap-8 md:rounded-4xl md:px-14 md:py-14">
+        <Flex direction="column" className="relative z-10 min-w-0 flex-1 gap-0.5 text-left md:gap-2">
           <Heading variant="title2" color="text-bolder-inverse" className="md:text-title2 text-[13px] font-semibold break-keep">
             이력서 작성, 더 이상 혼자 고민하지 마세요
           </Heading>
-          <span className="md:text-heading2 text-[8px] break-keep text-white">SCOOP이 채용공고에 맞는 맞춤 이력서를 5분 만에 만들어 드려요.</span>
+          <span className="md:text-heading2 text-[9px] break-keep text-white">SCOOP이 채용공고에 맞는 맞춤 이력서를 5분 만에 만들어 드려요.</span>
           <Button
             asChild
             variant="secondary"
@@ -31,7 +31,7 @@ export const FooterCtaSection = () => {
           </Button>
         </Flex>
 
-        <div className="relative h-13.5 w-32.5 shrink-0 md:h-40.75 md:w-100">
+        <div className="relative h-13.5 w-26 shrink-0 md:h-40.75 md:w-100">
           <div className="relative h-27 w-65 origin-top-left scale-50 md:h-40.75 md:w-100 md:scale-100">
             <Flex align="center" justify="center" className="h-49 w-44 md:h-75.75 md:w-67.5">
               <motion.div
@@ -62,14 +62,14 @@ export const FooterCtaSection = () => {
             </Flex>
 
             <motion.div
-              className="absolute top-8 left-53 md:top-13 md:left-82"
+              className="absolute top-8 left-44 md:top-13 md:left-82"
               animate={{ opacity: [0.8, 1, 0.8], scale: [0.95, 1, 0.95] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
             >
               <Sparkle className="size-6.5 text-white md:size-10.25" fill="currentColor" />
             </motion.div>
             <motion.div
-              className="absolute top-3 left-61 md:top-5 md:left-94"
+              className="absolute top-3 left-50 md:top-5 md:left-94"
               animate={{ opacity: [1, 0.8, 1], scale: [1, 0.95, 1] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
             >
@@ -88,7 +88,7 @@ export const FooterCtaSection = () => {
           </div>
         </div>
       </Flex>
-      <PcOnlyDialog isOpen={isOpen} onOpenChange={setIsOpen} />
+      <MobileBlockDialog isOpen={isOpen} onOpenChange={setIsOpen} />
     </section>
   )
 }

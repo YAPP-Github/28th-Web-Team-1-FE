@@ -4,11 +4,11 @@ import { Button, Text } from '@shared/ui'
 import { Dialog, DialogClose, DialogContent, DialogHeader } from '@shared/ui/dialog'
 import { sendKakaoMessageToMe } from '../lib/kakaoShare'
 
-interface PcOnlyDialogProps {
+interface MobileBlockDialogProps {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }
-export const PcOnlyDialog = ({ isOpen, onOpenChange }: PcOnlyDialogProps) => {
+export const MobileBlockDialog = ({ isOpen, onOpenChange }: MobileBlockDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="max-w-[min(361px,calc(100%-2rem))] gap-1 p-5 text-center">

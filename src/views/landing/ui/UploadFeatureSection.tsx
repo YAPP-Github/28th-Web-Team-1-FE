@@ -19,7 +19,7 @@ export const UploadFeatureSection = () => {
   return (
     <section className="relative isolate bg-white pb-10 md:pt-24 md:pb-16">
       <div className="absolute top-0 bottom-0 left-1/2 -z-10 w-screen -translate-x-1/2 overflow-hidden" aria-hidden>
-        <div className="bg-primary-30 absolute top-50 left-1/2 h-260 w-[160%] max-w-400 -translate-x-1/2 scale-125 rounded-full sm:top-72 sm:h-360 sm:scale-110 md:top-80 md:h-470 md:scale-100" />
+        <div className="bg-primary-30 absolute inset-x-0 top-20 h-260 rounded-t-[50%_150px] md:top-80 md:h-470 md:rounded-full" />
       </div>
 
       <Flex direction="row" justify="center" className="mx-auto max-w-308.5 gap-2 px-4 md:gap-8 md:px-0">
@@ -36,7 +36,7 @@ export const UploadFeatureSection = () => {
             </div>
             <h3 className="text-text-basic text-label1 md:text-display3">pdf 업로드</h3>
           </Flex>
-          <p className="text-text-subtle text-[8px] leading-[1.6] tracking-[-0.01em] md:text-[24px]">
+          <p className="text-text-subtle text-[10px] leading-[1.6] tracking-[-0.01em] md:text-[24px]">
             이미 만들어둔 이력서를 등록해 두면, 기본 정보와 경력을 불러 와서 이력서 초안을 만들 때 활용해요.
           </p>
         </motion.div>
@@ -53,7 +53,7 @@ export const UploadFeatureSection = () => {
             </div>
             <h3 className="text-text-basic text-label1 md:text-display3">노션 연동</h3>
           </Flex>
-          <p className="text-text-subtle text-[8px] leading-[1.6] tracking-[-0.01em] md:text-[24px]">Notion을 연결하면 정리해 둔 경험을 내 이력서에 맞는 형태로 만들어 드려요.</p>
+          <p className="text-text-subtle text-[10px] leading-[1.6] tracking-[-0.01em] md:text-[24px]">Notion을 연결하면 정리해 둔 경험을 내 이력서에 맞는 형태로 만들어 드려요.</p>
         </motion.div>
       </Flex>
 
@@ -61,7 +61,7 @@ export const UploadFeatureSection = () => {
         <motion.img
           src="/landing/upload-arrows.svg"
           alt=""
-          className="relative mt-2 block h-4 w-32 sm:h-11 sm:w-80 md:h-15 md:w-107"
+          className="relative block h-4 w-32 md:mt-2 md:h-15 md:w-107"
           aria-hidden
           initial={{ opacity: 0, y: -8 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -69,16 +69,11 @@ export const UploadFeatureSection = () => {
           transition={{ duration: 0.9, ease: EASE_EXPO_OUT }}
         />
 
-        <div className="relative mx-auto h-44 w-full max-w-250 sm:h-56 md:mt-8 md:h-80">
+        <div className="relative mx-auto h-44 w-full max-w-250 md:mt-8 md:h-80">
           {RESUME_CARDS.map((card, index) => (
             <motion.div
               key={card.label}
-              className={cn(
-                'shadow-2 absolute h-34 w-28 scale-60 rounded-xl border border-white bg-white px-4 py-4 sm:h-44 sm:w-36 sm:scale-95 sm:rounded-2xl sm:px-6.5 sm:py-6 md:h-65 md:w-54 md:scale-100',
-                card.rotate,
-                card.offsetY,
-                card.z
-              )}
+              className={cn('shadow-2 absolute h-34 w-28 scale-60 rounded-xl border border-white bg-white px-4 py-4 md:h-65 md:w-54 md:scale-100', card.rotate, card.offsetY, card.z)}
               style={{ left: `${index * 14 + 8}%` }}
               initial={{ opacity: 0, y: 32, scale: 0.9 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}

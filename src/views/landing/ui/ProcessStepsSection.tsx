@@ -44,7 +44,7 @@ const JobDescriptionMockup = () => {
       </Flex>
       <div className="mb-2 h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-white md:mb-4 md:border-x-8 md:border-t-8" aria-hidden />
 
-      <Flex direction="column" className="border-border-subtler w-full gap-1 rounded-xs border bg-white p-1.5 md:gap-2 md:rounded-xl md:p-2">
+      <Flex direction="column" className="w-full gap-1 rounded-xs bg-white p-1.5 md:gap-2 md:rounded-xl md:p-2">
         <Flex align="center" className="bg-element-gray-light w-fit gap-0.5 rounded-[1.5px] p-0.5 md:gap-1 md:rounded-lg md:p-1">
           {['URL 붙여넣기', '원문 붙여넣기'].map((tab, index) => (
             <span
@@ -90,7 +90,7 @@ const ExperienceMatchCard = ({ label }: { label: string }) => (
     <Flex align="start" className="gap-2">
       <p className="text-text-subtler w-13 shrink-0 text-[9px]">관련 역량</p>
       <Flex className="min-w-0 flex-1 flex-wrap gap-1">
-        {[0, 1, 2, 3].map((chip) => (
+        {[0, 1, 2].map((chip) => (
           <div key={chip} className="bg-bg-gray-subtler h-3 w-8 rounded-sm" />
         ))}
       </Flex>
@@ -137,7 +137,7 @@ const CompactExperienceMatchCard = ({ label }: { label: string }) => (
     <Flex align="center" justify="between">
       <Flex align="center" className="gap-1">
         <div className="border-border-subtle flex size-1.5 items-center justify-center rounded-[1.5px] border">
-          <Check className="text-text-subtler" size={4.5} strokeWidth={2} />
+          <Check className="text-text-subtler" size={4.5} strokeWidth={5} />
         </div>
         <p className="text-text-bolder text-[6px] font-semibold">{label}</p>
       </Flex>
@@ -262,7 +262,7 @@ const STEPS = [
     number: '01',
     titleEn: 'Experience',
     titleKo: '경험 정리',
-    description: ['Notion, PDF 등 경험이 담긴 자료를 업로드해주세요.', '혹은 떠오르는 경험을 자유롭게 작성해 주시면,', 'AI가 이력서에 적합한 STAR 구조로 정리해 드려요.'],
+    description: 'Notion, PDF 등 경험이 담긴 자료를 업로드해주세요. 혹은 떠오르는 경험을 자유롭게 작성해 주시면, AI가 이력서에 적합한 STAR 구조로 정리해 드려요.',
     mockup: <StarInputMockup />,
     glowPosition: 'top-right' as const,
     clipMockupMobile: false
@@ -271,7 +271,7 @@ const STEPS = [
     number: '02',
     titleEn: 'Job Description',
     titleKo: '채용 공고 분석',
-    description: ['지원하고 싶은 채용공고를 입력해주세요.', '채용 공고를 분석해, 그에 맞는 경험을 추천해 드릴게요.'],
+    description: '지원하고 싶은 채용공고를 입력해주세요. 채용 공고를 분석해, 그에 맞는 경험을 추천해 드릴게요.',
     mockup: <JobDescriptionMockup />,
     glowPosition: 'bottom-left' as const,
     clipMockupMobile: false
@@ -280,7 +280,7 @@ const STEPS = [
     number: '03',
     titleEn: 'Resume',
     titleKo: '이력서 생성',
-    description: ['AI가 채용공고를 분석해 가장 적합한 경험을 선별하고,', '맞춤형 이력서를 자동으로 생성해 드려요.'],
+    description: 'AI가 채용공고를 분석해 가장 적합한 경험을 선별하고, 맞춤형 이력서를 자동으로 생성해 드려요.',
     mockup: <MatchedExperienceMockup />,
     glowPosition: 'right' as const,
     clipMockupMobile: true
@@ -290,9 +290,9 @@ const STEPS = [
 type Step = (typeof STEPS)[number]
 
 const GLOW_POSITION_CLASSES: Record<Step['glowPosition'], string> = {
-  'top-right': 'top-0 right-0 md:-translate-y-1/4 md:translate-x-1/4',
-  'bottom-left': 'bottom-0 left-0 md:translate-y-1/4 md:-translate-x-1/4',
-  right: 'top-1/2 right-0 -translate-y-1/2 md:translate-x-1/4'
+  'top-right': 'top-0 right-0 -translate-y-4 translate-x-4 md:-translate-y-1/4 md:translate-x-1/4',
+  'bottom-left': 'bottom-0 left-0 translate-y-4 -translate-x-4 md:translate-y-1/4 md:-translate-x-1/4',
+  right: 'top-1/2 right-0 -translate-y-1/2 translate-x-4 md:translate-x-1/4'
 }
 
 const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
@@ -303,32 +303,25 @@ const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
 )
 
 const StepCard = ({ step }: { step: Step }) => (
-  <Flex direction="row" align="center" className="shadow-2 w-full gap-4 rounded-lg bg-white p-4 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
-    <Flex direction="column" className="min-w-0 flex-1 gap-3 md:w-125 md:flex-none md:shrink-0 md:gap-8">
+  <Flex direction="row" align="center" justify="between" className="shadow-2 w-full gap-4 rounded-lg bg-white p-5 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
+    <Flex direction="column" className="min-w-0 flex-1 gap-3 md:max-w-125 md:gap-8">
       <div className="relative h-14 overflow-hidden opacity-90 md:h-40" aria-hidden>
         <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight md:text-[220px]">{step.number}</p>
       </div>
 
       <Flex direction="column" className="gap-3 md:gap-6">
         <Flex direction="column" className="gap-1 md:gap-2">
-          <h3 className="text-text-basic text-heading2 leading-tight font-bold tracking-tight md:text-[70px]">{step.titleEn}</h3>
+          <h3 className="text-text-basic text-heading2 leading-tight font-bold tracking-tight whitespace-nowrap md:text-[70px]">{step.titleEn}</h3>
           <p className="text-text-disabled text-caption2 tracking-tight md:text-[28px] md:font-semibold">{step.titleKo}</p>
         </Flex>
-        <Flex direction="column" className="text-text-subtle text-[7px] leading-normal md:text-[20px]">
-          {step.description.map((line) => (
-            <p key={line}>{line}</p>
-          ))}
-        </Flex>
+        <p className="text-text-subtle text-[9px] leading-normal md:text-[20px]">{step.description}</p>
       </Flex>
     </Flex>
 
     <Flex
       align={step.clipMockupMobile ? { initial: 'start', md: 'center' } : 'center'}
       justify="center"
-      className={cn(
-        'bg-bg-gray-subtler min-w-0 flex-1 rounded-sm p-2.5 md:h-full md:w-137.5 md:flex-none md:shrink-0 md:rounded-[22px] md:p-10',
-        step.clipMockupMobile ? 'relative h-36 overflow-hidden' : 'h-full'
-      )}
+      className={cn('bg-bg-gray-subtler min-w-0 flex-1 rounded-sm p-2.5 md:h-full md:max-w-137.5 md:rounded-[22px] md:p-10', step.clipMockupMobile ? 'relative h-36 overflow-hidden' : 'h-full')}
     >
       {step.mockup}
     </Flex>
