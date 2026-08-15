@@ -44,7 +44,7 @@ const JobDescriptionMockup = () => {
       </Flex>
       <div className="mb-2 h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-white md:mb-4 md:border-x-8 md:border-t-8" aria-hidden />
 
-      <Flex direction="column" className="border-border-subtler w-full gap-1 rounded-xs border bg-white p-1.5 md:gap-2 md:rounded-xl md:p-2">
+      <Flex direction="column" className="w-full gap-1 rounded-xs bg-white p-1.5 md:gap-2 md:rounded-xl md:p-2">
         <Flex align="center" className="bg-element-gray-light w-fit gap-0.5 rounded-[1.5px] p-0.5 md:gap-1 md:rounded-lg md:p-1">
           {['URL 붙여넣기', '원문 붙여넣기'].map((tab, index) => (
             <span
@@ -137,7 +137,7 @@ const CompactExperienceMatchCard = ({ label }: { label: string }) => (
     <Flex align="center" justify="between">
       <Flex align="center" className="gap-1">
         <div className="border-border-subtle flex size-1.5 items-center justify-center rounded-[1.5px] border">
-          <Check className="text-text-subtler" size={4.5} strokeWidth={2} />
+          <Check className="text-text-subtler" size={4.5} strokeWidth={5} />
         </div>
         <p className="text-text-bolder text-[6px] font-semibold">{label}</p>
       </Flex>
@@ -290,9 +290,9 @@ const STEPS = [
 type Step = (typeof STEPS)[number]
 
 const GLOW_POSITION_CLASSES: Record<Step['glowPosition'], string> = {
-  'top-right': 'top-0 right-0 md:-translate-y-1/4 md:translate-x-1/4',
-  'bottom-left': 'bottom-0 left-0 md:translate-y-1/4 md:-translate-x-1/4',
-  right: 'top-1/2 right-0 -translate-y-1/2 md:translate-x-1/4'
+  'top-right': 'top-0 right-0 -translate-y-4 translate-x-4 md:-translate-y-1/4 md:translate-x-1/4',
+  'bottom-left': 'bottom-0 left-0 translate-y-4 -translate-x-4 md:translate-y-1/4 md:-translate-x-1/4',
+  right: 'top-1/2 right-0 -translate-y-1/2 translate-x-4 md:translate-x-1/4'
 }
 
 const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
