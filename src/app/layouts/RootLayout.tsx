@@ -40,7 +40,7 @@ export const RootLayout = ({
 }>) => {
   return (
     <html lang="ko" data-scroll-behavior="smooth" className={`${pretendard.className} ${pretendard.variable} ${elmsSans.variable} h-full antialiased`}>
-      <body className="flex h-full flex-col">
+      <body className="flex h-full flex-col overflow-x-hidden">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c') }} />
         <Providers>{children}</Providers>
       </body>

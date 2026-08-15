@@ -304,7 +304,7 @@ const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
 
 const StepCard = ({ step }: { step: Step }) => (
   <Flex direction="row" align="center" justify="between" className="shadow-2 w-full gap-4 rounded-lg bg-white p-5 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
-    <Flex direction="column" className="min-w-0 flex-1 gap-3 md:w-125 md:flex-none md:shrink-0 md:gap-8">
+    <Flex direction="column" className="min-w-0 flex-1 gap-3 md:max-w-125 md:gap-8">
       <div className="relative h-14 overflow-hidden opacity-90 md:h-40" aria-hidden>
         <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight md:text-[220px]">{step.number}</p>
       </div>
@@ -321,10 +321,7 @@ const StepCard = ({ step }: { step: Step }) => (
     <Flex
       align={step.clipMockupMobile ? { initial: 'start', md: 'center' } : 'center'}
       justify="center"
-      className={cn(
-        'bg-bg-gray-subtler min-w-0 flex-1 rounded-sm p-2.5 md:h-full md:w-137.5 md:flex-none md:shrink-0 md:rounded-[22px] md:p-10',
-        step.clipMockupMobile ? 'relative h-36 overflow-hidden' : 'h-full'
-      )}
+      className={cn('bg-bg-gray-subtler min-w-0 flex-1 rounded-sm p-2.5 md:h-full md:max-w-137.5 md:rounded-[22px] md:p-10', step.clipMockupMobile ? 'relative h-36 overflow-hidden' : 'h-full')}
     >
       {step.mockup}
     </Flex>
