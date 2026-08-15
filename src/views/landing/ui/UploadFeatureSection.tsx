@@ -36,7 +36,7 @@ export const UploadFeatureSection = () => {
             </div>
             <h3 className="text-text-basic text-label1 md:text-display3">pdf 업로드</h3>
           </Flex>
-          <p className="text-text-subtle text-[8px] leading-[1.6] tracking-[-0.01em] md:text-[24px]">
+          <p className="text-text-subtle text-[10px] leading-[1.6] tracking-[-0.01em] md:text-[24px]">
             이미 만들어둔 이력서를 등록해 두면, 기본 정보와 경력을 불러 와서 이력서 초안을 만들 때 활용해요.
           </p>
         </motion.div>
@@ -53,7 +53,7 @@ export const UploadFeatureSection = () => {
             </div>
             <h3 className="text-text-basic text-label1 md:text-display3">노션 연동</h3>
           </Flex>
-          <p className="text-text-subtle text-[8px] leading-[1.6] tracking-[-0.01em] md:text-[24px]">Notion을 연결하면 정리해 둔 경험을 내 이력서에 맞는 형태로 만들어 드려요.</p>
+          <p className="text-text-subtle text-[10px] leading-[1.6] tracking-[-0.01em] md:text-[24px]">Notion을 연결하면 정리해 둔 경험을 내 이력서에 맞는 형태로 만들어 드려요.</p>
         </motion.div>
       </Flex>
 
@@ -61,7 +61,7 @@ export const UploadFeatureSection = () => {
         <motion.img
           src="/landing/upload-arrows.svg"
           alt=""
-          className="relative mt-2 block h-4 w-32 sm:h-11 sm:w-80 md:h-15 md:w-107"
+          className="relative block h-4 w-32 sm:h-11 sm:w-80 md:mt-2 md:h-15 md:w-107"
           aria-hidden
           initial={{ opacity: 0, y: -8 }}
           whileInView={{ opacity: 1, y: 0 }}

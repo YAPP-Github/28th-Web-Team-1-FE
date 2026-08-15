@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
 import { useMobileBlockDialog } from '../lib/useMobileBlockDialog'
-import { PcOnlyDialog } from './PcOnlyDialog'
+import { MobileBlockDialog } from './MobileBlockDialog'
 
 const EASE_EXPO_OUT = [0.16, 1, 0.3, 1] as const
 
@@ -33,7 +33,7 @@ export const HeroSection = () => {
             </Heading>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EASE_EXPO_OUT, delay: 0.39 }}>
-            <Text color="text-subtle" className="md:text-heading2 block text-[9px] leading-normal whitespace-pre">
+            <Text color="text-subtle" className="md:text-heading2 block text-[10px] leading-normal font-medium whitespace-pre">
               {`Notion, PDF 등 경험이 담긴 자료를 업로드하면\nAI가 핵심 내용을 분석해 지원하는 채용공고에 맞는 이력서로 정리해 드려요.`}
             </Text>
           </motion.div>
@@ -58,7 +58,7 @@ export const HeroSection = () => {
       </motion.div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-60 bg-linear-to-t from-white/60 to-white/0 md:h-120.25" aria-hidden />
-      <PcOnlyDialog isOpen={isOpen} onOpenChange={setIsOpen} />
+      <MobileBlockDialog isOpen={isOpen} onOpenChange={setIsOpen} />
     </section>
   )
 }

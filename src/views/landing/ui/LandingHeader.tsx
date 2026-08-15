@@ -4,7 +4,7 @@ import { cn } from '@shared/lib'
 import { Button } from '@shared/ui'
 import { Logo } from '@shared/icon'
 import { useMobileBlockDialog } from '../lib/useMobileBlockDialog'
-import { PcOnlyDialog } from './PcOnlyDialog'
+import { MobileBlockDialog } from './MobileBlockDialog'
 
 export const LandingHeader = () => {
   const { isOpen, setIsOpen, handleClick } = useMobileBlockDialog()
@@ -43,7 +43,7 @@ export const LandingHeader = () => {
           </Link>
         </Button>
       </div>
-      <PcOnlyDialog isOpen={isOpen} onOpenChange={setIsOpen} />
+      <MobileBlockDialog isOpen={isOpen} onOpenChange={setIsOpen} />
     </header>
   )
 }
