@@ -90,7 +90,7 @@ const ExperienceMatchCard = ({ label }: { label: string }) => (
     <Flex align="start" className="gap-2">
       <p className="text-text-subtler w-13 shrink-0 text-[9px]">관련 역량</p>
       <Flex className="min-w-0 flex-1 flex-wrap gap-1">
-        {[0, 1, 2, 3].map((chip) => (
+        {[0, 1, 2].map((chip) => (
           <div key={chip} className="bg-bg-gray-subtler h-3 w-8 rounded-sm" />
         ))}
       </Flex>
@@ -303,7 +303,7 @@ const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
 )
 
 const StepCard = ({ step }: { step: Step }) => (
-  <Flex direction="row" align="center" className="shadow-2 w-full gap-4 rounded-lg bg-white p-5 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
+  <Flex direction="row" align="center" justify="between" className="shadow-2 w-full gap-4 rounded-lg bg-white p-5 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
     <Flex direction="column" className="min-w-0 flex-1 gap-3 md:w-125 md:flex-none md:shrink-0 md:gap-8">
       <div className="relative h-14 overflow-hidden opacity-90 md:h-40" aria-hidden>
         <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight md:text-[220px]">{step.number}</p>
