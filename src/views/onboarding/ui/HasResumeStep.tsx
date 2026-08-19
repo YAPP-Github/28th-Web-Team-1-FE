@@ -4,16 +4,20 @@ import type { OnboardingStepProps } from '../model/onboardingFlow'
 import { OnboardingStepShell } from './OnboardingStepShell'
 import { OnboardingRadioGroup, OnboardingRadioItem } from './OnboardingRadioGroup'
 import { AMPLITUDE_EVENTS } from '@shared/config'
+import { useMeQuery } from '@entities/user'
 import * as amplitude from '@amplitude/unified'
 
 /** 온보딩 스텝1: 이력서 보유 여부 선택 화면 */
 export const HasResumeStep = ({ onDone }: OnboardingStepProps) => {
   const [hasResume, setHasResume] = useState<boolean | null>(null)
+  const { data } = useMeQuery()
 
   useEffect(() => {
-    // Amplitude 이벤트 전송
+    if (!data?.me.userId) return
+    // 온보딩 처음 진입 시 setUserId 레이스 컨디션 방지
+    amplitude.setUserId(data.me.userId)
     amplitude.track(AMPLITUDE_EVENTS.RESUME_VIEWED)
-  }, [])
+  }, [data?.me.userId])
 
   return (
     <OnboardingStepShell

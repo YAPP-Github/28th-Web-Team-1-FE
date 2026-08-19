@@ -1,5 +1,5 @@
 'use client'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { userQueries } from './user.keys'
 
 /**
@@ -35,3 +35,13 @@ export const useMe = () => {
   })
   return { me: data }
 }
+
+/**
+ * 로그인 정보를 확인하기 위한 쿼리.
+ * @example
+ * ```tsx
+ * const { data } = useMeQuery()
+ * if (data?.me.userId) amplitude.setUserId(data.me.userId)
+ * ```
+ */
+export const useMeQuery = () => useQuery({ ...userQueries.me() })
