@@ -12,6 +12,9 @@ import { cn } from '@shared/lib/cn'
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover'
 import { Input } from '@shared/ui/input'
 
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
+
 /** 선택 목록에 쓰는 프로젝트 하나. 서버 프로젝트는 `projectId`를, 아직 생성 전인 초안은 `local:이름`을 id로 쓴다. */
 interface ProjectOption {
   id: string
@@ -56,8 +59,12 @@ export const AddProjectManualView = ({
       return
     }
 
+    // Amplitude 이벤트 전송
+    const isNewProject = selectedProject.id.startsWith('local:')
+    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_TEXT_SUBMITTED, { text_length: content.trim().length, project_target: isNewProject ? 'new' : 'existing' })
+
     // 새로 추가한 프로젝트 이름을 고른 경우: 프로젝트 생성 + AI STAR 추출
-    if (selectedProject.id.startsWith('local:')) {
+    if (isNewProject) {
       onExtract({ name: selectedProject.name, summary: content })
       return
     }
