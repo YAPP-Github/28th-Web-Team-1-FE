@@ -1,7 +1,8 @@
 'use client'
 import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { useAllResumes } from '@entities/resume'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { resumeQueries } from '@entities/resume'
 import { useWorkspaceId } from '@entities/user'
 import type { ResumeQuery } from '@shared/lib/gql/graphql'
 
@@ -31,7 +32,16 @@ const getResumeSequence = (resumes: Array<{ resumeId: string; createdAt: string 
 export const useResumeDraftViewedTracking = (resume: ResumeQuery['resume']) => {
   const workspaceId = useWorkspaceId()
   const { id: resumeId } = useParams<{ id: string }>()
-  const resumes = useAllResumes(workspaceId, resumeId)
+
+  // 찾는 resumeId가 나타날 때까지 페이지를 이어서 불러온다.
+  const { data, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery(resumeQueries.list(workspaceId, null, 30))
+  const resumes = data?.pages.flatMap((page) => page.resumes.resumes) ?? []
+  const isFound = resumes.some((r) => r.resumeId === resumeId)
+
+  useEffect(() => {
+    if (!isFound && hasNextPage && !isFetching) fetchNextPage()
+  }, [isFound, hasNextPage, isFetching, fetchNextPage])
+
   const resumeSequence = getResumeSequence(resumes, resumeId)
 
   useEffect(() => {

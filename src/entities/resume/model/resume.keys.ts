@@ -20,20 +20,14 @@ export const resumeQueries = {
       queryFn: () => resumeAPI.getResume({ workspaceId, resumeId })
     }),
 
-  /** 이력서 목록을 상태별(진행중·완료)로 커서 기반 조회한다. */
-  list: (workspaceId: string, status: ResumeStatusType, size = 5) =>
+  /**
+   * 이력서 목록을 커서 기반으로 조회한다.
+   * `status`가 있으면 상태별(진행중/완료) 섹션 미리보기용으로, 없으면 전체 목록용으로 별도 캐시·페이지네이션을 갖는다.
+   */
+  list: (workspaceId: string, status: ResumeStatusType | null, size = 5) =>
     infiniteQueryOptions({
-      queryKey: resumeKeys.list(workspaceId, status),
-      queryFn: ({ pageParam }) => resumeAPI.getResumes({ workspaceId, size, cursor: pageParam, statuses: [status] }),
-      initialPageParam: null as string | null,
-      getNextPageParam: (lastPage) => (lastPage.resumes.cursor.hasNext ? lastPage.resumes.cursor.nextCursor : null)
-    }),
-
-  /** 상태 구분 없이(진행중+완료) 전체 이력서 목록을 조회한다. */
-  allList: (workspaceId: string, size = 30) =>
-    infiniteQueryOptions({
-      queryKey: resumeKeys.allList(workspaceId),
-      queryFn: ({ pageParam }) => resumeAPI.getResumes({ workspaceId, size, cursor: pageParam, statuses: null }),
+      queryKey: status ? resumeKeys.list(workspaceId, status) : resumeKeys.allList(workspaceId),
+      queryFn: ({ pageParam }) => resumeAPI.getResumes({ workspaceId, size, cursor: pageParam, statuses: status ? [status] : null }),
       initialPageParam: null as string | null,
       getNextPageParam: (lastPage) => (lastPage.resumes.cursor.hasNext ? lastPage.resumes.cursor.nextCursor : null)
     }),
