@@ -1,6 +1,5 @@
 'use client'
-
-import { Suspense, type ComponentType } from 'react'
+import { Suspense, useEffect, type ComponentType } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Accordion as AccordionPrimitive } from 'radix-ui'
 import { ErrorBoundary } from '@sentry/nextjs'
@@ -19,6 +18,9 @@ import { AwardSection } from './profile/AwardSection'
 import { CertificateSection } from './profile/CertificateSection'
 import { SkillSection } from './profile/SkillSection'
 
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
+
 const INFO_SECTIONS: Array<{ value: string; label: string; Component: ComponentType<{ profile: Profile }> }> = [
   { value: 'basic', label: '기본 정보', Component: BasicSection },
   { value: 'competency', label: '핵심 역량', Component: CoreCompetencySection },
@@ -31,6 +33,10 @@ const INFO_SECTIONS: Array<{ value: string; label: string; Component: ComponentT
 ]
 
 export const MyProfilePage = () => {
+  useEffect(() => {
+    amplitude.track(AMPLITUDE_EVENTS.ACCOUNT_TAB_VIEWED)
+  }, [])
+
   return (
     <Flex direction="column" p="8" className="min-h-0 flex-1 overflow-y-auto">
       <Heading variant="heading2" color="text-basic">

@@ -1,5 +1,6 @@
 'use client'
-import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useInfiniteQuery, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import type { ResumeStatusType } from '@shared/lib/gql/graphql'
 import { resumeQueries } from './resume.keys'
 
@@ -38,6 +39,24 @@ export const useResumeList = (workspaceId: string, status: ResumeStatusType) => 
     select: (data) => data.pages.flatMap((page) => page.resumes.resumes)
   })
   return { resumes: data, ...rest }
+}
+
+/**
+ * 워크스페이스 전체 이력서(진행중+완료) 목록을 조회한다. 대상 이력서(`resumeId`)를 찾을 때까지만 다음 페이지를 이어서 불러온다.
+ * `resume_sequence` 트래킹처럼 전체 목록이 필요한 곳에서 쓴다. 순번 계산 등 목록을 어떻게 쓸지는 호출부 책임이다.
+ * @param workspaceId 현재 워크스페이스 ID
+ * @param resumeId 목록에서 찾을 때까지 페이지를 불러올 기준 이력서 ID
+ */
+export const useAllResumes = (workspaceId: string, resumeId: string) => {
+  const { data, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery(resumeQueries.allList(workspaceId))
+  const resumes = data?.pages.flatMap((page) => page.resumes.resumes) ?? []
+  const isFound = resumes.some((resume) => resume.resumeId === resumeId)
+
+  useEffect(() => {
+    if (!isFound && hasNextPage && !isFetching) void fetchNextPage()
+  }, [isFound, hasNextPage, isFetching, fetchNextPage])
+
+  return resumes
 }
 
 /**

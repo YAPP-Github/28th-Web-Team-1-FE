@@ -8,6 +8,7 @@ export const resumeKeys = {
   detail: (workspaceId: string, resumeId: string) => [...resumeKeys.details(), workspaceId, resumeId] as const,
   lists: () => [...resumeKeys.all, 'list'] as const,
   list: (workspaceId: string, status: ResumeStatusType) => [...resumeKeys.lists(), workspaceId, status] as const,
+  allList: (workspaceId: string) => [...resumeKeys.lists(), workspaceId, 'all'] as const,
   counts: (workspaceId: string) => [...resumeKeys.all, 'counts', workspaceId] as const
 }
 
@@ -24,6 +25,15 @@ export const resumeQueries = {
     infiniteQueryOptions({
       queryKey: resumeKeys.list(workspaceId, status),
       queryFn: ({ pageParam }) => resumeAPI.getResumes({ workspaceId, size, cursor: pageParam, statuses: [status] }),
+      initialPageParam: null as string | null,
+      getNextPageParam: (lastPage) => (lastPage.resumes.cursor.hasNext ? lastPage.resumes.cursor.nextCursor : null)
+    }),
+
+  /** 상태 구분 없이(진행중+완료) 전체 이력서 목록을 조회한다. */
+  allList: (workspaceId: string, size = 30) =>
+    infiniteQueryOptions({
+      queryKey: resumeKeys.allList(workspaceId),
+      queryFn: ({ pageParam }) => resumeAPI.getResumes({ workspaceId, size, cursor: pageParam, statuses: null }),
       initialPageParam: null as string | null,
       getNextPageParam: (lastPage) => (lastPage.resumes.cursor.hasNext ? lastPage.resumes.cursor.nextCursor : null)
     }),

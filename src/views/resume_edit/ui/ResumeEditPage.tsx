@@ -21,6 +21,7 @@ import { formToSaveInput } from '../model/formToSaveInput'
 import { ResumeIndex } from './ResumeIndex'
 import { CoreSkillPreviewSection } from './CoreSkillPreviewSection'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
+import { useResumeDraftViewedTracking } from '../hooks/useResumeDraftViewedTracking'
 import { useRouter } from 'next/navigation'
 
 import * as amplitude from '@amplitude/unified'
@@ -97,11 +98,8 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
 
-  useEffect(() => {
-    // 페이지 진입 시 Amplitude 이벤트 전송
-    amplitude.track(AMPLITUDE_EVENTS.RESUME_DRAFT_VIEWED, { jd_id: resume.targetJd?.jdId ?? null })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // 페이지 진입 시 Amplitude 이벤트 전송
+  useResumeDraftViewedTracking(resume)
 
   const defaultValues = useMemo(() => resumeToFormValues(resume), [resume])
   const form = useForm<ResumeFormValues>({ defaultValues })

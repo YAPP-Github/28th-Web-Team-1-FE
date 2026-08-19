@@ -1,6 +1,6 @@
 export { resumeAPI } from './api/resume.api'
 export { useCreateResume, useUpdateResume } from './model/resume.mutations'
-export { useResumeDetail, useResumeList, useResumeCounts } from './model/resume.queries'
+export { useResumeDetail, useResumeList, useResumeCounts, useAllResumes } from './model/resume.queries'
 export { resumeQueries, resumeKeys } from './model/resume.keys'
 export { payloadsOf, visibleItems, getItemLabel, getSectionItemLabels, toPreviewSections } from './model/resume-section'
 export type { ResumeSectionData, ResumeSectionItem } from './model/resume-section'
