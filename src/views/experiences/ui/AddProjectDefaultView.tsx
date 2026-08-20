@@ -6,9 +6,11 @@ import { cn } from '@shared/lib/cn'
 import { Button, Text } from '@shared/ui'
 import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@shared/ui/dialog'
 import { PdfUpload } from '@features/pdf_upload'
+import { useAddProjectMethodTracking } from '../hooks/useAddProjectMethodTracking'
 
 export const AddProjectDefaultView = ({ onManualClick, onNotionClick, onExtract }: { onManualClick: () => void; onNotionClick: () => void; onExtract: (file: File) => void }) => {
   const [file, setFile] = useState<File | null>(null)
+  const { trackMethodSelected } = useAddProjectMethodTracking()
 
   return (
     <>
@@ -17,7 +19,14 @@ export const AddProjectDefaultView = ({ onManualClick, onNotionClick, onExtract 
         <DialogDescription className="text-body1 text-text-subtler">한 번 정리해 두면 언제든 이력서에 불러와 사용할 수 있어요.</DialogDescription>
       </DialogHeader>
       <Flex direction="column" className="gap-4">
-        <PdfUpload file={file} onChange={setFile} className="h-100" />
+        <PdfUpload
+          file={file}
+          onChange={(newFile) => {
+            setFile(newFile)
+            trackMethodSelected('pdf')
+          }}
+          className="h-100"
+        />
         {file ? (
           <Button
             variant="primary"
@@ -32,8 +41,24 @@ export const AddProjectDefaultView = ({ onManualClick, onNotionClick, onExtract 
           </Button>
         ) : (
           <DialogFooter>
-            <AddProjectExperienceButton title="직접 정리" description="AI와 함께 STAR로 정리해보세요." icon={<Pencil size={18} />} onClick={() => onManualClick()} />
-            <AddProjectExperienceButton title="Notion" description="경험이 정리된 페이지를 직접 검색해주세요." icon={<NotionIcon size={20} />} onClick={() => onNotionClick()} />
+            <AddProjectExperienceButton
+              title="직접 정리"
+              description="AI와 함께 STAR로 정리해보세요."
+              icon={<Pencil size={18} />}
+              onClick={() => {
+                trackMethodSelected('write')
+                onManualClick()
+              }}
+            />
+            <AddProjectExperienceButton
+              title="Notion"
+              description="경험이 정리된 페이지를 직접 검색해주세요."
+              icon={<NotionIcon size={20} />}
+              onClick={() => {
+                trackMethodSelected('notion')
+                onNotionClick()
+              }}
+            />
           </DialogFooter>
         )}
       </Flex>

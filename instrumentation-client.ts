@@ -6,7 +6,11 @@ import * as Sentry from '@sentry/nextjs'
 import * as amplitude from '@amplitude/unified'
 
 const amplitudeApiKey = process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY
-if (!amplitudeApiKey) {
+
+// 개발 환경에서 Amplitude를 비활성화
+if (process.env.NODE_ENV !== 'production') {
+  console.warn('Amplitude disabled in non-production environment')
+} else if (!amplitudeApiKey) {
   console.warn('Amplitude API key missing — analytics disabled')
 } else {
   amplitude.initAll(amplitudeApiKey, { analytics: { autocapture: true }, sessionReplay: { sampleRate: 1 } })

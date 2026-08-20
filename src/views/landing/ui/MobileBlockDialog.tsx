@@ -1,14 +1,28 @@
 'use client'
+import { useEffect } from 'react'
 import { XIcon } from 'lucide-react'
 import { Button, Text } from '@shared/ui'
 import { Dialog, DialogClose, DialogContent, DialogHeader } from '@shared/ui/dialog'
 import { sendKakaoMessageToMe } from '../lib/kakaoShare'
+
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 
 interface MobileBlockDialogProps {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }
 export const MobileBlockDialog = ({ isOpen, onOpenChange }: MobileBlockDialogProps) => {
+  useEffect(() => {
+    // Amplitude 이벤트 전송
+    amplitude.track(AMPLITUDE_EVENTS.MOBILE_MODAL_VIEWED)
+  }, [])
+
+  const handleClickKakaoCta = () => {
+    amplitude.track(AMPLITUDE_EVENTS.KAKAO_CLICKED, { trigger_source: 'modal' })
+    sendKakaoMessageToMe()
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="max-w-[min(361px,calc(100%-2rem))] gap-1 p-5 text-center">
@@ -26,7 +40,7 @@ export const MobileBlockDialog = ({ isOpen, onOpenChange }: MobileBlockDialogPro
               {'카카오톡 나에게 보내기한 뒤,\nPC에서 링크를 열어 이어가보세요'}
             </Text>
           </DialogHeader>
-          <Button type="button" variant="text" size="lg" fullWidth className="text-text-basic rounded-lg border-none bg-[#FEE500] py-3 hover:bg-[#FEE500]/90" onClick={sendKakaoMessageToMe}>
+          <Button type="button" variant="text" size="lg" fullWidth className="text-text-basic rounded-lg border-none bg-[#FEE500] py-3 hover:bg-[#FEE500]/90" onClick={handleClickKakaoCta}>
             카카오톡 나에게 보내기
           </Button>
         </div>

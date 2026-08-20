@@ -6,6 +6,7 @@ import { useUpdateExperience, type ExperienceDetail } from '@entities/experience
 import { Text } from '@shared/ui'
 import { Textarea } from '@shared/ui/textarea'
 import { useAutosave } from '@shared/hooks/useAutosave'
+import { useStarFieldEditTracking } from '../hooks/useStarFieldEditTracking'
 
 const STAR_FIELDS = [
   { key: 'situation', label: 'Situation', sublabel: '상황' },
@@ -49,8 +50,10 @@ export const StarEditor = ({ workspaceId, experience }: StarEditorProps) => {
     })
   }
   const { schedule: scheduleAutoSave, flush: flushAutoSave } = useAutosave(save, AUTOSAVE_DELAY_MS)
+  const { handleFocus: trackFocus, handleChange: trackChange } = useStarFieldEditTracking()
 
   const handleChange = (key: StarKey) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    trackChange(key, e.target.value)
     setValues((prev) => ({ ...prev, [key]: e.target.value }))
     scheduleAutoSave()
   }
@@ -68,7 +71,14 @@ export const StarEditor = ({ workspaceId, experience }: StarEditorProps) => {
             </Text>
           </Flex>
           <div className="min-w-0 flex-1">
-            <Textarea maxLength={600} placeholder="텍스트를 입력해 주세요." value={values[field.key]} onChange={handleChange(field.key)} onBlur={() => flushAutoSave()} />
+            <Textarea
+              maxLength={600}
+              placeholder="텍스트를 입력해 주세요."
+              value={values[field.key]}
+              onFocus={() => trackFocus(field.key, values[field.key])}
+              onChange={handleChange(field.key)}
+              onBlur={() => flushAutoSave()}
+            />
           </div>
         </Flex>
       ))}

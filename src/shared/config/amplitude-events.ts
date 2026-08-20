@@ -32,5 +32,19 @@ export const AMPLITUDE_EVENTS = {
   SECTION_EDITED: 'section_edited',
   AI_EDIT_STARTED: 'ai_edit_started',
   EDIT_APPLIED: 'edit_applied',
-  RESUME_COMPLETION_CLICKED: 'resume_completion_clicked'
+  RESUME_COMPLETION_CLICKED: 'resume_completion_clicked',
+
+  // 랜딩
+  LANDING_VIEWED: 'landing_viewed',
+  MOBILE_MODAL_VIEWED: 'mobile_modal_viewed',
+  KAKAO_CLICKED: 'kakao_clicked',
+
+  // 경험 정리
+  EXPERIENCE_ADD_METHOD_SELECTED: 'experience_add_method_selected',
+  EXPERIENCE_TEXT_SUBMITTED: 'experience_text_submitted',
+  STAR_FIELD_EDITED: 'star_field_edited',
+
+  // 계정
+  ACCOUNT_TAB_VIEWED: 'account_tab_viewed',
+  ACCOUNT_INFO_UPDATED: 'account_info_updated'
 } as const
