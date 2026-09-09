@@ -52,7 +52,7 @@ const AwardItem = ({ sectionIndex, index, onRemove }: { sectionIndex: number; in
       <Divider />
       <Spacing size={20} />
 
-      <FormInput name={`${base}.name`} label="수상명" clearable={false} placeholder={'수상명을 입력해주세요.'} />
+      <FormInput name={`${base}.name`} label="수상명" clearable={false} placeholder={'수상명을 입력해주세요.'} maxLength={48} />
 
       <Spacing size={16} />
 

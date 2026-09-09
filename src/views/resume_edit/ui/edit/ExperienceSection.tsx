@@ -77,12 +77,12 @@ const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove }: { 
       <Divider />
       <Spacing size={20} />
 
-      <FormInput name={`${base}.name`} label="경험명" clearable={false} placeholder={'경험명을 입력해주세요.'} />
+      <FormInput name={`${base}.name`} label="경험명" clearable={false} placeholder={'경험명을 입력해주세요.'} maxLength={48} />
 
       <Spacing size={16} />
 
       <Flex className={'w-full gap-4'}>
-        <FormInput name={`${base}.role`} label="역할" clearable={false} placeholder={'역할을 입력해주세요.'} className={'w-full'} />
+        <FormInput name={`${base}.role`} label="역할" clearable={false} placeholder={'역할을 입력해주세요.'} className={'w-full'} maxLength={20} />
         <FormPeriodPicker name={`${base}.period`} label="기간" className={'w-full'} />
       </Flex>
 

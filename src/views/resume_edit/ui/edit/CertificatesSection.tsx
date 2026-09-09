@@ -54,7 +54,7 @@ const CertificatesSectionItem = ({ sectionIndex, index, onRemove }: { sectionInd
       <Divider />
       <Spacing size={20} />
 
-      <FormInput name={`${base}.name`} label="자격명" clearable={false} placeholder={'자격명을 입력해주세요.'} />
+      <FormInput name={`${base}.name`} label="자격명" clearable={false} placeholder={'자격명을 입력해주세요.'} maxLength={48} />
 
       <Spacing size={16} />
 
