@@ -92,7 +92,7 @@ export const ResumeIndex = ({ activeSectionUid, onSelectSection }: { activeSecti
                 onClick={() => basicInfoSectionUid && onSelectSection(basicInfoSectionUid)}
                 className={cn('flex w-full cursor-pointer items-center rounded-sm px-1.5 py-1 text-left', activeSectionUid === basicInfoSectionUid && 'bg-element-primary-lighter')}
               >
-                <Text variant="label2" color={'text-subtler'}>
+                <Text variant="label2" className={cn('text-text-subtler', activeSectionUid === basicInfoSectionUid && 'text-text-basic')}>
                   기본정보
                 </Text>
               </button>
