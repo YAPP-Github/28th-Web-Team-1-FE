@@ -4,6 +4,7 @@ import { type CreateResumeInput, type ResumeStatusType, type SaveResumeInput } f
 export const resumeAPI = {
   createResume: (variables: { workspaceId: string; input: CreateResumeInput }) => execute(createResumeDocument, variables),
   updateResume: (variables: { workspaceId: string; resumeId: string; input: SaveResumeInput }) => execute(updateResumeDocument, variables),
+  deleteResume: (variables: { workspaceId: string; resumeId: string }) => execute(deleteResumeDocument, variables),
   getResume: (variables: { resumeId: string; workspaceId: string }) => execute(resumeDocument, variables),
   getResumes: (variables: { workspaceId: string; size: number; cursor?: string | null; statuses?: ResumeStatusType[] | null }) => execute(resumesDocument, variables),
   getResumeCounts: (variables: { workspaceId: string }) => execute(resumeCountsDocument, variables)
@@ -55,6 +56,12 @@ const updateResumeDocument = graphql(`
     updateResume(workspaceId: $workspaceId, resumeId: $resumeId, input: $input) {
       resumeId
     }
+  }
+`)
+
+const deleteResumeDocument = graphql(`
+  mutation DeleteResume($workspaceId: ID!, $resumeId: ID!) {
+    deleteResume(workspaceId: $workspaceId, resumeId: $resumeId)
   }
 `)
 

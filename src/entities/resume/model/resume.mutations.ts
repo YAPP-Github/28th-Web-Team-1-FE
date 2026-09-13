@@ -52,3 +52,28 @@ export const useUpdateResume = (workspaceId: string, resumeId: string) => {
     }
   })
 }
+
+/**
+ * 이력서를 삭제한다. 성공 시 해당 이력서 상세와 함께 목록·개수 캐시를 무효화한다.
+ * @param workspaceId 현재 워크스페이스 ID
+ * @param resumeId 삭제할 이력서 ID
+ * @example
+ * ```tsx
+ * const { mutate } = useDeleteResume(workspaceId, resumeId)
+ * mutate(undefined, { onSuccess: () => router.push('/resumes') })
+ * ```
+ */
+export const useDeleteResume = (workspaceId: string, resumeId: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      const result = await resumeAPI.deleteResume({ workspaceId, resumeId })
+      return result.deleteResume
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: resumeKeys.detail(workspaceId, resumeId) })
+      queryClient.invalidateQueries({ queryKey: resumeKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: resumeKeys.counts(workspaceId) })
+    }
+  })
+}

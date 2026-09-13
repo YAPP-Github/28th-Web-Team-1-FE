@@ -9,9 +9,21 @@ import { Chip } from '@shared/ui/chip'
 import { formatDate } from '@shared/lib'
 import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
 import type { ResumeStatusType, ResumesQuery } from '@shared/lib/gql/graphql'
-import { useResumeCounts, useResumeList } from '@entities/resume'
+import { useResumeCounts, useResumeList, useDeleteResume } from '@entities/resume'
 import { useWorkspaceId } from '@entities/user'
-import { ArrowRightIcon } from 'lucide-react'
+import { toast } from 'sonner'
+import { ArrowRightIcon, Trash2 } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@shared/ui/alert_dialog'
 
 type ResumeSummary = ResumesQuery['resumes']['resumes'][number]
 
@@ -130,6 +142,10 @@ const ResumeCard = ({ resume }: { resume: ResumeSummary }) => {
         </Flex>
       </Flex>
 
+      <DeleteResumeConfirmDialog resumeId={resume.resumeId} />
+
+      <Spacing size={8} orientation={'vertical'} />
+
       <Button asChild variant={cta.variant} size={'md'}>
         <Link href={cta.href(resume.resumeId)}>
           <span className={'leading-none'}>{cta.label}</span>
@@ -167,5 +183,39 @@ const EmptyResumes = ({ type }: { type: ResumeSummary['status'] }) => {
         {fallbackText[type].description}
       </Text>
     </Flex>
+  )
+}
+
+const DeleteResumeConfirmDialog = ({ resumeId }: { resumeId: string }) => {
+  const workspaceId = useWorkspaceId()
+  const { mutate: deleteResume } = useDeleteResume(workspaceId, resumeId)
+
+  const handleDelete = () => {
+    deleteResume(undefined, {
+      onSuccess: () => toast.success('이력서가 삭제되었어요.', { id: 'resume-deleted', position: 'top-center' }),
+      onError: () => toast.error('삭제에 실패했어요.\n잠시 후 다시 시도해 주세요.', { id: 'resume-delete-error', position: 'top-center' })
+    })
+  }
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="tertiary" size={'icon-md'}>
+          <Trash2 size={18} />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>해당 이력서를 삭제하시겠어요?</AlertDialogTitle>
+          <AlertDialogDescription className="whitespace-pre-line">{`작성한 세부 내용이 모두 삭제되며,\n삭제한 내용은 복구할 수 없습니다.`}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel variant="tertiary">닫기</AlertDialogCancel>
+          <AlertDialogAction variant="danger" onClick={handleDelete}>
+            삭제
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
