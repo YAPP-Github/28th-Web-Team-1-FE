@@ -207,11 +207,7 @@ const DeleteResumeConfirmDialog = ({ resumeId }: { resumeId: string }) => {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>해당 이력서를 삭제하시겠어요?</AlertDialogTitle>
-          <AlertDialogDescription>
-            작성한 세부 내용이 모두 삭제되며,
-            <br />
-            삭제한 내용은 복구할 수 없습니다.
-          </AlertDialogDescription>
+          <AlertDialogDescription className="whitespace-pre-line">{`작성한 세부 내용이 모두 삭제되며,\n삭제한 내용은 복구할 수 없습니다.`}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel variant="tertiary">닫기</AlertDialogCancel>
