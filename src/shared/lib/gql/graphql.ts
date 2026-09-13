@@ -758,6 +758,14 @@ export type UpdateResumeMutationVariables = Exact<{
 
 export type UpdateResumeMutation = { updateResume: { resumeId: string } };
 
+export type DeleteResumeMutationVariables = Exact<{
+  workspaceId: string | number;
+  resumeId: string | number;
+}>;
+
+
+export type DeleteResumeMutation = { deleteResume: boolean };
+
 export type ResumeBasicInfoFieldsFragment = { name: string | null, email: string | null, phone: string | null, hideContact: boolean };
 
 export type ResumeCoreSkillFieldsFragment = { content: string | null, isInitialItem: boolean };
@@ -1360,6 +1368,11 @@ export const UpdateResumeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateResumeMutation, UpdateResumeMutationVariables>;
+export const DeleteResumeDocument = new TypedDocumentString(`
+    mutation DeleteResume($workspaceId: ID!, $resumeId: ID!) {
+  deleteResume(workspaceId: $workspaceId, resumeId: $resumeId)
+}
+    `) as unknown as TypedDocumentString<DeleteResumeMutation, DeleteResumeMutationVariables>;
 export const ResumeDocument = new TypedDocumentString(`
     query Resume($resumeId: ID!, $workspaceId: ID!) {
   resume(resumeId: $resumeId, workspaceId: $workspaceId) {
