@@ -1,17 +1,16 @@
 'use client'
 import Image from 'next/image'
-import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading, Text } from '@shared/ui'
-import { useMobileBlockDialog } from '../lib/useMobileBlockDialog'
+import { useLoginCta } from '../lib/useLoginCta'
 import { MobileBlockDialog } from './MobileBlockDialog'
 
 const EASE_EXPO_OUT = [0.16, 1, 0.3, 1] as const
 
 export const HeroSection = () => {
-  const { isOpen, setIsOpen, handleClick } = useMobileBlockDialog()
+  const { isOpen, setIsOpen, handleClick } = useLoginCta()
 
   return (
     <section className="relative mt-6 overflow-hidden rounded-lg pt-14 md:mt-10 md:rounded-[40px] md:pt-20">
@@ -39,11 +38,9 @@ export const HeroSection = () => {
           </motion.div>
         </Flex>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EASE_EXPO_OUT, delay: 0.6 }}>
-          <Button asChild size="icon-xl" className="text-caption2 md:text-headline1 h-fit w-fit gap-1 rounded-sm px-3 py-1.5 md:gap-2 md:rounded-xl md:px-8 md:py-4">
-            <Link href="/login" onClick={handleClick}>
-              무료로 시작하기
-              <ArrowRight data-icon="inline-end" className="size-3 transition-transform duration-300 group-hover/button:translate-x-1 md:size-6" />
-            </Link>
+          <Button size="icon-xl" className="text-caption2 md:text-headline1 h-fit w-fit gap-1 rounded-sm px-3 py-1.5 md:gap-2 md:rounded-xl md:px-8 md:py-4" onClick={handleClick}>
+            무료로 시작하기
+            <ArrowRight data-icon="inline-end" className="size-3 transition-transform duration-300 group-hover/button:translate-x-1 md:size-6" />
           </Button>
         </motion.div>
       </Flex>

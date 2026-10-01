@@ -5,8 +5,8 @@ export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)$).*)']
 }
 
-/** 비로그인 상태에서도 접근 가능한 경로. 나머지는 로그인 페이지로 튕긴다. */
-const PUBLIC_PATHS = new Set(['/', '/login', '/robots.txt', '/sitemap.xml'])
+/** 비로그인 상태에서도 접근 가능한 경로. 나머지는 랜딩(/)으로 튕긴다. */
+const PUBLIC_PATHS = new Set(['/', '/robots.txt', '/sitemap.xml'])
 
 /** 이미 로그인한 사용자가 볼 필요 없는 경로. 접근 시 /home으로 보낸다. (PUBLIC_PATHS의 부분집합이어야 함) */
 const GUEST_ONLY_PATHS = new Set(['/'])
