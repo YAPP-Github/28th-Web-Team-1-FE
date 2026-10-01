@@ -48,13 +48,13 @@ export const authFailureRedirect = (origin: string) => {
 }
 
 /**
- * 로그인하지 않은 상태로 보호된 페이지에 접근했을 때 로그인 페이지로 `?error=auth_required`를 붙여 리다이렉트하는 함수이다.
- * 미들웨어의 접근 제어(비로그인 시 `/`·`/login` 외 접근 차단)에서 사용한다.
+ * 로그인하지 않은 상태로 보호된 페이지에 접근했을 때 랜딩(`/`)으로 `?error=auth_required`를 붙여 리다이렉트하는 함수이다.
+ * 미들웨어의 접근 제어(비로그인 시 `/` 외 접근 차단)에서 사용한다.
  * @param request 원래 요청. 리다이렉트 기준 URL을 만드는 데 쓴다.
- * @returns `/login?error=auth_required`로의 `NextResponse` 리다이렉트
+ * @returns `/?error=auth_required`로의 `NextResponse` 리다이렉트
  */
 export const requireAuthRedirect = (request: Request) => {
-  const url = new URL('/login', request.url)
+  const url = new URL('/', request.url)
   url.searchParams.set('error', AUTH_ERROR.REQUIRED)
   return NextResponse.redirect(url)
 }
@@ -66,7 +66,7 @@ export const requireAuthRedirect = (request: Request) => {
  * @returns 안전하면 해당 경로, 아니면 `/`
  * @example
  * ```ts
- * safeRedirectPath('/onboarding')     // '/onboarding'
+ * safeRedirectPath('/home')           // '/home'
  * safeRedirectPath('//evil.com')      // '/'
  * ```
  */

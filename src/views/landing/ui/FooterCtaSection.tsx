@@ -1,14 +1,13 @@
 'use client'
-import Link from 'next/link'
 import { ArrowRight, Sparkle } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading } from '@shared/ui'
-import { useMobileBlockDialog } from '../lib/useMobileBlockDialog'
+import { useLoginCta } from '../lib/useLoginCta'
 import { MobileBlockDialog } from './MobileBlockDialog'
 
 export const FooterCtaSection = () => {
-  const { isOpen, setIsOpen, handleClick } = useMobileBlockDialog()
+  const { isOpen, setIsOpen, handleClick } = useLoginCta()
 
   return (
     <section className="py-14 md:py-24">
@@ -19,15 +18,13 @@ export const FooterCtaSection = () => {
           </Heading>
           <span className="md:text-heading2 text-[9px] break-keep text-white">SCOOP이 채용공고에 맞는 맞춤 이력서를 5분 만에 만들어 드려요.</span>
           <Button
-            asChild
             variant="secondary"
             size="icon-xl"
             className="text-text-basic md:text-headline1 mt-4 h-fit w-fit rounded-sm bg-white px-3 py-1.5 text-[8px] font-normal md:mt-8 md:gap-2 md:rounded-xl md:px-8 md:py-4 md:font-semibold"
+            onClick={handleClick}
           >
-            <Link href="/login" onClick={handleClick}>
-              이력서 만들기
-              <ArrowRight data-icon="inline-end" className="text-icon-gray size-3 transition-transform duration-300 group-hover/button:translate-x-1 md:size-5" />
-            </Link>
+            이력서 만들기
+            <ArrowRight data-icon="inline-end" className="text-icon-gray size-3 transition-transform duration-300 group-hover/button:translate-x-1 md:size-5" />
           </Button>
         </Flex>
 

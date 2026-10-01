@@ -33,7 +33,7 @@ const decodeNotionState = (raw: string | null) => {
  * @returns 성공 시 `{returnTo}?step=notion-page-select&connectionId=...`, 실패 시 `{returnTo}?error=notion` 리다이렉트
  * @example
  * ```ts
- * // GET /auth/notion/callback?code=...&state=... → 302 /onboarding?step=notion-page-select&connectionId=...
+ * // GET /auth/notion/callback?code=...&state=... → 302 /experiences?step=notion-page-select&connectionId=...
  * ```
  */
 export const GET = async (request: NextRequest) => {

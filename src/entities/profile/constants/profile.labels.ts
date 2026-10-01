@@ -10,11 +10,6 @@ export const EDUCATION_STATUS_LABELS = {
 } satisfies Record<EducationStatus, string>
 export const SKILL_LEVEL_LABELS = { HIGH: '상', MEDIUM: '중', LOW: '하' } satisfies Record<SkillLevel, string>
 
-// 라벨 값만 필요할 때 사용하는 배열
-export const DEGREE_LEVELS = Object.values(DEGREE_LABELS)
-export const EDUCATION_STATUSES = Object.values(EDUCATION_STATUS_LABELS)
-export const SKILL_LEVELS = Object.values(SKILL_LEVEL_LABELS)
-
 export interface SelectOption {
   value: string
   label: string
