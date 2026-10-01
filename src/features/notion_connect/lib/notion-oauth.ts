@@ -12,7 +12,7 @@ export const NOTION_OAUTH_NONCE_COOKIE = 'notion_oauth_nonce'
  * @param state 노션 왕복 간 유지할 값
  * @example
  * ```ts
- * encodeNotionState({ workspaceId: 'w1', returnTo: '/onboarding', nonce: 'n' }) // '{"w":"w1","r":"/onboarding","n":"n"}'
+ * encodeNotionState({ workspaceId: 'w1', returnTo: '/experiences', nonce: 'n' }) // '{"w":"w1","r":"/experiences","n":"n"}'
  * ```
  */
 const encodeNotionState = (state: { workspaceId: string; returnTo: string; nonce: string }): string => JSON.stringify({ w: state.workspaceId, r: state.returnTo, n: state.nonce })
