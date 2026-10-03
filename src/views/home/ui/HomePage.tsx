@@ -24,15 +24,19 @@ export const HomePage = () => {
 
         <Spacing size={40} />
 
-        <ErrorBoundary fallback={<ErrorFallback title="채용공고 입력창을 불러오지 못했어요." description="새로고침 후 다시 시도해 주세요." className="min-h-105" />}>
-          <Suspense fallback={<div className="min-h-105 w-full" />}>
+        <ErrorBoundary fallback={<ErrorFallback title="채용공고 입력창을 불러오지 못했어요." description="새로고침 후 다시 시도해 주세요." className="min-h-56.75" />}>
+          <Suspense fallback={<div className="min-h-56.75 w-full" />}>
             <JDAnalysisForm />
           </Suspense>
         </ErrorBoundary>
       </Flex>
 
       <Flex justify={'center'} px={'5'} pt={'3'} className={'pb-20'}>
-        <RecommendedJdSection />
+        <ErrorBoundary fallback={<ErrorFallback title="추천 공고를 불러오지 못했어요." description="새로고침 후 다시 시도해 주세요." className="w-full max-w-215" />}>
+          <Suspense fallback={<div className="min-h-130 w-full max-w-215" />}>
+            <RecommendedJdSection />
+          </Suspense>
+        </ErrorBoundary>
       </Flex>
     </Flex>
   )

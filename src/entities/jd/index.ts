@@ -1,5 +1,5 @@
 export { jdAPI } from './api/jd.api'
 export { useRegisterJd } from './model/jd.mutations'
-export { useJdInsight, useJdMeta, useJdDetail } from './model/jd.queries'
+export { useJdInsight, useJdMeta, useJdDetail, useJdRecommendationTags, useJdRecommendations } from './model/jd.queries'
 export { jdKeys, jdQueries } from './model/jd.keys'
-export type { JdRegisterInput, JdCandidate } from './model/jd.types'
+export type { JdRegisterInput, JdCandidate, JdRecommendation, JdRecommendationTag } from './model/jd.types'

@@ -1,5 +1,6 @@
 'use client'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { type JdRecommendationTag } from '@shared/lib/gql/graphql'
 import { jdQueries } from './jd.keys'
 
 /**
@@ -60,4 +61,39 @@ export const useJdDetail = (workspaceId: string, jdId: string) => {
     select: (data) => data.jd
   })
   return { jd: data, ...rest }
+}
+
+/**
+ * 추천 공고 태그 목록(태그 코드 + 화면 표시명)을 Suspense로 조회한다.
+ * 로딩은 상위 `Suspense`, 실패는 상위 `ErrorBoundary`가 처리한다.
+ * @example
+ * ```tsx
+ * const { tags } = useJdRecommendationTags()
+ * tags[0] // { tag: 'POPULAR', name: '인기 공고' }
+ * ```
+ */
+export const useJdRecommendationTags = () => {
+  const { data, ...rest } = useSuspenseQuery({
+    ...jdQueries.recommendationTags(),
+    select: (data) => data.jdRecommendationTags
+  })
+  return { tags: data, ...rest }
+}
+
+/**
+ * 추천 공고 목록을 Suspense로 조회한다. `tags`가 비면 전체, 여러 개면 모두 포함한 공고만 온다.
+ * 로딩은 상위 `Suspense`, 실패는 상위 `ErrorBoundary`가 처리한다.
+ * @param tags 필터할 추천 태그 목록
+ * @param size 조회 개수 (서버 최대 30)
+ * @example
+ * ```tsx
+ * const { recommendations } = useJdRecommendations(['POPULAR'], 6)
+ * ```
+ */
+export const useJdRecommendations = (tags: JdRecommendationTag[], size: number) => {
+  const { data, ...rest } = useSuspenseQuery({
+    ...jdQueries.recommendations(tags, size),
+    select: (data) => data.jdRecommendations.recommendations
+  })
+  return { recommendations: data, ...rest }
 }
