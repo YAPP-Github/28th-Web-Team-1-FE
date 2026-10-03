@@ -4,11 +4,12 @@ import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { ErrorFallback, Heading, Spacing, Text } from '@shared/ui'
 import { JDAnalysisForm } from './JDAnalysisForm'
+import { RecommendedJdSection } from './RecommendedJdSection'
 import homeGradient from '../assets/home_gradient.webp'
 
 export const HomePage = () => {
   return (
-    <Flex direction={'column'} className={'flex-1'}>
+    <Flex direction={'column'} className={'min-h-0 flex-1 overflow-y-auto'}>
       <Flex direction={'column'} align={'center'} px={'5'} className={'relative isolate py-40'}>
         <div className="absolute inset-x-0 top-0 -z-10 h-164">
           <Image src={homeGradient} alt="" fill priority sizes="100vw" className="object-cover" />
@@ -28,6 +29,10 @@ export const HomePage = () => {
             <JDAnalysisForm />
           </Suspense>
         </ErrorBoundary>
+      </Flex>
+
+      <Flex justify={'center'} px={'5'} pt={'3'} className={'pb-20'}>
+        <RecommendedJdSection />
       </Flex>
     </Flex>
   )
