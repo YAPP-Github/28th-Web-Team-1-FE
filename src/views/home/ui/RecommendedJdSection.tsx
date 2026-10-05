@@ -36,7 +36,7 @@ export const RecommendedJdSection = () => {
         </Flex>
 
         {recommendations.length ? (
-          <Grid columns={'2'} gap={'4'}>
+          <Grid columns={{ initial: '1', sm: '2' }} gap={'4'}>
             {recommendations.map((jd) => (
               <RecommendedJdCard key={jd.id} jd={jd} />
             ))}
@@ -55,7 +55,7 @@ const RecommendedJdCard = ({ jd }: { jd: JdRecommendation }) => {
   const period = [formatDate(jd.recruitmentStartAt), formatDate(jd.recruitmentEndAt)].filter(Boolean).join(' ~ ')
 
   return (
-    <Flex direction={'column'} gap={'4'} p={'5'} className={'border-border-subtler bg-element-white shadow-2 min-w-0 rounded-lg border'}>
+    <Flex direction={'column'} justify={'between'} gap={'4'} p={'5'} className={'border-border-subtler bg-element-white shadow-2 min-w-0 rounded-lg border'}>
       <Flex direction={'column'} className="gap-1.5">
         <Text as={'p'} variant={'label1'} color={'text-basic'} className={'truncate'}>
           [{jd.companyName}] {jd.title}
