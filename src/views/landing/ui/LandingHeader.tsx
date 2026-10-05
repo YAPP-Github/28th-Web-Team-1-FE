@@ -3,11 +3,11 @@ import Link from 'next/link'
 import { cn } from '@shared/lib'
 import { Button } from '@shared/ui'
 import { Logo } from '@shared/icon'
-import { useMobileBlockDialog } from '../lib/useMobileBlockDialog'
+import { useLoginCta } from '../lib/useLoginCta'
 import { MobileBlockDialog } from './MobileBlockDialog'
 
 export const LandingHeader = () => {
-  const { isOpen, setIsOpen, handleClick } = useMobileBlockDialog()
+  const { isOpen, setIsOpen, handleClick } = useLoginCta()
 
   return (
     <header className="border-border-subtler fixed inset-x-0 top-0 z-50 bg-white py-3 md:py-8 md:shadow-[0_4px_8px_rgba(0,0,0,0.08)]">
@@ -37,10 +37,8 @@ export const LandingHeader = () => {
             </Link>
           </Button>
         </div>
-        <Button asChild variant="secondary" size="sm" className="md:text-headline2 rounded-md px-4 py-2 md:h-10.5 md:gap-1.5 md:rounded-lg md:px-5 md:py-2.5">
-          <Link href="/login" onClick={handleClick}>
-            로그인
-          </Link>
+        <Button variant="secondary" size="sm" className="md:text-headline2 rounded-md px-4 py-2 md:h-10.5 md:gap-1.5 md:rounded-lg md:px-5 md:py-2.5" onClick={handleClick}>
+          로그인
         </Button>
       </div>
       <MobileBlockDialog isOpen={isOpen} onOpenChange={setIsOpen} />

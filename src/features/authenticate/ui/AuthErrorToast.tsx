@@ -25,7 +25,7 @@ export const AuthErrorToast = () => {
     const message = getAuthErrorMessage(errorCode)
     if (!message) return
     toast.error(message, { id: 'auth-error', position: 'top-center' })
-    router.replace('/login')
+    router.replace('/')
   }, [errorCode, router])
 
   return null
