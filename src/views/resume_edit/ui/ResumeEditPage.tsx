@@ -18,7 +18,7 @@ import { ResumeBasicInfoHeader, ResumeSectionView } from '@widgets/resume_previe
 import { emptyItemPayload, nextDisplayOrder, type ResumeFormItem, type ResumeFormSection, type ResumeFormValues } from '../model/resume-form.types'
 import { resumeToFormValues } from '../model/resumeToFormValues'
 import { formToSaveInput } from '../model/formToSaveInput'
-import { ResumeIndex } from './ResumeIndex'
+import { SetCategoryModal } from './SetCategoryModal'
 import { CoreSkillPreviewSection } from './CoreSkillPreviewSection'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
 import { useResumeDraftViewedTracking } from '../hooks/useResumeDraftViewedTracking'
@@ -209,7 +209,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
  */
 const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { activeSectionUid: string | null; onSelectSection: (sectionUid: string | null) => void; targetJdId: string | null }) => {
   const { control, getValues } = useFormContext<ResumeFormValues>()
-  const { move: moveSection } = useFieldArray({ control, name: 'sections' })
+  const { move: moveSection, replace: replaceSections } = useFieldArray({ control, name: 'sections' })
   const sections = useWatch({ control, name: 'sections' }) ?? EMPTY_SECTIONS
 
   const basicInfoSection = sections.find((section) => section.type === 'BASIC_INFO') ?? null
@@ -287,7 +287,9 @@ const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { active
         onSectionMove={handleSectionMove}
         registerSectionRef={registerSectionRef}
       />
-      <ResumeIndex activeSectionUid={activeSectionUid} onSelectSection={selectSection} />
+      <Flex align={'end'} className={'bg-bg-gray-subtler p-4'}>
+        <SetCategoryModal onReplaceSections={replaceSections} />
+      </Flex>
       <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} targetJdId={targetJdId} />
     </>
   )
@@ -350,7 +352,7 @@ const ResumePreview = ({ basicInfoSection, bodyEntries, activeSectionUid, onSele
   const itemMoveRegistry = useItemMoveRegistry()
 
   return (
-    <Flex align={'center'} className={'bg-bg-gray-subtler flex-1'}>
+    <Flex align={'center'} className={'bg-bg-gray-subtler relative flex-1'}>
       <Flex direction={'column'} className={'bg-bg-white mx-auto h-[calc(100%-2rem)] w-149 min-w-149 overflow-y-auto p-7'}>
         {basicInfoSection ? (
           <SelectableArea sectionUid={basicInfoSection.uid} activeSectionUid={activeSectionUid} onSelect={onSelectSection} registerRef={registerSectionRef}>
