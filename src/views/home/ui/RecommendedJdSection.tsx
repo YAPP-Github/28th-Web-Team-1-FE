@@ -20,8 +20,8 @@ export const RecommendedJdSection = () => {
         아래 공고 이력서 만들어보는건 어때요?
       </Text>
 
-      <Flex direction={'column'} gap={{ initial: '3', sm: '5' }} className={'w-full flex-wrap'}>
-        <Flex gap={'2'}>
+      <Flex direction={'column'} gap={{ initial: '3', sm: '5' }} className={'w-full'}>
+        <Flex gap={'2'} wrap={'wrap'}>
           {tags.map(({ tag, name }) => (
             <Button
               key={tag}
