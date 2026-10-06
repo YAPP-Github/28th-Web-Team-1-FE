@@ -1,11 +1,14 @@
 import { execute, graphql } from '@shared/lib'
+import { type JdRecommendationTag } from '@shared/lib/gql/graphql'
 import { type JdRegisterInput } from '../model/jd.types'
 
 export const jdAPI = {
   getJdInsight: (variables: { workspaceId: string; jdId: string }) => execute(jdInsightDocument, variables),
   getJdMeta: (variables: { workspaceId: string; jdId: string }) => execute(jdMetaDocument, variables),
   getJdDetail: (variables: { workspaceId: string; jdId: string }) => execute(jdDetailDocument, variables),
-  registerJd: (variables: { workspaceId: string; request: JdRegisterInput }) => execute(registerJdDocument, variables)
+  registerJd: (variables: { workspaceId: string; request: JdRegisterInput }) => execute(registerJdDocument, variables),
+  getJdRecommendationTags: () => execute(jdRecommendationTagsDocument),
+  getJdRecommendations: (variables: { tags: JdRecommendationTag[]; size: number }) => execute(jdRecommendationsDocument, variables)
 }
 
 const jdInsightDocument = graphql(`
@@ -46,6 +49,30 @@ const registerJdDocument = graphql(`
       candidates {
         title
         body
+      }
+    }
+  }
+`)
+
+const jdRecommendationTagsDocument = graphql(`
+  query JdRecommendationTags {
+    jdRecommendationTags {
+      tag
+      name
+    }
+  }
+`)
+
+const jdRecommendationsDocument = graphql(`
+  query JdRecommendations($tags: [JdRecommendationTag!]!, $size: Int!) {
+    jdRecommendations(tags: $tags, size: $size) {
+      recommendations {
+        id
+        companyName
+        title
+        sourceUrl
+        recruitmentStartAt
+        recruitmentEndAt
       }
     }
   }

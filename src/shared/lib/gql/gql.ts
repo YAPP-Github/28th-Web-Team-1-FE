@@ -27,6 +27,8 @@ type Documents = {
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": typeof types.JdMetaDocument,
     "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n": typeof types.JdDetailDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": typeof types.RegisterJdDocument,
+    "\n  query JdRecommendationTags {\n    jdRecommendationTags {\n      tag\n      name\n    }\n  }\n": typeof types.JdRecommendationTagsDocument,
+    "\n  query JdRecommendations($tags: [JdRecommendationTag!]!, $size: Int!) {\n    jdRecommendations(tags: $tags, size: $size) {\n      recommendations {\n        id\n        companyName\n        title\n        sourceUrl\n        recruitmentStartAt\n        recruitmentEndAt\n      }\n    }\n  }\n": typeof types.JdRecommendationsDocument,
     "\n  mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {\n    connectNotion(workspaceId: $workspaceId, request: $request) {\n      connectionId\n      notionWorkspaceName\n      notionWorkspaceIcon\n    }\n  }\n": typeof types.ConnectNotionDocument,
     "\n  query NotionConnections($workspaceId: ID!, $size: Int!) {\n    notionConnections(workspaceId: $workspaceId, size: $size) {\n      connections {\n        connectionId\n        notionWorkspaceName\n        notionWorkspaceIcon\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": typeof types.NotionConnectionsDocument,
     "\n  query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {\n    notionPages(workspaceId: $workspaceId, connectionId: $connectionId, query: $query, size: $size, cursor: $cursor) {\n      pages {\n        pageId\n        title\n        url\n        lastEditedTime\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": typeof types.NotionPagesDocument,
@@ -73,6 +75,8 @@ const documents: Documents = {
     "\n  query JdMeta($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyName\n      positionTitle\n    }\n  }\n": types.JdMetaDocument,
     "\n  query JdDetail($workspaceId: ID!, $jdId: ID!) {\n    jd(workspaceId: $workspaceId, id: $jdId) {\n      companyIntro\n      responsibilities\n      requiredExperiences\n      preferredExperiences\n      hiringProcess\n    }\n  }\n": types.JdDetailDocument,
     "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n": types.RegisterJdDocument,
+    "\n  query JdRecommendationTags {\n    jdRecommendationTags {\n      tag\n      name\n    }\n  }\n": types.JdRecommendationTagsDocument,
+    "\n  query JdRecommendations($tags: [JdRecommendationTag!]!, $size: Int!) {\n    jdRecommendations(tags: $tags, size: $size) {\n      recommendations {\n        id\n        companyName\n        title\n        sourceUrl\n        recruitmentStartAt\n        recruitmentEndAt\n      }\n    }\n  }\n": types.JdRecommendationsDocument,
     "\n  mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {\n    connectNotion(workspaceId: $workspaceId, request: $request) {\n      connectionId\n      notionWorkspaceName\n      notionWorkspaceIcon\n    }\n  }\n": types.ConnectNotionDocument,
     "\n  query NotionConnections($workspaceId: ID!, $size: Int!) {\n    notionConnections(workspaceId: $workspaceId, size: $size) {\n      connections {\n        connectionId\n        notionWorkspaceName\n        notionWorkspaceIcon\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": types.NotionConnectionsDocument,
     "\n  query NotionPages($workspaceId: ID!, $connectionId: ID!, $query: String, $size: Int!, $cursor: String) {\n    notionPages(workspaceId: $workspaceId, connectionId: $connectionId, query: $query, size: $size, cursor: $cursor) {\n      pages {\n        pageId\n        title\n        url\n        lastEditedTime\n      }\n      cursor {\n        hasNext\n        nextCursor\n      }\n    }\n  }\n": types.NotionPagesDocument,
@@ -155,6 +159,14 @@ export function graphql(source: "\n  query JdDetail($workspaceId: ID!, $jdId: ID
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation RegisterJd($workspaceId: ID!, $request: JdRegisterRequest!) {\n    registerJd(workspaceId: $workspaceId, request: $request) {\n      jd {\n        jdId\n      }\n      candidates {\n        title\n        body\n      }\n    }\n  }\n"): typeof import('./graphql').RegisterJdDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query JdRecommendationTags {\n    jdRecommendationTags {\n      tag\n      name\n    }\n  }\n"): typeof import('./graphql').JdRecommendationTagsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query JdRecommendations($tags: [JdRecommendationTag!]!, $size: Int!) {\n    jdRecommendations(tags: $tags, size: $size) {\n      recommendations {\n        id\n        companyName\n        title\n        sourceUrl\n        recruitmentStartAt\n        recruitmentEndAt\n      }\n    }\n  }\n"): typeof import('./graphql').JdRecommendationsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

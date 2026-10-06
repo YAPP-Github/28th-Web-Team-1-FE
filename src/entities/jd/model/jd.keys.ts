@@ -1,11 +1,14 @@
 import { queryOptions } from '@tanstack/react-query'
+import { type JdRecommendationTag } from '@shared/lib/gql/graphql'
 import { jdAPI } from '../api/jd.api'
 
 export const jdKeys = {
   all: ['jd'] as const,
   insight: (workspaceId: string, jdId: string) => [...jdKeys.all, 'insight', workspaceId, jdId] as const,
   meta: (workspaceId: string, jdId: string) => [...jdKeys.all, 'meta', workspaceId, jdId] as const,
-  detail: (workspaceId: string, jdId: string) => [...jdKeys.all, 'detail', workspaceId, jdId] as const
+  detail: (workspaceId: string, jdId: string) => [...jdKeys.all, 'detail', workspaceId, jdId] as const,
+  recommendationTags: () => [...jdKeys.all, 'recommendationTags'] as const,
+  recommendations: (tags: JdRecommendationTag[], size: number) => [...jdKeys.all, 'recommendations', tags, size] as const
 }
 
 /**
@@ -35,5 +38,17 @@ export const jdQueries = {
     queryOptions({
       queryKey: jdKeys.detail(workspaceId, jdId),
       queryFn: () => jdAPI.getJdDetail({ workspaceId, jdId })
+    }),
+  /** 추천 공고 태그 목록(태그 코드 + 화면 표시명)을 조회한다. 홈 추천 공고 필터 칩에 쓴다. */
+  recommendationTags: () =>
+    queryOptions({
+      queryKey: jdKeys.recommendationTags(),
+      queryFn: jdAPI.getJdRecommendationTags
+    }),
+  /** 추천 공고 목록을 조회한다. `tags`가 비면 전체, 여러 개면 모두 포함한 공고만. */
+  recommendations: (tags: JdRecommendationTag[], size: number) =>
+    queryOptions({
+      queryKey: jdKeys.recommendations(tags, size),
+      queryFn: () => jdAPI.getJdRecommendations({ tags, size })
     })
 }

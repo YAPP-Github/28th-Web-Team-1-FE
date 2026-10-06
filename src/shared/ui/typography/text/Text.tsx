@@ -1,12 +1,12 @@
 import { Text as RadixText, type TextProps } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
-import { typographyVariants } from '../shared'
-import type { TextColor, TypographyVariant } from '../shared'
+import { getVariantClass } from '../shared'
+import type { ResponsiveVariant, TextColor } from '../shared'
 
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
 
 type CustomTextProps = DistributiveOmit<TextProps, 'weight' | 'color'> & {
-  variant?: TypographyVariant
+  variant?: ResponsiveVariant
   className?: string
   weight?: TextProps['weight'] | 'semibold'
   color?: TextColor
@@ -34,6 +34,7 @@ type CustomTextProps = DistributiveOmit<TextProps, 'weight' | 'color'> & {
  * @example
  * ```
  * <Text variant="body1">본문 텍스트</Text>
+ * <Text variant={{ initial: 'body2', sm: 'body1' }}>반응형 (768px 이상 body1)</Text>
  * <Text variant="title1" size="8" weight="bold">큰 제목</Text>
  * <Text variant="caption1" color="gray-60">회색 캡션</Text>
  * <Text variant="body1" color="text-basic" weight="semibold">시맨틱 토큰</Text>
@@ -49,7 +50,7 @@ export const Text = ({ variant, className, children, weight, color, ...props }: 
       {...props}
       weight={isSemibold ? undefined : weight}
       style={color ? { color: `var(--color-${color})` } : undefined}
-      className={cn(variant && typographyVariants[variant], isSemibold && 'font-semibold', className)}
+      className={cn(variant && getVariantClass(variant), isSemibold && 'font-semibold', className)}
     >
       {children}
     </RadixText>

@@ -124,21 +124,6 @@ input CreateResumeInput {
 }
 
 """
-AI 기능 사용에 소모되는 크레딧입니다.
-"""
-type Credit {
-  """
-  오늘 남은 크레딧입니다.
-  """
-  remaining: Int!
-
-  """
-  하루에 지급되는 총 크레딧입니다.
-  """
-  total: Int!
-}
-
-"""
 커서 정보입니다.
 """
 type Cursor {
@@ -506,6 +491,33 @@ type JdInsight {
   지원 전략입니다. 어떤 경험을 어떻게 강조하면 좋을지 조언하는 서술형 문단입니다.
   """
   strategy: String!
+}
+
+type JdRecommendation {
+  companyName: String!
+  id: ID!
+  recruitmentEndAt: String
+  recruitmentStartAt: String
+  sourceUrl: String!
+  tags: [JdRecommendationTag!]
+  title: String!
+}
+
+type JdRecommendationPage {
+  cursor: Cursor!
+  recommendations: [JdRecommendation!]!
+}
+
+enum JdRecommendationTag {
+  EXTERNAL_ACTIVITY
+  MAJOR_COMPANY
+  POPULAR
+  TECH_COMPANY
+}
+
+type JdRecommendationTagInfo {
+  name: String!
+  tag: JdRecommendationTag!
 }
 
 """
@@ -1395,12 +1407,6 @@ input ProfileSkillRequest {
 
 type Query {
   """
-  인증된 사용자의 오늘 잔여 크레딧을 조회합니다.
-  매일 KST 00:00 기준으로 total로 재초기화되며 이월되지 않습니다.
-  """
-  credit: Credit!
-
-  """
   경험 단건을 조회합니다.
   """
   experience(
@@ -1510,6 +1516,17 @@ type Query {
     """
     workspaceId: ID!
   ): JdInsight
+
+  """
+  추천 공고 태그 목록과 화면 표시명을 조회합니다.
+  """
+  jdRecommendationTags: [JdRecommendationTagInfo!]!
+
+  """
+  활성화된 추천 공고 목록을 조회합니다.
+  tags가 비어 있으면 전체 추천 공고를 조회하고, 여러 tags가 오면 모두 포함한 공고를 조회합니다.
+  """
+  jdRecommendations(cursor: String = null, size: Int! = 10, tags: [JdRecommendationTag!]! = []): JdRecommendationPage!
 
   """
   워크스페이스의 JD 목록을 조회합니다.

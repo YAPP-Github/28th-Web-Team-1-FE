@@ -67,7 +67,7 @@ export const JDAnalysisForm = () => {
     <>
       <JDAnalysisProgressDialog isOpen={showProgress} isComplete={isSuccess} />
 
-      <div className="flex min-h-105 w-full justify-center">
+      <div className="flex w-full justify-center">
         <AnimatePresence mode="wait">
           {phase === 'INPUT' && (
             <motion.div key="input" exit={{ opacity: 0 }} animate={{ opacity: 1 }} className={'w-full'}>
@@ -110,7 +110,7 @@ const JDInputStep = ({ onSubmit, isPending }: { onSubmit: (request: JdRegisterIn
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full justify-center">
-      <Flex direction={'column'} gap={'4'} p={'4'} className="border-border-subtler h-fit w-full max-w-215 rounded-2xl border">
+      <Flex direction={'column'} gap={'4'} p={'4'} className="border-border-subtler bg-element-white shadow-3 h-fit w-full max-w-215 rounded-2xl border">
         <SelectedControl value={inputType} onValueChange={(value) => setInputType(value as 'url' | 'text')} className="w-55">
           <SelectedControlItem value="url">URL 붙여넣기</SelectedControlItem>
           <SelectedControlItem value="text">원문 붙여넣기</SelectedControlItem>
@@ -123,7 +123,7 @@ const JDInputStep = ({ onSubmit, isPending }: { onSubmit: (request: JdRegisterIn
           placeholder={placeholder}
           className={cn(
             'field-sizing-content',
-            'max-h-24 min-h-0 w-full',
+            'max-h-24 min-h-18 w-full',
             'text-body1 text-text-basic',
             'resize-none overflow-y-auto outline-none',
             'placeholder:text-body1 placeholder:text-text-subtler'

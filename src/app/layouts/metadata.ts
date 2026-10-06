@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#6b44ff'
+  themeColor: '#F0ECFF' // element-primary-lighter
 }
 
 /** 검색엔진·AI가 서비스 정체를 이해할 수 있게 루트 레이아웃에 심는 구조화 데이터. */

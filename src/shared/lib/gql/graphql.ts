@@ -99,6 +99,12 @@ export type FreeExperienceContentsRequest = {
   content: string;
 };
 
+export type JdRecommendationTag =
+  | 'EXTERNAL_ACTIVITY'
+  | 'MAJOR_COMPANY'
+  | 'POPULAR'
+  | 'TECH_COMPANY';
+
 /**
  * JD 등록 입력입니다. sourceUrl 또는 body 중 하나는 필요합니다.
  * body가 있으면 크롤 없이 body로 처리하고, sourceUrl은 출처 메타로만 저장됩니다.
@@ -604,6 +610,19 @@ export type RegisterJdMutationVariables = Exact<{
 
 export type RegisterJdMutation = { registerJd: { jd: { jdId: string } | null, candidates: Array<{ title: string, body: string }> | null } };
 
+export type JdRecommendationTagsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type JdRecommendationTagsQuery = { jdRecommendationTags: Array<{ tag: JdRecommendationTag, name: string }> };
+
+export type JdRecommendationsQueryVariables = Exact<{
+  tags: Array<JdRecommendationTag> | JdRecommendationTag;
+  size: number;
+}>;
+
+
+export type JdRecommendationsQuery = { jdRecommendations: { recommendations: Array<{ id: string, companyName: string, title: string, sourceUrl: string, recruitmentStartAt: string | null, recruitmentEndAt: string | null }> } };
+
 export type ConnectNotionMutationVariables = Exact<{
   workspaceId: string | number;
   request: ConnectNotionRequest;
@@ -1105,6 +1124,28 @@ export const RegisterJdDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RegisterJdMutation, RegisterJdMutationVariables>;
+export const JdRecommendationTagsDocument = new TypedDocumentString(`
+    query JdRecommendationTags {
+  jdRecommendationTags {
+    tag
+    name
+  }
+}
+    `) as unknown as TypedDocumentString<JdRecommendationTagsQuery, JdRecommendationTagsQueryVariables>;
+export const JdRecommendationsDocument = new TypedDocumentString(`
+    query JdRecommendations($tags: [JdRecommendationTag!]!, $size: Int!) {
+  jdRecommendations(tags: $tags, size: $size) {
+    recommendations {
+      id
+      companyName
+      title
+      sourceUrl
+      recruitmentStartAt
+      recruitmentEndAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<JdRecommendationsQuery, JdRecommendationsQueryVariables>;
 export const ConnectNotionDocument = new TypedDocumentString(`
     mutation ConnectNotion($workspaceId: ID!, $request: ConnectNotionRequest!) {
   connectNotion(workspaceId: $workspaceId, request: $request) {

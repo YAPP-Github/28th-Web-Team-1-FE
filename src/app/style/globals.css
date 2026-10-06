@@ -27,6 +27,21 @@ html {
   --space-12: calc(48px * var(--scaling));
 }
 
+/* ── Breakpoints ── */
+/* Radix Themes 브레이크포인트에 맞춤 (Radix는 설정으로 못 바꿈)
+   Tailwind 기본값: sm 640 / md 768 / lg 1024 / xl 1280 / 2xl 1536 */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-xs: 520px;
+  --breakpoint-sm: 768px;
+  --breakpoint-md: 1024px;
+  --breakpoint-lg: 1280px;
+  --breakpoint-xl: 1640px;
+}
+
+/* Text/Heading의 반응형 variant용 (getVariantClass가 동적으로 조합하는 클래스) */
+@source inline('{xs:,sm:,md:,lg:,xl:}text-{display1,display2,display3,title1,title2,title3,heading1,heading2,headline1,headline2,body1,body2,label1,label2,caption1,caption2}');
+
 /* ── Color Palette ── */
 @theme inline {
   /* Primary Color Palette */
