@@ -7,9 +7,10 @@ type QueryItem = QuerySection['items'][number]
  * 미리보기가 다루는 섹션·아이템 shape.
  *
  * 편집 폼(`ResumeFormSection`: sectionId/itemId가 신규 시 null)과 서버 응답(`ResumeQuery`) 양쪽이
- * 그대로 대입되도록 id를 `string | null`로 넓힌다. 미리보기는 표시에만 관여하므로 폼 전용 필드(uid 등)는 요구하지 않는다.
+ * 그대로 대입되도록 id를 `string | null`로 넓힌다. `uid`는 편집 화면 아이템 드래그 정렬의 key/dnd id로
+ * 쓰이는 클라이언트 전용 안정 식별자다(편집 화면에서만 채워 넣어, 읽기 전용 상세 화면에서는 비어 있다).
  */
-export type ResumeSectionItem = Omit<QueryItem, 'itemId'> & { itemId: string | null }
+export type ResumeSectionItem = Omit<QueryItem, 'itemId'> & { itemId: string | null; uid?: string }
 export type ResumeSectionData = Omit<QuerySection, 'sectionId' | 'items'> & {
   sectionId: string | null
   items: ResumeSectionItem[]
@@ -17,11 +18,14 @@ export type ResumeSectionData = Omit<QuerySection, 'sectionId' | 'items'> & {
 
 type SectionItems = ResumeSectionData['items']
 
-/** 섹션 아이템들에서 해당 타입의 payload만 뽑아 null을 제거한다. (미리보기·편집 switch 공통) */
+/**
+ * 섹션 아이템들에서 해당 타입의 payload만 뽑아 null을 제거한다. (미리보기·편집 switch 공통)
+ * 반환값에 `itemId`와 클라이언트 전용 `uid`를 함께 실어, 위젯이 정렬 정체자로 그대로 쓸 수 있게 한다.
+ */
 export const payloadsOf = <K extends keyof SectionItems[number]['payload']>(items: SectionItems, key: K) =>
   items.flatMap((item) => {
     const payload = item.payload[key]
-    return payload === null ? [] : [{ ...payload, itemId: item.itemId }]
+    return payload === null ? [] : [{ ...payload, itemId: item.itemId, uid: item.uid }]
   })
 
 /** 순서는 배열 순서가 곧 표시 순서다(정렬 안 함). displayOrder는 저장 시 index로 부여된다.*/

@@ -20,6 +20,7 @@ export const resumeToFormValues = (resume: ResumeQuery['resume']): ResumeFormVal
     displayOrder: section.displayOrder,
     visible: section.visible,
     items: [...section.items].sort(byDisplayOrder).map((item) => ({
+      uid: item.itemId,
       itemId: item.itemId,
       displayOrder: item.displayOrder,
       visible: item.visible,

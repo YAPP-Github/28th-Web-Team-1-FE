@@ -20,7 +20,13 @@ export const LanguageSection = ({ title, sectionIndex }: { title: string; sectio
           variant={'text'}
           size={'sm'}
           onClick={() =>
-            append({ itemId: null, displayOrder: nextDisplayOrder(fields), visible: true, payload: { ...emptyItemPayload, language: { examName: '', scoreOrGrade: '', acquiredAt: null } } })
+            append({
+              uid: crypto.randomUUID(),
+              itemId: null,
+              displayOrder: nextDisplayOrder(fields),
+              visible: true,
+              payload: { ...emptyItemPayload, language: { examName: '', scoreOrGrade: '', acquiredAt: null } }
+            })
           }
         >
           어학 추가

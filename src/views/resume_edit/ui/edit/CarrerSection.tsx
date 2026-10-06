@@ -28,7 +28,13 @@ export const CareerSection = ({ title, sectionIndex, targetJdId }: { title: stri
           variant={'text'}
           size={'sm'}
           onClick={() =>
-            append({ itemId: null, displayOrder: nextDisplayOrder(fields), visible: true, payload: { ...emptyItemPayload, career: { companyName: '', role: null, contents: '', period: null } } })
+            append({
+              uid: crypto.randomUUID(),
+              itemId: null,
+              displayOrder: nextDisplayOrder(fields),
+              visible: true,
+              payload: { ...emptyItemPayload, career: { companyName: '', role: null, contents: '', period: null } }
+            })
           }
         >
           경력 / 활동 추가

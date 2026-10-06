@@ -12,6 +12,7 @@ import { emptyItemPayload, type ResumeFormItem } from './resume-form.types'
  */
 export const experiencesToFormItems = (experiences: Experience[]): ResumeFormItem[] =>
   experiences.map((experience, index) => ({
+    uid: crypto.randomUUID(),
     itemId: null,
     displayOrder: index + 1,
     visible: true,

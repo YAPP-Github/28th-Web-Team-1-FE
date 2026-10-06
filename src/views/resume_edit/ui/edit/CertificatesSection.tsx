@@ -20,7 +20,13 @@ export const CertificatesSection = ({ title, sectionIndex }: { title: string; se
           variant={'text'}
           size={'sm'}
           onClick={() =>
-            append({ itemId: null, displayOrder: nextDisplayOrder(fields), visible: true, payload: { ...emptyItemPayload, certificate: { name: '', organization: null, acquiredAt: null } } })
+            append({
+              uid: crypto.randomUUID(),
+              itemId: null,
+              displayOrder: nextDisplayOrder(fields),
+              visible: true,
+              payload: { ...emptyItemPayload, certificate: { name: '', organization: null, acquiredAt: null } }
+            })
           }
         >
           자격증 추가

@@ -23,6 +23,7 @@ export const EducationSection = ({ title, sectionIndex }: { title: string; secti
           size={'sm'}
           onClick={() =>
             append({
+              uid: crypto.randomUUID(),
               itemId: null,
               displayOrder: nextDisplayOrder(fields),
               visible: true,
