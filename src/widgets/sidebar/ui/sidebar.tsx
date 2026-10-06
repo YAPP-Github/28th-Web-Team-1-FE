@@ -33,7 +33,7 @@ export const Sidebar = () => {
         'transition-all duration-300 ease-in-out',
         isEffectiveExpanded ? 'w-(--sidebar-width-expanded)' : 'w-(--sidebar-width-collapsed)',
         // 반응형 md이하에서 숨김 처리
-        'hidden md:flex'
+        'hidden sm:flex'
       )}
     >
       <header className={cn('flex h-10', isEffectiveExpanded ? 'justify-between' : 'justify-center')}>

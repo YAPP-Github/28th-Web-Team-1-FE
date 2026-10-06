@@ -6,13 +6,9 @@ import { ErrorFallback, Heading, Text } from '@shared/ui'
 import { JDAnalysisForm } from './JDAnalysisForm'
 import { RecommendedJdSection } from './RecommendedJdSection'
 import homeGradientDesktop from '../assets/home_gradient_desktop.webp'
-import homeGradientMobile from '../assets/home_gradient_mobile.webp'
 import { Logo } from '@/src/shared/icon'
 
-const {
-  props: { srcSet: desktopSrcSet }
-} = getImageProps({ src: homeGradientDesktop, alt: '', sizes: '100vw', priority: true })
-const { props: mobileImageProps } = getImageProps({ src: homeGradientMobile, alt: '', sizes: '100vw', priority: true })
+const { props: desktopImageProps } = getImageProps({ src: homeGradientDesktop, alt: '', sizes: '100vw' })
 
 export const HomePage = () => {
   return (
@@ -26,12 +22,11 @@ export const HomePage = () => {
         gap={{ initial: '6', sm: '40px' }}
         className={'relative isolate'}
       >
-        <Logo />
-        <div className="absolute inset-x-0 -top-16.5 -z-10 sm:top-0">
-          <picture>
-            <source media="(min-width: 768px)" srcSet={desktopSrcSet} />
-            <img {...mobileImageProps} className="h-auto w-full object-cover sm:h-164" />
-          </picture>
+        <Logo className="-mt-3 text-lg font-extrabold sm:hidden" />
+        <div className="absolute inset-x-0 top-0 -z-10">
+          <div className="bg-element-primary-lighter h-109.75 sm:hidden" />
+          <img {...desktopImageProps} className="hidden h-164 w-full object-fill sm:block" />
+          <div className="to-bg-white absolute inset-x-0 bottom-0 h-11.25 bg-linear-to-b from-transparent" />
         </div>
 
         <Flex direction={'column'} gap={{ initial: '1', sm: '3' }}>

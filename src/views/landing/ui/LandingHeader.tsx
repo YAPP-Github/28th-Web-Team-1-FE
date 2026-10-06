@@ -10,8 +10,8 @@ export const LandingHeader = () => {
   const { isOpen, setIsOpen, handleClick } = useMobileBlockDialog()
 
   return (
-    <header className="border-border-subtler fixed inset-x-0 top-0 z-50 bg-white py-3 md:py-8 md:shadow-[0_4px_8px_rgba(0,0,0,0.08)]">
-      <div className="mx-auto flex max-w-360 items-center justify-between px-4 md:px-8">
+    <header className="border-border-subtler fixed inset-x-0 top-0 z-50 bg-white py-2 md:py-8 md:shadow-[0_4px_8px_rgba(0,0,0,0.08)]">
+      <div className="mx-auto flex max-w-360 items-center justify-between px-5 md:px-8">
         <div className="flex items-center gap-6 md:gap-20">
           <Logo className="text-lg font-extrabold md:text-2xl" />
           <Button
