@@ -32,7 +32,7 @@ export const Sidebar = () => {
         'bg-bg-gray-subtler flex h-full flex-col px-4 py-5',
         'transition-all duration-300 ease-in-out',
         isEffectiveExpanded ? 'w-(--sidebar-width-expanded)' : 'w-(--sidebar-width-collapsed)',
-        // 반응형 md이하에서 숨김 처리
+        // 반응형 sm이하에서 숨김 처리
         'hidden sm:flex'
       )}
     >
