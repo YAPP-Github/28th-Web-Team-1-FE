@@ -39,6 +39,9 @@ html {
   --breakpoint-xl: 1640px;
 }
 
+/* Text/Heading의 반응형 variant용 (getVariantClass가 동적으로 조합하는 클래스) */
+@source inline('{xs:,sm:,md:,lg:,xl:}text-{display1,display2,display3,title1,title2,title3,heading1,heading2,headline1,headline2,body1,body2,label1,label2,caption1,caption2}');
+
 /* ── Color Palette ── */
 @theme inline {
   /* Primary Color Palette */

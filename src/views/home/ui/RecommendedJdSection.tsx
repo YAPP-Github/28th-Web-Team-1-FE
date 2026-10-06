@@ -2,7 +2,7 @@
 import { useState, useTransition } from 'react'
 import { CalendarIcon } from 'lucide-react'
 import { Flex, Grid } from '@radix-ui/themes'
-import { formatDate } from '@shared/lib'
+import { cn, formatDate } from '@shared/lib'
 import { Button, Text } from '@shared/ui'
 import { useJdRecommendationTags, useJdRecommendations, type JdRecommendation, type JdRecommendationTag } from '@entities/jd'
 
@@ -15,12 +15,12 @@ export const RecommendedJdSection = () => {
   const { recommendations } = useJdRecommendations(selectedTag ? [selectedTag] : [], RECOMMENDATION_SIZE)
 
   return (
-    <Flex direction={'column'} gap={'6'} className={'w-full max-w-215'}>
+    <Flex direction={'column'} gap={{ initial: '4', sm: '6' }} className={'w-full max-w-215'}>
       <Text as={'p'} variant={'heading2'} color={'text-basic'}>
         아래 공고 이력서 만들어보는건 어때요?
       </Text>
 
-      <Flex direction={'column'} gap={'5'}>
+      <Flex direction={'column'} gap={{ initial: '3', sm: '5' }} className={'w-full flex-wrap'}>
         <Flex gap={'2'}>
           {tags.map(({ tag, name }) => (
             <Button
@@ -55,7 +55,19 @@ const RecommendedJdCard = ({ jd }: { jd: JdRecommendation }) => {
   const period = [formatDate(jd.recruitmentStartAt), formatDate(jd.recruitmentEndAt)].filter(Boolean).join(' ~ ')
 
   return (
-    <Flex direction={'column'} justify={'between'} gap={'4'} p={'5'} className={'border-border-subtler bg-element-white shadow-2 min-w-0 rounded-lg border'}>
+    <Flex
+      direction={'column'}
+      justify={'between'}
+      gap={'4'}
+      p={{ initial: '4', sm: '5' }}
+      className={cn(
+        'min-w-0 rounded-lg',
+        // sm
+        'sm:border-border-subtler sm:bg-element-white sm:shadow-2 sm:border',
+        // initial
+        'bg-element-gray-lighter'
+      )}
+    >
       <Flex direction={'column'} className="gap-1.5">
         <Text as={'p'} variant={'label1'} color={'text-basic'} className={'truncate'}>
           [{jd.companyName}] {jd.title}

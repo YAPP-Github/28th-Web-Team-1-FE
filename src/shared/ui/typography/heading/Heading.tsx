@@ -1,12 +1,12 @@
 import { Heading as RadixHeading, type HeadingProps } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
-import { typographyVariants } from '../shared'
-import type { TextColor, TypographyVariant } from '../shared'
+import { getVariantClass } from '../shared'
+import type { ResponsiveVariant, TextColor } from '../shared'
 
 type RadixWeight = HeadingProps['weight']
 
 type CustomTextProps = {
-  variant?: TypographyVariant
+  variant?: ResponsiveVariant
   className?: string
   weight?: HeadingProps['weight'] | 'semibold'
   color?: TextColor
@@ -34,6 +34,7 @@ type CustomTextProps = {
  * @example
  * ```
  * <Heading variant="body1">본문 텍스트</Heading>
+ * <Heading variant={{ initial: 'heading1', sm: 'title2' }}>반응형 (768px 이상 title2)</Heading>
  * <Heading variant="caption1" color="gray-60">회색 캡션</Heading>
  * <Heading size="9" weight="semibold">빨간 semibold 텍스트</Heading>
  * <Heading as="h2" variant="body2">제목</Heading>
@@ -47,7 +48,7 @@ export const Heading = ({ variant, className, children, weight, color, ...props 
       {...(props as HeadingProps)}
       weight={isSemibold ? undefined : (weight as RadixWeight)}
       style={color ? { color: `var(--color-${color})` } : undefined}
-      className={cn(variant && typographyVariants[variant], isSemibold && 'font-semibold', className)}
+      className={cn(variant && getVariantClass(variant), isSemibold && 'font-semibold', className)}
     >
       {children}
     </RadixHeading>
