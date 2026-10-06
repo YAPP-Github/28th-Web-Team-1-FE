@@ -63,7 +63,7 @@ const SetCategoryModal = ({ onReplaceSections }: { onReplaceSections: UseFieldAr
       <Tooltip open={isTooltipOpen && !isOpen} onOpenChange={setIsTooltipOpen}>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button variant={'outline'} size={'icon-md'} className={'shadow-2 text-text-subtler rounded-full bg-white'} onClick={openModal} aria-label={'카테고리 추가/삭제'}>
+            <Button variant={'outline'} size={'icon-md'} className={'shadow-2 text-icon-gray-light rounded-full bg-white'} onClick={openModal} aria-label={'카테고리 추가/삭제'}>
               <Diff />
             </Button>
           </DialogTrigger>
