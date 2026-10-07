@@ -48,12 +48,6 @@ export const getItemLabel = (item: ResumeSectionData['items'][number]): string =
   )
 }
 
-/** 목차(ResumeIndex)에 표시할 아이템 라벨 목록. 빈 라벨은 제외한다. */
-export const getSectionItemLabels = (section: ResumeSectionData): string[] =>
-  visibleItems(section)
-    .map(getItemLabel)
-    .filter((label) => label.trim().length > 0)
-
 const byDisplayOrder = <T extends { displayOrder: number }>(a: T, b: T) => a.displayOrder - b.displayOrder
 
 /**
