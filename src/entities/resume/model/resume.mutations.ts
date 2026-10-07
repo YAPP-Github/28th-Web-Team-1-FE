@@ -24,6 +24,27 @@ export const useCreateResume = (workspaceId: string) => {
 }
 
 /**
+ * PDF 이력서를 업로드해 새 이력서를 생성한다. 성공 시 목록·개수 캐시를 무효화한다.
+ * 4.5MB 초과 시 `file_size_exceeded` 코드의 `ApiError`가 발생한다.
+ * @param workspaceId 현재 워크스페이스 ID
+ * @example
+ * ```tsx
+ * const { mutate } = useImportResume(workspaceId)
+ * mutate({ file, targetJdId: jdId }, { onSuccess: ({ resumeId }) => router.push(`/resumes/edit/${resumeId}`) })
+ * ```
+ */
+export const useImportResume = (workspaceId: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (variables: { file: File; targetJdId?: string }) => resumeAPI.importResume({ workspaceId, ...variables }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: resumeKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: resumeKeys.counts(workspaceId) })
+    }
+  })
+}
+
+/**
  * 기존 이력서를 전체 스냅샷 단위로 수정한다.
  * 요청에 없는 기존 섹션·아이템은 서버에서 삭제되므로, 편집 화면의 전체 상태를 그대로 담아 보낸다.
  * 성공 시 해당 이력서 상세와 함께 목록·개수 캐시도 무효화한다.

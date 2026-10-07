@@ -16,6 +16,7 @@ import { Dialog, DialogContent } from '@shared/ui/dialog'
 
 import * as amplitude from '@amplitude/unified'
 import { AMPLITUDE_EVENTS } from '@shared/config'
+import { ResumeCreateMethodDialog } from './ResumeCreateMethodDialog'
 
 type AnalysisPhase = 'INPUT' | 'SELECT_POSITION'
 
@@ -66,6 +67,7 @@ export const JDAnalysisForm = () => {
   return (
     <>
       <JDAnalysisProgressDialog isOpen={showProgress} isComplete={isSuccess} />
+      <ResumeCreateMethodDialog open={true} onOpenChange={() => {}} onSelect={() => {}} />
 
       <div className="flex w-full justify-center">
         <AnimatePresence mode="wait">
