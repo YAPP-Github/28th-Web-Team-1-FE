@@ -683,8 +683,8 @@ export type PolishProfileTextMutation = { polishProfileText: { title: string | n
 
 export type GenerateCoreCompetencyMutationVariables = Exact<{
   workspaceId: string | number;
-  resumeId: string | number;
-  jdId?: string | number | null | undefined;
+  jdId: string | number;
+  resumeId?: string | number | null | undefined;
 }>;
 
 
@@ -1262,11 +1262,11 @@ export const PolishProfileTextDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<PolishProfileTextMutation, PolishProfileTextMutationVariables>;
 export const GenerateCoreCompetencyDocument = new TypedDocumentString(`
-    mutation GenerateCoreCompetency($workspaceId: ID!, $resumeId: ID!, $jdId: ID) {
+    mutation GenerateCoreCompetency($workspaceId: ID!, $jdId: ID!, $resumeId: ID) {
   generateCoreCompetency(
     workspaceId: $workspaceId
-    resumeId: $resumeId
     jdId: $jdId
+    resumeId: $resumeId
   ) {
     coreCompetency
     strategy
