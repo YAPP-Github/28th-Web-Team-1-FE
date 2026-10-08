@@ -14,23 +14,22 @@ import { JdResumeFlowDialogs } from './JdResumeFlowDialogs'
 import { useJdResumeFlow } from '../hooks/useJdResumeFlow'
 
 export const JDAnalysisForm = () => {
-  const { register: handleRegister, reset: handleReset, candidates, isPending, dialogProps } = useJdResumeFlow()
-  const phase = candidates.length ? 'SELECT_POSITION' : 'INPUT'
+  const { flow, handleRegister, handleSelectPosition, handleReset, isPending, dialogProps } = useJdResumeFlow()
 
   return (
     <>
       <JdResumeFlowDialogs {...dialogProps} />
       <div className="flex w-full justify-center">
         <AnimatePresence mode="wait">
-          {phase === 'INPUT' && (
+          {flow.step !== 'SELECT_POSITION' && (
             <motion.div key="input" exit={{ opacity: 0 }} animate={{ opacity: 1 }} className={'w-full'}>
               <JDInputStep onSubmit={handleRegister} isPending={isPending} />
             </motion.div>
           )}
 
-          {phase === 'SELECT_POSITION' && (
+          {flow.step === 'SELECT_POSITION' && (
             <motion.div key="select" exit={{ opacity: 0 }} animate={{ opacity: 1 }} className={'w-full'}>
-              <JDSelectStep candidates={candidates} onSubmit={handleRegister} onBack={handleReset} isPending={isPending} />
+              <JDSelectStep candidates={flow.candidates} onSubmit={handleSelectPosition} onBack={handleReset} isPending={isPending} />
             </motion.div>
           )}
         </AnimatePresence>

@@ -7,10 +7,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@shared/ui/dia
 import type { useJdResumeFlow } from '../hooks/useJdResumeFlow'
 
 /**
- * `useJdResumeFlow`의 모달 묶음. 이력서 생성 방식 모달 + JD 분석·PDF 추출 진행 모달.
+ * 이력서 생성 방식 모달 + JD 분석·PDF 추출 진행 모달.
  * @example
  * ```tsx
- * const { register, dialogProps } = useJdResumeFlow()
+ * const { handleRegister, dialogProps } = useJdResumeFlow()
  * <JdResumeFlowDialogs {...dialogProps} />
  * ```
  */

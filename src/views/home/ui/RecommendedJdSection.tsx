@@ -15,7 +15,7 @@ export const RecommendedJdSection = () => {
   const [, startTransition] = useTransition()
   const { tags } = useJdRecommendationTags()
   const { recommendations } = useJdRecommendations(selectedTag ? [selectedTag] : [], RECOMMENDATION_SIZE)
-  const { register, isPending, dialogProps } = useJdResumeFlow()
+  const { handleRegister, isPending, dialogProps } = useJdResumeFlow()
 
   return (
     <Flex direction={'column'} gap={{ initial: '4', sm: '6' }} className={'w-full max-w-215'}>
@@ -42,7 +42,7 @@ export const RecommendedJdSection = () => {
         {recommendations.length ? (
           <Grid columns={{ initial: '1', sm: '2' }} gap={'4'}>
             {recommendations.map((jd) => (
-              <RecommendedJdCard key={jd.id} jd={jd} onCreate={() => register({ sourceUrl: jd.sourceUrl })} disabled={isPending} />
+              <RecommendedJdCard key={jd.id} jd={jd} onCreate={() => handleRegister({ sourceUrl: jd.sourceUrl })} disabled={isPending} />
             ))}
           </Grid>
         ) : (
