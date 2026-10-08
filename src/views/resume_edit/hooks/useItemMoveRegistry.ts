@@ -2,7 +2,7 @@
 import { useCallback, useRef } from 'react'
 
 /** 섹션 uid로 그 섹션 아이템의 순서 변경 핸들러를 찾아 쓰는 레지스트리. */
-export type ItemMoveRegistry = {
+export type UseItemMoveRegistry = {
   /** 섹션 컴포넌트가 자신의 아이템 move 핸들러를 등록한다. */
   registerItemMover: (sectionUid: string, mover: (fromUid: string, toUid: string) => void) => () => void
   /** 섹션 uid로 핸들러를 찾는다. 없으면 undefined. */
@@ -17,7 +17,7 @@ export type ItemMoveRegistry = {
  * 그래서 섹션 컴포넌트가 핸들러를 등록하고, provider가 uid로 찾아 호출한다.
  * 이렇게 하면 폼의 private 필드(`control._formValues`)에 손대지 않아도 된다.
  */
-export const useItemMoveRegistry = (): ItemMoveRegistry => {
+export const useItemMoveRegistry = (): UseItemMoveRegistry => {
   const movers = useRef(new Map<string, (fromUid: string, toUid: string) => void>())
 
   const registerItemMover = useCallback((sectionUid: string, mover: (fromUid: string, toUid: string) => void) => {

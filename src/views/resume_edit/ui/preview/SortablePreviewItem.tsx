@@ -1,7 +1,7 @@
 'use client'
 import { Flex } from '@radix-ui/themes'
 import { useSortable } from '@dnd-kit/react/sortable'
-import { isInSortableGroup } from './sortable'
+import { isInSortableGroup } from '../../model/sortable'
 import type { ReactNode } from 'react'
 
 /**

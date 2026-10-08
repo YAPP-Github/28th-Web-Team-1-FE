@@ -4,7 +4,7 @@ import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-f
 import type { SectionItemWrapper } from '@widgets/resume_preview'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 import { SortablePreviewItem } from './SortablePreviewItem'
-import type { ItemMoveRegistry } from './itemMoveRegistry'
+import type { UseItemMoveRegistry } from '../../hooks/useItemMoveRegistry'
 
 /**
  * 미리보기 섹션 하나의 아이템 드래그 정렬을 폼에 반영한다.
@@ -17,7 +17,7 @@ import type { ItemMoveRegistry } from './itemMoveRegistry'
  * @param registry 아이템 move 핸들러 보관소(드래그 종료 시 provider가 찾아 호출)
  * @returns 위젯 섹션 컴포넌트에 넘길 `ItemWrapper`
  */
-export const useSortableSectionItems = ({ sectionUid, sectionIndex, registry }: { sectionUid: string; sectionIndex: number; registry: ItemMoveRegistry }): SectionItemWrapper => {
+export const useSortableSectionItems = ({ sectionUid, sectionIndex, registry }: { sectionUid: string; sectionIndex: number; registry: UseItemMoveRegistry }): SectionItemWrapper => {
   const { control, getValues } = useFormContext<ResumeFormValues>()
   const { move } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
   const { registerItemMover } = registry

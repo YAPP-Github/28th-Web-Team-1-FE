@@ -26,8 +26,8 @@ import { useRouter } from 'next/navigation'
 import { DragDropProvider, PointerSensor } from '@dnd-kit/react'
 import { PointerActivationConstraints, type Draggable } from '@dnd-kit/dom'
 import { isSortable, useSortable } from '@dnd-kit/react/sortable'
-import { useItemMoveRegistry, type ItemMoveRegistry } from './preview/itemMoveRegistry'
-import { isInSortableGroup } from './preview/sortable'
+import { useItemMoveRegistry, type UseItemMoveRegistry } from '../hooks/useItemMoveRegistry'
+import { isInSortableGroup } from '../model/sortable'
 import { useSortableSectionItems } from './preview/useSortableSectionItems'
 
 import * as amplitude from '@amplitude/unified'
@@ -430,7 +430,7 @@ interface SortablePreviewSectionProps {
   onSelect: (sectionUid: string) => void
   /** 미니맵 스크롤용 DOM 등록 ref. */
   registerRef: (uid: string, el: HTMLElement | null) => void
-  itemMoveRegistry: ItemMoveRegistry
+  itemMoveRegistry: UseItemMoveRegistry
 }
 
 /**
