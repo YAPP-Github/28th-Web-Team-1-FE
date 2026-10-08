@@ -1,41 +1,19 @@
-import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { Plus, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { DEGREE_OPTIONS, EDUCATION_STATUS_OPTIONS } from '@entities/profile'
-import { Section } from './Section'
+import { AddItemButton, Section } from './Section'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormSelect } from '../form/FormSelect'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
-import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
+import { useSectionItems } from '../../hooks/useSectionItems'
 
 export const EducationSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
-  const { control } = useFormContext<ResumeFormValues>()
-  const { fields, append, remove } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
+  const { fields, remove, addItem } = useSectionItems(sectionIndex)
 
   return (
-    <Section
-      title={title}
-      actionButton={
-        <Button
-          variant={'text'}
-          size={'sm'}
-          onClick={() =>
-            append({
-              uid: crypto.randomUUID(),
-              itemId: null,
-              displayOrder: nextDisplayOrder(fields),
-              visible: true,
-              payload: { ...emptyItemPayload, education: { schoolName: '', major: null, degree: null, status: null, period: null } }
-            })
-          }
-        >
-          학력 추가
-          <Plus size={16} data-icon="inline-end" />
-        </Button>
-      }
-    >
+    <Section title={title} actionButton={<AddItemButton label={'학력 추가'} onClick={() => addItem({ education: { schoolName: '', major: null, degree: null, status: null, period: null } })} />}>
       {fields.map((field, index) => (
         <EducationSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} />
       ))}

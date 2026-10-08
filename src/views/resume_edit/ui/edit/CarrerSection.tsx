@@ -1,47 +1,25 @@
-import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { Plus, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import * as amplitude from '@amplitude/unified'
 import { AMPLITUDE_EVENTS } from '@shared/config'
-import { Section } from './Section'
+import { AddItemButton, Section } from './Section'
 import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
 import { FormTextarea } from '../form/FormTextarea'
-import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
+import { useSectionItems } from '../../hooks/useSectionItems'
 
 /**
- * 경력(CAREER) 편집 섹션. `useFieldArray`로 아이템 추가/삭제를 관리한다.
+ * 경력(CAREER) 편집 섹션. `useSectionItems`로 아이템 추가/삭제를 관리한다.
  * 리스트 key는 서버 itemId가 아니라 fieldArray가 주는 `field.id`를 써서 신규 항목의 중복 key를 원천 차단한다.
  */
 export const CareerSection = ({ title, sectionIndex, targetJdId }: { title: string; sectionIndex: number; targetJdId: string | null }) => {
-  const { control } = useFormContext<ResumeFormValues>()
-  const { fields, append, remove } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
+  const { fields, remove, addItem } = useSectionItems(sectionIndex)
 
   return (
-    <Section
-      title={title}
-      actionButton={
-        <Button
-          variant={'text'}
-          size={'sm'}
-          onClick={() =>
-            append({
-              uid: crypto.randomUUID(),
-              itemId: null,
-              displayOrder: nextDisplayOrder(fields),
-              visible: true,
-              payload: { ...emptyItemPayload, career: { companyName: '', role: null, contents: '', period: null } }
-            })
-          }
-        >
-          경력 / 활동 추가
-          <Plus size={16} data-icon="inline-end" />
-        </Button>
-      }
-    >
+    <Section title={title} actionButton={<AddItemButton label={'경력 / 활동 추가'} onClick={() => addItem({ career: { companyName: '', role: null, contents: '', period: null } })} />}>
       {fields.map((field, index) => (
         <CareerSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} targetJdId={targetJdId} />
       ))}

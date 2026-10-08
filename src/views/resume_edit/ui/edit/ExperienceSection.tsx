@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { RotateCcw, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import * as amplitude from '@amplitude/unified'
 import { AMPLITUDE_EVENTS } from '@shared/config'
 import { ExperiencePickerDialog } from '@views/resume_create'
-import { Section } from './Section'
+import { AddItemButton, Section } from './Section'
 import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
@@ -29,15 +29,7 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
   const { previousExperienceIds, setPreviousExperienceIds } = usePreviousExperienceIdsTracking()
 
   return (
-    <Section
-      title={title}
-      actionButton={
-        <Button variant={'text'} size={'sm'} onClick={() => setIsPickerOpen(true)}>
-          경험 재선택
-          <RotateCcw size={16} data-icon="inline-end" />
-        </Button>
-      }
-    >
+    <Section title={title} actionButton={<AddItemButton label={'경험 재선택'} onClick={() => setIsPickerOpen(true)} />}>
       {fields.map((field, index) => (
         <ExperienceSectionItem key={field.id} sectionIndex={sectionIndex} index={index} targetJdId={targetJdId} onRemove={() => remove(index)} />
       ))}
