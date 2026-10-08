@@ -12,7 +12,7 @@ export const resumeAPI = {
     const formData = new FormData()
     formData.append('file', new File([variables.file], variables.file.name, { type: 'application/pdf' }))
     const query = variables.targetJdId ? `?${new URLSearchParams({ targetJdId: variables.targetJdId })}` : ''
-    return http.post<{ resumeId: number }>(`/api/v1/workspaces/${variables.workspaceId}/resume-imports${query}`, { body: formData })
+    return http.post<{ resumeId: string }>(`/api/v1/workspaces/${variables.workspaceId}/resume-imports${query}`, { body: formData })
   }
 }
 
