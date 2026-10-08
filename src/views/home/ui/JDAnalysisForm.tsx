@@ -1,74 +1,25 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ArrowRightIcon, ChevronLeft } from 'lucide-react'
 import { motion, AnimatePresence } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { SelectedControl, SelectedControlItem } from '@shared/ui/selected_control'
-import { Text, Button, ProcessingView } from '@shared/ui'
+import { Text, Button } from '@shared/ui'
 import { RadioGroup, RadioGroupItem } from '@shared/ui/radio_group'
-import { useWorkspaceId } from '@entities/user'
-import { useRegisterJd, type JdRegisterInput, type JdCandidate } from '@entities/jd'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
-import { Dialog, DialogContent } from '@shared/ui/dialog'
+import { type JdRegisterInput, type JdCandidate } from '@entities/jd'
 
-import * as amplitude from '@amplitude/unified'
-import { AMPLITUDE_EVENTS } from '@shared/config'
-import { ResumeCreateMethodDialog } from './ResumeCreateMethodDialog'
-
-type AnalysisPhase = 'INPUT' | 'SELECT_POSITION'
+import { JdResumeFlowDialogs } from './JdResumeFlowDialogs'
+import { useJdResumeFlow } from '../hooks/useJdResumeFlow'
 
 export const JDAnalysisForm = () => {
-  const router = useRouter()
-  const [phase, setPhase] = useState<AnalysisPhase>('INPUT')
-  const [candidates, setCandidates] = useState<JdCandidate[]>([])
-
-  const workspaceId = useWorkspaceId()
-  const { mutate: registerJd, isPending, isSuccess } = useRegisterJd(workspaceId)
-
-  const [showProgress, setShowProgress] = useState(false)
-  // 분석이 250ms 넘게 걸릴 때만 진행 모달을 띄운다. (빠르게 실패하는 요청은 모달 없이 toast만)
-  useEffect(() => {
-    if (!isPending) return
-    const timer = setTimeout(() => setShowProgress(true), 250)
-    return () => {
-      clearTimeout(timer)
-      setShowProgress(false)
-    }
-  }, [isPending])
-
-  const handleRegister = (request: JdRegisterInput) => {
-    registerJd(request, {
-      onSuccess: (res) => {
-        if (res.jd) {
-          // JD 등록 성공 시 Amplitude 이벤트 전송. 후보 선택 단계(candidates)에서는 아직 jd_id가 없어 보내지 않는다.
-          amplitude.track(AMPLITUDE_EVENTS.JD_URL_ENTERED, { jd_id: res.jd.jdId })
-          router.push(`/resumes/create?jdId=${res.jd.jdId}`)
-        } else if (res.candidates?.length) {
-          setCandidates(res.candidates)
-          setPhase('SELECT_POSITION')
-        }
-      },
-      onError: (err) => {
-        toast.error(err.message, {
-          position: 'top-center'
-        })
-      }
-    })
-  }
-
-  const handleReset = () => {
-    setCandidates([])
-    setPhase('INPUT')
-  }
+  const { register: handleRegister, reset: handleReset, candidates, isPending, dialogProps } = useJdResumeFlow()
+  const phase = candidates.length ? 'SELECT_POSITION' : 'INPUT'
 
   return (
     <>
-      <JDAnalysisProgressDialog isOpen={showProgress} isComplete={isSuccess} />
-      <ResumeCreateMethodDialog open={true} onOpenChange={() => {}} onSelect={() => {}} />
-
+      <JdResumeFlowDialogs {...dialogProps} />
       <div className="flex w-full justify-center">
         <AnimatePresence mode="wait">
           {phase === 'INPUT' && (
@@ -177,17 +128,3 @@ const JDSelectStep = ({ candidates, onSubmit, onBack, isPending }: { candidates:
     </form>
   )
 }
-
-const STEPS = ['채용 공고 읽는 중', '내 경험 분석 중', '지원 전략 생성 중']
-
-interface JDAnalysisProgressDialogProps {
-  isOpen: boolean
-  isComplete: boolean
-}
-export const JDAnalysisProgressDialog = ({ isOpen, isComplete }: JDAnalysisProgressDialogProps) => (
-  <Dialog open={isOpen}>
-    <DialogContent showCloseButton={false} className="w-150">
-      <ProcessingView isComplete={isComplete} steps={STEPS} title="채용공고를 분석하고 있어요" description="잠시만 기다려주세요" successTitle="" successDescription="" />
-    </DialogContent>
-  </Dialog>
-)
