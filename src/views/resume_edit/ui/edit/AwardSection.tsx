@@ -19,7 +19,15 @@ export const AwardSection = ({ title, sectionIndex }: { title: string; sectionIn
         <Button
           variant={'text'}
           size={'sm'}
-          onClick={() => append({ itemId: null, displayOrder: nextDisplayOrder(fields), visible: true, payload: { ...emptyItemPayload, award: { name: '', organization: null, awardedAt: null } } })}
+          onClick={() =>
+            append({
+              uid: crypto.randomUUID(),
+              itemId: null,
+              displayOrder: nextDisplayOrder(fields),
+              visible: true,
+              payload: { ...emptyItemPayload, award: { name: '', organization: null, awardedAt: null } }
+            })
+          }
         >
           수상 추가
           <Plus size={16} data-icon="inline-end" />

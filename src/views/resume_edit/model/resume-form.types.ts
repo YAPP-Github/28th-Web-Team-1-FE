@@ -10,7 +10,16 @@ import type { ResumeQuery } from '@shared/lib/gql/graphql'
 type QuerySection = ResumeQuery['resume']['sections'][number]
 type QueryItem = QuerySection['items'][number]
 
-export type ResumeFormItem = Omit<QueryItem, 'itemId'> & { itemId: string | null }
+export type ResumeFormItem = Omit<QueryItem, 'itemId'> & {
+  itemId: string | null
+  /**
+   * 클라이언트 전용 안정 식별자. 미리보기 아이템 드래그 정렬의 key/dnd id로 쓴다.
+   * 서버 `itemId`는 신규(미저장) 아이템에서 null이라 식별자로 부적합하고, `useFieldArray`의 `field.id`는
+   * reorder 시 다른 인스턴스의 값과 어긋날 수 있어 별도로 둔다. 저장 시엔 전송하지 않는다.
+   * (기존 아이템은 `uid = itemId`, 신규 아이템은 새 UUID)
+   */
+  uid: string
+}
 
 export type ResumeFormSection = Omit<QuerySection, 'sectionId' | 'items'> & {
   /**

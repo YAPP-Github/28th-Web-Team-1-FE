@@ -1,7 +1,37 @@
 import { Flex } from '@radix-ui/themes'
 import { Divider, Text } from '@shared/ui'
 import { formatYYYYMM } from '@shared/lib'
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, type ComponentType, type ReactNode } from 'react'
+
+/**
+ * 섹션 컴포넌트가 아이템 하나를 감쌀 때 쓰는 래퍼 컴포넌트의 규약.
+ * 편집 화면은 아이템 드래그 정렬을 위해 sortable로 등록하는 컴포넌트를 넘기고,
+ * 순수 미리보기(상세·PDF)는 넘기지 않아 원래 마크업이 그대로 렌더된다.
+ *
+ * 컴포넌트(콜백이 아닌)로 받는 이유는 정렬 등록이 리액트 훅이라, 아이템마다 컴포넌트 인스턴스가
+ * 필요하기 때문이다. `uid`는 `payloadsOf`가 붙여 준 클라이언트 전용 정체자다.
+ */
+export type SectionItemWrapper = ComponentType<{ uid?: string; index: number; children: ReactNode }>
+
+/**
+ * 위젯 섹션 컴포넌트가 다루는 아이템 타입.
+ * 서버 GraphQL 프래그먼트에, 클라이언트 전용 정체자(`itemId`, `uid`)를 더한 형태다.
+ * `uid`는 편집 화면의 드래그 정렬 정체자로만 쓰이고, 순수 미리보기에서는 `undefined`로 채워진다.
+ */
+export type PreviewItem<T> = T & { itemId?: string | null; uid?: string }
+
+/** 드래그 정렬을 걸지 않는 화면(상세·PDF)의 기본 래퍼. 아무 것도 하지 않고 children만 그대로 렌더한다. */
+const PlainItem = ({ children }: { children: ReactNode }) => <>{children}</>
+
+/**
+ * 섹션 컴포넌트가 아이템을 감쌀 때 쓰는 헬퍼. 드래그 정렬 화면은 sortable 래퍼를, 나머지는 원래 마크업을 쓴다.
+ * 정렬 등록이 리액트 훅이라 아이템마다 컴포넌트 인스턴스가 필요해서, 래퍼는 콜백이 아닌 컴포넌트로 받는다.
+ */
+export const SectionItemShell = ({ ItemWrapper = PlainItem, uid, index, children }: { ItemWrapper?: SectionItemWrapper; uid?: string; index: number; children: ReactNode }) => (
+  <ItemWrapper uid={uid} index={index}>
+    {children}
+  </ItemWrapper>
+)
 
 export const Section = ({ title, children }: { title: string; children: ReactNode }) => {
   return (

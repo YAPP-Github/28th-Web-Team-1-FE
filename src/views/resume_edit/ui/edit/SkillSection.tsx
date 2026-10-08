@@ -21,7 +21,13 @@ export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIn
 
   const handleAdd = () => {
     if (!name.trim()) return
-    append({ itemId: null, displayOrder: nextDisplayOrder(fields), visible: true, payload: { ...emptyItemPayload, skill: { name: name.trim(), level: level.trim() || null } } })
+    append({
+      uid: crypto.randomUUID(),
+      itemId: null,
+      displayOrder: nextDisplayOrder(fields),
+      visible: true,
+      payload: { ...emptyItemPayload, skill: { name: name.trim(), level: level.trim() || null } }
+    })
     setName('')
     setLevel('')
   }
