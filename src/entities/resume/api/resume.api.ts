@@ -1,4 +1,4 @@
-import { execute, graphql } from '@shared/lib'
+import { execute, graphql, http } from '@shared/lib'
 import { type CreateResumeInput, type ResumeStatusType, type SaveResumeInput } from '@shared/lib/gql/graphql'
 
 export const resumeAPI = {
@@ -7,7 +7,13 @@ export const resumeAPI = {
   deleteResume: (variables: { workspaceId: string; resumeId: string }) => execute(deleteResumeDocument, variables),
   getResume: (variables: { resumeId: string; workspaceId: string }) => execute(resumeDocument, variables),
   getResumes: (variables: { workspaceId: string; size: number; cursor?: string | null; statuses?: ResumeStatusType[] | null }) => execute(resumesDocument, variables),
-  getResumeCounts: (variables: { workspaceId: string }) => execute(resumeCountsDocument, variables)
+  getResumeCounts: (variables: { workspaceId: string }) => execute(resumeCountsDocument, variables),
+  importResume: (variables: { workspaceId: string; file: File; targetJdId?: string }) => {
+    const formData = new FormData()
+    formData.append('file', new File([variables.file], variables.file.name, { type: 'application/pdf' }))
+    const query = variables.targetJdId ? `?${new URLSearchParams({ targetJdId: variables.targetJdId })}` : ''
+    return http.post<{ resumeId: string }>(`/api/v1/workspaces/${variables.workspaceId}/resume-imports${query}`, { body: formData })
+  }
 }
 
 /** 이력서 목록. 카드 표시에 필요한 대상 JD(기업명·포지션·핵심 역량)와 등록일까지 함께 조회한다. */
