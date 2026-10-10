@@ -7,6 +7,7 @@ export const experienceAPI = {
   getProjectExperiences: (variables: { workspaceId: string; projectId: string; size: number; cursor?: string | null }) => execute(projectExperiencesDocument, variables),
   getExperience: (variables: { workspaceId: string; experienceId: string }) => execute(experienceDocument, variables),
   getSearchExperiences: (variables: { workspaceId: string; keyword: string; size: number; cursor?: string | null }) => execute(searchExperiencesDocument, variables),
+  getExperienceQuestionRooms: (variables: { workspaceId: string; jdId: string }) => execute(experienceQuestionRoomsDocument, variables),
   createExperience: (variables: { workspaceId: string; request: CreateExperienceInput }) => execute(createExperienceDocument, variables),
   updateExperience: (variables: { workspaceId: string; experienceId: string; request: UpdateExperienceInput }) => execute(updateExperienceDocument, variables),
   deleteExperience: (variables: { workspaceId: string; experienceId: string }) => execute(deleteExperienceDocument, variables)
@@ -144,6 +145,21 @@ const matchedExperiencesDocument = graphql(`
     }
   }
 `)
+/**
+ * JD별 경험 질문 카드 목록을 조회한다. (0~5개)
+ * JD 담당업무·우대사항을 바탕으로 AI가 질문을 생성하며, 최초 조회는 느릴 수 있다(이후엔 저장된 목록 반환).
+ */
+const experienceQuestionRoomsDocument = graphql(`
+  query ExperienceQuestionRooms($workspaceId: ID!, $jdId: ID!) {
+    experienceQuestionRooms(workspaceId: $workspaceId, jdId: $jdId) {
+      questionRoomId
+      question
+      sourceText
+      sourceType
+    }
+  }
+`)
+
 const createExperienceDocument = graphql(`
   mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {
     createExperience(workspaceId: $workspaceId, request: $request) {

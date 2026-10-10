@@ -87,3 +87,22 @@ export const useMatchedExperiences = (workspaceId: string, jdId: string) => {
   })
   return { experiences: data, ...rest }
 }
+
+/**
+ * JD별 경험 질문 카드 목록(0~5개)을 조회한다.
+ * 최초 조회는 JD 기반 AI 생성이라 느릴 수 있고, 이후에는 저장된 목록이 반환된다.
+ * useSuspenseQuery는 enabled를 지원하지 않으므로 JD가 없으면 이 훅을 호출하지 말고 호출부에서 빈 상태를 렌더한다.
+ * AI가 질문을 만들지 못하면 빈 배열이므로 로딩·빈 상태를 호출부에서 처리한다.
+ * @param workspaceId 라우트 `[workspaceId]`에서 온 워크스페이스 ID
+ * @param jdId 질문을 만들 기준이 될 JD ID
+ * @example
+ * ```tsx
+ * const { questionRooms } = useExperienceQuestionRooms(workspaceId, jdId)
+ * ```
+ */
+export const useExperienceQuestionRooms = (workspaceId: string, jdId: string) => {
+  const { data, ...rest } = useSuspenseQuery({
+    ...experienceQueries.questionRooms(workspaceId, jdId)
+  })
+  return { questionRooms: data?.experienceQuestionRooms ?? [], ...rest }
+}

@@ -93,6 +93,13 @@ export type ExperienceContentsType =
   /** Situation, Task, Action, Result로 구성된 형식입니다. */
   | 'STAR';
 
+/** 경험 질문 카드의 출처 항목 종류입니다. */
+export type ExperienceQuestionRoomSourceType =
+  /** JD 우대사항 항목입니다. */
+  | 'PREFERRED_EXPERIENCE'
+  /** JD 담당업무 항목입니다. */
+  | 'RESPONSIBILITY';
+
 /** FREE 형식의 경험 상세 내용 입력입니다. */
 export type FreeExperienceContentsRequest = {
   /** 자유 내용입니다. */
@@ -552,6 +559,14 @@ export type MatchedExperiencesQueryVariables = Exact<{
 
 
 export type MatchedExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, matchRate: number | null, recommendedReason: string | null, role: string | null, period: { startAt: string | null, endAt: string | null } | null, contents: { type: ExperienceContentsType, free: { content: string } | null, star: { situation: string, task: string, action: string, result: string } | null }, project: { projectId: string, name: string } | null }> } };
+
+export type ExperienceQuestionRoomsQueryVariables = Exact<{
+  workspaceId: string | number;
+  jdId: string | number;
+}>;
+
+
+export type ExperienceQuestionRoomsQuery = { experienceQuestionRooms: Array<{ questionRoomId: string, question: string, sourceText: string, sourceType: ExperienceQuestionRoomSourceType }> };
 
 export type CreateExperienceMutationVariables = Exact<{
   workspaceId: string | number;
@@ -1062,6 +1077,16 @@ export const MatchedExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<MatchedExperiencesQuery, MatchedExperiencesQueryVariables>;
+export const ExperienceQuestionRoomsDocument = new TypedDocumentString(`
+    query ExperienceQuestionRooms($workspaceId: ID!, $jdId: ID!) {
+  experienceQuestionRooms(workspaceId: $workspaceId, jdId: $jdId) {
+    questionRoomId
+    question
+    sourceText
+    sourceType
+  }
+}
+    `) as unknown as TypedDocumentString<ExperienceQuestionRoomsQuery, ExperienceQuestionRoomsQueryVariables>;
 export const CreateExperienceDocument = new TypedDocumentString(`
     mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {
   createExperience(workspaceId: $workspaceId, request: $request) {

@@ -11,7 +11,9 @@ export const experienceKeys = {
   details: () => [...experienceKeys.all, 'detail'] as const,
   detail: (workspaceId: string, experienceId: string) => [...experienceKeys.details(), workspaceId, experienceId] as const,
   searches: () => [...experienceKeys.all, 'search'] as const,
-  search: (workspaceId: string, keyword: string) => [...experienceKeys.searches(), workspaceId, keyword] as const
+  search: (workspaceId: string, keyword: string) => [...experienceKeys.searches(), workspaceId, keyword] as const,
+  questionRooms: () => [...experienceKeys.all, 'question-room'] as const,
+  questionRoomList: (workspaceId: string, jdId: string) => [...experienceKeys.questionRooms(), workspaceId, jdId] as const
 }
 
 export const experienceQueries = {
@@ -53,5 +55,15 @@ export const experienceQueries = {
     queryOptions({
       queryKey: experienceKeys.search(workspaceId, keyword),
       queryFn: () => experienceAPI.getSearchExperiences({ workspaceId, keyword, size })
+    }),
+
+  /**
+   * JD별 경험 질문 카드 목록(0~5개)을 조회한다.
+   * 최초 조회는 JD 기반 AI 생성이라 느릴 수 있으며, 이후에는 저장된 목록을 그대로 반환한다.
+   */
+  questionRooms: (workspaceId: string, jdId: string) =>
+    queryOptions({
+      queryKey: experienceKeys.questionRoomList(workspaceId, jdId),
+      queryFn: () => experienceAPI.getExperienceQuestionRooms({ workspaceId, jdId })
     })
 }
