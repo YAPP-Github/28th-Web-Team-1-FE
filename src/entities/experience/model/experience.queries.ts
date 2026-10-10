@@ -106,3 +106,20 @@ export const useExperienceQuestionRooms = (workspaceId: string, jdId: string) =>
   })
   return { questionRooms: data?.experienceQuestionRooms ?? [], ...rest }
 }
+
+/**
+ * 경험 질문 대화방 단건(질문 카드 + 전체 메시지)을 Suspense로 조회한다.
+ * useSuspenseQuery는 enabled를 지원하지 않으므로 questionRoomId가 있을 때만 이 훅을 호출해야 한다.
+ * @param workspaceId 라우트 `[workspaceId]`에서 온 워크스페이스 ID
+ * @param questionRoomId 조회할 질문 대화방 ID (`experienceQuestionRooms`의 questionRoomId)
+ * @example
+ * ```tsx
+ * const { room, messages } = useExperienceQuestionRoom(workspaceId, questionRoomId)
+ * ```
+ */
+export const useExperienceQuestionRoom = (workspaceId: string, questionRoomId: string) => {
+  const { data, ...rest } = useSuspenseQuery({
+    ...experienceQueries.questionRoom(workspaceId, questionRoomId)
+  })
+  return { room: data?.experienceQuestionRoom.room, messages: data?.experienceQuestionRoom.messages ?? [], ...rest }
+}

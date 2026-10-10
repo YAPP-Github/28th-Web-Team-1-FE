@@ -13,7 +13,8 @@ export const experienceKeys = {
   searches: () => [...experienceKeys.all, 'search'] as const,
   search: (workspaceId: string, keyword: string) => [...experienceKeys.searches(), workspaceId, keyword] as const,
   questionRooms: () => [...experienceKeys.all, 'question-room'] as const,
-  questionRoomList: (workspaceId: string, jdId: string) => [...experienceKeys.questionRooms(), workspaceId, jdId] as const
+  questionRoomList: (workspaceId: string, jdId: string) => [...experienceKeys.questionRooms(), workspaceId, jdId] as const,
+  questionRoomDetail: (workspaceId: string, questionRoomId: string) => [...experienceKeys.questionRooms(), workspaceId, questionRoomId] as const
 }
 
 export const experienceQueries = {
@@ -65,5 +66,12 @@ export const experienceQueries = {
     queryOptions({
       queryKey: experienceKeys.questionRoomList(workspaceId, jdId),
       queryFn: () => experienceAPI.getExperienceQuestionRooms({ workspaceId, jdId })
+    }),
+
+  /** 경험 질문 대화방 단건(질문 카드)을 조회한다. 목록 카드의 questionRoomId로 상세 진입 시 사용한다. */
+  questionRoom: (workspaceId: string, questionRoomId: string) =>
+    queryOptions({
+      queryKey: experienceKeys.questionRoomDetail(workspaceId, questionRoomId),
+      queryFn: () => experienceAPI.getExperienceQuestionRoom({ workspaceId, questionRoomId })
     })
 }

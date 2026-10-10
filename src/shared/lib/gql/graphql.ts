@@ -93,6 +93,13 @@ export type ExperienceContentsType =
   /** Situation, Task, Action, Result로 구성된 형식입니다. */
   | 'STAR';
 
+/** 메시지를 보낸 쪽입니다. */
+export type ExperienceQuestionRoomMessageRole =
+  /** AI입니다. */
+  | 'AI'
+  /** 사용자입니다. */
+  | 'USER';
+
 /** 경험 질문 카드의 출처 항목 종류입니다. */
 export type ExperienceQuestionRoomSourceType =
   /** JD 우대사항 항목입니다. */
@@ -567,6 +574,14 @@ export type ExperienceQuestionRoomsQueryVariables = Exact<{
 
 
 export type ExperienceQuestionRoomsQuery = { experienceQuestionRooms: Array<{ questionRoomId: string, question: string, sourceText: string, sourceType: ExperienceQuestionRoomSourceType }> };
+
+export type ExperienceQuestionRoomQueryVariables = Exact<{
+  workspaceId: string | number;
+  questionRoomId: string | number;
+}>;
+
+
+export type ExperienceQuestionRoomQuery = { experienceQuestionRoom: { room: { questionRoomId: string, question: string, sourceText: string, sourceType: ExperienceQuestionRoomSourceType }, messages: Array<{ messageId: string, role: ExperienceQuestionRoomMessageRole, content: string | null, createdAt: string, experienceIds: Array<string> | null, block: { title: string, bullets: Array<string> } | null, feedback: { fit: string, improvement: string } | null }> } };
 
 export type CreateExperienceMutationVariables = Exact<{
   workspaceId: string | number;
@@ -1087,6 +1102,36 @@ export const ExperienceQuestionRoomsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<ExperienceQuestionRoomsQuery, ExperienceQuestionRoomsQueryVariables>;
+export const ExperienceQuestionRoomDocument = new TypedDocumentString(`
+    query ExperienceQuestionRoom($workspaceId: ID!, $questionRoomId: ID!) {
+  experienceQuestionRoom(
+    workspaceId: $workspaceId
+    questionRoomId: $questionRoomId
+  ) {
+    room {
+      questionRoomId
+      question
+      sourceText
+      sourceType
+    }
+    messages {
+      messageId
+      role
+      content
+      createdAt
+      experienceIds
+      block {
+        title
+        bullets
+      }
+      feedback {
+        fit
+        improvement
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ExperienceQuestionRoomQuery, ExperienceQuestionRoomQueryVariables>;
 export const CreateExperienceDocument = new TypedDocumentString(`
     mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {
   createExperience(workspaceId: $workspaceId, request: $request) {

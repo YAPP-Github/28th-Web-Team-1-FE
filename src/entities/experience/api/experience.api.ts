@@ -8,6 +8,7 @@ export const experienceAPI = {
   getExperience: (variables: { workspaceId: string; experienceId: string }) => execute(experienceDocument, variables),
   getSearchExperiences: (variables: { workspaceId: string; keyword: string; size: number; cursor?: string | null }) => execute(searchExperiencesDocument, variables),
   getExperienceQuestionRooms: (variables: { workspaceId: string; jdId: string }) => execute(experienceQuestionRoomsDocument, variables),
+  getExperienceQuestionRoom: (variables: { workspaceId: string; questionRoomId: string }) => execute(experienceQuestionRoomDocument, variables),
   createExperience: (variables: { workspaceId: string; request: CreateExperienceInput }) => execute(createExperienceDocument, variables),
   updateExperience: (variables: { workspaceId: string; experienceId: string; request: UpdateExperienceInput }) => execute(updateExperienceDocument, variables),
   deleteExperience: (variables: { workspaceId: string; experienceId: string }) => execute(deleteExperienceDocument, variables)
@@ -156,6 +157,37 @@ const experienceQuestionRoomsDocument = graphql(`
       question
       sourceText
       sourceType
+    }
+  }
+`)
+/**
+ * 경험 질문 대화방의 질문 카드와 전체 메시지를 오래된 순서로 조회한다.
+ * 목록 카드(experienceQuestionRooms)의 questionRoomId로 상세 진입 시 사용한다.
+ */
+const experienceQuestionRoomDocument = graphql(`
+  query ExperienceQuestionRoom($workspaceId: ID!, $questionRoomId: ID!) {
+    experienceQuestionRoom(workspaceId: $workspaceId, questionRoomId: $questionRoomId) {
+      room {
+        questionRoomId
+        question
+        sourceText
+        sourceType
+      }
+      messages {
+        messageId
+        role
+        content
+        createdAt
+        experienceIds
+        block {
+          title
+          bullets
+        }
+        feedback {
+          fit
+          improvement
+        }
+      }
     }
   }
 `)

@@ -1,8 +1,8 @@
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
-import { Flex, Skeleton } from '@radix-ui/themes'
+import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { ChevronLeft, ChevronRight, CircleCheckBig, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import * as amplitude from '@amplitude/unified'
 import { AMPLITUDE_EVENTS } from '@shared/config'
 import { AddItemButton, SectionEmpty } from './Section'
@@ -15,9 +15,7 @@ import { FormTextarea } from '../form/FormTextarea'
 // import { usePreviousExperienceIdsTracking } from '../../hooks/usePreviousExperienceIdsTracking'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 import { SelectedControl, SelectedControlItem } from '@shared/ui/selected_control'
-import { LogoIcon } from '@shared/icon'
-import { useExperienceQuestionRooms } from '@entities/experience'
-import { useWorkspaceId } from '@entities/user'
+import { AiView } from './AiView'
 
 /**
  * 경험(EXPERIENCE) 편집 섹션. '경험 재선택'으로 `ExperiencePickerDialog`를 열어 선택한 경험들로 아이템을 통째로 교체한다.
@@ -30,7 +28,7 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
   // const { previousExperienceIds, setPreviousExperienceIds } = usePreviousExperienceIdsTracking()
 
   return (
-    <Flex direction="column" className={'w-full px-8 pb-6'}>
+    <Flex direction="column" className={'min-h-0 w-full px-8 pb-6'}>
       <Flex justify="between" align="center" className={'py-6'}>
         <Text variant={'headline1'}>{title}</Text>
         <SelectedControl value={view} onValueChange={setView} className="max-w-40">
@@ -61,153 +59,6 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
     //       setIsPickerOpen(false)
     //     }}
     //   />
-  )
-}
-
-const AiView = ({ targetJdId }: { targetJdId: string | null }) => {
-  const [view, setView] = useState<'INDEX' | 'DETAIL'>('INDEX')
-  // const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null)
-  // Todo: AI 추천 목록 api 연동 후 렌더링
-  // Todo: view 전환 시 애니메이션 적용
-
-  return (
-    <>
-      {view === 'INDEX' && <AiIndexView targetJdId={targetJdId} />}
-
-      {view === 'DETAIL' && (
-        <Flex direction={'column'}>
-          <Flex align={'center'} gap={'1'} asChild>
-            <button onClick={() => setView('INDEX')}>
-              <ChevronLeft size={18} className={'text-icon-gray-light shrink-0'} />
-              <Text variant={'label1'} color={'text-subtle'}>
-                질문목록
-              </Text>
-            </button>
-          </Flex>
-
-          <Spacing size={16} />
-
-          <Flex direction={'column'} className={'gap-2'}>
-            <Text variant={'headline1'} className={'line-clamp-2'}>
-              생성형 AI의 출력 결과를 직접 평가하고 품질 기준을 정의한 경험이 있나요?
-            </Text>
-            <Flex>
-              <Text variant={'label2'} color={'text-subtler'}>
-                담당 업무
-              </Text>
-
-              <Divider orientation={'vertical'} className={'mx-1.5 my-auto h-2.5'} />
-
-              <Text variant={'label2'} color={'text-subtler'}>
-                AI 모델 성능 고도화: 생성형 모델의 품질 측정 및 피드백
-              </Text>
-            </Flex>
-          </Flex>
-
-          <Spacing size={20} />
-          <Divider color={'gray-10'} />
-          <Spacing size={20} />
-        </Flex>
-      )}
-    </>
-  )
-}
-
-const AiIndexView = ({ targetJdId }: { targetJdId: string | null }) => {
-  return (
-    <Flex direction={'column'} className={'overflow-y-auto'}>
-      <Flex gap={'3'}>
-        <LogoIcon />
-
-        <Flex direction={'column'} gap={'1'}>
-          <Text variant={'headline1'}>SCOOP AI가 채용 공고에 맞는 경험을 분석했어요</Text>
-          <Text variant={'label2'} color={'text-subtler'}>
-            공고의 담당 업무와 우대 사항에 맞춰 이력서에 꼭 담으면 좋을 경험을 찾았어요
-          </Text>
-        </Flex>
-      </Flex>
-
-      <Spacing size={24} />
-
-      <Flex direction={'column'} className={'gap-2'}>
-        {targetJdId ? (
-          <Suspense fallback={<AiRecommendQuestions.Skeleton />}>
-            <AiRecommendQuestions targetJdId={targetJdId} />
-          </Suspense>
-        ) : (
-          <Text variant={'label2'} color={'text-subtler'}>
-            채용 공고를 연결하면 SCOOP AI가 추천 경험 질문을 생성해 드려요.
-          </Text>
-        )}
-      </Flex>
-    </Flex>
-  )
-}
-
-const AiRecommendQuestions = ({ targetJdId }: { targetJdId: string }) => {
-  const workspaceId = useWorkspaceId()
-  const { questionRooms } = useExperienceQuestionRooms(workspaceId, targetJdId)
-  return (
-    <>
-      {questionRooms.map((room) => (
-        <Flex key={room.questionRoomId} align={'center'} className={'bg-element-gray-lighter gap-4 rounded-lg px-4 py-5'} asChild>
-          <button
-            className={'shrink-0'}
-            onClick={() => {
-              // setView('DETAIL')
-            }}
-          >
-            <CircleCheckBig size={20} className={'text-icon-gray-lighter shrink-0'} />
-
-            <Flex direction={'column'} className={'flex-1 gap-2'}>
-              <Text variant={'headline2'} className={'line-clamp-2 text-left'}>
-                {room.question}
-              </Text>
-              <Flex>
-                <Text variant={'label2'} color={'text-subtler'} className={'shrink-0'}>
-                  담당 업무
-                </Text>
-
-                <Divider orientation={'vertical'} className={'mx-1.5 my-auto h-2.5 shrink-0'} />
-
-                <Text variant={'label2'} color={'text-subtler'} className={'truncate'}>
-                  {room.sourceText}
-                </Text>
-              </Flex>
-            </Flex>
-
-            <ChevronRight size={18} className={'text-icon-gray-light shrink-0'} />
-          </button>
-        </Flex>
-      ))}
-    </>
-  )
-}
-
-AiRecommendQuestions.Skeleton = () => {
-  return (
-    <>
-      {[1, 2, 3, 4].map((_, index) => (
-        <Flex key={index} align={'center'} className={'bg-element-gray-lighter gap-4 rounded-lg px-4 py-5'}>
-          <CircleCheckBig size={20} className={'text-icon-gray-lighter shrink-0'} />
-
-          <Flex direction={'column'} className={'flex-1 gap-2'}>
-            <Skeleton className={'h-5.5 w-80'} />
-            <Flex>
-              <Text variant={'label2'} color={'text-subtler'} className={'shrink-0'}>
-                담당 업무
-              </Text>
-
-              <Divider orientation={'vertical'} className={'mx-1.5 my-auto h-2.5 shrink-0'} />
-
-              <Skeleton className={'h-4.5 w-full'} />
-            </Flex>
-          </Flex>
-
-          <ChevronRight size={18} className={'text-icon-gray-light shrink-0'} />
-        </Flex>
-      ))}
-    </>
   )
 }
 

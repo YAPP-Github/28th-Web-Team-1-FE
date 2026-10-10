@@ -1,4 +1,4 @@
-import type { ExperienceQuestionRoomsQuery, ExperienceQuery, ProjectExperiencesQuery } from '@shared/lib/gql/graphql'
+import type { ExperienceQuestionRoomQuery, ExperienceQuestionRoomsQuery, ExperienceQuery, ProjectExperiencesQuery } from '@shared/lib/gql/graphql'
 
 /** 경험 단건 상세(제목·태그·역할·기간·STAR 포함). `Experience` 쿼리 결과에서 파생. */
 export type ExperienceDetail = NonNullable<ExperienceQuery['experience']>
@@ -8,6 +8,12 @@ export type ProjectExperience = ProjectExperiencesQuery['experiences']['experien
 
 /** JD별 경험 질문 카드(질문·근거 원문·출처 종류·대화방 ID). `ExperienceQuestionRooms` 쿼리 결과에서 파생. */
 export type ExperienceQuestionRoomCard = ExperienceQuestionRoomsQuery['experienceQuestionRooms'][number]
+
+/** 경험 질문 대화방 상세(질문 카드 + 전체 메시지). `ExperienceQuestionRoom` 쿼리 결과에서 파생. */
+export type ExperienceQuestionRoomDetail = NonNullable<ExperienceQuestionRoomQuery['experienceQuestionRoom']>
+
+/** 질문 대화방 메시지. role이 USER면 content/experienceIds, AI면 block/feedback이 채워진다. */
+export type ExperienceQuestionRoomMessage = ExperienceQuestionRoomQuery['experienceQuestionRoom']['messages'][number]
 
 /** STAR 형식 경험 상세 내용 (Situation·Task·Action·Result) */
 export interface StarContentsInput {
