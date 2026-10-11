@@ -9,7 +9,7 @@ export {
   useExperienceQuestionRooms,
   useExperienceQuestionRoom
 } from './model/experience.queries'
-export { useCreateExperience, useUpdateExperience, useDeleteExperience } from './model/experience.mutations'
+export { useCreateExperience, useUpdateExperience, useDeleteExperience, useSendExperienceQuestionRoomMessage } from './model/experience.mutations'
 export type {
   ExperienceDetail,
   ProjectExperience,

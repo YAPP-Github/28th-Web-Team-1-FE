@@ -1,5 +1,5 @@
 import { execute, graphql } from '@shared/lib'
-import type { ExperienceListTab } from '@shared/lib/gql/graphql'
+import type { ExperienceListTab, SendExperienceQuestionRoomMessageRequest } from '@shared/lib/gql/graphql'
 import type { CreateExperienceInput, UpdateExperienceInput } from '../model/experience.types'
 
 export const experienceAPI = {
@@ -19,6 +19,8 @@ export const experienceAPI = {
   getSearchExperiences: (variables: { workspaceId: string; keyword: string; size: number; cursor?: string | null }) => execute(searchExperiencesDocument, variables),
   getExperienceQuestionRooms: (variables: { workspaceId: string; jdId: string }) => execute(experienceQuestionRoomsDocument, variables),
   getExperienceQuestionRoom: (variables: { workspaceId: string; questionRoomId: string }) => execute(experienceQuestionRoomDocument, variables),
+  sendExperienceQuestionRoomMessage: (variables: { workspaceId: string; questionRoomId: string; request: SendExperienceQuestionRoomMessageRequest }) =>
+    execute(sendExperienceQuestionRoomMessageDocument, variables),
   createExperience: (variables: { workspaceId: string; request: CreateExperienceInput }) => execute(createExperienceDocument, variables),
   updateExperience: (variables: { workspaceId: string; experienceId: string; request: UpdateExperienceInput }) => execute(updateExperienceDocument, variables),
   deleteExperience: (variables: { workspaceId: string; experienceId: string }) => execute(deleteExperienceDocument, variables)
@@ -220,6 +222,26 @@ const experienceQuestionRoomDocument = graphql(`
           fit
           improvement
         }
+      }
+    }
+  }
+`)
+
+const sendExperienceQuestionRoomMessageDocument = graphql(`
+  mutation SendExperienceQuestionRoomMessage($workspaceId: ID!, $questionRoomId: ID!, $request: SendExperienceQuestionRoomMessageRequest!) {
+    sendExperienceQuestionRoomMessage(workspaceId: $workspaceId, questionRoomId: $questionRoomId, request: $request) {
+      messageId
+      role
+      content
+      createdAt
+      experienceIds
+      block {
+        title
+        bullets
+      }
+      feedback {
+        fit
+        improvement
       }
     }
   }

@@ -454,6 +454,14 @@ export type SaveResumeSectionItemInput = {
   visible: boolean;
 };
 
+/** 질문 대화방 메시지 전송 입력입니다. */
+export type SendExperienceQuestionRoomMessageRequest = {
+  /** 사용자가 입력한 내용입니다. (최대 2000자, 경험을 선택했다면 생략 가능) */
+  content?: string | null | undefined;
+  /** 함께 보낼 경험 ID 목록입니다. (같은 프로젝트에서 최대 5개) */
+  experienceIds?: Array<string | number>;
+};
+
 /** 스킬 숙련도입니다. */
 export type SkillLevel =
   /** 상 */
@@ -592,6 +600,15 @@ export type ExperienceQuestionRoomQueryVariables = Exact<{
 
 
 export type ExperienceQuestionRoomQuery = { experienceQuestionRoom: { room: { questionRoomId: string, question: string, sourceText: string, sourceType: ExperienceQuestionRoomSourceType }, messages: Array<{ messageId: string, role: ExperienceQuestionRoomMessageRole, content: string | null, createdAt: string, experienceIds: Array<string> | null, block: { title: string, bullets: Array<string> } | null, feedback: { fit: string, improvement: string } | null }> } };
+
+export type SendExperienceQuestionRoomMessageMutationVariables = Exact<{
+  workspaceId: string | number;
+  questionRoomId: string | number;
+  request: SendExperienceQuestionRoomMessageRequest;
+}>;
+
+
+export type SendExperienceQuestionRoomMessageMutation = { sendExperienceQuestionRoomMessage: { messageId: string, role: ExperienceQuestionRoomMessageRole, content: string | null, createdAt: string, experienceIds: Array<string> | null, block: { title: string, bullets: Array<string> } | null, feedback: { fit: string, improvement: string } | null } };
 
 export type CreateExperienceMutationVariables = Exact<{
   workspaceId: string | number;
@@ -1168,6 +1185,29 @@ export const ExperienceQuestionRoomDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<ExperienceQuestionRoomQuery, ExperienceQuestionRoomQueryVariables>;
+export const SendExperienceQuestionRoomMessageDocument = new TypedDocumentString(`
+    mutation SendExperienceQuestionRoomMessage($workspaceId: ID!, $questionRoomId: ID!, $request: SendExperienceQuestionRoomMessageRequest!) {
+  sendExperienceQuestionRoomMessage(
+    workspaceId: $workspaceId
+    questionRoomId: $questionRoomId
+    request: $request
+  ) {
+    messageId
+    role
+    content
+    createdAt
+    experienceIds
+    block {
+      title
+      bullets
+    }
+    feedback {
+      fit
+      improvement
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<SendExperienceQuestionRoomMessageMutation, SendExperienceQuestionRoomMessageMutationVariables>;
 export const CreateExperienceDocument = new TypedDocumentString(`
     mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {
   createExperience(workspaceId: $workspaceId, request: $request) {
