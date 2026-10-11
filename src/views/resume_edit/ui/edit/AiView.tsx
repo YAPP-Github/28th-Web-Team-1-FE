@@ -72,12 +72,21 @@ const AiIndexView = ({ targetJdId, onOpen }: { targetJdId: string | null; onOpen
 const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOpen: (questionRoomId: string) => void }) => {
   const workspaceId = useWorkspaceId()
   const { questionRooms } = useExperienceQuestionRooms(workspaceId, targetJdId)
+  const { getValues } = useFormContext<ResumeFormValues>()
+
+  // 이미 이력서 EXPERIENCE 항목으로 추가된 질문방 ID. 해당 방은 체크 아이콘 색으로 구분한다.
+  const appliedQuestionRoomIds = new Set(
+    getValues('sections')
+      .find((section) => section.type === 'EXPERIENCE')
+      ?.items.map((item) => item.payload.experience?.experienceQuestionRoomId)
+  )
+
   return (
     <>
       {questionRooms.map((room) => (
         <Flex key={room.questionRoomId} align={'center'} className={'bg-element-gray-lighter gap-4 rounded-lg px-4 py-5'} asChild>
           <button className={'shrink-0'} onClick={() => onOpen(room.questionRoomId)}>
-            <CircleCheckBig size={20} className={'text-icon-gray-lighter shrink-0'} />
+            <CircleCheckBig size={20} className={cn('shrink-0', appliedQuestionRoomIds.has(room.questionRoomId) ? 'text-text-primary-basic' : 'text-icon-gray-lighter')} />
 
             <Flex direction={'column'} className={'flex-1 gap-2'}>
               <Text variant={'headline2'} className={'line-clamp-2 text-left'}>
