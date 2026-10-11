@@ -55,7 +55,7 @@ type Documents = {
     "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": typeof types.ResumeBasicInfoFieldsFragmentDoc,
     "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n    isInitialItem\n  }\n": typeof types.ResumeCoreSkillFieldsFragmentDoc,
     "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeCareerFieldsFragmentDoc,
-    "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeExperienceFieldsFragmentDoc,
+    "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    experienceQuestionRoomId\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeExperienceFieldsFragmentDoc,
     "\n  fragment ResumeEducationFields on ResumeEducationPayload {\n    schoolName\n    major\n    degree\n    status\n    period {\n      startAt\n      endAt\n    }\n  }\n": typeof types.ResumeEducationFieldsFragmentDoc,
     "\n  fragment ResumeAwardFields on ResumeAwardPayload {\n    name\n    organization\n    awardedAt\n  }\n": typeof types.ResumeAwardFieldsFragmentDoc,
     "\n  fragment ResumeLanguageFields on ResumeLanguagePayload {\n    examName\n    scoreOrGrade\n    acquiredAt\n  }\n": typeof types.ResumeLanguageFieldsFragmentDoc,
@@ -106,7 +106,7 @@ const documents: Documents = {
     "\n  fragment ResumeBasicInfoFields on ResumeBasicInfoPayload {\n    name\n    email\n    phone\n    hideContact\n  }\n": types.ResumeBasicInfoFieldsFragmentDoc,
     "\n  fragment ResumeCoreSkillFields on ResumeCoreSkillPayload {\n    content\n    isInitialItem\n  }\n": types.ResumeCoreSkillFieldsFragmentDoc,
     "\n  fragment ResumeCareerFields on ResumeCareerPayload {\n    companyName\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeCareerFieldsFragmentDoc,
-    "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeExperienceFieldsFragmentDoc,
+    "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    experienceQuestionRoomId\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeExperienceFieldsFragmentDoc,
     "\n  fragment ResumeEducationFields on ResumeEducationPayload {\n    schoolName\n    major\n    degree\n    status\n    period {\n      startAt\n      endAt\n    }\n  }\n": types.ResumeEducationFieldsFragmentDoc,
     "\n  fragment ResumeAwardFields on ResumeAwardPayload {\n    name\n    organization\n    awardedAt\n  }\n": types.ResumeAwardFieldsFragmentDoc,
     "\n  fragment ResumeLanguageFields on ResumeLanguagePayload {\n    examName\n    scoreOrGrade\n    acquiredAt\n  }\n": types.ResumeLanguageFieldsFragmentDoc,
@@ -280,7 +280,7 @@ export function graphql(source: "\n  fragment ResumeCareerFields on ResumeCareer
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    period {\n      startAt\n      endAt\n    }\n  }\n"): typeof import('./graphql').ResumeExperienceFieldsFragmentDoc;
+export function graphql(source: "\n  fragment ResumeExperienceFields on ResumeExperiencePayload {\n    name\n    role\n    contents\n    experienceQuestionRoomId\n    period {\n      startAt\n      endAt\n    }\n  }\n"): typeof import('./graphql').ResumeExperienceFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

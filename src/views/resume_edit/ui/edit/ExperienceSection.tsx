@@ -27,7 +27,7 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
       <Divider color={'gray-60'} />
       <Spacing size={32} />
 
-      {view === 'ai' && <AiView targetJdId={targetJdId} />}
+      {view === 'ai' && <AiView targetJdId={targetJdId} sectionIndex={sectionIndex} onApplied={() => setView('manual')} />}
 
       {view === 'manual' && <ManualView sectionIndex={sectionIndex} targetJdId={targetJdId} />}
     </Flex>

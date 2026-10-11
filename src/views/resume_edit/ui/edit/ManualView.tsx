@@ -22,7 +22,7 @@ export const ManualView = ({ sectionIndex, targetJdId }: { sectionIndex: number;
 
   const count = fields.length
   const scrollRef = useRef<HTMLDivElement>(null)
-  const prevCount = useRef(count)
+  const prevCount = useRef(0)
 
   useEffect(() => {
     if (count > prevCount.current) {
@@ -55,7 +55,7 @@ export const ManualView = ({ sectionIndex, targetJdId }: { sectionIndex: number;
             icon={Pencil}
             label={'직접 입력하기'}
             description={'원하는 경험을 직접 입력할 수 있어요'}
-            onSelect={() => addItem({ experience: { name: '', role: null, contents: '', period: null } })}
+            onSelect={() => addItem({ experience: { name: '', role: null, contents: '', period: null, experienceQuestionRoomId: null } })}
           />
           <Divider color={'gray-10'} />
           <MenuItem icon={FolderOpen} label={'내 경험 불러오기'} description={'STAR 구조로 저장된 경험을 불러올 수 있어요'} disabled={!targetJdId} onSelect={() => setIsPickerOpen(true)} />
@@ -76,7 +76,8 @@ export const ManualView = ({ sectionIndex, targetJdId }: { sectionIndex: number;
                   name: experience.title,
                   role: experience.role,
                   period: experience.period,
-                  contents: flattenExperienceContents(experience.contents)
+                  contents: flattenExperienceContents(experience.contents),
+                  experienceQuestionRoomId: null
                 }
               })
             )

@@ -321,6 +321,8 @@ export type ResumeEducationPayloadInput = {
 export type ResumeExperiencePayloadInput = {
   /** 경험 상세 내용 목록입니다. */
   contents?: string | null | undefined;
+  /** 경험 추천으로 추가한 경우 해당 추천 질문방의 ID입니다. 직접 입력한 경험은 생략할 수 있습니다. */
+  experienceQuestionRoomId?: string | number | null | undefined;
   /** 경험 이름입니다. */
   name?: string | null | undefined;
   /** 경험 수행 기간입니다. */
@@ -848,7 +850,7 @@ export type ResumeCoreSkillFieldsFragment = { content: string | null, isInitialI
 
 export type ResumeCareerFieldsFragment = { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
-export type ResumeExperienceFieldsFragment = { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null };
+export type ResumeExperienceFieldsFragment = { name: string | null, role: string | null, contents: string | null, experienceQuestionRoomId: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
 export type ResumeEducationFieldsFragment = { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
@@ -866,7 +868,7 @@ export type ResumeQueryVariables = Exact<{
 }>;
 
 
-export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string | null, email: string | null, phone: string | null, hideContact: boolean } | null, coreSkill: { content: string | null, isInitialItem: boolean } | null, career: { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string | null, organization: string | null, awardedAt: string | null } | null, language: { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null } | null, certificate: { name: string | null, organization: string | null, acquiredAt: string | null } | null, skill: { name: string | null, level: string | null } | null } }> }> } };
+export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string | null, email: string | null, phone: string | null, hideContact: boolean } | null, coreSkill: { content: string | null, isInitialItem: boolean } | null, career: { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string | null, role: string | null, contents: string | null, experienceQuestionRoomId: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string | null, organization: string | null, awardedAt: string | null } | null, language: { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null } | null, certificate: { name: string | null, organization: string | null, acquiredAt: string | null } | null, skill: { name: string | null, level: string | null } | null } }> }> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -932,6 +934,7 @@ export const ResumeExperienceFieldsFragmentDoc = new TypedDocumentString(`
   name
   role
   contents
+  experienceQuestionRoomId
   period {
     startAt
     endAt
@@ -1638,6 +1641,7 @@ fragment ResumeExperienceFields on ResumeExperiencePayload {
   name
   role
   contents
+  experienceQuestionRoomId
   period {
     startAt
     endAt

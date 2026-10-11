@@ -10,6 +10,7 @@ import { emptyItemPayload, type ResumeFormItem } from './resume-form.types'
  * 매핑은 생성 플로우(`buildResumeInput`)와 동일하되, 반환 타입만 API 입력이 아닌 폼 아이템이다.
  * @param experiences 선택된 경험 목록(순서 = 표시 순서)
  */
+// Todo: 사용하지 않음 삭제 예정. 경험 선택은 `applyExperienceBlockToForm`로 대체됨.
 export const experiencesToFormItems = (experiences: Experience[]): ResumeFormItem[] =>
   experiences.map((experience, index) => ({
     uid: crypto.randomUUID(),
@@ -22,7 +23,8 @@ export const experiencesToFormItems = (experiences: Experience[]): ResumeFormIte
         name: experience.title,
         role: experience.role,
         period: experience.period,
-        contents: flattenExperienceContents(experience.contents)
+        contents: flattenExperienceContents(experience.contents),
+        experienceQuestionRoomId: null
       }
     }
   }))

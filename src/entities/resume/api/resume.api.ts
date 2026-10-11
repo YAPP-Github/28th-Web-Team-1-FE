@@ -99,6 +99,7 @@ export const resumeExperienceFields = graphql(`
     name
     role
     contents
+    experienceQuestionRoomId
     period {
       startAt
       endAt

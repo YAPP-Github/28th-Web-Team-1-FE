@@ -1,4 +1,5 @@
-import { Suspense, useEffect, useRef, useState, type FormEvent } from 'react'
+import { Suspense, useEffect, useRef, useState, type SyntheticEvent } from 'react'
+import { useFormContext } from 'react-hook-form'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { ArrowUp, ChevronLeft, ChevronRight, CircleCheckBig, Plus, TextAlignStart, X } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
@@ -6,13 +7,15 @@ import { LogoIcon } from '@shared/icon'
 import { useExperienceQuestionRoom, useExperienceQuestionRooms, useSendExperienceQuestionRoomMessage, type ExperienceQuestionRoomMessage, type ProjectExperience } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { cn } from '@shared/lib'
+import { applyExperienceBlockToForm } from '../../model/applyExperienceBlockToForm'
+import type { ResumeFormValues } from '../../model/resume-form.types'
 import { ExperiencePickerDialog } from './ExperiencePickerDialog'
 
 /**
  * AI 추천 탭의 상세 뷰 묶음. 질문 카드 목록(INDEX)과 선택한 질문방 대화 상세(DETAIL)를 전환한다.
  * 목록은 JD 기준 `useExperienceQuestionRooms`, 상세는 `questionRoomId` 기준 `useExperienceQuestionRoom`로 조회한다.
  */
-export const AiView = ({ targetJdId }: { targetJdId: string | null }) => {
+export const AiView = ({ targetJdId, sectionIndex, onApplied }: { targetJdId: string | null; sectionIndex: number; onApplied: () => void }) => {
   const [view, setView] = useState<'INDEX' | 'DETAIL'>('INDEX')
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null)
 
@@ -28,7 +31,9 @@ export const AiView = ({ targetJdId }: { targetJdId: string | null }) => {
         />
       )}
 
-      {view === 'DETAIL' && activeQuestionId && <AiDetailView targetJdId={targetJdId} questionRoomId={activeQuestionId} onBack={() => setView('INDEX')} />}
+      {view === 'DETAIL' && activeQuestionId && (
+        <AiDetailView targetJdId={targetJdId} questionRoomId={activeQuestionId} sectionIndex={sectionIndex} onApplied={onApplied} onBack={() => setView('INDEX')} />
+      )}
     </>
   )
 }
@@ -126,11 +131,19 @@ AiRecommendQuestions.Skeleton = () => {
   )
 }
 
+interface AiDetailViewProps {
+  targetJdId: string | null
+  questionRoomId: string
+  sectionIndex: number
+  onApplied: () => void
+  onBack: () => void
+}
+
 /**
  * 질문 카드 상세. 목록에서 선택한 질문방 ID로 단건 조회해 질문·근거 원문과 전체 대화 메시지를 보여준다.
  * 뒤로가기는 `onBack`이 처리하므로 목록은 쿼리 캐시에서 재조회 없이 복귀한다.
  */
-const AiDetailView = ({ targetJdId, questionRoomId, onBack }: { targetJdId: string | null; questionRoomId: string; onBack: () => void }) => {
+const AiDetailView = ({ targetJdId, questionRoomId, sectionIndex, onApplied, onBack }: AiDetailViewProps) => {
   const workspaceId = useWorkspaceId()
 
   return (
@@ -147,13 +160,22 @@ const AiDetailView = ({ targetJdId, questionRoomId, onBack }: { targetJdId: stri
       <Spacing size={16} />
 
       <Suspense fallback={<AiDetailViewSkeleton />}>
-        <QuestionRoomDetail workspaceId={workspaceId} targetJdId={targetJdId} questionRoomId={questionRoomId} />
+        <QuestionRoomDetail workspaceId={workspaceId} targetJdId={targetJdId} questionRoomId={questionRoomId} sectionIndex={sectionIndex} onApplied={onApplied} />
       </Suspense>
     </Flex>
   )
 }
 
-const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId }: { workspaceId: string; targetJdId: string | null; questionRoomId: string }) => {
+interface QuestionRoomDetailProps {
+  workspaceId: string
+  targetJdId: string | null
+  questionRoomId: string
+  sectionIndex: number
+  onApplied: () => void
+}
+
+const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIndex, onApplied }: QuestionRoomDetailProps) => {
+  const form = useFormContext<ResumeFormValues>()
   const { room, messages = [] } = useExperienceQuestionRoom(workspaceId, questionRoomId)
   const { mutate: sendMessage, isPending } = useSendExperienceQuestionRoomMessage(workspaceId, questionRoomId)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
@@ -166,7 +188,12 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId }: { works
     if (container) container.scrollTop = container.scrollHeight
   }, [messages])
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleApply = (block: NonNullable<ExperienceQuestionRoomMessage['block']>) => {
+    applyExperienceBlockToForm(form, { sectionIndex, experienceQuestionRoomId: questionRoomId, block })
+    onApplied()
+  }
+
+  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (isPending) return
@@ -215,7 +242,13 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId }: { works
             관련 경험을 입력하면 SCOOP AI가 공고에 맞춰 초안을 작성해 드려요.
           </Text>
         </Flex>
-        {messages.map((message) => (message.role === 'USER' ? <UserMessageCard key={message.messageId} message={message} /> : <AiMessageCard key={message.messageId} message={message} />))}
+        {messages.map((message) =>
+          message.role === 'USER' ? (
+            <UserMessageCard key={message.messageId} message={message} />
+          ) : (
+            <AiMessageCard key={message.messageId} message={message} onApply={() => message.block && handleApply(message.block)} />
+          )
+        )}
       </Flex>
 
       <Spacing size={40} />
@@ -322,7 +355,7 @@ const ExperienceChip = ({ experience, onDelete }: ExperienceChipProps) => {
   )
 }
 
-const AiMessageCard = ({ message }: { message: ExperienceQuestionRoomMessage }) => (
+const AiMessageCard = ({ message, onApply }: { message: ExperienceQuestionRoomMessage; onApply: () => void }) => (
   <Flex gap={'3'}>
     <LogoIcon className={'shrink-0 opacity-50'} />
 
@@ -332,7 +365,9 @@ const AiMessageCard = ({ message }: { message: ExperienceQuestionRoomMessage }) 
           <Text variant={'label1'} color={'text-primary-basic'}>
             초안 1
           </Text>
-          <Button size={'xs'}>이력서에 적용</Button>
+          <Button size={'xs'} onClick={onApply} disabled={!message.block}>
+            이력서에 적용
+          </Button>
         </Flex>
 
         <Divider color={'gray-10'} />
