@@ -13,7 +13,7 @@ import { projectQueries } from './project.keys'
 export const useProjectList = (workspaceId: string) => {
   const { data, ...rest } = useSuspenseInfiniteQuery({
     ...projectQueries.list(workspaceId),
-    select: (data) => data.pages.flatMap((page) => page.projectList.projects)
+    select: (data) => data.pages.flatMap((page) => page.projectList.projects).map((project) => ({ ...project, experienceCount: Number(project.experienceCount) }))
   })
   return { projects: data, ...rest }
 }

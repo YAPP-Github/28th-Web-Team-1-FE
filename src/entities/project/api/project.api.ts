@@ -36,6 +36,7 @@ const projectsDocument = graphql(`
       projects {
         projectId
         name
+        experienceCount
         period {
           startAt
           endAt

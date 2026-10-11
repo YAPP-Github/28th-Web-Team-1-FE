@@ -93,6 +93,13 @@ export type ExperienceContentsType =
   /** Situation, Task, Action, Result로 구성된 형식입니다. */
   | 'STAR';
 
+/** 경험 목록 조회 탭입니다. */
+export type ExperienceListTab =
+  /** 질문 카드 기준 AI 매칭 순으로 조회합니다. questionRoomId가 필수입니다. */
+  | 'AI_RECOMMENDATION'
+  /** 기존 커서 페이징 순서로 직접 작성한 경험을 조회합니다. */
+  | 'MANUAL';
+
 /** 메시지를 보낸 쪽입니다. */
 export type ExperienceQuestionRoomMessageRole =
   /** AI입니다. */
@@ -534,10 +541,13 @@ export type ProjectExperiencesQueryVariables = Exact<{
   projectId: string | number;
   size: number;
   cursor?: string | null | undefined;
+  jdId?: string | number | null | undefined;
+  tab?: ExperienceListTab | null | undefined;
+  questionRoomId?: string | number | null | undefined;
 }>;
 
 
-export type ProjectExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, role: string | null, period: { startAt: string | null, endAt: string | null } | null }> } };
+export type ProjectExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, matchRate: number | null, recommendedReason: string | null, role: string | null, period: { startAt: string | null, endAt: string | null } | null, contents: { type: ExperienceContentsType, star: { situation: string, task: string, action: string, result: string } | null, free: { content: string } | null }, project: { projectId: string, name: string, role: string | null, period: { startAt: string | null, endAt: string | null } | null } | null }> } };
 
 export type ExperienceQueryVariables = Exact<{
   workspaceId: string | number;
@@ -729,7 +739,7 @@ export type ProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ProjectsQuery = { projectList: { cursor: { hasNext: boolean, nextCursor: string | null }, projects: Array<{ projectId: string, name: string, period: { startAt: string | null, endAt: string | null } | null }> } };
+export type ProjectsQuery = { projectList: { cursor: { hasNext: boolean, nextCursor: string | null }, projects: Array<{ projectId: string, name: string, experienceCount: unknown, period: { startAt: string | null, endAt: string | null } | null }> } };
 
 export type ProjectQueryVariables = Exact<{
   workspaceId: string | number;
@@ -975,12 +985,15 @@ export const ExperiencesDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<ExperiencesQuery, ExperiencesQueryVariables>;
 export const ProjectExperiencesDocument = new TypedDocumentString(`
-    query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String) {
+    query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String, $jdId: ID, $tab: ExperienceListTab, $questionRoomId: ID) {
   experiences(
     workspaceId: $workspaceId
     projectId: $projectId
     size: $size
     cursor: $cursor
+    jdId: $jdId
+    tab: $tab
+    questionRoomId: $questionRoomId
   ) {
     cursor {
       hasNext
@@ -990,10 +1003,33 @@ export const ProjectExperiencesDocument = new TypedDocumentString(`
       experienceId
       title
       tags
+      matchRate
+      recommendedReason
       role
       period {
         startAt
         endAt
+      }
+      contents {
+        type
+        star {
+          situation
+          task
+          action
+          result
+        }
+        free {
+          content
+        }
+      }
+      project {
+        projectId
+        name
+        role
+        period {
+          startAt
+          endAt
+        }
       }
     }
   }
@@ -1357,6 +1393,7 @@ export const ProjectsDocument = new TypedDocumentString(`
     projects {
       projectId
       name
+      experienceCount
       period {
         startAt
         endAt

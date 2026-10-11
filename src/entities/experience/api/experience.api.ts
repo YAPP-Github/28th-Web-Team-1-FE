@@ -1,10 +1,20 @@
 import { execute, graphql } from '@shared/lib'
+import type { ExperienceListTab } from '@shared/lib/gql/graphql'
 import type { CreateExperienceInput, UpdateExperienceInput } from '../model/experience.types'
 
 export const experienceAPI = {
   getExperiences: (variables: { workspaceId: string; size: number; cursor?: string | null }) => execute(experiencesDocument, variables),
+  //Todo: getMatchedExperiences api 삭제 예정
   getMatchedExperiences: (variables: { workspaceId: string; jdId: string; size: number; cursor?: string | null }) => execute(matchedExperiencesDocument, variables),
-  getProjectExperiences: (variables: { workspaceId: string; projectId: string; size: number; cursor?: string | null }) => execute(projectExperiencesDocument, variables),
+  getProjectExperiences: (variables: {
+    workspaceId: string
+    projectId: string
+    size: number
+    cursor?: string | null
+    jdId?: string | null
+    tab?: ExperienceListTab | null
+    questionRoomId?: string | null
+  }) => execute(projectExperiencesDocument, variables),
   getExperience: (variables: { workspaceId: string; experienceId: string }) => execute(experienceDocument, variables),
   getSearchExperiences: (variables: { workspaceId: string; keyword: string; size: number; cursor?: string | null }) => execute(searchExperiencesDocument, variables),
   getExperienceQuestionRooms: (variables: { workspaceId: string; jdId: string }) => execute(experienceQuestionRoomsDocument, variables),
@@ -40,8 +50,8 @@ const experiencesDocument = graphql(`
 `)
 
 const projectExperiencesDocument = graphql(`
-  query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String) {
-    experiences(workspaceId: $workspaceId, projectId: $projectId, size: $size, cursor: $cursor) {
+  query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String, $jdId: ID, $tab: ExperienceListTab, $questionRoomId: ID) {
+    experiences(workspaceId: $workspaceId, projectId: $projectId, size: $size, cursor: $cursor, jdId: $jdId, tab: $tab, questionRoomId: $questionRoomId) {
       cursor {
         hasNext
         nextCursor
@@ -50,10 +60,33 @@ const projectExperiencesDocument = graphql(`
         experienceId
         title
         tags
+        matchRate
+        recommendedReason
         role
         period {
           startAt
           endAt
+        }
+        contents {
+          type
+          star {
+            situation
+            task
+            action
+            result
+          }
+          free {
+            content
+          }
+        }
+        project {
+          projectId
+          name
+          role
+          period {
+            startAt
+            endAt
+          }
         }
       }
     }

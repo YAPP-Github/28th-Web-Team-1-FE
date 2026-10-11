@@ -1,19 +1,21 @@
 'use client'
 import { useSuspenseInfiniteQuery, useSuspenseQuery, keepPreviousData, useQuery } from '@tanstack/react-query'
-import { experienceQueries } from './experience.keys'
+import { experienceQueries, type ProjectExperienceListParams } from './experience.keys'
 
 /**
  * 특정 프로젝트에 속한 경험 목록을 Suspense로 조회한다. (경험 상세 페이지 "경험 목록")
+ * AI 추천 탭이면 `params`에 `{ tab: 'AI_RECOMMENDATION', jdId, questionRoomId }`, 직접 작성 탭이면 `{ tab: 'MANUAL', jdId }`를 넘긴다.
  * @param workspaceId 라우트에서 확정된 워크스페이스 ID
  * @param projectId 라우트 `[id]`에서 온 프로젝트 ID
+ * @param params 탭별 조회 파라미터(없으면 탭 구분 없이 전체 조회)
  * @example
  * ```tsx
  * const { experiences } = useProjectExperiences(workspaceId, projectId)
  * ```
  */
-export const useProjectExperiences = (workspaceId: string, projectId: string) => {
+export const useProjectExperiences = (workspaceId: string, projectId: string, params?: ProjectExperienceListParams) => {
   const { data, ...rest } = useSuspenseInfiniteQuery({
-    ...experienceQueries.listByProject(workspaceId, projectId),
+    ...experienceQueries.listByProject(workspaceId, projectId, params),
     select: (data) => data.pages.flatMap((page) => page.experiences.experiences)
   })
   return { experiences: data, ...rest }

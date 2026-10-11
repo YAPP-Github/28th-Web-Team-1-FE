@@ -1,13 +1,17 @@
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import { experienceAPI } from '../api/experience.api'
 
+/** 프로젝트 안에서 경험 목록을 조회할 때의 탭 파라미터. AI 추천 탭은 `questionRoomId`가 필수다. */
+export type ProjectExperienceListParams = { jdId: string } & ({ tab: 'AI_RECOMMENDATION'; questionRoomId: string } | { tab: 'MANUAL' })
+
 export const experienceKeys = {
   all: ['experience'] as const,
   lists: () => [...experienceKeys.all, 'list'] as const,
   list: (workspaceId: string) => [...experienceKeys.lists(), workspaceId] as const,
   matches: () => [...experienceKeys.all, 'matched'] as const,
   matched: (workspaceId: string, jdId: string) => [...experienceKeys.matches(), workspaceId, jdId] as const,
-  listByProject: (workspaceId: string, projectId: string) => [...experienceKeys.lists(), workspaceId, 'project', projectId] as const,
+  listByProject: (workspaceId: string, projectId: string, params?: ProjectExperienceListParams) =>
+    [...experienceKeys.lists(), workspaceId, 'project', projectId, params?.tab ?? null, params && 'questionRoomId' in params ? params.questionRoomId : null] as const,
   details: () => [...experienceKeys.all, 'detail'] as const,
   detail: (workspaceId: string, experienceId: string) => [...experienceKeys.details(), workspaceId, experienceId] as const,
   searches: () => [...experienceKeys.all, 'search'] as const,
@@ -35,11 +39,11 @@ export const experienceQueries = {
       initialPageParam: null as string | null,
       getNextPageParam: (lastPage) => (lastPage.experiences.cursor.hasNext ? lastPage.experiences.cursor.nextCursor : null)
     }),
-  /** 경험 상세 페이지의 특정 프로젝트에 속한 경험 목록을 커서 기반으로 조회한다. */
-  listByProject: (workspaceId: string, projectId: string, size = 20) =>
+  /** 경험 상세 페이지의 특정 프로젝트에 속한 경험 목록을 커서 기반으로 조회한다. 탭 파라미터를 주면 탭별로 조회한다. */
+  listByProject: (workspaceId: string, projectId: string, params?: ProjectExperienceListParams) =>
     infiniteQueryOptions({
-      queryKey: experienceKeys.listByProject(workspaceId, projectId),
-      queryFn: ({ pageParam }) => experienceAPI.getProjectExperiences({ workspaceId, projectId, size, cursor: pageParam }),
+      queryKey: experienceKeys.listByProject(workspaceId, projectId, params),
+      queryFn: ({ pageParam }) => experienceAPI.getProjectExperiences({ workspaceId, projectId, size: 20, cursor: pageParam, ...params }),
       initialPageParam: null as string | null,
       getNextPageParam: (lastPage) => (lastPage.experiences.cursor.hasNext ? lastPage.experiences.cursor.nextCursor : null)
     }),
