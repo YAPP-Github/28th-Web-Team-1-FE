@@ -230,7 +230,7 @@ const EditExperienceButton = ({ workspaceId, experience }: { workspaceId: string
 
   const setField = (key: 'title' | 'role') => (e: React.ChangeEvent<HTMLInputElement>) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault()
     const trimmed = form.title.trim()
     if (!trimmed) {
