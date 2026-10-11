@@ -14,18 +14,17 @@ import { RefreshCcw } from 'lucide-react'
 type Props = {
   isOpen: boolean
   onOpenChange?: (isOpen: boolean) => void
+  defaultSelectedExperiences?: ProjectExperience[]
   onComplete: (experiences: ProjectExperience[]) => void
 } & ProjectExperienceListParams
 
 const MAX_SELECT = 5
 
-export const ExperiencePickerDialog = (props: Props) => {
-  const { isOpen, onOpenChange, onComplete } = props
+export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete, defaultSelectedExperiences = [], ...listParams }: Props) => {
   const workspaceId = useWorkspaceId()
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(null)
-  const [selectedExperiences, setSelectedExperiences] = useState<ProjectExperience[]>([])
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(defaultSelectedExperiences[0]?.project?.projectId ?? null)
+  const [selectedExperiences, setSelectedExperiences] = useState<ProjectExperience[]>(defaultSelectedExperiences)
 
-  const listParams: ProjectExperienceListParams = props.tab === 'AI_RECOMMENDATION' ? { tab: props.tab, jdId: props.jdId, questionRoomId: props.questionRoomId } : { tab: props.tab, jdId: props.jdId }
   const selectedExperienceIds = selectedExperiences.map((experience) => experience.experienceId)
 
   const toggleExperience = (experience: ProjectExperience) => {

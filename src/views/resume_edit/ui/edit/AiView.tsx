@@ -1,4 +1,4 @@
-import { Suspense, useState, type FormEvent } from 'react'
+import { Suspense, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { ArrowUp, ChevronLeft, ChevronRight, CircleCheckBig, Plus, TextAlignStart, X } from 'lucide-react'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
@@ -159,6 +159,12 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId }: { works
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const [content, setContent] = useState('')
   const [selectedExperiences, setSelectedExperiences] = useState<ProjectExperience[]>([])
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const container = scrollRef.current
+    if (container) container.scrollTop = container.scrollHeight
+  }, [messages])
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
@@ -202,7 +208,7 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId }: { works
       <Divider color={'gray-10'} />
       <Spacing size={20} />
 
-      <Flex direction={'column'} className={'min-h-0 flex-1 gap-6 overflow-y-auto'}>
+      <Flex ref={scrollRef} direction={'column'} className={'min-h-0 flex-1 gap-6 overflow-y-auto'}>
         <Flex gap={'3'}>
           <LogoIcon className={'opacity-50'} />
           <Text variant={'body2'} color={'text-subtle'}>
@@ -261,11 +267,12 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId }: { works
           </Flex>
         </Flex>
       </form>
-      {/*Todo: selectedExperiences에 대한 처리 (연동) */}
       {targetJdId && (
         <ExperiencePickerDialog
+          key={String(isPickerOpen)}
           isOpen={isPickerOpen}
           onOpenChange={setIsPickerOpen}
+          defaultSelectedExperiences={selectedExperiences}
           tab={'AI_RECOMMENDATION'}
           jdId={targetJdId}
           questionRoomId={questionRoomId}
