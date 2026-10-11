@@ -142,10 +142,11 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
     if (hasGeneratedRef.current) return
     hasGeneratedRef.current = true
 
-    // 최초 생성 아이템(isInitialItem)이 아직 남아 있을 때만 생성한다. 이미 채워진(사용자 편집) 경우 재생성하지 않는다.
-    if (!needsCoreCompetency(resume)) return
+    // 최초 생성 아이템(isInitialItem)이 아직 남아 있고(사용자 편집 시 재생성 안 함), JD(생성 필수 인자)가 연결된 경우에만 생성한다.
+    const jdId = resume.targetJd?.jdId
+    if (!needsCoreCompetency(resume) || !jdId) return
 
-    void generateCoreCompetency({ workspaceId, resumeId, jdId: resume.targetJd?.jdId ?? null })
+    void generateCoreCompetency({ workspaceId, resumeId, jdId })
       .then(({ coreCompetency }) => applyCoreCompetencyToForm(form, coreCompetency))
       .catch(() => toast.error('핵심역량 생성에 실패했어요. 잠시 후 다시 시도해주세요.'))
     // 페이지 진입 시 1회만 실행한다.
