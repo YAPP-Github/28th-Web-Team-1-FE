@@ -1,21 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
-import { useFieldArray, useFormContext, type FieldArrayPath } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { Trash2 } from 'lucide-react'
+import { type LucideIcon, Trash2, Pencil, FolderOpen } from 'lucide-react'
 import * as amplitude from '@amplitude/unified'
 import { AMPLITUDE_EVENTS } from '@shared/config'
 import { AddItemButton, SectionEmpty } from './Section'
 import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { DeleteItemAlert } from './DeleteItemAlert'
+import { ExperiencePickerDialog } from './ExperiencePickerDialog'
 import { FormInput } from '../form/FormInput'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
 import { FormTextarea } from '../form/FormTextarea'
-// import { experiencesToFormItems } from '../../model/experiencesToFormItems'
-// import { usePreviousExperienceIdsTracking } from '../../hooks/usePreviousExperienceIdsTracking'
-import type { ResumeFormValues } from '../../model/resume-form.types'
+import { useSectionItems } from '../../hooks/useSectionItems'
 import { SelectedControl, SelectedControlItem } from '@shared/ui/selected_control'
 import { AiView } from './AiView'
+import { DropdownMenu } from 'radix-ui'
+import { flattenExperienceContents } from '@views/resume_create'
 
 /**
  * 경험(EXPERIENCE) 편집 섹션. '경험 재선택'으로 `ExperiencePickerDialog`를 열어 선택한 경험들로 아이템을 통째로 교체한다.
@@ -45,26 +45,12 @@ export const ExperienceSection = ({ title, sectionIndex, targetJdId }: { title: 
       {/*Todo: manual View 따로 분리*/}
       {view === 'manual' && <ManualView sectionIndex={sectionIndex} targetJdId={targetJdId} />}
     </Flex>
-
-    //
-    //   <ExperiencePickerDialog
-    //     isOpen={isPickerOpen}
-    //     jdId={targetJdId ?? ''}
-    //     actionType={'reselect'}
-    //     previousExperienceIds={previousExperienceIds}
-    //     onOpenChange={setIsPickerOpen}
-    //     onComplete={(experiences) => {
-    //       replace(experiencesToFormItems(experiences))
-    //       setPreviousExperienceIds(experiences.map((experience) => experience.experienceId))
-    //       setIsPickerOpen(false)
-    //     }}
-    //   />
   )
 }
 
 const ManualView = ({ sectionIndex, targetJdId }: { sectionIndex: number; targetJdId: string | null }) => {
-  const { control } = useFormContext<ResumeFormValues>()
-  const { fields, remove } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
+  const { fields, remove, addItem } = useSectionItems(sectionIndex)
+  const [isPickerOpen, setIsPickerOpen] = useState(false)
 
   const count = fields.length
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -92,10 +78,59 @@ const ManualView = ({ sectionIndex, targetJdId }: { sectionIndex: number; target
       </Flex>
       <Spacing size={32} />
 
-      <AddItemButton label="경험 추가" onClick={() => {}} />
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger asChild>
+          <AddItemButton label="경험 추가" />
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content side={'top'} align={'start'} sideOffset={10} collisionPadding={15} className={'bg-element-white shadow-3 shadow-shadow-3 w-fit overflow-hidden rounded-md p-2'}>
+          <MenuItem
+            icon={Pencil}
+            label={'직접 입력하기'}
+            description={'원하는 경험을 직접 입력할 수 있어요'}
+            onSelect={() => addItem({ experience: { name: '', role: null, contents: '', period: null } })}
+          />
+          <Divider color={'gray-10'} />
+          <MenuItem icon={FolderOpen} label={'내 경험 불러오기'} description={'STAR 구조로 저장된 경험을 불러올 수 있어요'} disabled={!targetJdId} onSelect={() => setIsPickerOpen(true)} />
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+
+      {targetJdId && (
+        <ExperiencePickerDialog
+          key={String(isPickerOpen)}
+          isOpen={isPickerOpen}
+          onOpenChange={setIsPickerOpen}
+          tab={'MANUAL'}
+          jdId={targetJdId}
+          onComplete={(experiences) => {
+            experiences.forEach((experience) =>
+              addItem({
+                experience: {
+                  name: experience.title,
+                  role: experience.role,
+                  period: experience.period,
+                  contents: flattenExperienceContents(experience.contents)
+                }
+              })
+            )
+            setIsPickerOpen(false)
+          }}
+        />
+      )}
     </>
   )
 }
+
+const MenuItem = ({ icon: Icon, label, description, onSelect, disabled }: { icon: LucideIcon; label: string; description: string; onSelect: () => void; disabled?: boolean }) => (
+  <DropdownMenu.Item onSelect={onSelect} disabled={disabled} className={'flex cursor-pointer items-center gap-4 border-none p-2'}>
+    <Icon size={18} className={'text-icon-gray-light'} />
+    <Flex direction={'column'}>
+      <Text variant={'label1'}>{label}</Text>
+      <Text variant={'caption1'} color={'text-subtle'}>
+        {description}
+      </Text>
+    </Flex>
+  </DropdownMenu.Item>
+)
 
 const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove }: { sectionIndex: number; index: number; targetJdId: string | null; onRemove: () => void }) => {
   const base = `sections.${sectionIndex}.items.${index}.payload.experience`

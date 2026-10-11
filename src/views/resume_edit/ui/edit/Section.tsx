@@ -1,4 +1,4 @@
-import { useEffect, useRef, Children } from 'react'
+import { useEffect, useRef, Children, type ComponentProps } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Plus } from 'lucide-react'
@@ -49,9 +49,9 @@ export const SectionEmpty = () => {
   )
 }
 
-export const AddItemButton = ({ label, onClick }: { label: string; onClick: () => void }) => {
+export const AddItemButton = ({ label, ...props }: { label: string } & ComponentProps<typeof Button>) => {
   return (
-    <Button type={'button'} fullWidth variant={'tertiary'} onClick={onClick} className={'border-border-subtle border-dashed'}>
+    <Button type={'button'} fullWidth variant={'tertiary'} className={'border-border-subtle border-dashed'} {...props}>
       <Plus size={16} data-icon="inline-start" />
       {label}
     </Button>
