@@ -126,10 +126,10 @@ const ProjectList = ({
             onClick={() => onSelect(project.projectId)}
             className={cn(
               'hover:bg-element-white hover:shadow-2 flex flex-col gap-0.5 rounded-md px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent',
-              activeProjectId === project.projectId && 'bg-element-gray-lighter'
+              activeProjectId === project.projectId && 'bg-element-white shadow-2'
             )}
           >
-            <Text variant={'label1'} truncate className={'line'}>
+            <Text variant={'label1'} truncate className={cn('line-clamp-1', activeProjectId === project.projectId && 'text-text-primary-basic')}>
               {project.name}
             </Text>
             <Text variant={'label2'} color={'text-subtler'} truncate>
@@ -196,9 +196,11 @@ const ExperienceList = ({ workspaceId, projectId, params, selectedExperienceIds,
                 <Checkbox checked={isChecked} disabled={isDisabled} onCheckedChange={() => onToggle(experience)} />
                 <Text variant={'label1'}>{experience.title}</Text>
 
-                <Text variant={'label1'} color={'text-primary-basic'} className={'ml-auto'}>
-                  {experience.matchRate}%
-                </Text>
+                {experience.matchRate !== null && (
+                  <Text variant={'label1'} color={'text-primary-basic'} className={'ml-auto'}>
+                    {experience.matchRate}%
+                  </Text>
+                )}
               </label>
             </Flex>
           )
