@@ -1,13 +1,12 @@
 'use client'
+import { useGoogleLoginRedirect } from '@features/authenticate'
 import { ArrowRight, Sparkle } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Heading } from '@shared/ui'
-import { useLoginCta } from '../lib/useLoginCta'
-import { MobileBlockDialog } from './MobileBlockDialog'
 
 export const FooterCtaSection = () => {
-  const { isOpen, setIsOpen, handleClick } = useLoginCta()
+  const startLogin = useGoogleLoginRedirect()
 
   return (
     <section className="py-14 md:py-24">
@@ -21,7 +20,7 @@ export const FooterCtaSection = () => {
             variant="secondary"
             size="icon-xl"
             className="text-text-basic md:text-headline1 mt-4 h-fit w-fit rounded-sm bg-white px-3 py-1.5 text-[8px] font-normal md:mt-8 md:gap-2 md:rounded-xl md:px-8 md:py-4 md:font-semibold"
-            onClick={handleClick}
+            onClick={() => startLogin()}
           >
             이력서 만들기
             <ArrowRight data-icon="inline-end" className="text-icon-gray size-3 transition-transform duration-300 group-hover/button:translate-x-1 md:size-5" />
@@ -85,7 +84,6 @@ export const FooterCtaSection = () => {
           </div>
         </div>
       </Flex>
-      <MobileBlockDialog isOpen={isOpen} onOpenChange={setIsOpen} />
     </section>
   )
 }

@@ -1,15 +1,14 @@
 'use client'
+import { useGoogleLoginRedirect } from '@features/authenticate'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { cn } from '@shared/lib'
 import { Button } from '@shared/ui'
 import { Logo } from '@shared/icon'
-import { useLoginCta } from '../lib/useLoginCta'
-import { MobileBlockDialog } from './MobileBlockDialog'
 
 /** @param transparentAtTop 스크롤 맨 위에선 배경 없이 뒤의 히어로 배경이 비치게 한다 (히어로 B안용) */
 export const LandingHeader = ({ transparentAtTop = false }: { transparentAtTop?: boolean }) => {
-  const { isOpen, setIsOpen, handleClick } = useLoginCta()
+  const startLogin = useGoogleLoginRedirect()
   const [isAtTop, setIsAtTop] = useState(true)
 
   useEffect(() => {
@@ -53,11 +52,10 @@ export const LandingHeader = ({ transparentAtTop = false }: { transparentAtTop?:
             </Link>
           </Button>
         </div>
-        <Button variant="secondary" size="sm" className="md:text-headline2 rounded-md px-4 py-2 md:h-10.5 md:gap-1.5 md:rounded-lg md:px-5 md:py-2.5" onClick={handleClick}>
+        <Button variant="secondary" size="sm" className="md:text-headline2 rounded-md px-4 py-2 md:h-10.5 md:gap-1.5 md:rounded-lg md:px-5 md:py-2.5" onClick={() => startLogin()}>
           로그인
         </Button>
       </div>
-      <MobileBlockDialog isOpen={isOpen} onOpenChange={setIsOpen} />
     </header>
   )
 }

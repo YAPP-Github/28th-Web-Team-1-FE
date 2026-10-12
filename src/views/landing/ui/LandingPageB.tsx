@@ -8,16 +8,13 @@ import { cn, formatDate } from '@shared/lib'
 import { Button, ErrorFallback, Heading, Text } from '@shared/ui'
 import { SelectedControl, SelectedControlItem } from '@shared/ui/selected_control'
 import { useJdRecommendationTags, useJdRecommendations, type JdRecommendation, type JdRecommendationTag } from '@entities/jd'
-import { useLoginCta } from '../lib/useLoginCta'
 import { FooterCtaSection } from './FooterCtaSection'
 import { LandingFooter } from './LandingFooter'
 import { LandingHeader } from './LandingHeader'
-import { MobileBlockDialog } from './MobileBlockDialog'
-import { MobileKakaoCta } from './MobileKakaoCta'
 import { ProcessStepsSection } from './ProcessStepsSection'
 import { TaglineSection } from './TaglineSection'
 import { UploadFeatureSection } from './UploadFeatureSection'
-import { AuthErrorToast } from '@features/authenticate'
+import { AuthErrorToast, useGoogleLoginRedirect } from '@features/authenticate'
 
 const RECOMMENDATION_SIZE = 6
 
@@ -26,7 +23,7 @@ export const LandingPageB = () => {
   return (
     <div className="relative isolate">
       <HeroBackground />
-      <main className="mx-auto max-w-360 px-5 pt-20 pb-24 md:px-8 md:pt-26.5 md:pb-0">
+      <main className="mx-auto max-w-360 px-5 pt-20 md:px-8 md:pt-26.5">
         <Suspense fallback={null}>
           <AuthErrorToast />
         </Suspense>
@@ -37,7 +34,6 @@ export const LandingPageB = () => {
         <ProcessStepsSection />
         <FooterCtaSection />
         <LandingFooter />
-        <MobileKakaoCta />
       </main>
     </div>
   )
@@ -55,7 +51,7 @@ const HeroBackground = () => (
 )
 
 const JdHeroSection = () => {
-  const { isOpen, setIsOpen, handleClick } = useLoginCta()
+  const startLogin = useGoogleLoginRedirect()
 
   return (
     <section>
@@ -66,18 +62,16 @@ const JdHeroSection = () => {
             공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.
           </Text>
         </Flex>
-        <JdInputCard onSubmit={handleClick} />
+        <JdInputCard onSubmit={() => startLogin()} />
       </Flex>
 
       <Flex justify={'center'} pt={'3'} className={'pb-20'}>
         <ErrorBoundary fallback={<ErrorFallback title="추천 공고를 불러오지 못했어요." description="새로고침 후 다시 시도해 주세요." className="w-full max-w-215" />}>
           <Suspense fallback={<div className="min-h-130 w-full max-w-215" />}>
-            <RecommendedJdList onCreate={handleClick} />
+            <RecommendedJdList onCreate={() => startLogin()} />
           </Suspense>
         </ErrorBoundary>
       </Flex>
-
-      <MobileBlockDialog isOpen={isOpen} onOpenChange={setIsOpen} />
     </section>
   )
 }
