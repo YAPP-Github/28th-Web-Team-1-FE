@@ -17,17 +17,17 @@ const StarInputMockup = () => {
   ]
 
   return (
-    <Flex direction="column" className="w-full gap-1.5 md:gap-3.5">
+    <Flex direction="column" className="w-full gap-1.5 sm:gap-3.5">
       {fields.map((field) => (
-        <Flex key={field.en} className="gap-1 md:gap-2.5">
-          <Flex direction="column" justify="center" className="w-9 shrink-0 gap-0 md:w-17 md:gap-0.5">
-            <p className="text-text-basic text-[7px] leading-tight font-semibold md:text-[13px]">{field.en}</p>
-            <p className="text-text-subtler text-[6px] leading-tight md:text-[12px]">{field.ko}</p>
+        <Flex key={field.en} className="gap-1 sm:gap-2.5">
+          <Flex direction="column" justify="center" className="w-9 shrink-0 gap-0 sm:w-17 sm:gap-0.5">
+            <p className="text-text-basic text-[7px] leading-tight font-semibold sm:text-[13px]">{field.en}</p>
+            <p className="text-text-subtler text-[6px] leading-tight sm:text-[12px]">{field.ko}</p>
           </Flex>
-          <Flex direction="column" justify="center" className="h-7 min-w-9 flex-1 gap-1 rounded-[6px] bg-white px-1 md:h-18 md:min-w-0 md:gap-2 md:rounded-[11px] md:px-4">
-            <div className="bg-gray-10 h-0.5 w-[45%] rounded-full md:h-1.5" />
-            <div className="bg-gray-10 h-0.5 w-[92%] rounded-full md:h-1.5" />
-            <div className="bg-gray-10 h-0.5 w-[92%] rounded-full md:h-1.5" />
+          <Flex direction="column" justify="center" className="h-7 min-w-9 flex-1 gap-1 rounded-[6px] bg-white px-1 sm:h-18 sm:min-w-0 sm:gap-2 sm:rounded-[11px] sm:px-4">
+            <div className="bg-gray-10 h-0.5 w-[45%] rounded-full sm:h-1.5" />
+            <div className="bg-gray-10 h-0.5 w-[92%] rounded-full sm:h-1.5" />
+            <div className="bg-gray-10 h-0.5 w-[92%] rounded-full sm:h-1.5" />
           </Flex>
         </Flex>
       ))}
@@ -38,31 +38,31 @@ const StarInputMockup = () => {
 const JobDescriptionMockup = () => {
   return (
     <Flex direction="column" align="center" className="w-full max-w-105">
-      <Flex direction="column" align="center" className="shadow-3 relative z-10 w-full gap-0.5 rounded-xs bg-white px-2.5 py-2 text-center md:w-auto md:gap-1 md:rounded-xl md:px-4.5 md:py-3.5">
-        <p className="text-text-basic text-[6px] leading-tight font-medium tracking-[-0.02em] text-balance md:text-base md:font-bold md:text-pretty">지원할 공고의 링크를 입력해주세요</p>
-        <p className="text-text-subtle md:text-caption1 text-[5px] leading-normal text-balance md:text-pretty">공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.</p>
+      <Flex direction="column" align="center" className="shadow-3 relative z-10 w-full gap-0.5 rounded-xs bg-white px-2.5 py-2 text-center sm:w-auto sm:gap-1 sm:rounded-xl sm:px-4.5 sm:py-3.5">
+        <p className="text-text-basic text-[6px] leading-tight font-medium tracking-[-0.02em] text-balance sm:text-base sm:font-bold sm:text-pretty">지원할 공고의 링크를 입력해주세요</p>
+        <p className="text-text-subtle sm:text-caption1 text-[5px] leading-normal text-balance sm:text-pretty">공고 내용을 분석해, 가장 맞는 경험을 추천해 드릴게요.</p>
       </Flex>
-      <div className="mb-2 h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-white md:mb-4 md:border-x-8 md:border-t-8" aria-hidden />
+      <div className="mb-2 h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-white sm:mb-4 sm:border-x-8 sm:border-t-8" aria-hidden />
 
-      <Flex direction="column" className="w-full gap-1 rounded-xs bg-white p-1.5 md:gap-2 md:rounded-xl md:p-2">
-        <Flex align="center" className="bg-element-gray-light w-fit gap-0.5 rounded-[1.5px] p-0.5 md:gap-1 md:rounded-lg md:p-1">
+      <Flex direction="column" className="w-full gap-1 rounded-xs bg-white p-1.5 sm:gap-2 sm:rounded-xl sm:p-2">
+        <Flex align="center" className="bg-element-gray-light w-fit gap-0.5 rounded-[1.5px] p-0.5 sm:gap-1 sm:rounded-lg sm:p-1">
           {['URL 붙여넣기', '원문 붙여넣기'].map((tab, index) => (
             <span
               key={tab}
-              className={`rounded-[1px] px-1.5 py-0.5 text-[6px] font-semibold whitespace-nowrap md:rounded-md md:px-3 md:py-1.5 md:text-[10px] ${index === 0 ? 'text-text-basic shadow-1 bg-white' : 'text-text-subtler'}`}
+              className={`rounded-[1px] px-1.5 py-0.5 text-[6px] font-semibold whitespace-nowrap sm:rounded-md sm:px-3 sm:py-1.5 sm:text-[10px] ${index === 0 ? 'text-text-basic shadow-1 bg-white' : 'text-text-subtler'}`}
             >
               {tab}
             </span>
           ))}
         </Flex>
-        <Flex direction="column" className="gap-1 px-0.5 py-1 md:gap-2 md:px-1 md:py-1.5">
-          <div className="bg-gray-10 h-0.5 w-[40%] rounded-full md:h-1" />
-          <div className="bg-gray-10 h-0.5 w-[88%] rounded-full md:h-1" />
-          <div className="bg-gray-10 h-0.5 w-[88%] rounded-full md:h-1" />
+        <Flex direction="column" className="gap-1 px-0.5 py-1 sm:gap-2 sm:px-1 sm:py-1.5">
+          <div className="bg-gray-10 h-0.5 w-[40%] rounded-full sm:h-1" />
+          <div className="bg-gray-10 h-0.5 w-[88%] rounded-full sm:h-1" />
+          <div className="bg-gray-10 h-0.5 w-[88%] rounded-full sm:h-1" />
         </Flex>
         <Flex justify="end">
-          <div className="bg-primary-50 flex size-4.5 items-center justify-center rounded-[2.5px] md:size-8 md:rounded-sm">
-            <ArrowRight className="size-2.5 text-white md:size-4" size={16} />
+          <div className="bg-primary-50 flex size-4.5 items-center justify-center rounded-[2.5px] sm:size-8 sm:rounded-sm">
+            <ArrowRight className="size-2.5 text-white sm:size-4" size={16} />
           </div>
         </Flex>
       </Flex>
@@ -172,16 +172,16 @@ const MatchedExperienceMockupMobile = () => {
   const experiences = ['경험 1', '경험 2']
 
   return (
-    <Flex direction="column" align="center" className="w-full gap-2 md:hidden">
+    <Flex direction="column" align="center" className="w-full gap-2 sm:hidden">
       <Flex className="w-full gap-2">
         {experiences.map((experience) => (
           <CompactExperienceMatchCard key={experience} label={experience} />
         ))}
       </Flex>
 
-      <ArrowRight className="text-primary-30 size-2 shrink-0 rotate-90 md:size-4" />
+      <ArrowRight className="text-primary-30 size-2 shrink-0 rotate-90 sm:size-4" />
 
-      <div className="shadow-3 w-[80%] rounded-xs bg-white p-1.5 md:rounded-xl md:p-2.5">
+      <div className="shadow-3 w-[80%] rounded-xs bg-white p-1.5 sm:rounded-xl sm:p-2.5">
         <Flex direction="column" className="gap-1.5">
           <Flex align="center" justify="between">
             <p className="text-text-basic text-[7px] font-bold">김스쿱</p>
@@ -214,7 +214,7 @@ const MatchedExperienceMockupDesktop = () => {
   const experiences = ['경험 1', '경험 2', '경험 3']
 
   return (
-    <Flex direction="row" align="center" className="hidden w-full gap-3 md:flex">
+    <Flex direction="row" align="center" className="hidden w-full gap-3 sm:flex">
       <Flex direction="column" className="w-52.5 gap-2.5">
         {experiences.map((experience) => (
           <ExperienceMatchCard key={experience} label={experience} />
@@ -290,38 +290,38 @@ const STEPS = [
 type Step = (typeof STEPS)[number]
 
 const GLOW_POSITION_CLASSES: Record<Step['glowPosition'], string> = {
-  'top-right': 'top-0 right-0 -translate-y-4 translate-x-4 md:-translate-y-1/4 md:translate-x-1/4',
-  'bottom-left': 'bottom-0 left-0 translate-y-4 -translate-x-4 md:translate-y-1/4 md:-translate-x-1/4',
-  right: 'top-1/2 right-0 -translate-y-1/2 translate-x-4 md:translate-x-1/4'
+  'top-right': 'top-0 right-0 -translate-y-4 translate-x-4 sm:-translate-y-1/4 sm:translate-x-1/4',
+  'bottom-left': 'bottom-0 left-0 translate-y-4 -translate-x-4 sm:translate-y-1/4 sm:-translate-x-1/4',
+  right: 'top-1/2 right-0 -translate-y-1/2 translate-x-4 sm:translate-x-1/4'
 }
 
 const StepGlow = ({ position }: { position: Step['glowPosition'] }) => (
   <div
     aria-hidden
-    className={cn('pointer-events-none absolute -z-10 size-56 rounded-full bg-[radial-gradient(circle,#DFDBFE_0%,transparent_70%)] blur-2xl md:size-125', GLOW_POSITION_CLASSES[position])}
+    className={cn('pointer-events-none absolute -z-10 size-56 rounded-full bg-[radial-gradient(circle,#DFDBFE_0%,transparent_70%)] blur-2xl sm:size-125', GLOW_POSITION_CLASSES[position])}
   />
 )
 
 const StepCard = ({ step }: { step: Step }) => (
-  <Flex direction="row" align="center" justify="between" className="shadow-2 w-full gap-4 rounded-lg bg-white p-5 md:h-138.75 md:gap-16.5 md:rounded-[40px] md:p-16">
-    <Flex direction="column" className="min-w-0 flex-1 gap-3 md:max-w-125 md:gap-8">
-      <div className="relative h-14 overflow-hidden opacity-90 md:h-40" aria-hidden>
-        <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight md:text-[220px]">{step.number}</p>
+  <Flex direction="row" align="center" justify="between" className="shadow-2 w-full gap-4 rounded-lg bg-white p-5 sm:h-138.75 sm:gap-16.5 sm:rounded-[40px] sm:p-16">
+    <Flex direction="column" className="min-w-0 flex-1 gap-3 sm:max-w-125 sm:gap-8">
+      <div className="relative h-14 overflow-hidden opacity-90 sm:h-40" aria-hidden>
+        <p className="font-elms text-primary-10 text-[80px] leading-none font-bold tracking-tight sm:text-[220px]">{step.number}</p>
       </div>
 
-      <Flex direction="column" className="gap-3 md:gap-6">
-        <Flex direction="column" className="gap-1 md:gap-2">
-          <h3 className="text-text-basic text-heading2 leading-tight font-bold tracking-tight whitespace-nowrap md:text-[70px]">{step.titleEn}</h3>
-          <p className="text-text-disabled text-caption2 tracking-tight md:text-[28px] md:font-semibold">{step.titleKo}</p>
+      <Flex direction="column" className="gap-3 sm:gap-6">
+        <Flex direction="column" className="gap-1 sm:gap-2">
+          <h3 className="text-text-basic text-heading2 leading-tight font-bold tracking-tight whitespace-nowrap sm:text-[70px]">{step.titleEn}</h3>
+          <p className="text-text-disabled text-caption2 tracking-tight sm:text-[28px] sm:font-semibold">{step.titleKo}</p>
         </Flex>
-        <p className="text-text-subtle text-[9px] leading-normal md:text-[20px]">{step.description}</p>
+        <p className="text-text-subtle text-[9px] leading-normal sm:text-[20px]">{step.description}</p>
       </Flex>
     </Flex>
 
     <Flex
-      align={step.clipMockupMobile ? { initial: 'start', md: 'center' } : 'center'}
+      align={step.clipMockupMobile ? { initial: 'start', sm: 'center' } : 'center'}
       justify="center"
-      className={cn('bg-bg-gray-subtler min-w-0 flex-1 rounded-sm p-2.5 md:h-full md:max-w-137.5 md:rounded-[22px] md:p-10', step.clipMockupMobile ? 'relative h-36 overflow-hidden' : 'h-full')}
+      className={cn('bg-bg-gray-subtler min-w-0 flex-1 rounded-sm p-2.5 sm:h-full sm:max-w-137.5 sm:rounded-[22px] sm:p-10', step.clipMockupMobile ? 'relative h-36 overflow-hidden' : 'h-full')}
     >
       {step.mockup}
     </Flex>
@@ -329,7 +329,7 @@ const StepCard = ({ step }: { step: Step }) => (
 )
 
 const ProcessStepsMobile = () => (
-  <Flex direction="column" className="w-full gap-6 md:hidden">
+  <Flex direction="column" className="w-full gap-6 sm:hidden">
     {STEPS.map((step, index) => (
       <motion.div
         key={step.number}
@@ -383,7 +383,7 @@ const ProcessStepsDesktop = () => {
   })
 
   return (
-    <div ref={trackRef} className="relative hidden w-full md:block" style={{ height: `${STEPS.length * SCROLL_VH_PER_STEP}vh` }}>
+    <div ref={trackRef} className="relative hidden w-full sm:block" style={{ height: `${STEPS.length * SCROLL_VH_PER_STEP}vh` }}>
       <div className="sticky top-26.5 flex h-[calc(100vh-6.625rem)] items-center">
         {STEPS.map((step, index) => (
           <StepPanel key={step.number} step={step} state={index === activeIndex ? 'active' : index < activeIndex ? 'prev' : 'next'} />
@@ -395,11 +395,11 @@ const ProcessStepsDesktop = () => {
 
 export const ProcessStepsSection = () => {
   return (
-    <section id="features" className="py-14 md:py-24">
-      <Flex direction="column" align="center" className="w-full gap-10 md:gap-25">
-        <Flex direction="column" align="center" className="mx-auto max-w-311.25 gap-2 md:gap-3">
-          <p className="font-elms text-primary-50 text-[16px] font-extrabold tracking-tight md:text-[36px]">SCOOP</p>
-          <h2 className="text-text-basic text-heading2 px-4 text-center font-bold tracking-tight break-keep md:text-[48px]">3단계로 완성하는 맞춤 이력서</h2>
+    <section id="features" className="py-14 sm:py-24">
+      <Flex direction="column" align="center" className="w-full gap-10 sm:gap-25">
+        <Flex direction="column" align="center" className="mx-auto max-w-311.25 gap-2 sm:gap-3">
+          <p className="font-elms text-primary-50 text-[16px] font-extrabold tracking-tight sm:text-[36px]">SCOOP</p>
+          <h2 className="text-text-basic text-heading2 px-4 text-center font-bold tracking-tight break-keep sm:text-[48px]">3단계로 완성하는 맞춤 이력서</h2>
         </Flex>
 
         <ProcessStepsMobile />

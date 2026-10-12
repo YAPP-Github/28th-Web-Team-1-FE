@@ -30,7 +30,7 @@ export const LandingPageB = () => {
         </div>
         <div className="to-bg-white absolute inset-x-0 bottom-0 h-11.25 bg-linear-to-b from-transparent" />
       </div>
-      <main className="mx-auto max-w-360 px-5 pt-20 md:px-8 md:pt-26.5">
+      <main className="mx-auto max-w-360 px-5 pt-20 sm:px-8 sm:pt-26.5">
         <Suspense fallback={null}>
           <AuthErrorToast />
         </Suspense>
