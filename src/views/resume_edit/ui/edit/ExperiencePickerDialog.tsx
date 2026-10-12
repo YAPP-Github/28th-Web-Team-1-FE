@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useState, type ReactNode } from 'react'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader } from '@shared/ui/dialog'
 import { Divider, Spacing, Text, Heading, Button } from '@shared/ui'
@@ -45,37 +45,17 @@ export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete, defau
           </Text>
         </DialogHeader>
 
-        <Flex className={'border-border-subtler min-h-0 flex-1 overflow-hidden rounded-md border'}>
-          <Flex direction={'column'} className={'bg-element-gray-lighter w-58 p-4'}>
-            <Text variant={'label1'} color={'text-subtler'}>
-              프로젝트
-            </Text>
-            <Spacing size={12} />
-            <Suspense fallback={<ProjectListSkeleton />}>
-              <ProjectList workspaceId={workspaceId} activeProjectId={activeProjectId} hasSelection={selectedExperienceIds.length > 0} onSelect={setActiveProjectId} />
-            </Suspense>
-          </Flex>
-
-          {activeProjectId ? (
-            <Suspense fallback={<ExperienceListSkeleton />}>
-              <ExperienceList
-                key={activeProjectId}
-                workspaceId={workspaceId}
-                projectId={activeProjectId}
-                params={listParams}
-                selectedExperienceIds={selectedExperienceIds}
-                onToggle={toggleExperience}
-                onReset={() => setSelectedExperiences([])}
-              />
-            </Suspense>
-          ) : (
-            <Flex align={'center'} justify={'center'} className={'flex-1'}>
-              <Text variant={'label1'} color={'text-subtler'}>
-                프로젝트를 선택하면 경험 목록이 표시돼요
-              </Text>
-            </Flex>
-          )}
-        </Flex>
+        <Suspense fallback={<ExperiencePickerBodySkeleton />}>
+          <ProjectExperiencesBody
+            workspaceId={workspaceId}
+            activeProjectId={activeProjectId}
+            listParams={listParams}
+            selectedExperienceIds={selectedExperienceIds}
+            onToggle={toggleExperience}
+            onReset={() => setSelectedExperiences([])}
+            onSelect={setActiveProjectId}
+          />
+        </Suspense>
 
         <DialogFooter className={'flex gap-1'}>
           <DialogClose asChild>
@@ -92,19 +72,89 @@ export const ExperiencePickerDialog = ({ isOpen, onOpenChange, onComplete, defau
   )
 }
 
+interface ProjectExperiencesBodyProps {
+  workspaceId: string
+  activeProjectId: string | null
+  listParams: ProjectExperienceListParams
+  selectedExperienceIds: string[]
+  onToggle: (experience: ProjectExperience) => void
+  onReset: () => void
+  onSelect: (projectId: string) => void
+}
+
+/** 다이얼로그 본문 프레임(테두리 박스). 프로젝트 pane과 경험 pane을 가로로 담는다. */
+const BodyFrame = ({ children }: { children: ReactNode }) => <Flex className={'border-border-subtler min-h-0 flex-1 overflow-hidden rounded-md border'}>{children}</Flex>
+
+/** 프로젝트 선택 pane. 제목과 프로젝트 목록(또는 스켈레톤)을 세로로 담는다. */
+const ProjectPane = ({ children }: { children: ReactNode }) => (
+  <Flex direction={'column'} className={'bg-element-gray-lighter w-58 p-4'}>
+    <Text variant={'label1'} color={'text-subtler'}>
+      프로젝트
+    </Text>
+    <Spacing size={12} />
+    {children}
+  </Flex>
+)
+
+/**
+ * 프로젝트 목록 pane과 경험 목록 pane을 함께 렌더한다. 두 pane이 같은 프로젝트 목록 쿼리를
+ * 필요로 하므로(경험 pane은 프로젝트명 표시) 여기서 한 번만 구독해 내려준다.
+ * 프로젝트 목록 로딩은 이 컴포넌트를 감싼 Suspense가, 경험 목록 로딩은 내부 Suspense가 처리한다.
+ */
+const ProjectExperiencesBody = ({ workspaceId, activeProjectId, listParams, selectedExperienceIds, onToggle, onReset, onSelect }: ProjectExperiencesBodyProps) => {
+  const { projects } = useProjectList(workspaceId)
+  const projectTitle = projects.find((project) => project.projectId === activeProjectId)?.name ?? '프로젝트'
+
+  return (
+    <BodyFrame>
+      <ProjectPane>
+        <ProjectList projects={projects} activeProjectId={activeProjectId} hasSelection={selectedExperienceIds.length > 0} onSelect={onSelect} />
+      </ProjectPane>
+
+      {activeProjectId ? (
+        <ExperienceList
+          key={activeProjectId}
+          workspaceId={workspaceId}
+          projectId={activeProjectId}
+          projectTitle={projectTitle}
+          params={listParams}
+          selectedExperienceIds={selectedExperienceIds}
+          onToggle={onToggle}
+          onReset={onReset}
+        />
+      ) : (
+        <Flex className={'min-w-0 flex-1'}>
+          <Flex direction={'column'} gap={'4'} className={'min-h-0 w-90 flex-1 overflow-hidden px-5 py-4'}>
+            <Heading variant={'heading2'} className={'line-clamp-1'}>
+              프로젝트명
+            </Heading>
+            <Divider color={'gray-10'} />
+
+            <Text variant={'label2'} color={'text-subtler'} className={'my-auto text-center'}>
+              프로젝트를 선택하면 경험 목록을 볼 수 있어요
+            </Text>
+          </Flex>
+
+          <Divider orientation={'vertical'} color={'gray-10'} />
+
+          <ExperiencePreviewPane />
+        </Flex>
+      )}
+    </BodyFrame>
+  )
+}
+
 const ProjectList = ({
-  workspaceId,
+  projects,
   activeProjectId,
   hasSelection,
   onSelect
 }: {
-  workspaceId: string
+  projects: ReturnType<typeof useProjectList>['projects']
   activeProjectId: string | null
   hasSelection: boolean
   onSelect: (projectId: string) => void
 }) => {
-  const { projects } = useProjectList(workspaceId)
-
   if (projects.length === 0) {
     return (
       <Text variant={'label1'} color={'text-subtler'}>
@@ -145,30 +195,22 @@ const ProjectList = ({
 interface ExperienceListProps {
   workspaceId: string
   projectId: string
+  projectTitle: string
   params: ProjectExperienceListParams
   selectedExperienceIds: string[]
   onToggle: (experience: ProjectExperience) => void
   onReset: () => void
 }
 
-const ExperienceList = ({ workspaceId, projectId, params, selectedExperienceIds, onToggle, onReset }: ExperienceListProps) => {
-  const { experiences } = useProjectExperiences(workspaceId, projectId, params)
+const ExperienceList = ({ workspaceId, projectId, projectTitle, params, selectedExperienceIds, onToggle, onReset }: ExperienceListProps) => {
   const [activeExperience, setActiveExperience] = useState<ProjectExperience | null>(null)
-
-  if (experiences.length === 0) {
-    return (
-      <Text variant={'label1'} color={'text-subtler'}>
-        프로젝트에 등록된 경험이 없어요
-      </Text>
-    )
-  }
 
   return (
     <Flex className={'min-w-0 flex-1'}>
       <Flex direction={'column'} gap={'4'} className={'min-h-0 w-90 flex-1 overflow-y-auto px-5 py-4'}>
         <Flex justify={'between'} align={'center'}>
           <Heading variant={'heading2'} className={'line-clamp-1'}>
-            {experiences[0].project?.name}
+            {projectTitle}
           </Heading>
 
           <Button variant={'text'} size={'xs'} className={'text-text-subtle'} onClick={onReset}>
@@ -179,50 +221,90 @@ const ExperienceList = ({ workspaceId, projectId, params, selectedExperienceIds,
 
         <Divider color={'gray-10'} />
 
-        {experiences.map((experience) => {
-          const isChecked = selectedExperienceIds.includes(experience.experienceId)
-          const isDisabled = !isChecked && selectedExperienceIds.length >= MAX_SELECT
-
-          return (
-            <Flex
-              key={experience.experienceId}
-              align={'center'}
-              gap={'3'}
-              className={'hover:bg-element-gray-lighter cursor-pointer rounded-md px-3 py-2.5'}
-              onMouseOver={() => setActiveExperience(experience)}
-              asChild
-            >
-              <label>
-                <Checkbox checked={isChecked} disabled={isDisabled} onCheckedChange={() => onToggle(experience)} />
-                <Text variant={'label1'}>{experience.title}</Text>
-
-                {experience.matchRate !== null && (
-                  <Text variant={'label1'} color={'text-primary-basic'} className={'ml-auto'}>
-                    {experience.matchRate}%
-                  </Text>
-                )}
-              </label>
-            </Flex>
-          )
-        })}
+        <Suspense fallback={<ExperienceItemsSkeleton />}>
+          <ExperienceItemsBody workspaceId={workspaceId} projectId={projectId} params={params} selectedExperienceIds={selectedExperienceIds} onToggle={onToggle} onHover={setActiveExperience} />
+        </Suspense>
       </Flex>
 
       <Divider orientation={'vertical'} color={'gray-10'} />
 
-      <Flex direction={'column'} className={'w-75 overflow-y-auto px-5 py-4'}>
-        <Text variant={'label1'} color={'text-subtler'}>
-          경험 원문
-        </Text>
-        <Spacing size={20} />
-
-        <Text variant={'headline2'}>{activeExperience?.title ?? '경험명'}</Text>
-        <Spacing size={16} />
-
-        <FormatExperienceContents contents={activeExperience?.contents} />
-      </Flex>
+      <ExperiencePreviewPane experience={activeExperience} />
     </Flex>
   )
 }
+
+interface ExperienceItemsBodyProps {
+  workspaceId: string
+  projectId: string
+  params: ProjectExperienceListParams
+  selectedExperienceIds: string[]
+  onToggle: (experience: ProjectExperience) => void
+  onHover: (experience: ProjectExperience) => void
+}
+
+/** 경험 목록 아이템 영역. 경험 쿼리를 소유해 이 영역만 로딩되고, 제목·원문 pane은 먼저 렌더된다. */
+const ExperienceItemsBody = ({ workspaceId, projectId, params, selectedExperienceIds, onToggle, onHover }: ExperienceItemsBodyProps) => {
+  const { experiences } = useProjectExperiences(workspaceId, projectId, params)
+
+  if (experiences.length === 0) {
+    return (
+      <Flex direction={'column'} align={'center'} justify={'center'} className={'flex-1'}>
+        <Text variant={'label1'} color={'text-subtle'}>
+          아직 등록된 경험이 없어요
+        </Text>
+        <Text variant={'caption1'} color={'text-subtler'}>
+          프로젝트와 관련된 경험을 추가해 주세요
+        </Text>
+      </Flex>
+    )
+  }
+
+  return (
+    <>
+      {experiences.map((experience) => {
+        const isChecked = selectedExperienceIds.includes(experience.experienceId)
+        const isDisabled = !isChecked && selectedExperienceIds.length >= MAX_SELECT
+
+        return (
+          <Flex
+            key={experience.experienceId}
+            align={'center'}
+            gap={'3'}
+            className={'hover:bg-element-gray-lighter cursor-pointer rounded-md px-3 py-2.5'}
+            onMouseOver={() => onHover(experience)}
+            asChild
+          >
+            <label>
+              <Checkbox checked={isChecked} disabled={isDisabled} onCheckedChange={() => onToggle(experience)} />
+              <Text variant={'label1'}>{experience.title}</Text>
+
+              {experience.matchRate !== null && (
+                <Text variant={'label1'} color={'text-primary-basic'} className={'ml-auto'}>
+                  {experience.matchRate}%
+                </Text>
+              )}
+            </label>
+          </Flex>
+        )
+      })}
+    </>
+  )
+}
+
+/** '경험 원문' 미리보기 pane. 선택된 경험이 없으면 빈 상태(경험명·'-')를 보여준다. */
+const ExperiencePreviewPane = ({ experience = null }: { experience?: ProjectExperience | null }) => (
+  <Flex direction={'column'} className={'w-75 overflow-y-auto px-5 py-4'}>
+    <Text variant={'label1'} color={'text-subtler'}>
+      경험 원문
+    </Text>
+    <Spacing size={20} />
+
+    <Text variant={'headline2'}>{experience?.title ?? '경험명'}</Text>
+    <Spacing size={16} />
+
+    <FormatExperienceContents contents={experience?.contents} />
+  </Flex>
+)
 
 const FormatExperienceContents = ({ contents }: { contents?: ProjectExperience['contents'] }) => {
   if (contents?.type === 'FREE') {
@@ -265,23 +347,33 @@ const ProjectListSkeleton = () => (
   </Flex>
 )
 
+/** 경험 아이템 영역만 가리는 스켈레톤. 제목·원문 pane은 그대로 두고 목록 자리만 채운다. */
+const ExperienceItemsSkeleton = () => (
+  <Flex direction={'column'} gap={'4'}>
+    {[0, 1, 2, 3, 4].map((i) => (
+      <Skeleton key={i} height={'22px'} width={'100%'} />
+    ))}
+  </Flex>
+)
+
 const ExperienceListSkeleton = () => (
   <Flex className={'min-w-0 flex-1'}>
     <Flex direction={'column'} gap={'4'} className={'min-h-0 w-90 flex-1 overflow-hidden px-5 py-4'}>
       <Skeleton height={'28px'} width={'40%'} />
-      {[0, 1, 2, 3, 4].map((i) => (
-        <Skeleton key={i} height={'22px'} width={'100%'} />
-      ))}
+      <ExperienceItemsSkeleton />
     </Flex>
 
     <Divider orientation={'vertical'} color={'gray-10'} />
 
-    <Flex direction={'column'} gap={'4'} className={'w-75 px-5 py-4'}>
-      <Skeleton height={'16px'} width={'30%'} />
-      <Skeleton height={'24px'} width={'60%'} />
-      {[0, 1, 2, 3].map((i) => (
-        <Skeleton key={i} height={'32px'} width={'100%'} />
-      ))}
-    </Flex>
+    <ExperiencePreviewPane />
   </Flex>
+)
+
+const ExperiencePickerBodySkeleton = () => (
+  <BodyFrame>
+    <ProjectPane>
+      <ProjectListSkeleton />
+    </ProjectPane>
+    <ExperienceListSkeleton />
+  </BodyFrame>
 )
