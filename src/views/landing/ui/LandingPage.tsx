@@ -1,16 +1,10 @@
 'use client'
 import { Suspense, useEffect } from 'react'
-import { FooterCtaSection } from './FooterCtaSection'
-import { HeroSection } from './HeroSection'
-import { LandingFooter } from './LandingFooter'
-import { LandingHeader } from './LandingHeader'
-import { MobileKakaoCta } from './MobileKakaoCta'
-import { ProcessStepsSection } from './ProcessStepsSection'
-import { TaglineSection } from './TaglineSection'
-import { UploadFeatureSection } from './UploadFeatureSection'
+import { LandingPageA } from './LandingPageA'
+import { LandingPageB } from './LandingPageB'
 
+import { useSearchParams } from 'next/navigation'
 import * as amplitude from '@amplitude/unified'
-import { AuthErrorToast } from '@features/authenticate'
 import { AMPLITUDE_EVENTS } from '@shared/config'
 
 export const LandingPage = () => {
@@ -19,19 +13,13 @@ export const LandingPage = () => {
     amplitude.track(AMPLITUDE_EVENTS.LANDING_VIEWED)
   }, [])
 
+  // 정적 렌더엔 A가 들어가고, 클라이언트에서 variant를 읽어 바꾼다
   return (
-    <main className="mx-auto max-w-360 px-5 pt-20 pb-24 md:px-8 md:pt-26.5 md:pb-0">
-      <Suspense fallback={null}>
-        <AuthErrorToast />
-      </Suspense>
-      <LandingHeader />
-      <HeroSection />
-      <TaglineSection />
-      <UploadFeatureSection />
-      <ProcessStepsSection />
-      <FooterCtaSection />
-      <LandingFooter />
-      <MobileKakaoCta />
-    </main>
+    <Suspense fallback={<LandingPageA />}>
+      <LandingVariant />
+    </Suspense>
   )
 }
+
+/** 랜딩 A/B 분기. 배정 로직 전이라 `?landing=B`로만 B안을 본다. 배정 붙이면 이 조건만 교체 */
+const LandingVariant = () => (useSearchParams().get('landing') === 'B' ? <LandingPageB /> : <LandingPageA />)
