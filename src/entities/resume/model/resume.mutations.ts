@@ -6,7 +6,7 @@ import { resumeKeys } from './resume.keys'
 
 /**
  * 이력서를 전체 스냅샷 단위로 생성한다.
- * 생성된 이력서의 `resumeId`가 담긴 결과를 반환한다.
+ * 생성된 이력서의 `resumeId`가 담긴 결과를 반환한다. 성공 시 목록·개수 캐시를 무효화한다.
  * @param workspaceId 현재 워크스페이스 ID
  * @example
  * ```tsx
@@ -15,10 +15,15 @@ import { resumeKeys } from './resume.keys'
  * ```
  */
 export const useCreateResume = (workspaceId: string) => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (input: CreateResumeInput) => {
       const { createResume } = await resumeAPI.createResume({ workspaceId, input })
       return createResume
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: resumeKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: resumeKeys.counts(workspaceId) })
     }
   })
 }
