@@ -1,6 +1,7 @@
 'use client'
 import { Check, FilePlus2 } from 'lucide-react'
 import { motion } from 'motion/react'
+import uploadArrows from '../assets/upload-arrows.svg'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { NotionIcon } from '@/src/shared/icon'
@@ -59,7 +60,7 @@ export const UploadFeatureSection = () => {
 
       <div className="relative mt-4 flex flex-col items-center md:pt-32 md:pb-24">
         <motion.img
-          src="/landing/upload-arrows.svg"
+          src={uploadArrows.src}
           alt=""
           className="relative block h-4 w-32 md:mt-2 md:h-15 md:w-107"
           aria-hidden

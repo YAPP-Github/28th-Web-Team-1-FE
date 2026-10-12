@@ -1,6 +1,9 @@
 'use client'
 import { useGoogleLoginRedirect } from '@features/authenticate'
 import Image from 'next/image'
+import backgroundImage from '../assets/background.webp'
+import landingLogo from '../assets/landing_logo.gif'
+import resumeImage from '../assets/resume.webp'
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
@@ -13,11 +16,11 @@ export const HeroSection = () => {
 
   return (
     <section className="relative mt-6 overflow-hidden rounded-lg pt-14 md:mt-10 md:rounded-[40px] md:pt-20">
-      <Image src="/landing/background.webp" alt="" fill priority sizes="100vw" className="object-cover" />
+      <Image src={backgroundImage} alt="" fill priority sizes="100vw" className="object-cover" />
 
       <Flex direction="column" align="center" className="relative mx-auto max-w-144.5 gap-3 px-4 text-center md:gap-6">
         <motion.img
-          src="/landing/lading_logo.gif"
+          src={landingLogo.src}
           alt="SCOOP"
           className="h-16 w-auto md:h-34"
           initial={{ opacity: 0, y: 16 }}
@@ -50,7 +53,7 @@ export const HeroSection = () => {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 1.25, ease: EASE_EXPO_OUT, delay: 0.74 }}
       >
-        <Image src="/landing/resume.webp" alt="SCOOP으로 생성한 이력서 미리보기" width={2924} height={4278} sizes="(min-width: 768px) 480px, 90vw" className="h-auto w-full" priority />
+        <Image src={resumeImage} alt="SCOOP으로 생성한 이력서 미리보기" sizes="(min-width: 768px) 480px, 90vw" className="h-auto w-full" priority />
       </motion.div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-60 bg-linear-to-t from-white/60 to-white/0 md:h-120.25" aria-hidden />

@@ -1,6 +1,7 @@
 'use client'
 import { Suspense, useState, useTransition } from 'react'
 import Image from 'next/image'
+import heroGradient from '../assets/hero_b_gradient.webp'
 import { ArrowRightIcon, CalendarIcon } from 'lucide-react'
 import { Flex, Grid } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
@@ -25,7 +26,7 @@ export const LandingPageB = () => {
       <div className="absolute inset-x-0 top-0 -z-10" aria-hidden>
         <div className="bg-element-primary-lighter h-[calc(--spacing(109.75)+--spacing(20))] sm:hidden" />
         <div className="relative hidden h-[calc(--spacing(164)+--spacing(26.5))] sm:block">
-          <Image src="/landing/hero_b_gradient.webp" alt="" fill priority sizes="100vw" className="object-fill" />
+          <Image src={heroGradient} alt="" fill priority sizes="100vw" className="object-fill" />
         </div>
         <div className="to-bg-white absolute inset-x-0 bottom-0 h-11.25 bg-linear-to-b from-transparent" />
       </div>
