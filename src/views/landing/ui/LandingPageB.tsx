@@ -22,7 +22,13 @@ const RECOMMENDATION_SIZE = 6
 export const LandingPageB = () => {
   return (
     <div className="relative isolate">
-      <HeroBackground />
+      <div className="absolute inset-x-0 top-0 -z-10" aria-hidden>
+        <div className="bg-element-primary-lighter h-[calc(--spacing(109.75)+--spacing(20))] sm:hidden" />
+        <div className="relative hidden h-[calc(--spacing(164)+--spacing(26.5))] sm:block">
+          <Image src="/landing/hero_b_gradient.webp" alt="" fill priority sizes="100vw" className="object-fill" />
+        </div>
+        <div className="to-bg-white absolute inset-x-0 bottom-0 h-11.25 bg-linear-to-b from-transparent" />
+      </div>
       <main className="mx-auto max-w-360 px-5 pt-20 md:px-8 md:pt-26.5">
         <Suspense fallback={null}>
           <AuthErrorToast />
@@ -39,17 +45,6 @@ export const LandingPageB = () => {
   )
 }
 
-/** 헤더 뒤·양옆까지 꽉 차는 배경. main 밖(전체 폭 wrapper 기준)에 깔고, 높이는 홈 배경 + 헤더 높이 */
-const HeroBackground = () => (
-  <div className="absolute inset-x-0 top-0 -z-10" aria-hidden>
-    <div className="bg-element-primary-lighter h-[calc(--spacing(109.75)+--spacing(20))] sm:hidden" />
-    <div className="relative hidden h-[calc(--spacing(164)+--spacing(26.5))] sm:block">
-      <Image src="/landing/hero_b_gradient.webp" alt="" fill priority sizes="100vw" className="object-fill" />
-    </div>
-    <div className="to-bg-white absolute inset-x-0 bottom-0 h-11.25 bg-linear-to-b from-transparent" />
-  </div>
-)
-
 const JdHeroSection = () => {
   const startLogin = useGoogleLoginRedirect()
 
@@ -65,7 +60,7 @@ const JdHeroSection = () => {
         <JdInputCard onSubmit={() => startLogin()} />
       </Flex>
 
-      <Flex justify={'center'} pt={'3'} className={'pb-20'}>
+      <Flex justify={'center'} pt={'3'} className={'pb-4'}>
         <ErrorBoundary fallback={<ErrorFallback title="추천 공고를 불러오지 못했어요." description="새로고침 후 다시 시도해 주세요." className="w-full max-w-215" />}>
           <Suspense fallback={<div className="min-h-130 w-full max-w-215" />}>
             <RecommendedJdList onCreate={() => startLogin()} />
