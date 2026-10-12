@@ -20,6 +20,7 @@ import { formToSaveInput } from '../model/formToSaveInput'
 import { SetCategoryModal } from './SetCategoryModal'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
 import { ExperienceEditProvider, useExperienceEditState } from '../model/experienceEditContext'
+import { TargetJdProvider } from '../model/targetJdContext'
 import { useResumeDraftViewedTracking } from '../hooks/useResumeDraftViewedTracking'
 import { useRouter } from 'next/navigation'
 import { ResumePreview } from './preview/ResumePreview'
@@ -172,7 +173,9 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
     <FormProvider {...form}>
       <ResumeToolbar targetJd={resume.targetJd} onSave={handleSave} onDraftSave={handleDraftSave} isSaving={isPending} lastSavedAt={lastSavedAt} />
       <main className="flex min-h-0 flex-1">
-        <ResumeBoard activeSectionUid={activeSectionUid} onSelectSection={setActiveSectionUid} targetJdId={resume.targetJd?.jdId ?? null} />
+        <TargetJdProvider targetJdId={resume.targetJd?.jdId ?? null}>
+          <ResumeBoard activeSectionUid={activeSectionUid} onSelectSection={setActiveSectionUid} />
+        </TargetJdProvider>
       </main>
     </FormProvider>
   )
@@ -181,7 +184,7 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
 /**
  * 폼 값(`sections`)을 구독해 미리보기와 편집 영역에 실시간으로 흘려보낸다.
  */
-const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { activeSectionUid: string | null; onSelectSection: (sectionUid: string | null) => void; targetJdId: string | null }) => {
+const ResumeBoard = ({ activeSectionUid, onSelectSection }: { activeSectionUid: string | null; onSelectSection: (sectionUid: string | null) => void }) => {
   const { control, getValues } = useFormContext<ResumeFormValues>()
   const { move: moveSection, replace: replaceSections } = useFieldArray({ control, name: 'sections' })
   const sections = useWatch({ control, name: 'sections' }) ?? EMPTY_SECTIONS
@@ -253,7 +256,7 @@ const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { active
       <Flex align={'end'} className={'bg-bg-gray-subtler p-4'}>
         <SetCategoryModal onReplaceSections={replaceSections} />
       </Flex>
-      <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} targetJdId={targetJdId} />
+      <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} />
     </ExperienceEditProvider>
   )
 }
@@ -299,6 +302,6 @@ const ResumeToolbar = ({ targetJd, onSave, onDraftSave, isSaving, lastSavedAt }:
   )
 }
 
-const ResumeEdit = ({ section, sectionIndex, targetJdId }: { section: ResumeFormSection | null; sectionIndex: number; targetJdId: string | null }) => {
-  return <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} sectionIndex={sectionIndex} targetJdId={targetJdId} /> : null}</Flex>
+const ResumeEdit = ({ section, sectionIndex }: { section: ResumeFormSection | null; sectionIndex: number }) => {
+  return <Flex className={'bg-bg-white mx-auto w-160'}>{section ? <ResumeSectionEdit section={section} sectionIndex={sectionIndex} /> : null}</Flex>
 }

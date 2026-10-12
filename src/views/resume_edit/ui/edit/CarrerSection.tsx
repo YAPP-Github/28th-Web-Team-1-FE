@@ -10,12 +10,14 @@ import { FormInput } from '../form/FormInput'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
 import { FormTextarea } from '../form/FormTextarea'
 import { useSectionItems } from '../../hooks/useSectionItems'
+import { useTargetJdId } from '../../model/targetJdContext'
 
 /**
  * 경력(CAREER) 편집 섹션. `useSectionItems`로 아이템 추가/삭제를 관리한다.
  * 리스트 key는 서버 itemId가 아니라 fieldArray가 주는 `field.id`를 써서 신규 항목의 중복 key를 원천 차단한다.
  */
-export const CareerSection = ({ title, sectionIndex, targetJdId }: { title: string; sectionIndex: number; targetJdId: string | null }) => {
+export const CareerSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
+  const targetJdId = useTargetJdId()
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
 
   return (
