@@ -84,8 +84,13 @@ const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOp
   return (
     <>
       {questionRooms.map((room) => (
-        <Flex key={room.questionRoomId} align={'center'} className={'bg-element-gray-lighter gap-4 rounded-lg px-4 py-5'} asChild>
-          <button className={'shrink-0'} onClick={() => onOpen(room.questionRoomId)}>
+        <Flex
+          key={room.questionRoomId}
+          align={'center'}
+          className={'hover:bg-element-white hover:border-border-primary-light bg-element-gray-lighter gap-4 rounded-lg border border-transparent px-4 py-5'}
+          asChild
+        >
+          <button onClick={() => onOpen(room.questionRoomId)}>
             <CircleCheckBig size={20} className={cn('shrink-0', appliedQuestionRoomIds.has(room.questionRoomId) ? 'text-text-primary-basic' : 'text-icon-gray-lighter')} />
 
             <Flex direction={'column'} className={'flex-1 gap-2'}>
