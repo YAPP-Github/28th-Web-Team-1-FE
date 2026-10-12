@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch, type UseFormReturn } from 'react-hook-form'
@@ -21,6 +21,7 @@ import { formToSaveInput } from '../model/formToSaveInput'
 import { SetCategoryModal } from './SetCategoryModal'
 import { CoreSkillPreviewSection } from './CoreSkillPreviewSection'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
+import { ExperienceEditProvider, useExperienceEditState } from '../model/experienceEditContext'
 import { useResumeDraftViewedTracking } from '../hooks/useResumeDraftViewedTracking'
 import { useRouter } from 'next/navigation'
 import { DragDropProvider, PointerSensor } from '@dnd-kit/react'
@@ -245,13 +246,20 @@ const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { active
     else sectionRefs.current.delete(uid)
   }, [])
 
+  // EXPERIENCE 편집 상태. 세부 규칙은 `useExperienceEditState`가 캡슐화하고, 여기서는 provider에 넘길 값만 쥔다.
+  const { value: experienceEditValue, openManual } = useExperienceEditState()
+
   // 미리보기·미니맵에서 섹션을 선택하면 활성 상태를 바꾸고 해당 미리보기 섹션을 화면 안으로 스크롤한다.
+  // EXPERIENCE를 클릭하면 '직접 작성' 뷰로 전환하고, item 래퍼를 클릭한 경우 그 item의 uid까지 담아 해당 item으로 이동시킨다.
   const selectSection = useCallback(
-    (sectionUid: string) => {
+    (sectionUid: string, itemUid?: string) => {
       onSelectSection(sectionUid)
       sectionRefs.current.get(sectionUid)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+
+      const section = getValues('sections').find((candidate) => candidate.uid === sectionUid)
+      if (section?.type === 'EXPERIENCE') openManual(itemUid)
     },
-    [onSelectSection]
+    [onSelectSection, getValues, openManual]
   )
 
   /**
@@ -280,7 +288,7 @@ const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { active
   }, [activeSectionUid, activeSectionIndex, bodyEntries, onSelectSection])
 
   return (
-    <>
+    <ExperienceEditProvider value={experienceEditValue}>
       <ResumePreview
         basicInfoSection={basicInfoSection}
         bodyEntries={bodyEntries}
@@ -293,7 +301,7 @@ const ResumeBoard = ({ activeSectionUid, onSelectSection, targetJdId }: { active
         <SetCategoryModal onReplaceSections={replaceSections} />
       </Flex>
       <ResumeEdit section={activeSection} sectionIndex={activeSectionIndex} targetJdId={targetJdId} />
-    </>
+    </ExperienceEditProvider>
   )
 }
 
@@ -343,7 +351,7 @@ interface ResumePreviewProps {
   /** 미리보기 본문 섹션과 폼 `sections` 배열 인덱스의 쌍. */
   bodyEntries: Array<{ section: ResumeFormSection; formIndex: number }>
   activeSectionUid: string | null
-  onSelectSection: (sectionUid: string) => void
+  onSelectSection: (sectionUid: string, itemUid?: string) => void
   /** 미리보기 섹션 드래그가 끝나면 폼 순서를 바꿔주는 핸들러. 출발·도착 섹션의 `uid`를 받는다. */
   onSectionMove: (fromUid: string, toUid: string) => void
   registerSectionRef: (uid: string, el: HTMLElement | null) => void
@@ -429,7 +437,7 @@ interface SortablePreviewSectionProps {
   /** 폼 `sections` 배열에서의 인덱스. 아이템 field array 경로(`sections.${sectionIndex}.items`)에 쓰인다. */
   sectionIndex: number
   activeSectionUid: string | null
-  onSelect: (sectionUid: string) => void
+  onSelect: (sectionUid: string, itemUid?: string) => void
   /** 미니맵 스크롤용 DOM 등록 ref. */
   registerRef: (uid: string, el: HTMLElement | null) => void
   itemMoveRegistry: UseItemMoveRegistry
@@ -462,7 +470,7 @@ const SortablePreviewSection = ({ section, index, sectionIndex, activeSectionUid
 interface SelectableAreaProps {
   sectionUid: string
   activeSectionUid: string | null
-  onSelect: (sectionUid: string) => void
+  onSelect: (sectionUid: string, itemUid?: string) => void
   registerRef: (uid: string, el: HTMLElement | null) => void
   children: ReactNode
 }
@@ -474,9 +482,15 @@ const selectOnKeyDown = (select: () => void) => (event: KeyboardEvent<HTMLDivEle
   select()
 }
 
+/** 클릭 지점에서 가장 가까운 아이템 래퍼(`data-item-uid`)를 찾는다. 섹션 여백을 클릭하면 undefined. */
+const itemUidFromEvent = (event: MouseEvent<HTMLDivElement>): string | undefined => {
+  const target = event.target
+  return target instanceof Element ? (target.closest('[data-item-uid]')?.getAttribute('data-item-uid') ?? undefined) : undefined
+}
+
 /** 미리보기에서 클릭·키보드로 활성 섹션을 선택할 수 있게 감싸는 래퍼. `data-active`를 자식(Section)의 group-data 스타일이 읽는다. 미니맵 스크롤 이동을 위해 자기 DOM을 uid로 등록한다. */
 const SelectableArea = ({ sectionUid, activeSectionUid, onSelect, registerRef, children }: SelectableAreaProps) => {
-  const select = () => onSelect(sectionUid)
+  const select = (event?: MouseEvent<HTMLDivElement>) => onSelect(sectionUid, event ? itemUidFromEvent(event) : undefined)
 
   return (
     <div
@@ -485,7 +499,7 @@ const SelectableArea = ({ sectionUid, activeSectionUid, onSelect, registerRef, c
       tabIndex={0}
       data-active={activeSectionUid === sectionUid}
       onClick={select}
-      onKeyDown={selectOnKeyDown(select)}
+      onKeyDown={selectOnKeyDown(() => onSelect(sectionUid))}
       className={'group cursor-pointer rounded-sm outline-none'}
     >
       {children}
@@ -509,7 +523,7 @@ interface SortableSelectableAreaProps extends SelectableAreaProps {
  * 아이템을 드래그할 때 그 섹션이 타깃으로 잡혀 섹션과 아이템이 서로 자리를 바꾸게 된다.
  */
 const SortableSelectableArea = ({ sectionUid, index, activeSectionUid, onSelect, registerRef, children }: SortableSelectableAreaProps) => {
-  const select = () => onSelect(sectionUid)
+  const select = (event?: MouseEvent<HTMLDivElement>) => onSelect(sectionUid, event ? itemUidFromEvent(event) : undefined)
   const { ref } = useSortable({ id: sectionUid, index, accept: (source) => isInSortableGroup(source, undefined) })
 
   // sortable 등록 ref와 미니맵 스크롤용 DOM 등록 ref를 하나의 ref로 병합한다.

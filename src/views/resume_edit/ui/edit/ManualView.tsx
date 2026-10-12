@@ -14,15 +14,16 @@ import { FormTextarea } from '../form/FormTextarea'
 import { useSectionItems } from '../../hooks/useSectionItems'
 import { DropdownMenu } from 'radix-ui'
 import { flattenExperienceContents } from '@views/resume_create'
+import type { ExperienceItemTarget } from '../../model/experienceEditContext'
 
 /** 경험(EXPERIENCE) 섹션의 '직접 작성' 뷰. 아이템을 직접 추가·편집하거나 저장된 경험을 불러온다. */
-export const ManualView = ({ sectionIndex, targetJdId }: { sectionIndex: number; targetJdId: string | null }) => {
+export const ManualView = ({ sectionIndex, targetJdId, target }: { sectionIndex: number; targetJdId: string | null; target: ExperienceItemTarget | null }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
 
   const count = fields.length
   const scrollRef = useRef<HTMLDivElement>(null)
-  const prevCount = useRef(0)
+  const prevCount = useRef(count)
 
   useEffect(() => {
     if (count > prevCount.current) {
@@ -30,6 +31,14 @@ export const ManualView = ({ sectionIndex, targetJdId }: { sectionIndex: number;
     }
     prevCount.current = count
   }, [count])
+
+  // 미리보기에서 클릭한 item을 이 뷰의 맨 위로 스크롤한다. `scrollIntoView`는 실제 스크롤 컨테이너가
+  // `scrollRef`가 아니라 상위 요소여도 동작한다(위 count 증가 effect와 같은 방식).
+  useEffect(() => {
+    if (!target?.uid) return
+
+    scrollRef.current?.querySelector<HTMLElement>(`[data-item-uid="${CSS.escape(target.uid)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [target])
 
   return (
     <>
@@ -39,7 +48,7 @@ export const ManualView = ({ sectionIndex, targetJdId }: { sectionIndex: number;
         ) : (
           <>
             {fields.map((field, index) => (
-              <ExperienceSectionItem key={field.id} sectionIndex={sectionIndex} index={index} targetJdId={targetJdId} onRemove={() => remove(index)} />
+              <ExperienceSectionItem key={field.id} uid={field.uid} sectionIndex={sectionIndex} index={index} targetJdId={targetJdId} onRemove={() => remove(index)} />
             ))}
           </>
         )}
@@ -101,11 +110,11 @@ const MenuItem = ({ icon: Icon, label, description, onSelect, disabled }: { icon
   </DropdownMenu.Item>
 )
 
-const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove }: { sectionIndex: number; index: number; targetJdId: string | null; onRemove: () => void }) => {
+const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove, uid }: { sectionIndex: number; index: number; targetJdId: string | null; onRemove: () => void; uid: string }) => {
   const base = `sections.${sectionIndex}.items.${index}.payload.experience`
 
   return (
-    <Flex direction={'column'}>
+    <Flex data-item-uid={uid} direction={'column'}>
       <Flex justify={'between'}>
         <Text variant={'headline2'}>경험 {index + 1}</Text>
 
