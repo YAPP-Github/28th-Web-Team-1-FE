@@ -4,9 +4,10 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import * as amplitude from '@amplitude/unified'
 import { AMPLITUDE_EVENTS } from '@shared/config'
-import { useWorkspaceId } from '@entities/user'
+import { useMe, useWorkspaceId } from '@entities/user'
 import { useRegisterJd, type JdRegisterInput, type JdCandidate } from '@entities/jd'
-import { useImportResume } from '@entities/resume'
+import { useCreateResume, useImportResume } from '@entities/resume'
+import { buildResumeInput } from '../model/buildResumeInput'
 
 type ResumeCreateChoice = { method: 'import'; file: File } | { method: 'scratch' }
 
@@ -30,8 +31,11 @@ type Flow =
 export const useJdResumeFlow = () => {
   const router = useRouter()
   const workspaceId = useWorkspaceId()
+  const { me } = useMe()
   const { mutate: registerJd, isPending } = useRegisterJd(workspaceId)
   const { mutate: importResume, isSuccess: isImportSuccess } = useImportResume(workspaceId)
+  const { mutate: createResume, isSuccess: isCreateSuccess } = useCreateResume(workspaceId)
+
   const [flow, setFlow] = useState<Flow>({ step: 'INPUT' })
 
   const reset = () => setFlow({ step: 'INPUT' })
@@ -46,11 +50,27 @@ export const useJdResumeFlow = () => {
     registerJd(input, {
       onSuccess: ({ jd, candidates }) => {
         if (!jd) return setFlow(candidates?.length ? { step: 'SELECT_POSITION', choice, candidates } : { step: 'INPUT' })
-        // 후보 목록 응답에서는 아직 jd_id가 없어 보내지 않는다.
         amplitude.track(AMPLITUDE_EVENTS.JD_URL_ENTERED, { jd_id: jd.jdId })
 
-        if (choice.method === 'scratch') return router.push(`/resumes/create?jdId=${jd.jdId}`)
-        importResume({ file: choice.file, targetJdId: jd.jdId }, { onSuccess: (res) => router.push(`/resumes/edit/${res.resumeId}`), onError: fail })
+        // 기존 내 이력서에서 추출하기
+        if (choice.method === 'import')
+          return importResume(
+            { file: choice.file, targetJdId: jd.jdId },
+            {
+              onSuccess: ({ resumeId }) => {
+                router.push(`/resumes/edit/${resumeId}`)
+              },
+              onError: fail
+            }
+          )
+        // 처음부터 만들기
+        else if (choice.method === 'scratch')
+          return createResume(buildResumeInput(jd.jdId, me), {
+            onSuccess: ({ resumeId }) => {
+              router.push(`/resumes/edit/${resumeId}`)
+            },
+            onError: fail
+          })
       },
       onError: fail
     })
@@ -63,7 +83,7 @@ export const useJdResumeFlow = () => {
     handleReset: reset,
     isPending,
     dialogProps: {
-      progress: { isOpen: flow.step === 'PROCESSING', isComplete: isImportSuccess },
+      progress: { isOpen: flow.step === 'PROCESSING', isComplete: isImportSuccess || isCreateSuccess },
       method: {
         isOpen: flow.step === 'SELECT_METHOD',
         onOpenChange: (open: boolean) => !open && reset(),
