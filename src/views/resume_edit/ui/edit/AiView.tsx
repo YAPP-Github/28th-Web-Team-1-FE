@@ -331,9 +331,8 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
 const UserMessageCard = ({ message }: { message: ExperienceQuestionRoomMessage }) => (
   <Flex direction={'column'} className={'gap-2.5'}>
     <Flex wrap={'wrap'} justify={'end'} className={'gap-1.5'}>
-      {/* TODO: title 교체*/}
-      {message.experienceIds?.map((experienceId) => (
-        <ExperienceChip key={experienceId} experience={{ experienceId, title: experienceId }} />
+      {message.experiences?.map((experience) => (
+        <ExperienceChip key={experience.experienceId} experience={experience} />
       ))}
     </Flex>
     {message.content && (
@@ -372,7 +371,7 @@ const AiMessageCard = ({ message, onApply }: { message: ExperienceQuestionRoomMe
       <Flex direction={'column'} className={'border-border-subtle bg-element-white h-fit w-full gap-3 rounded-2xl border px-4 pt-3 pb-4'}>
         <Flex justify={'between'} align={'center'}>
           <Text variant={'label1'} color={'text-primary-basic'}>
-            초안 1
+            초안 {message.draftNumber}
           </Text>
           <Button size={'xs'} onClick={onApply} disabled={!message.block}>
             이력서에 적용

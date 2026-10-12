@@ -601,7 +601,7 @@ export type ExperienceQuestionRoomQueryVariables = Exact<{
 }>;
 
 
-export type ExperienceQuestionRoomQuery = { experienceQuestionRoom: { room: { questionRoomId: string, question: string, sourceText: string, sourceType: ExperienceQuestionRoomSourceType }, messages: Array<{ messageId: string, role: ExperienceQuestionRoomMessageRole, content: string | null, createdAt: string, experienceIds: Array<string> | null, block: { title: string, bullets: Array<string> } | null, feedback: { fit: string, improvement: string } | null }> } };
+export type ExperienceQuestionRoomQuery = { experienceQuestionRoom: { room: { questionRoomId: string, question: string, sourceText: string, sourceType: ExperienceQuestionRoomSourceType }, messages: Array<{ messageId: string, role: ExperienceQuestionRoomMessageRole, content: string | null, createdAt: string, draftNumber: number | null, experiences: Array<{ experienceId: string, title: string }> | null, block: { title: string, bullets: Array<string> } | null, feedback: { fit: string, improvement: string } | null }> } };
 
 export type SendExperienceQuestionRoomMessageMutationVariables = Exact<{
   workspaceId: string | number;
@@ -610,7 +610,7 @@ export type SendExperienceQuestionRoomMessageMutationVariables = Exact<{
 }>;
 
 
-export type SendExperienceQuestionRoomMessageMutation = { sendExperienceQuestionRoomMessage: { messageId: string, role: ExperienceQuestionRoomMessageRole, content: string | null, createdAt: string, experienceIds: Array<string> | null, block: { title: string, bullets: Array<string> } | null, feedback: { fit: string, improvement: string } | null } };
+export type SendExperienceQuestionRoomMessageMutation = { sendExperienceQuestionRoomMessage: { messageId: string, role: ExperienceQuestionRoomMessageRole, content: string | null, createdAt: string, draftNumber: number | null, experiences: Array<{ experienceId: string, title: string }> | null, block: { title: string, bullets: Array<string> } | null, feedback: { fit: string, improvement: string } | null } };
 
 export type CreateExperienceMutationVariables = Exact<{
   workspaceId: string | number;
@@ -1175,7 +1175,11 @@ export const ExperienceQuestionRoomDocument = new TypedDocumentString(`
       role
       content
       createdAt
-      experienceIds
+      draftNumber
+      experiences {
+        experienceId
+        title
+      }
       block {
         title
         bullets
@@ -1199,7 +1203,11 @@ export const SendExperienceQuestionRoomMessageDocument = new TypedDocumentString
     role
     content
     createdAt
-    experienceIds
+    draftNumber
+    experiences {
+      experienceId
+      title
+    }
     block {
       title
       bullets

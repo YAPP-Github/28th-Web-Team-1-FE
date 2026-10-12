@@ -12,7 +12,7 @@ export type ExperienceQuestionRoomCard = ExperienceQuestionRoomsQuery['experienc
 /** 경험 질문 대화방 상세(질문 카드 + 전체 메시지). `ExperienceQuestionRoom` 쿼리 결과에서 파생. */
 export type ExperienceQuestionRoomDetail = NonNullable<ExperienceQuestionRoomQuery['experienceQuestionRoom']>
 
-/** 질문 대화방 메시지. role이 USER면 content/experienceIds, AI면 block/feedback이 채워진다. */
+/** 질문 대화방 메시지. role이 USER면 content/experiences, AI면 block/feedback이 채워진다. */
 export type ExperienceQuestionRoomMessage = ExperienceQuestionRoomQuery['experienceQuestionRoom']['messages'][number]
 
 /** STAR 형식 경험 상세 내용 (Situation·Task·Action·Result) */

@@ -213,7 +213,11 @@ const experienceQuestionRoomDocument = graphql(`
         role
         content
         createdAt
-        experienceIds
+        draftNumber
+        experiences {
+          experienceId
+          title
+        }
         block {
           title
           bullets
@@ -234,7 +238,11 @@ const sendExperienceQuestionRoomMessageDocument = graphql(`
       role
       content
       createdAt
-      experienceIds
+      draftNumber
+      experiences {
+        experienceId
+        title
+      }
       block {
         title
         bullets

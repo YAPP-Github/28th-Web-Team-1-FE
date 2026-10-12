@@ -96,7 +96,8 @@ export const useSendExperienceQuestionRoomMessage = (workspaceId: string, questi
         role: 'USER',
         content: request.content ?? null,
         createdAt: new Date().toISOString(),
-        experienceIds: (request.experienceIds ?? []).map(String),
+        draftNumber: null,
+        experiences: (request.experienceIds ?? []).map((experienceId) => ({ experienceId: String(experienceId), title: '' })),
         block: null,
         feedback: null
       }

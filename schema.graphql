@@ -251,6 +251,15 @@ type ExperienceQuestionRoomDetail {
   room: ExperienceQuestionRoomCard!
 }
 
+"""질문 대화방에서 선택한 경험입니다."""
+type ExperienceQuestionRoomExperience {
+  """경험 ID입니다."""
+  experienceId: ID!
+
+  """경험명입니다."""
+  title: String!
+}
+
 """AI 피드백입니다."""
 type ExperienceQuestionRoomFeedback {
   """JD 질문에 대한 적합도 평가 한 문장입니다."""
@@ -261,7 +270,7 @@ type ExperienceQuestionRoomFeedback {
 }
 
 """
-질문 대화방 메시지입니다. role이 USER면 content/experienceIds, AI면 block/feedback이 채워집니다.
+질문 대화방 메시지입니다. role이 USER면 content/experiences, AI면 block/feedback이 채워집니다.
 """
 type ExperienceQuestionRoomMessage {
   """AI가 만든 경험 블록입니다. (AI)"""
@@ -273,8 +282,11 @@ type ExperienceQuestionRoomMessage {
   """메시지가 저장된 시각입니다."""
   createdAt: String!
 
-  """사용자가 선택한 경험 ID 목록입니다. (USER)"""
-  experienceIds: [ID!]
+  """대화방 안에서 몇 번째 AI 초안인지 나타내는 번호입니다. 1부터 시작합니다. (AI)"""
+  draftNumber: Int
+
+  """사용자가 선택한 경험의 ID와 경험명입니다. (USER, 삭제된 경험은 제외)"""
+  experiences: [ExperienceQuestionRoomExperience!]
 
   """AI 피드백입니다. (AI)"""
   feedback: ExperienceQuestionRoomFeedback
