@@ -2,7 +2,7 @@
 
 <br>
 
-# <img width="200" alt="SCOOP 로고" src=".github/readme/logo.png" />
+# <img width="200" alt="SCOOP 로고" src=".github/readme/logo.webp" />
 
 **"SCOOP,취준생을 위한 이력서 생성 자동화 서비스"**
 
@@ -20,9 +20,9 @@ Notion, PDF 등 경험이 담긴 자료를 업로드하거나 떠오르는 경�
 
 AI가 선별한 경험으로 맞춤형 이력서를 자동으로 완성해요. 문장 다듬기로 다듬고, PDF로 바로 내려받을 수 있어요.
 
-<img width="1920" alt="경험 정리" src=".github/readme/introduce1.png" />
-<img width="1920" alt="채용 공고 분석" src=".github/readme/introduce2.png" />
-<img width="1920" alt="이력서 생성" src=".github/readme/introduce3.png" />
+<img width="1920" alt="경험 정리" src=".github/readme/introduce1.webp" />
+<img width="1920" alt="채용 공고 분석" src=".github/readme/introduce2.webp" />
+<img width="1920" alt="이력서 생성" src=".github/readme/introduce3.webp" />
 
 <br>
 
