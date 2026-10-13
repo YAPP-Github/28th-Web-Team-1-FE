@@ -100,7 +100,7 @@ const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOp
               </Text>
               <Flex>
                 <Text variant={'label2'} color={'text-subtler'} className={'shrink-0'}>
-                  담당 업무
+                  {room.sourceType === 'PREFERRED_EXPERIENCE' ? '우대 사항' : '담당 업무'}
                 </Text>
 
                 <Divider orientation={'vertical'} className={'mx-1.5 my-auto h-2.5 shrink-0'} />
