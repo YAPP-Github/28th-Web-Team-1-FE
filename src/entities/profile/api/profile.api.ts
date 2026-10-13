@@ -79,10 +79,10 @@ const polishProfileTextDocument = graphql(`
   }
 `)
 
-/** 프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성한다. 결과만 반환하고 이력서(resumeId)에는 생성 성공 여부만 기록한다. jdId를 주면 해당 JD 내용을 반영해 생성하고 strategy도 함께 반환한다. */
+/** 프로필 정보(경력/프로젝트/스킬)와 JD(jdId, 필수)를 바탕으로 핵심역량과 지원 전략(strategy)을 AI로 생성한다. resumeId(선택)를 주면 이력서에 생성 성공 여부를 기록한다. */
 const generateCoreCompetencyDocument = graphql(`
   mutation GenerateCoreCompetency($workspaceId: ID!, $jdId: ID!, $resumeId: ID) {
-    generateCoreCompetency(workspaceId: $workspaceId, jdId: $jdId, resumeId: $resumeId) {
+    generateCoreCompetency(workspaceId: $workspaceId, resumeId: $resumeId, jdId: $jdId) {
       coreCompetency
       strategy
     }

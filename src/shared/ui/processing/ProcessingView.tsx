@@ -77,7 +77,7 @@ export const ProcessingView = ({ isComplete, steps, title, description, successT
   if (isSuccess) return <SuccessView title={successTitle} description={successDescription} />
 
   return (
-    <Flex direction="column" align="center" className="gap-8 px-16 py-10">
+    <Flex direction="column" align="center" className="gap-8 py-12 md:py-16">
       <ProgressRing value={displayProgress} />
       <Flex direction="column" align="center" className="gap-1">
         <DialogDescription className="text-body1 text-text-subtler">{description}</DialogDescription>

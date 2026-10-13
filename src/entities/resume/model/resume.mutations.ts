@@ -6,7 +6,7 @@ import { resumeKeys } from './resume.keys'
 
 /**
  * 이력서를 전체 스냅샷 단위로 생성한다.
- * 생성된 이력서의 `resumeId`가 담긴 결과를 반환한다.
+ * 생성된 이력서의 `resumeId`가 담긴 결과를 반환한다. 성공 시 목록·개수 캐시를 무효화한다.
  * @param workspaceId 현재 워크스페이스 ID
  * @example
  * ```tsx
@@ -15,10 +15,36 @@ import { resumeKeys } from './resume.keys'
  * ```
  */
 export const useCreateResume = (workspaceId: string) => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (input: CreateResumeInput) => {
       const { createResume } = await resumeAPI.createResume({ workspaceId, input })
       return createResume
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: resumeKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: resumeKeys.counts(workspaceId) })
+    }
+  })
+}
+
+/**
+ * PDF 이력서를 업로드해 새 이력서를 생성한다. 성공 시 목록·개수 캐시를 무효화한다.
+ * 4.5MB 초과 시 `file_size_exceeded` 코드의 `ApiError`가 발생한다.
+ * @param workspaceId 현재 워크스페이스 ID
+ * @example
+ * ```tsx
+ * const { mutate } = useImportResume(workspaceId)
+ * mutate({ file, targetJdId: jdId }, { onSuccess: ({ resumeId }) => router.push(`/resumes/edit/${resumeId}`) })
+ * ```
+ */
+export const useImportResume = (workspaceId: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (variables: { file: File; targetJdId?: string }) => resumeAPI.importResume({ workspaceId, ...variables }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: resumeKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: resumeKeys.counts(workspaceId) })
     }
   })
 }

@@ -5,6 +5,8 @@ import { Flex, Grid } from '@radix-ui/themes'
 import { cn, formatDate } from '@shared/lib'
 import { Button, Text } from '@shared/ui'
 import { useJdRecommendationTags, useJdRecommendations, type JdRecommendation, type JdRecommendationTag } from '@entities/jd'
+import { useJdResumeFlow } from '../hooks/useJdResumeFlow'
+import { JdResumeFlowDialogs } from './JdResumeFlowDialogs'
 
 const RECOMMENDATION_SIZE = 6
 
@@ -13,9 +15,11 @@ export const RecommendedJdSection = () => {
   const [, startTransition] = useTransition()
   const { tags } = useJdRecommendationTags()
   const { recommendations } = useJdRecommendations(selectedTag ? [selectedTag] : [], RECOMMENDATION_SIZE)
+  const { handleRegister, isPending, dialogProps } = useJdResumeFlow()
 
   return (
     <Flex direction={'column'} gap={{ initial: '4', sm: '6' }} className={'w-full max-w-215'}>
+      <JdResumeFlowDialogs {...dialogProps} />
       <Text as={'p'} variant={'heading2'} color={'text-basic'}>
         아래 공고 이력서 만들어보는건 어때요?
       </Text>
@@ -38,7 +42,7 @@ export const RecommendedJdSection = () => {
         {recommendations.length ? (
           <Grid columns={{ initial: '1', sm: '2' }} gap={'4'}>
             {recommendations.map((jd) => (
-              <RecommendedJdCard key={jd.id} jd={jd} />
+              <RecommendedJdCard key={jd.id} jd={jd} onCreate={() => handleRegister({ sourceUrl: jd.sourceUrl })} disabled={isPending} />
             ))}
           </Grid>
         ) : (
@@ -51,7 +55,7 @@ export const RecommendedJdSection = () => {
   )
 }
 
-const RecommendedJdCard = ({ jd }: { jd: JdRecommendation }) => {
+const RecommendedJdCard = ({ jd, onCreate, disabled }: { jd: JdRecommendation; onCreate: () => void; disabled: boolean }) => {
   const period = [formatDate(jd.recruitmentStartAt), formatDate(jd.recruitmentEndAt)].filter(Boolean).join(' ~ ')
 
   return (
@@ -81,14 +85,13 @@ const RecommendedJdCard = ({ jd }: { jd: JdRecommendation }) => {
           </Flex>
         )}
       </Flex>
-
       <Flex gap={'2'}>
         <Button asChild size={'xs'} variant={'secondary'}>
           <a href={jd.sourceUrl} target={'_blank'} rel={'noopener noreferrer'}>
             공고 보기
           </a>
         </Button>
-        <Button size={'xs'} variant={'secondary'}>
+        <Button size={'xs'} variant={'secondary'} onClick={onCreate} disabled={disabled}>
           이력서 만들기
         </Button>
       </Flex>
