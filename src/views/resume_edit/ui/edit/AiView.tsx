@@ -368,7 +368,7 @@ const ExperienceChip = ({ experience, onDelete }: ExperienceChipProps) => {
       <Text variant={'label2'}>{experience.title}</Text>
 
       {onDelete && (
-        <button onClick={() => onDelete(experience.experienceId)}>
+        <button type="button" onClick={() => onDelete(experience.experienceId)}>
           <X size={12} />
         </button>
       )}
