@@ -19,7 +19,8 @@ import { AuthErrorToast, useGoogleLoginRedirect } from '@features/authenticate'
 
 const RECOMMENDATION_SIZE = 6
 
-/** 랜딩 A/B 테스트의 B안 (Aha-moment를 일찍) */
+/** AB-TEST(landing): 랜딩 A/B 테스트의 B안 (Aha-moment를 일찍) */
+// TODO : AB-TEST(landing)
 export const LandingPageB = () => {
   return (
     <div className="relative isolate">

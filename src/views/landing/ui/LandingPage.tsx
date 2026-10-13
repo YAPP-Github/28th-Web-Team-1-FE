@@ -1,25 +1,20 @@
-'use client'
-import { Suspense, useEffect } from 'react'
+import { cookies } from 'next/headers'
 import { LandingPageA } from './LandingPageA'
 import { LandingPageB } from './LandingPageB'
+import { LandingViewTracker } from './LandingViewTracker'
 
-import { useSearchParams } from 'next/navigation'
-import * as amplitude from '@amplitude/unified'
-import { AMPLITUDE_EVENTS } from '@shared/config'
+import { LANDING_VARIANT_COOKIE } from '@shared/lib/landing-ab'
 
-export const LandingPage = () => {
-  useEffect(() => {
-    // Amplitude 이벤트 전송
-    amplitude.track(AMPLITUDE_EVENTS.LANDING_VIEWED)
-  }, [])
+/** AB-TEST(landing): middleware가 배정한 쿠키대로 서버에서 A/B를 그린다. `?landing=B`로 QA 강제 가능(집계 제외). */
+// TODO : AB-TEST(landing)
+export const LandingPage = async ({ searchParams }: PageProps<'/'>) => {
+  const { landing } = await searchParams
+  const assigned = (await cookies()).get(LANDING_VARIANT_COOKIE)?.value
 
-  // 정적 렌더엔 A가 들어가고, 클라이언트에서 variant를 읽어 바꾼다
   return (
-    <Suspense fallback={<LandingPageA />}>
-      <LandingVariant />
-    </Suspense>
+    <>
+      <LandingViewTracker variant={landing ? undefined : assigned} />
+      {(landing ?? assigned) === 'B' ? <LandingPageB /> : <LandingPageA />}
+    </>
   )
 }
-
-/** 랜딩 A/B 분기. 배정 로직 전이라 `?landing=B`로만 B안을 본다. 배정 붙이면 이 조건만 교체 */
-const LandingVariant = () => (useSearchParams().get('landing') === 'B' ? <LandingPageB /> : <LandingPageA />)
