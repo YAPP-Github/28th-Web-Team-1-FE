@@ -2,7 +2,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { experienceAPI } from '../api/experience.api'
 import { experienceKeys } from './experience.keys'
-import type { CreateExperienceInput, UpdateExperienceInput } from './experience.types'
+import type { ExperienceQuestionRoomQuery, SendExperienceQuestionRoomMessageRequest } from '@shared/lib/gql/graphql'
+import type { CreateExperienceInput, ExperienceQuestionRoomMessage, UpdateExperienceInput } from './experience.types'
 
 /**
  * 경험을 생성한다. 성공 시 해당 프로젝트의 경험 목록 캐시를 무효화한다. (projectId는 요청 본문에서 가져온다)
@@ -66,5 +67,63 @@ export const useDeleteExperience = (workspaceId: string, projectId: string) => {
       return result.deleteExperience
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: experienceKeys.listByProject(workspaceId, projectId) })
+  })
+}
+
+/**
+ * 질문 대화방에 사용자 입력을 보내고 AI가 만든 경험 블록과 피드백을 받는다.
+ * USER 메시지를 먼저 캐시에 반영하고(낙관적 업데이트), 응답이 오면 AI 메시지를 이어 붙인 뒤 최종적으로 목록을 무효화해 서버 상태와 동기화한다.
+ * @param workspaceId 라우트에서 확정된 워크스페이스 ID
+ * @param questionRoomId 메시지를 보낼 질문 대화방 ID
+ * @example
+ * ```tsx
+ * const { mutate: sendMessage, isPending } = useSendExperienceQuestionRoomMessage(workspaceId, questionRoomId)
+ * sendMessage({ content: '경험 설명', experienceIds: ['1', '2'] })
+ * ```
+ */
+export type SendExperienceQuestionRoomMessageVariables = SendExperienceQuestionRoomMessageRequest & {
+  /** 낙관적 USER 메시지에 표시할 경험 제목. 서버 요청 본문에는 포함되지 않는다. */
+  optimisticExperiences?: Array<{ experienceId: string; title: string }>
+}
+
+export const useSendExperienceQuestionRoomMessage = (workspaceId: string, questionRoomId: string) => {
+  const queryClient = useQueryClient()
+  const queryKey = experienceKeys.questionRoomDetail(workspaceId, questionRoomId)
+
+  return useMutation({
+    mutationFn: ({ optimisticExperiences: _optimisticExperiences, ...request }: SendExperienceQuestionRoomMessageVariables) =>
+      experienceAPI.sendExperienceQuestionRoomMessage({ workspaceId, questionRoomId, request }),
+    onMutate: async (request) => {
+      await queryClient.cancelQueries({ queryKey })
+      const previous = queryClient.getQueryData<ExperienceQuestionRoomQuery>(queryKey)
+
+      const optimisticMessage: ExperienceQuestionRoomMessage = {
+        messageId: `optimistic-${crypto.randomUUID()}`,
+        role: 'USER',
+        content: request.content ?? null,
+        createdAt: new Date().toISOString(),
+        draftNumber: null,
+        experiences: request.optimisticExperiences ?? (request.experienceIds ?? []).map((experienceId) => ({ experienceId: String(experienceId), title: '' })),
+        block: null,
+        feedback: null
+      }
+
+      queryClient.setQueryData<ExperienceQuestionRoomQuery>(queryKey, (old) =>
+        old ? { ...old, experienceQuestionRoom: { ...old.experienceQuestionRoom, messages: [...old.experienceQuestionRoom.messages, optimisticMessage] } } : old
+      )
+
+      return { previous }
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<ExperienceQuestionRoomQuery>(queryKey, (old) =>
+        old?.experienceQuestionRoom
+          ? { ...old, experienceQuestionRoom: { ...old.experienceQuestionRoom, messages: [...old.experienceQuestionRoom.messages, data.sendExperienceQuestionRoomMessage] } }
+          : old
+      )
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey })
   })
 }

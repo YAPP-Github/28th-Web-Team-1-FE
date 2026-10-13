@@ -18,7 +18,7 @@ import type { ResumeFormSection, ResumeFormValues } from '../model/resume-form.t
  * - ＋(추가): 숨겨둔 기존 섹션은 `visible:true`, 이력서에 없던 타입은 새 섹션 생성
  * 변경은 로컬에 스테이징되고 **저장**을 눌러야 폼에 반영된다(닫으면 취소).
  */
-const SetCategoryModal = ({ onReplaceSections }: { onReplaceSections: UseFieldArrayReplace<ResumeFormValues, 'sections'> }) => {
+export const SetCategoryModal = ({ onReplaceSections }: { onReplaceSections: UseFieldArrayReplace<ResumeFormValues, 'sections'> }) => {
   const { getValues } = useFormContext<ResumeFormValues>()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -152,5 +152,3 @@ const SetCategoryModal = ({ onReplaceSections }: { onReplaceSections: UseFieldAr
     </Dialog>
   )
 }
-
-export { SetCategoryModal }

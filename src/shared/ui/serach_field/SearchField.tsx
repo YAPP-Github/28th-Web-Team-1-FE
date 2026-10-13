@@ -94,7 +94,7 @@ interface SearchFieldProps extends Omit<React.ComponentProps<'input'>, 'size'>, 
  * ```
  */
 const SearchField = ({ className, type, onSubmit, rounded = 'full', size = 'default', ...props }: SearchFieldProps) => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     onSubmit?.()
   }

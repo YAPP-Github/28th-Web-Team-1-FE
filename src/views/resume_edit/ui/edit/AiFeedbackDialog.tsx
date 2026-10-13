@@ -63,7 +63,7 @@ export const AiFeedbackDialog = ({ target, jdId }: AiFeedbackDialogProps) => {
   const { mutateAsync: polish, isPending } = usePolishProfileText()
 
   const [isOpen, setIsOpen] = useState(false)
-  const [structure, setStructure] = useState<PolishStructure>('PROBLEM_SOLUTION_RESULT')
+  const [structure, setStructure] = useState<PolishStructure>('BULLET')
   const [instruction, setInstruction] = useState('')
   /** 우측 편집 필드의 현재 값. key = field.name. 열 때 폼 값으로 초기화한다. */
   const [drafts, setDrafts] = useState<Record<string, string>>({})

@@ -1,4 +1,5 @@
 export { NotionIcon } from './NotionIcon'
 export { GoogleIcon } from './GoogleIcon'
-export { Logo } from './Logo'
+export { TextLogo } from './TextLogo'
 export { ScoopIcon } from './ScoopIcon'
+export { LogoIcon } from './LogoIcon'

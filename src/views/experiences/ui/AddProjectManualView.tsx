@@ -123,7 +123,7 @@ const ProjectCreatePopover = ({ projects, onCreate }: ProjectCreatePopoverProps)
     setIsOpen(false)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault()
     // 텍스트가 비어 있으면 "직접 추가" 버튼 자체가 렌더되지 않는 것과 동일하게, 제출도 무시한다.
     if (!text) return

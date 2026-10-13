@@ -31,7 +31,7 @@ export const SortablePreviewItem = ({ group, uid, index, children }: { group: st
   })
 
   return (
-    <Flex ref={ref} direction={'column'} className={'gap-2'} data-preview-item={true} style={isDragging ? { opacity: 0.4 } : undefined}>
+    <Flex ref={ref} direction={'column'} className={'gap-2'} data-preview-item={true} data-item-uid={uid} style={isDragging ? { opacity: 0.4 } : undefined}>
       {children}
     </Flex>
   )
