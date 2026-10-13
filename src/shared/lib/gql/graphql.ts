@@ -1422,8 +1422,8 @@ export const GenerateCoreCompetencyDocument = new TypedDocumentString(`
     mutation GenerateCoreCompetency($workspaceId: ID!, $jdId: ID!, $resumeId: ID) {
   generateCoreCompetency(
     workspaceId: $workspaceId
-    jdId: $jdId
     resumeId: $resumeId
+    jdId: $jdId
   ) {
     coreCompetency
     strategy
