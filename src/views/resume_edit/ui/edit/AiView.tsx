@@ -94,18 +94,18 @@ const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOp
           <button onClick={() => onOpen(room.questionRoomId)}>
             <CircleCheckBig size={20} className={cn('shrink-0', appliedQuestionRoomIds.has(room.questionRoomId) ? 'text-text-primary-basic' : 'text-icon-gray-lighter')} />
 
-            <Flex direction={'column'} className={'flex-1 gap-2'}>
+            <Flex direction={'column'} className={'min-w-0 flex-1 gap-2'}>
               <Text variant={'headline2'} className={'line-clamp-2 text-left'}>
                 {room.question}
               </Text>
-              <Flex>
+              <Flex className={'min-w-0'}>
                 <Text variant={'label2'} color={'text-subtler'} className={'shrink-0'}>
                   {room.sourceType === 'PREFERRED_EXPERIENCE' ? '우대 사항' : '담당 업무'}
                 </Text>
 
                 <Divider orientation={'vertical'} className={'mx-1.5 my-auto h-2.5 shrink-0'} />
 
-                <Text variant={'label2'} color={'text-subtler'} className={'truncate'}>
+                <Text variant={'label2'} color={'text-subtler'} className={'min-w-0 truncate'}>
                   {room.sourceText}
                 </Text>
               </Flex>
