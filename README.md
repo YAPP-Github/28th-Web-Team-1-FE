@@ -1,10 +1,10 @@
-<img width="1920" alt="SCOOP" src="readme/main.webp" />
+<img width="1920" alt="SCOOP" src=".github/readme/main.webp" />
 
 <br>
 
-# <img width="200" alt="SCOOP 로고" src="readme/logo.png" />
+# <img width="200" alt="SCOOP 로고" src=".github/readme/logo.png" />
 
-> "SCOOP, 떠먹여 주는 이력서"
+**"SCOOP,취준생을 위한 이력서 생성 자동화 서비스"**
 
 ### 경험 정리부터 공고 맞춤 이력서까지, 5분 만에!
 
@@ -20,9 +20,9 @@ Notion, PDF 등 경험이 담긴 자료를 업로드하거나 떠오르는 경�
 
 AI가 선별한 경험으로 맞춤형 이력서를 자동으로 완성해요. 문장 다듬기로 다듬고, PDF로 바로 내려받을 수 있어요.
 
-<img width="1920" alt="경험 정리" src="readme/introduce1.png" />
-<img width="1920" alt="채용 공고 분석" src="readme/introduce2.png" />
-<img width="1920" alt="이력서 생성" src="readme/introduce3.png" />
+<img width="1920" alt="경험 정리" src=".github/readme/introduce1.png" />
+<img width="1920" alt="채용 공고 분석" src=".github/readme/introduce2.png" />
+<img width="1920" alt="이력서 생성" src=".github/readme/introduce3.png" />
 
 <br>
 
@@ -78,8 +78,6 @@ src/
 <br>
 
 ## 로컬 개발 환경 설정
-
-**사전 준비**: Node.js 24, npm
 
 ### 1. 의존성 설치
 
