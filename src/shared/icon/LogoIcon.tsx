@@ -7,9 +7,9 @@ import type { ComponentProps } from 'react'
  * <LogoIcon size={24} className="text-primary-50" />
  * ```
  */
-export const LogoIcon = ({ size = 24, ...props }: { size?: number } & ComponentProps<'svg'>) => {
+export const LogoIcon = ({ size = 24, className, ...props }: { size?: number } & ComponentProps<'svg'>) => {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg width={size} height={size} className={`text-element-primary-light ${className ?? ''}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
         d="M22.0132 15.2657L2.51231 5.38122C2.18682 5.22831 1.78317 5.37391 1.63025 5.6994C1.47733 6.02489 1.62294 6.42854 1.94842 6.58146L10.81 11.4674C10.4158 13.4427 10.81 16.0096 13.9863 17.8434C17.109 19.3105 20.2797 18.5681 21.4748 16.732C21.6736 16.3998 22.3286 15.4138 22.0031 15.2609L22.0132 15.2657Z"
         fill="currentColor"
