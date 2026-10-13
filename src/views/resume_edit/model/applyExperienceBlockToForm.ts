@@ -13,6 +13,8 @@ import { emptyItemPayload, nextDisplayOrder, type ResumeFormItem, type ResumeFor
  * - 신규 항목은 `role`/`period`를 `null`로 둔다.
  *
  * `setValue`가 dirty를 유발해 이후 자동저장/저장에 함께 반영된다.
+ *
+ * @returns 방금 반영된 경험 항목의 uid
  */
 
 interface ApplyExperienceBlockToFormProps {
@@ -21,10 +23,8 @@ interface ApplyExperienceBlockToFormProps {
   block: { title: string; bullets: string[] }
 }
 
-export const applyExperienceBlockToForm = (form: UseFormReturn<ResumeFormValues>, { sectionIndex, experienceQuestionRoomId, block }: ApplyExperienceBlockToFormProps) => {
-  const items = form.getValues(`sections.${sectionIndex}.items`)
-  if (!items) return
-
+export const applyExperienceBlockToForm = (form: UseFormReturn<ResumeFormValues>, { sectionIndex, experienceQuestionRoomId, block }: ApplyExperienceBlockToFormProps): string => {
+  const items = form.getValues(`sections.${sectionIndex}.items`) ?? []
   const name = block.title
   const contents = block.bullets.map((bullet) => `- ${bullet}`).join('\n')
 
@@ -32,7 +32,7 @@ export const applyExperienceBlockToForm = (form: UseFormReturn<ResumeFormValues>
   if (matchedIndex >= 0) {
     form.setValue(`sections.${sectionIndex}.items.${matchedIndex}.payload.experience.name`, name, { shouldDirty: true, shouldValidate: true })
     form.setValue(`sections.${sectionIndex}.items.${matchedIndex}.payload.experience.contents`, contents, { shouldDirty: true, shouldValidate: true })
-    return
+    return items[matchedIndex].uid
   }
 
   const newItem: ResumeFormItem = {
@@ -44,4 +44,5 @@ export const applyExperienceBlockToForm = (form: UseFormReturn<ResumeFormValues>
   }
 
   form.setValue(`sections.${sectionIndex}.items`, [...items, newItem], { shouldDirty: true, shouldValidate: true })
+  return newItem.uid
 }

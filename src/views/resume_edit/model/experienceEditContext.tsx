@@ -16,6 +16,7 @@ type ExperienceEditContextValue = {
   setView: (view: ExperienceEditView) => void
   /** 미리보기에서 클릭한 item으로 편집 뷰를 스크롤하기 위한 대상. 클릭이 없었으면 null. */
   itemTarget: ExperienceItemTarget | null
+  openManual: (uid?: string) => void
 }
 
 /**
@@ -39,7 +40,7 @@ export const useExperienceEditState = () => {
     setItemTarget((prev) => ({ uid: uid ?? null, nonce: (prev?.nonce ?? 0) + 1 }))
   }, [])
 
-  const value = useMemo<ExperienceEditContextValue>(() => ({ view, setView, itemTarget }), [view, setView, itemTarget])
+  const value = useMemo<ExperienceEditContextValue>(() => ({ view, setView, itemTarget, openManual }), [view, setView, itemTarget, openManual])
 
   return { value, openManual }
 }

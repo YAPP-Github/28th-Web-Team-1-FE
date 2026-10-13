@@ -10,6 +10,7 @@ import { cn } from '@shared/lib'
 import { applyExperienceBlockToForm } from '../../model/applyExperienceBlockToForm'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 import { ExperiencePickerDialog } from './ExperiencePickerDialog'
+import { useExperienceEdit } from '../../model/experienceEditContext'
 
 /**
  * AI 추천 탭의 상세 뷰 묶음. 질문 카드 목록(INDEX)과 선택한 질문방 대화 상세(DETAIL)를 전환한다.
@@ -202,8 +203,11 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
     if (container) container.scrollTop = container.scrollHeight
   }, [messages])
 
+  const { openManual } = useExperienceEdit()
+
   const handleApply = (block: NonNullable<ExperienceQuestionRoomMessage['block']>) => {
-    applyExperienceBlockToForm(form, { sectionIndex, experienceQuestionRoomId: questionRoomId, block })
+    const addedUid = applyExperienceBlockToForm(form, { sectionIndex, experienceQuestionRoomId: questionRoomId, block })
+    openManual(addedUid)
     onApplied()
   }
 
