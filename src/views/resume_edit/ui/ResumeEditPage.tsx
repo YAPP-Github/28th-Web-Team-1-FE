@@ -14,7 +14,7 @@ import type { ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
 import { useResumeDetail, useUpdateResume } from '@entities/resume'
 import { useGenerateCoreCompetency } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
-import { emptyItemPayload, nextDisplayOrder, type ResumeFormItem, type ResumeFormSection, type ResumeFormValues } from '../model/resume-form.types'
+import { createFormItem, nextDisplayOrder, type ResumeFormSection, type ResumeFormValues } from '../model/resume-form.types'
 import { resumeToFormValues } from '../model/resumeToFormValues'
 import { formToSaveInput } from '../model/formToSaveInput'
 import { SetCategoryModal } from './SetCategoryModal'
@@ -77,13 +77,7 @@ const applyCoreCompetencyToForm = (form: UseFormReturn<ResumeFormValues>, coreCo
 
   const items = sections[sectionIndex].items
   if (items.length === 0) {
-    const newItem: ResumeFormItem = {
-      uid: crypto.randomUUID(),
-      itemId: null,
-      displayOrder: nextDisplayOrder(items),
-      visible: true,
-      payload: { ...emptyItemPayload, coreSkill: { content: coreCompetency, isInitialItem: false } }
-    }
+    const newItem = createFormItem({ coreSkill: { content: coreCompetency, isInitialItem: false } }, nextDisplayOrder(items))
     form.setValue(`sections.${sectionIndex}.items`, [newItem], { shouldDirty: true, shouldValidate: true })
     return
   }
@@ -96,7 +90,7 @@ const applyCoreCompetencyToForm = (form: UseFormReturn<ResumeFormValues>, coreCo
  * AI 핵심역량이 채워지지 않은 상태라 자동 생성이 필요하다.
  * 한번 생성하면 서버가 아이템을 비-초기로 기록하므로, 이후 진입에서는 사용자가 편집한 내용을 덮어쓰지 않는다.
  */
-const needsCoreCompetency = (resume: ResumeQuery['resume']) => resume.sections.some((section) => section.type === 'CORE_SKILL' && section.items.some((item) => item.payload.coreSkill?.isInitialItem))
+const needsCoreCompetency = (sections: ResumeFormSection[]) => sections.some((section) => section.type === 'CORE_SKILL' && section.items.some((item) => item.payload.coreSkill?.isInitialItem))
 
 const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const router = useRouter()
@@ -118,8 +112,9 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
 
     // 최초 생성 아이템(isInitialItem)이 아직 남아 있을 때만 생성한다. 이미 채워진(사용자 편집) 경우 재생성하지 않는다.
     // jdId는 서버에서 필수라 대상 JD가 없는 이력서는 생성하지 않는다.
+    // 서버에 CORE_SKILL이 없어도 `resumeToFormValues`가 빈 섹션을 주입하므로 서버 원본 대신 폼 초기값에서 찾는다.
     const jdId = resume.targetJd?.jdId
-    if (!needsCoreCompetency(resume) || !jdId) return
+    if (!needsCoreCompetency(defaultValues.sections) || !jdId) return
 
     void generateCoreCompetency({ workspaceId, jdId })
       .then(({ coreCompetency }) => applyCoreCompetencyToForm(form, coreCompetency))
@@ -132,8 +127,9 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
 
   // 활성 섹션은 uid로 추적한다. 기존 섹션은 uid === sectionId라 초기값은 sectionId로 잡아도 된다.
+  // 서버에 EXPERIENCE가 없으면 `resumeToFormValues`가 빈 경험 섹션을 주입하므로, 서버 원본 대신 폼 초기값에서 찾는다.
   const [activeSectionUid, setActiveSectionUid] = useState<string | null>(() => {
-    return resume.sections.find((s) => s.type === 'EXPERIENCE')?.sectionId ?? null
+    return defaultValues.sections.find((s) => s.type === 'EXPERIENCE' && s.visible)?.uid ?? null
   })
 
   // 수동 저장은 '완료'(COMPLETED), 30초 자동저장은 '임시저장'(DRAFT)으로 상태를 구분해 보낸다.
