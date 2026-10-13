@@ -18,7 +18,7 @@ const Switch = ({ className, ...props }: React.ComponentProps<typeof SwitchPrimi
         // Layout
         'peer relative inline-flex h-5 w-8 shrink-0 items-center rounded-full border border-transparent px-px',
         // Interaction
-        'transition-all duration-200 outline-none after:absolute after:-inset-x-3 after:-inset-y-2',
+        'transition-all duration-200 outline-none',
         // Checked / Unchecked
         'data-checked:bg-element-primary data-unchecked:bg-element-gray-light',
         // Focus visible (키보드 포커스)

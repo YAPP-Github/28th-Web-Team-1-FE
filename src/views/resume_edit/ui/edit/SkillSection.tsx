@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useFieldArray, useFormContext, useWatch, type FieldArrayPath } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import { Flex } from '@radix-ui/themes'
 import { Text, Button } from '@shared/ui'
 import { Input } from '@shared/ui/input'
@@ -7,13 +7,13 @@ import { Chip } from '@shared/ui/chip'
 import { SelectBox } from '@shared/ui/select_box'
 import { X } from 'lucide-react'
 import { SKILL_LEVEL_LABELS, SKILL_LEVEL_OPTIONS } from '@entities/profile'
+import type { ResumeFormValues } from '../../model/resume-form.types'
 import type { SkillLevel } from '@shared/lib/gql/graphql'
 import { Section } from './Section'
-import { emptyItemPayload, nextDisplayOrder, type ResumeFormValues } from '../../model/resume-form.types'
+import { useSectionItems } from '../../hooks/useSectionItems'
 
 export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
-  const { control } = useFormContext<ResumeFormValues>()
-  const { fields, append, remove } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
+  const { fields, remove, addItem } = useSectionItems(sectionIndex)
 
   // 기술 칩은 상단 입력으로 새로 만들어 append하는 방식이라, 입력 중인 값은 폼이 아닌 로컬 상태로 둔다.
   const [name, setName] = useState('')
@@ -21,13 +21,7 @@ export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIn
 
   const handleAdd = () => {
     if (!name.trim()) return
-    append({
-      uid: crypto.randomUUID(),
-      itemId: null,
-      displayOrder: nextDisplayOrder(fields),
-      visible: true,
-      payload: { ...emptyItemPayload, skill: { name: name.trim(), level: level.trim() || null } }
-    })
+    addItem({ skill: { name: name.trim(), level: level.trim() || null } })
     setName('')
     setLevel('')
   }

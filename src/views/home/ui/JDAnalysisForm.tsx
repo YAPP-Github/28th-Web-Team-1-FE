@@ -48,7 +48,7 @@ const JDInputStep = ({ onSubmit, isPending }: { onSubmit: (request: JdRegisterIn
     onSubmit(inputType === 'url' ? { sourceUrl: inputValue.trim() } : { body: inputValue.trim() })
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     submit()
   }
@@ -92,7 +92,7 @@ const JDInputStep = ({ onSubmit, isPending }: { onSubmit: (request: JdRegisterIn
 const JDSelectStep = ({ candidates, onSubmit, onBack, isPending }: { candidates: JdCandidate[]; onSubmit: (request: JdRegisterInput) => void; onBack: () => void; isPending: boolean }) => {
   const [selected, setSelected] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (selected === null || isPending) return
     onSubmit({ body: candidates[Number(selected)].body })

@@ -93,6 +93,27 @@ export type ExperienceContentsType =
   /** Situation, Task, Action, Result로 구성된 형식입니다. */
   | 'STAR';
 
+/** 경험 목록 조회 탭입니다. */
+export type ExperienceListTab =
+  /** 질문 카드 기준 AI 매칭 순으로 조회합니다. questionRoomId가 필수입니다. */
+  | 'AI_RECOMMENDATION'
+  /** 기존 커서 페이징 순서로 직접 작성한 경험을 조회합니다. */
+  | 'MANUAL';
+
+/** 메시지를 보낸 쪽입니다. */
+export type ExperienceQuestionRoomMessageRole =
+  /** AI입니다. */
+  | 'AI'
+  /** 사용자입니다. */
+  | 'USER';
+
+/** 경험 질문 카드의 출처 항목 종류입니다. */
+export type ExperienceQuestionRoomSourceType =
+  /** JD 우대사항 항목입니다. */
+  | 'PREFERRED_EXPERIENCE'
+  /** JD 담당업무 항목입니다. */
+  | 'RESPONSIBILITY';
+
 /** FREE 형식의 경험 상세 내용 입력입니다. */
 export type FreeExperienceContentsRequest = {
   /** 자유 내용입니다. */
@@ -300,6 +321,8 @@ export type ResumeEducationPayloadInput = {
 export type ResumeExperiencePayloadInput = {
   /** 경험 상세 내용 목록입니다. */
   contents?: string | null | undefined;
+  /** 경험 추천으로 추가한 경우 해당 추천 질문방의 ID입니다. 직접 입력한 경험은 생략할 수 있습니다. */
+  experienceQuestionRoomId?: string | number | null | undefined;
   /** 경험 이름입니다. */
   name?: string | null | undefined;
   /** 경험 수행 기간입니다. */
@@ -433,6 +456,14 @@ export type SaveResumeSectionItemInput = {
   visible: boolean;
 };
 
+/** 질문 대화방 메시지 전송 입력입니다. */
+export type SendExperienceQuestionRoomMessageRequest = {
+  /** 사용자가 입력한 내용입니다. (최대 2000자, 경험을 선택했다면 생략 가능) */
+  content?: string | null | undefined;
+  /** 함께 보낼 경험 ID 목록입니다. (같은 프로젝트에서 최대 5개) */
+  experienceIds?: Array<string | number>;
+};
+
 /** 스킬 숙련도입니다. */
 export type SkillLevel =
   /** 상 */
@@ -520,10 +551,13 @@ export type ProjectExperiencesQueryVariables = Exact<{
   projectId: string | number;
   size: number;
   cursor?: string | null | undefined;
+  jdId?: string | number | null | undefined;
+  tab?: ExperienceListTab | null | undefined;
+  questionRoomId?: string | number | null | undefined;
 }>;
 
 
-export type ProjectExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, role: string | null, period: { startAt: string | null, endAt: string | null } | null }> } };
+export type ProjectExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, matchRate: number | null, recommendedReason: string | null, role: string | null, period: { startAt: string | null, endAt: string | null } | null, contents: { type: ExperienceContentsType, star: { situation: string, task: string, action: string, result: string } | null, free: { content: string } | null }, project: { projectId: string, name: string, role: string | null, period: { startAt: string | null, endAt: string | null } | null } | null }> } };
 
 export type ExperienceQueryVariables = Exact<{
   workspaceId: string | number;
@@ -552,6 +586,31 @@ export type MatchedExperiencesQueryVariables = Exact<{
 
 
 export type MatchedExperiencesQuery = { experiences: { cursor: { hasNext: boolean, nextCursor: string | null }, experiences: Array<{ experienceId: string, title: string, tags: Array<string>, matchRate: number | null, recommendedReason: string | null, role: string | null, period: { startAt: string | null, endAt: string | null } | null, contents: { type: ExperienceContentsType, free: { content: string } | null, star: { situation: string, task: string, action: string, result: string } | null }, project: { projectId: string, name: string } | null }> } };
+
+export type ExperienceQuestionRoomsQueryVariables = Exact<{
+  workspaceId: string | number;
+  jdId: string | number;
+}>;
+
+
+export type ExperienceQuestionRoomsQuery = { experienceQuestionRooms: Array<{ questionRoomId: string, question: string, sourceText: string, sourceType: ExperienceQuestionRoomSourceType }> };
+
+export type ExperienceQuestionRoomQueryVariables = Exact<{
+  workspaceId: string | number;
+  questionRoomId: string | number;
+}>;
+
+
+export type ExperienceQuestionRoomQuery = { experienceQuestionRoom: { room: { questionRoomId: string, question: string, sourceText: string, sourceType: ExperienceQuestionRoomSourceType }, messages: Array<{ messageId: string, role: ExperienceQuestionRoomMessageRole, content: string | null, createdAt: string, draftNumber: number | null, experiences: Array<{ experienceId: string, title: string }> | null, block: { title: string, bullets: Array<string> } | null, feedback: { fit: string, improvement: string } | null }> } };
+
+export type SendExperienceQuestionRoomMessageMutationVariables = Exact<{
+  workspaceId: string | number;
+  questionRoomId: string | number;
+  request: SendExperienceQuestionRoomMessageRequest;
+}>;
+
+
+export type SendExperienceQuestionRoomMessageMutation = { sendExperienceQuestionRoomMessage: { messageId: string, role: ExperienceQuestionRoomMessageRole, content: string | null, createdAt: string, draftNumber: number | null, experiences: Array<{ experienceId: string, title: string }> | null, block: { title: string, bullets: Array<string> } | null, feedback: { fit: string, improvement: string } | null } };
 
 export type CreateExperienceMutationVariables = Exact<{
   workspaceId: string | number;
@@ -699,7 +758,7 @@ export type ProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ProjectsQuery = { projectList: { cursor: { hasNext: boolean, nextCursor: string | null }, projects: Array<{ projectId: string, name: string, period: { startAt: string | null, endAt: string | null } | null }> } };
+export type ProjectsQuery = { projectList: { cursor: { hasNext: boolean, nextCursor: string | null }, projects: Array<{ projectId: string, name: string, experienceCount: unknown, period: { startAt: string | null, endAt: string | null } | null }> } };
 
 export type ProjectQueryVariables = Exact<{
   workspaceId: string | number;
@@ -791,7 +850,7 @@ export type ResumeCoreSkillFieldsFragment = { content: string | null, isInitialI
 
 export type ResumeCareerFieldsFragment = { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
-export type ResumeExperienceFieldsFragment = { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null };
+export type ResumeExperienceFieldsFragment = { name: string | null, role: string | null, contents: string | null, experienceQuestionRoomId: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
 export type ResumeEducationFieldsFragment = { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null };
 
@@ -809,7 +868,7 @@ export type ResumeQueryVariables = Exact<{
 }>;
 
 
-export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string | null, email: string | null, phone: string | null, hideContact: boolean } | null, coreSkill: { content: string | null, isInitialItem: boolean } | null, career: { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string | null, organization: string | null, awardedAt: string | null } | null, language: { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null } | null, certificate: { name: string | null, organization: string | null, acquiredAt: string | null } | null, skill: { name: string | null, level: string | null } | null } }> }> } };
+export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType, template: ResumeTemplate, targetJd: { jdId: string, companyName: string, positionTitle: string } | null, sections: Array<{ sectionId: string, type: ResumeSectionType, displayText: string, displayOrder: number, visible: boolean, items: Array<{ itemId: string, displayOrder: number, visible: boolean, payload: { basicInfo: { name: string | null, email: string | null, phone: string | null, hideContact: boolean } | null, coreSkill: { content: string | null, isInitialItem: boolean } | null, career: { companyName: string | null, role: string | null, contents: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, experience: { name: string | null, role: string | null, contents: string | null, experienceQuestionRoomId: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, education: { schoolName: string | null, major: string | null, degree: string | null, status: string | null, period: { startAt: string | null, endAt: string | null } | null } | null, award: { name: string | null, organization: string | null, awardedAt: string | null } | null, language: { examName: string | null, scoreOrGrade: string | null, acquiredAt: string | null } | null, certificate: { name: string | null, organization: string | null, acquiredAt: string | null } | null, skill: { name: string | null, level: string | null } | null } }> }> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -875,6 +934,7 @@ export const ResumeExperienceFieldsFragmentDoc = new TypedDocumentString(`
   name
   role
   contents
+  experienceQuestionRoomId
   period {
     startAt
     endAt
@@ -945,12 +1005,15 @@ export const ExperiencesDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<ExperiencesQuery, ExperiencesQueryVariables>;
 export const ProjectExperiencesDocument = new TypedDocumentString(`
-    query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String) {
+    query ProjectExperiences($workspaceId: ID!, $projectId: ID!, $size: Int!, $cursor: String, $jdId: ID, $tab: ExperienceListTab, $questionRoomId: ID) {
   experiences(
     workspaceId: $workspaceId
     projectId: $projectId
     size: $size
     cursor: $cursor
+    jdId: $jdId
+    tab: $tab
+    questionRoomId: $questionRoomId
   ) {
     cursor {
       hasNext
@@ -960,10 +1023,33 @@ export const ProjectExperiencesDocument = new TypedDocumentString(`
       experienceId
       title
       tags
+      matchRate
+      recommendedReason
       role
       period {
         startAt
         endAt
+      }
+      contents {
+        type
+        star {
+          situation
+          task
+          action
+          result
+        }
+        free {
+          content
+        }
+      }
+      project {
+        projectId
+        name
+        role
+        period {
+          startAt
+          endAt
+        }
       }
     }
   }
@@ -1062,6 +1148,77 @@ export const MatchedExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<MatchedExperiencesQuery, MatchedExperiencesQueryVariables>;
+export const ExperienceQuestionRoomsDocument = new TypedDocumentString(`
+    query ExperienceQuestionRooms($workspaceId: ID!, $jdId: ID!) {
+  experienceQuestionRooms(workspaceId: $workspaceId, jdId: $jdId) {
+    questionRoomId
+    question
+    sourceText
+    sourceType
+  }
+}
+    `) as unknown as TypedDocumentString<ExperienceQuestionRoomsQuery, ExperienceQuestionRoomsQueryVariables>;
+export const ExperienceQuestionRoomDocument = new TypedDocumentString(`
+    query ExperienceQuestionRoom($workspaceId: ID!, $questionRoomId: ID!) {
+  experienceQuestionRoom(
+    workspaceId: $workspaceId
+    questionRoomId: $questionRoomId
+  ) {
+    room {
+      questionRoomId
+      question
+      sourceText
+      sourceType
+    }
+    messages {
+      messageId
+      role
+      content
+      createdAt
+      draftNumber
+      experiences {
+        experienceId
+        title
+      }
+      block {
+        title
+        bullets
+      }
+      feedback {
+        fit
+        improvement
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ExperienceQuestionRoomQuery, ExperienceQuestionRoomQueryVariables>;
+export const SendExperienceQuestionRoomMessageDocument = new TypedDocumentString(`
+    mutation SendExperienceQuestionRoomMessage($workspaceId: ID!, $questionRoomId: ID!, $request: SendExperienceQuestionRoomMessageRequest!) {
+  sendExperienceQuestionRoomMessage(
+    workspaceId: $workspaceId
+    questionRoomId: $questionRoomId
+    request: $request
+  ) {
+    messageId
+    role
+    content
+    createdAt
+    draftNumber
+    experiences {
+      experienceId
+      title
+    }
+    block {
+      title
+      bullets
+    }
+    feedback {
+      fit
+      improvement
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<SendExperienceQuestionRoomMessageMutation, SendExperienceQuestionRoomMessageMutationVariables>;
 export const CreateExperienceDocument = new TypedDocumentString(`
     mutation CreateExperience($workspaceId: ID!, $request: CreateExperienceRequest!) {
   createExperience(workspaceId: $workspaceId, request: $request) {
@@ -1287,6 +1444,7 @@ export const ProjectsDocument = new TypedDocumentString(`
     projects {
       projectId
       name
+      experienceCount
       period {
         startAt
         endAt
@@ -1491,6 +1649,7 @@ fragment ResumeExperienceFields on ResumeExperiencePayload {
   name
   role
   contents
+  experienceQuestionRoomId
   period {
     startAt
     endAt

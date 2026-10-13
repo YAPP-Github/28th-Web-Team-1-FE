@@ -45,12 +45,12 @@ export const usePolishProfileText = () => {
 }
 
 /**
- * 프로필 정보(경력/프로젝트/스킬)와 JD(`jdId`, 필수)를 바탕으로 핵심역량과 `strategy`를 AI로 생성한다. 결과만 반환해 편집 폼에 로컬 반영 후 별도 저장한다.
- * `resumeId`(선택)를 주면 이력서에 생성 성공 여부를 기록한다.
+ * 프로필 정보(경력/프로젝트/스킬)를 바탕으로 핵심역량을 AI로 생성한다. 결과만 반환해 편집 폼에 로컬 반영 후 별도 저장하며, `strategy`도 함께 반환한다.
+ * `jdId`는 필수다 — 해당 JD 내용을 반영해 생성하고 화면 표시용 지원 전략도 이 JD에서 받는다.
  * @example
  * ```tsx
  * const { mutateAsync: generate } = useGenerateCoreCompetency()
- * const { coreCompetency, strategy } = await generate({ workspaceId, resumeId, jdId })
+ * const { coreCompetency, strategy } = await generate({ workspaceId, jdId })
  * ```
  */
 export const useGenerateCoreCompetency = () => {

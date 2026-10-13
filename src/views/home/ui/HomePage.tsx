@@ -6,7 +6,7 @@ import { ErrorFallback, Heading, Text } from '@shared/ui'
 import { JDAnalysisForm } from './JDAnalysisForm'
 import { RecommendedJdSection } from './RecommendedJdSection'
 import homeGradientDesktop from '../assets/home_gradient_desktop.webp'
-import { Logo } from '@/src/shared/icon'
+import { TextLogo } from '@/src/shared/icon'
 
 const { props: desktopImageProps } = getImageProps({ src: homeGradientDesktop, alt: '', sizes: '100vw' })
 
@@ -22,7 +22,7 @@ export const HomePage = () => {
         gap={{ initial: '6', sm: '40px' }}
         className={'relative isolate'}
       >
-        <Logo className="-mt-3 text-lg font-extrabold sm:hidden" />
+        <TextLogo className="-mt-3 text-lg font-extrabold sm:hidden" />
         <div className="absolute inset-x-0 top-0 -z-10">
           <div className="bg-element-primary-lighter h-109.75 sm:hidden" />
           <img {...desktopImageProps} className="hidden h-164 w-full object-fill sm:block" />

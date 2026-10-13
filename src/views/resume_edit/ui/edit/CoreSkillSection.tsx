@@ -6,8 +6,10 @@ import { Section } from './Section'
 import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { FormTextarea } from '../form/FormTextarea'
 import type { ResumeFormValues } from '../../model/resume-form.types'
+import { useTargetJdId } from '../../model/targetJdContext'
 
-export const CoreSkillSection = ({ title, sectionIndex, targetJdId }: { title: string; sectionIndex: number; targetJdId: string | null }) => {
+export const CoreSkillSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
+  const targetJdId = useTargetJdId()
   const { control } = useFormContext<ResumeFormValues>()
   const { fields } = useFieldArray({ control, name: `sections.${sectionIndex}.items` as FieldArrayPath<ResumeFormValues> })
 

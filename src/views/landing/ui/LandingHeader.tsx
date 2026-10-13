@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { cn } from '@shared/lib'
 import { Button } from '@shared/ui'
-import { Logo } from '@shared/icon'
+import { TextLogo } from '@shared/icon'
 
 /** @param transparentAtTop 스크롤 맨 위에선 배경 없이 뒤의 히어로 배경이 비치게 한다 (히어로 B안용) */
 export const LandingHeader = ({ transparentAtTop = false }: { transparentAtTop?: boolean }) => {
@@ -28,7 +28,7 @@ export const LandingHeader = ({ transparentAtTop = false }: { transparentAtTop?:
     >
       <div className="mx-auto flex max-w-360 items-center justify-between px-5 sm:px-8">
         <div className="flex items-center gap-6 sm:gap-20">
-          <Logo className="text-lg font-extrabold sm:text-2xl" />
+          <TextLogo className="text-lg font-extrabold md:text-2xl" />
           <Button
             asChild
             variant="text"
