@@ -220,7 +220,11 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
     if (!trimmed && selectedExperiences.length === 0) return
 
     sendMessage(
-      { content: trimmed || null, experienceIds: selectedExperiences.map((experience) => experience.experienceId) },
+      {
+        content: trimmed || null,
+        experienceIds: selectedExperiences.map((experience) => experience.experienceId),
+        optimisticExperiences: selectedExperiences.map((experience) => ({ experienceId: experience.experienceId, title: experience.title }))
+      },
       {
         onSuccess: () => {
           setContent('')

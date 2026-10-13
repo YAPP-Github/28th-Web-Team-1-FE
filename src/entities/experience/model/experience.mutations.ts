@@ -81,12 +81,18 @@ export const useDeleteExperience = (workspaceId: string, projectId: string) => {
  * sendMessage({ content: '경험 설명', experienceIds: ['1', '2'] })
  * ```
  */
+export type SendExperienceQuestionRoomMessageVariables = SendExperienceQuestionRoomMessageRequest & {
+  /** 낙관적 USER 메시지에 표시할 경험 제목. 서버 요청 본문에는 포함되지 않는다. */
+  optimisticExperiences?: Array<{ experienceId: string; title: string }>
+}
+
 export const useSendExperienceQuestionRoomMessage = (workspaceId: string, questionRoomId: string) => {
   const queryClient = useQueryClient()
   const queryKey = experienceKeys.questionRoomDetail(workspaceId, questionRoomId)
 
   return useMutation({
-    mutationFn: (request: SendExperienceQuestionRoomMessageRequest) => experienceAPI.sendExperienceQuestionRoomMessage({ workspaceId, questionRoomId, request }),
+    mutationFn: ({ optimisticExperiences: _optimisticExperiences, ...request }: SendExperienceQuestionRoomMessageVariables) =>
+      experienceAPI.sendExperienceQuestionRoomMessage({ workspaceId, questionRoomId, request }),
     onMutate: async (request) => {
       await queryClient.cancelQueries({ queryKey })
       const previous = queryClient.getQueryData<ExperienceQuestionRoomQuery>(queryKey)
@@ -97,7 +103,7 @@ export const useSendExperienceQuestionRoomMessage = (workspaceId: string, questi
         content: request.content ?? null,
         createdAt: new Date().toISOString(),
         draftNumber: null,
-        experiences: (request.experienceIds ?? []).map((experienceId) => ({ experienceId: String(experienceId), title: '' })),
+        experiences: request.optimisticExperiences ?? (request.experienceIds ?? []).map((experienceId) => ({ experienceId: String(experienceId), title: '' })),
         block: null,
         feedback: null
       }
