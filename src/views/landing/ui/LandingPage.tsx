@@ -1,37 +1,20 @@
-'use client'
-import { Suspense, useEffect } from 'react'
-import { FooterCtaSection } from './FooterCtaSection'
-import { HeroSection } from './HeroSection'
-import { LandingFooter } from './LandingFooter'
-import { LandingHeader } from './LandingHeader'
-import { MobileKakaoCta } from './MobileKakaoCta'
-import { ProcessStepsSection } from './ProcessStepsSection'
-import { TaglineSection } from './TaglineSection'
-import { UploadFeatureSection } from './UploadFeatureSection'
+import { cookies } from 'next/headers'
+import { LandingPageA } from './LandingPageA'
+import { LandingPageB } from './LandingPageB'
+import { LandingViewTracker } from './LandingViewTracker'
 
-import * as amplitude from '@amplitude/unified'
-import { AuthErrorToast } from '@features/authenticate'
-import { AMPLITUDE_EVENTS } from '@shared/config'
+import { LANDING_VARIANT_COOKIE } from '@shared/lib/landing-ab'
 
-export const LandingPage = () => {
-  useEffect(() => {
-    // Amplitude 이벤트 전송
-    amplitude.track(AMPLITUDE_EVENTS.LANDING_VIEWED)
-  }, [])
+/** AB-TEST(landing): middleware가 배정한 쿠키대로 서버에서 A/B를 그린다. `?landing=B`로 QA 강제 가능(집계 제외). */
+// TODO : AB-TEST(landing)
+export const LandingPage = async ({ searchParams }: PageProps<'/'>) => {
+  const { landing } = await searchParams
+  const assigned = (await cookies()).get(LANDING_VARIANT_COOKIE)?.value
 
   return (
-    <main className="mx-auto max-w-360 px-5 pt-20 pb-24 md:px-8 md:pt-26.5 md:pb-0">
-      <Suspense fallback={null}>
-        <AuthErrorToast />
-      </Suspense>
-      <LandingHeader />
-      <HeroSection />
-      <TaglineSection />
-      <UploadFeatureSection />
-      <ProcessStepsSection />
-      <FooterCtaSection />
-      <LandingFooter />
-      <MobileKakaoCta />
-    </main>
+    <>
+      <LandingViewTracker variant={landing ? undefined : assigned} />
+      {(landing ?? assigned) === 'B' ? <LandingPageB /> : <LandingPageA />}
+    </>
   )
 }

@@ -11,7 +11,7 @@ export const LandingFooter = () => {
           이용약관
         </Link>
       </Button>
-      <Button asChild variant="text" className="text-text-basic md:text-heading1 text-headline1">
+      <Button asChild variant="text" className="text-text-basic sm:text-heading1 text-headline1">
         <Link href="https://available-snow-c5b.notion.site/3ac0173187fb80a3af84fbb6bb20f150?source=copy_link" target="_blank" rel="noopener noreferrer">
           개인정보 처리방침
         </Link>

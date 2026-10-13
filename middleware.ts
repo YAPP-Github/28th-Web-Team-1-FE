@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { ACCESS_TOKEN_MAX_AGE, clearAuthCookies, cookieOptions, refreshTokens, requireAuthRedirect } from '@shared/lib/auth'
+import { nextWithLandingVariant } from '@shared/lib/landing-ab' // TODO : AB-TEST(landing) 종료 후 NextResponse.next()로 수정 필요
 
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp)$).*)']
@@ -29,14 +30,15 @@ export const middleware = async (request: NextRequest) => {
   }
 
   if (!refreshToken) {
-    if (isPublicPath) return NextResponse.next()
+    if (isPublicPath) return nextWithLandingVariant(request) // TODO : AB-TEST(landing)
     return requireAuthRedirect(request)
   }
 
   const tokens = await refreshTokens(refreshToken)
 
   if (!tokens) {
-    const response = isPublicPath ? NextResponse.next() : requireAuthRedirect(request)
+    // TODO : AB-TEST(landing)
+    const response = isPublicPath ? nextWithLandingVariant(request) : requireAuthRedirect(request)
     clearAuthCookies(response.cookies)
     return response
   }
