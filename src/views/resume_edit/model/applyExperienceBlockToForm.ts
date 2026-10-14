@@ -1,5 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form'
-import { emptyItemPayload, nextDisplayOrder, type ResumeFormItem, type ResumeFormValues } from './resume-form.types'
+import { createFormItem, nextDisplayOrder, type ResumeFormValues } from './resume-form.types'
 
 /**
  * AI 응답 block을 EXPERIENCE 섹션 항목 하나에 반영한다.
@@ -35,13 +35,7 @@ export const applyExperienceBlockToForm = (form: UseFormReturn<ResumeFormValues>
     return items[matchedIndex].uid
   }
 
-  const newItem: ResumeFormItem = {
-    uid: crypto.randomUUID(),
-    itemId: null,
-    displayOrder: nextDisplayOrder(items),
-    visible: true,
-    payload: { ...emptyItemPayload, experience: { name, role: null, period: null, contents, experienceQuestionRoomId } }
-  }
+  const newItem = createFormItem({ experience: { name, role: null, period: null, contents, experienceQuestionRoomId } }, nextDisplayOrder(items))
 
   form.setValue(`sections.${sectionIndex}.items`, [...items, newItem], { shouldDirty: true, shouldValidate: true })
   return newItem.uid

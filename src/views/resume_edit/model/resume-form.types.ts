@@ -56,3 +56,18 @@ export const emptyItemPayload: ResumeFormItem['payload'] = {
   language: null,
   skill: null
 }
+
+/**
+ * 신규 아이템 객체를 조립한다. `emptyItemPayload`를 깔고 섹션 타입 payload만 덮어쓰며,
+ * 공통 필드(`uid`/`itemId`/`displayOrder`/`visible`)를 한 곳에서 채운다.
+ *
+ * `displayOrder`는 삽입 방식(폼 초기값/append/setValue)마다 기준이 달라 호출부가 계산해 넘긴다.
+ * 기존 아이템은 `uid = itemId`, 신규 아이템은 새 UUID를 쓴다(여기선 항상 신규).
+ */
+export const createFormItem = (payload: Partial<ResumeFormItem['payload']>, displayOrder: number): ResumeFormItem => ({
+  uid: crypto.randomUUID(),
+  itemId: null,
+  displayOrder,
+  visible: true,
+  payload: { ...emptyItemPayload, ...payload }
+})

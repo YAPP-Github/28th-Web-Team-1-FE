@@ -94,18 +94,18 @@ const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOp
           <button onClick={() => onOpen(room.questionRoomId)}>
             <CircleCheckBig size={20} className={cn('shrink-0', appliedQuestionRoomIds.has(room.questionRoomId) ? 'text-text-primary-basic' : 'text-icon-gray-lighter')} />
 
-            <Flex direction={'column'} className={'flex-1 gap-2'}>
+            <Flex direction={'column'} className={'min-w-0 flex-1 gap-2'}>
               <Text variant={'headline2'} className={'line-clamp-2 text-left'}>
                 {room.question}
               </Text>
-              <Flex>
+              <Flex className={'min-w-0'}>
                 <Text variant={'label2'} color={'text-subtler'} className={'shrink-0'}>
                   {room.sourceType === 'PREFERRED_EXPERIENCE' ? '우대 사항' : '담당 업무'}
                 </Text>
 
                 <Divider orientation={'vertical'} className={'mx-1.5 my-auto h-2.5 shrink-0'} />
 
-                <Text variant={'label2'} color={'text-subtler'} className={'truncate'}>
+                <Text variant={'label2'} color={'text-subtler'} className={'min-w-0 truncate'}>
                   {room.sourceText}
                 </Text>
               </Flex>
@@ -259,7 +259,7 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
 
       <Flex ref={scrollRef} direction={'column'} className={'min-h-0 flex-1 gap-6 overflow-y-auto'}>
         <Flex gap={'3'}>
-          <LogoIcon className={'opacity-50'} />
+          <LogoIcon />
           <Text variant={'body2'} color={'text-subtle'}>
             관련 경험을 입력하면 SCOOP AI가 공고에 맞춰 초안을 작성해 드려요.
           </Text>
@@ -378,7 +378,7 @@ const ExperienceChip = ({ experience, onDelete }: ExperienceChipProps) => {
 
 const AiMessageCard = ({ message, onApply }: { message: ExperienceQuestionRoomMessage; onApply: () => void }) => (
   <Flex gap={'3'}>
-    <LogoIcon className={'shrink-0 opacity-50'} />
+    <LogoIcon className={'shrink-0'} />
 
     <Flex direction={'column'} className={'gap-2.5'}>
       <Flex direction={'column'} className={'border-border-subtle bg-element-white h-fit w-full gap-3 rounded-2xl border px-4 pt-3 pb-4'}>
