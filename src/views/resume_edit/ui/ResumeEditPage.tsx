@@ -16,6 +16,7 @@ import { useResumeDetail, useUpdateResume } from '@entities/resume'
 import { useGenerateCoreCompetency } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import { createFormItem, nextDisplayOrder, type ResumeFormSection, type ResumeFormValues } from '../model/resume-form.types'
+import { needsCoreCompetency } from '../model/coreCompetency'
 import { resumeToFormValues } from '../model/resumeToFormValues'
 import { formToSaveInput } from '../model/formToSaveInput'
 import { SetCategoryModal } from './SetCategoryModal'
@@ -89,13 +90,6 @@ const applyCoreCompetencyToForm = (form: UseFormReturn<ResumeFormValues>, coreCo
 
   form.setValue(`sections.${sectionIndex}.items.0.payload.coreSkill.content`, coreCompetency, { shouldDirty: true, shouldValidate: true })
 }
-
-/**
- * CORE_SKILL 섹션에 '이력서 최초 생성 과정에서 만들어진' 아이템(isInitialItem)이 아직 남아 있으면
- * AI 핵심역량이 채워지지 않은 상태라 자동 생성이 필요하다.
- * 한번 생성하면 서버가 아이템을 비-초기로 기록하므로, 이후 진입에서는 사용자가 편집한 내용을 덮어쓰지 않는다.
- */
-const needsCoreCompetency = (sections: ResumeFormSection[]) => sections.some((section) => section.type === 'CORE_SKILL' && section.items.some((item) => item.payload.coreSkill?.isInitialItem))
 
 const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const router = useRouter()

@@ -1,17 +1,24 @@
 'use client'
-import { useCallback, useState, type Ref } from 'react'
+import { useCallback, useEffect, useRef, useState, type Ref } from 'react'
 import { useAnimate, useReducedMotion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
 import { FileCheckCorner, Plus, XIcon } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@shared/ui/dialog'
 import { sendKakaoMessageToMe } from '@shared/lib'
 import { AMPLITUDE_EVENTS } from '@shared/config'
-import type { ResumeBasicInfoFieldsFragment } from '@shared/lib/gql/graphql'
-import { toPreviewSections, useResumeDetail, type ResumeSectionData } from '@entities/resume'
+import type { ResumeBasicInfoFieldsFragment, ResumeQuery } from '@shared/lib/gql/graphql'
+import { toPreviewSections, useResumeDetail, useUpdateResume, type ResumeSectionData } from '@entities/resume'
+import { useGenerateCoreCompetency } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import { ResumeBasicInfoHeader, ResumeSectionView } from '@widgets/resume_preview'
 import { useResumeDraftViewedTracking } from '../hooks/useResumeDraftViewedTracking'
+import { createFormItem, nextDisplayOrder, type ResumeFormValues } from '../model/resume-form.types'
+import { needsCoreCompetency } from '../model/coreCompetency'
+import { resumeToFormValues } from '../model/resumeToFormValues'
+import { formToSaveInput } from '../model/formToSaveInput'
+import { CoreSkillPreviewSection } from './CoreSkillPreviewSection'
 
 import * as amplitude from '@amplitude/unified'
 
@@ -27,6 +34,7 @@ export const ResumeMobilePreview = ({ resumeId }: { resumeId: string }) => {
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
   useResumeDraftViewedTracking(resume)
+  useGenerateCoreCompetencyOnEntry(workspaceId, resumeId, resume)
 
   const { basicInfoSection, bodySections } = toPreviewSections(resume.sections)
   const { isOpen, onOpenChange, sheetRef, openWithSheetPeek } = useContinueOnPcDialog()
@@ -57,25 +65,6 @@ export const ResumeMobilePreview = ({ resumeId }: { resumeId: string }) => {
   )
 }
 
-// PC에서 이어 하기 다이얼로그의 열림 상태와 바텀시트 애니메이션을 관리한다.
-const useContinueOnPcDialog = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [sheetRef, animate] = useAnimate<HTMLDivElement>()
-  const shouldReduceMotion = useReducedMotion()
-
-  const onOpenChange = (nextOpen: boolean) => {
-    if (nextOpen) amplitude.track(AMPLITUDE_EVENTS.MOBILE_MODAL_VIEWED, { trigger_source: 'resume_edit' })
-    setIsOpen(nextOpen)
-  }
-
-  const openWithSheetPeek = () => {
-    onOpenChange(true)
-    if (!shouldReduceMotion) animate(sheetRef.current, { y: [null, -60, 0] }, { duration: 0.8, ease: 'easeInOut' })
-  }
-
-  return { isOpen, onOpenChange, sheetRef, openWithSheetPeek }
-}
-
 interface ScaledResumePageProps {
   basicInfo: ResumeBasicInfoFieldsFragment | null
   sections: ResumeSectionData[]
@@ -99,9 +88,7 @@ const ScaledResumePage = ({ basicInfo, sections, onClick }: ScaledResumePageProp
         <Divider color={'gray-10'} />
         <Spacing size={12} />
         <Flex direction={'column'} gap="5">
-          {sections.map((section) => (
-            <ResumeSectionView key={section.type} section={section} />
-          ))}
+          {sections.map((section) => (section.type === 'CORE_SKILL' ? <CoreSkillPreviewSection key={section.type} section={section} /> : <ResumeSectionView key={section.type} section={section} />))}
         </Flex>
       </div>
     </div>
@@ -160,3 +147,54 @@ const ContinueOnPcDialogContent = () => {
     </DialogContent>
   )
 }
+
+// PC에서 이어 하기 다이얼로그의 열림 상태와 바텀시트 애니메이션을 관리한다.
+const useContinueOnPcDialog = () => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [sheetRef, animate] = useAnimate<HTMLDivElement>()
+  const shouldReduceMotion = useReducedMotion()
+
+  const onOpenChange = (nextOpen: boolean) => {
+    if (nextOpen) amplitude.track(AMPLITUDE_EVENTS.MOBILE_MODAL_VIEWED, { trigger_source: 'resume_edit' })
+    setIsOpen(nextOpen)
+  }
+
+  const openWithSheetPeek = () => {
+    onOpenChange(true)
+    if (!shouldReduceMotion) animate(sheetRef.current, { y: [null, -60, 0] }, { duration: 0.8, ease: 'easeInOut' })
+  }
+
+  return { isOpen, onOpenChange, sheetRef, openWithSheetPeek }
+}
+
+// 핵심역량이 생성 전(isInitialItem)이면 진입 시 1회 생성해 바로 저장한다
+const useGenerateCoreCompetencyOnEntry = (workspaceId: string, resumeId: string, resume: ResumeQuery['resume']) => {
+  const { mutateAsync: generateCoreCompetency } = useGenerateCoreCompetency()
+  const { mutateAsync: updateResume } = useUpdateResume(workspaceId, resumeId)
+  const hasRunRef = useRef(false)
+
+  useEffect(() => {
+    if (hasRunRef.current) return
+    hasRunRef.current = true
+
+    const values = resumeToFormValues(resume)
+    const jdId = resume.targetJd?.jdId
+    if (!jdId || !needsCoreCompetency(values.sections)) return
+
+    generateCoreCompetency({ workspaceId, jdId })
+      .then(({ coreCompetency }) => updateResume(formToSaveInput(withCoreCompetency(values, coreCompetency), { status: resume.status, template: resume.template, targetJdId: jdId })))
+      .catch(() => toast.error('핵심역량 생성에 실패했어요. 잠시 후 다시 시도해주세요.'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+}
+
+// 생성한 핵심역량을 CORE_SKILL 첫 항목에 넣은 폼 값을 돌려준다(PC applyCoreCompetencyToForm의 폼 없는 버전). 항목이 없으면 새로 만든다.
+const withCoreCompetency = (values: ResumeFormValues, content: string): ResumeFormValues => ({
+  sections: values.sections.map((section) => {
+    if (section.type !== 'CORE_SKILL') return section
+    const [first, ...rest] = section.items
+    const coreSkill = { content, isInitialItem: false }
+    const head = first ? { ...first, payload: { ...first.payload, coreSkill } } : createFormItem({ coreSkill }, nextDisplayOrder(section.items))
+    return { ...section, items: [head, ...rest] }
+  })
+})
