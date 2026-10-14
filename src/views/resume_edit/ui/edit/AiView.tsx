@@ -259,7 +259,7 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
 
       <Flex ref={scrollRef} direction={'column'} className={'min-h-0 flex-1 gap-6 overflow-y-auto'}>
         <Flex gap={'3'}>
-          <LogoIcon className={'opacity-50'} />
+          <LogoIcon />
           <Text variant={'body2'} color={'text-subtle'}>
             관련 경험을 입력하면 SCOOP AI가 공고에 맞춰 초안을 작성해 드려요.
           </Text>
@@ -378,7 +378,7 @@ const ExperienceChip = ({ experience, onDelete }: ExperienceChipProps) => {
 
 const AiMessageCard = ({ message, onApply }: { message: ExperienceQuestionRoomMessage; onApply: () => void }) => (
   <Flex gap={'3'}>
-    <LogoIcon className={'shrink-0 opacity-50'} />
+    <LogoIcon className={'shrink-0'} />
 
     <Flex direction={'column'} className={'gap-2.5'}>
       <Flex direction={'column'} className={'border-border-subtle bg-element-white h-fit w-full gap-3 rounded-2xl border px-4 pt-3 pb-4'}>
