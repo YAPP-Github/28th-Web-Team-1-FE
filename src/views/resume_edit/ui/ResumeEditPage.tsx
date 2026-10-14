@@ -7,8 +7,9 @@ import { toast } from 'sonner'
 import { FileCheckCorner, FileClock, RefreshCcw } from 'lucide-react'
 import { Button, Text } from '@shared/ui'
 import { formatDate, isAccessDeniedError, type GraphQLError } from '@shared/lib'
-import { AMPLITUDE_EVENTS } from '@shared/config'
+import { AMPLITUDE_EVENTS, MEDIA_QUERY } from '@shared/config'
 import { useIntervalAutosave } from '@shared/hooks/useIntervalAutosave'
+import { useMediaQuery } from '@shared/hooks/useMediaQuery'
 import { useAccessDeniedRedirect } from '@shared/hooks/useAccessDeniedRedirect'
 import type { ResumeQuery, ResumeStatusType } from '@shared/lib/gql/graphql'
 import { useResumeDetail, useUpdateResume } from '@entities/resume'
@@ -22,6 +23,7 @@ import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
 import { ExperienceEditProvider, useExperienceEditState } from '../model/experienceEditContext'
 import { TargetJdProvider } from '../model/targetJdContext'
 import { useResumeDraftViewedTracking } from '../hooks/useResumeDraftViewedTracking'
+import { ResumeMobilePreview } from './ResumeMobilePreview'
 import { useRouter } from 'next/navigation'
 import { ResumePreview } from './preview/ResumePreview'
 
@@ -31,11 +33,14 @@ import * as amplitude from '@amplitude/unified'
 const EMPTY_SECTIONS: ResumeFormSection[] = []
 
 export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
+  // 편집 레이아웃이 들어가지 않는 폭(모바일)에서는 폼·자동저장을 띄우지 않고 읽기 전용 미리보기만 보여준다.
+  const isDesktop = useMediaQuery(MEDIA_QUERY.sm)
+
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
       <ErrorBoundary fallback={({ error }) => (isAccessDeniedError(error) ? <ResumeAccessDeniedFallback error={error} /> : <ResumeFallback>Failed to load resume.</ResumeFallback>)}>
         <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
-          <ResumeWorkspace resumeId={resumeId} />
+          {isDesktop === null ? <ResumeFallback>불러오는 중...</ResumeFallback> : isDesktop ? <ResumeWorkspace resumeId={resumeId} /> : <ResumeMobilePreview resumeId={resumeId} />}
         </Suspense>
       </ErrorBoundary>
     </Flex>

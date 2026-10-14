@@ -1,4 +1,5 @@
 import { GoogleOAuthProvider } from './GoogleOAuthProvider'
+import { KakaoSdkInitializer } from './KakaoSdkInitializer'
 import { MSWInitializer } from './MSWInitializer'
 import { QueryProvider } from './QueryProvider'
 import { AmplitudeIdentify } from './AmplitudeIdentify'
@@ -13,6 +14,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
         <TooltipProvider>
           <GoogleOAuthProvider>
             <MSWInitializer />
+            <KakaoSdkInitializer />
             <QueryProvider>
               <AmplitudeIdentify />
               {children}
