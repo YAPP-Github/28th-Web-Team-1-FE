@@ -32,7 +32,7 @@ export const useJdResumeFlow = () => {
   const router = useRouter()
   const workspaceId = useWorkspaceId()
   const { me } = useMe()
-  const { mutate: registerJd, isPending } = useRegisterJd(workspaceId)
+  const { mutate: registerJd } = useRegisterJd(workspaceId)
   const { mutate: importResume, isSuccess: isImportSuccess } = useImportResume(workspaceId)
   const { mutate: createResume, isSuccess: isCreateSuccess } = useCreateResume(workspaceId)
 
@@ -81,7 +81,7 @@ export const useJdResumeFlow = () => {
     handleRegister: (input: JdRegisterInput) => setFlow({ step: 'SELECT_METHOD', input }),
     handleSelectPosition: (input: JdRegisterInput) => flow.step === 'SELECT_POSITION' && createResumeFromJd(input, flow.choice),
     handleReset: reset,
-    isPending,
+    isPending: flow.step === 'PROCESSING',
     dialogProps: {
       progress: { isOpen: flow.step === 'PROCESSING', isComplete: isImportSuccess || isCreateSuccess },
       method: {
