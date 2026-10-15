@@ -2,6 +2,7 @@ import { Suspense, useEffect, useRef, useState, type SyntheticEvent } from 'reac
 import { useFormContext } from 'react-hook-form'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { ArrowUp, ChevronLeft, ChevronRight, CircleCheckBig, Plus, TextAlignStart, X } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button, Divider, LoadingDots, Spacing, Text } from '@shared/ui'
 import { LogoIcon } from '@shared/icon'
 import { useExperienceQuestionRoom, useExperienceQuestionRooms, useSendExperienceQuestionRoomMessage, type ExperienceQuestionRoomMessage, type ProjectExperience } from '@entities/experience'
