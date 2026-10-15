@@ -1,17 +1,24 @@
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Trash2 } from 'lucide-react'
-import { AddItemButton, Section } from './Section'
+import { AddItemButton, LoadProfileButton, Section } from './Section'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormDatePicker } from '../form/FormDatePicker'
 import { useSectionItems } from '../../hooks/useSectionItems'
+import { useLoadProfileItems } from '../../hooks/useLoadProfileItems'
+import { toAwardPayloads } from '../../model/profileToSectionPayloads'
 
 export const AwardSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toAwardPayloads)
 
   return (
-    <Section title={title} actionButton={<AddItemButton label={'수상 추가'} onClick={() => addItem({ award: { name: '', organization: null, awardedAt: null } })} />}>
+    <Section
+      title={title}
+      headerAction={<LoadProfileButton disabled={isLoading} onClick={loadProfileItems} />}
+      footerAction={<AddItemButton label={'수상 추가'} onClick={() => addItem({ award: { name: '', organization: null, awardedAt: null } })} />}
+    >
       {fields.map((field, index) => (
         <AwardItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} />
       ))}

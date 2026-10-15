@@ -3,13 +3,15 @@ import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Trash2 } from 'lucide-react'
 import * as amplitude from '@amplitude/unified'
 import { AMPLITUDE_EVENTS } from '@shared/config'
-import { AddItemButton, Section } from './Section'
+import { AddItemButton, LoadProfileButton, Section } from './Section'
 import { AiFeedbackDialog } from './AiFeedbackDialog'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
 import { FormTextarea } from '../form/FormTextarea'
 import { useSectionItems } from '../../hooks/useSectionItems'
+import { useLoadProfileItems } from '../../hooks/useLoadProfileItems'
+import { toCareerPayloads } from '../../model/profileToSectionPayloads'
 import { useTargetJdId } from '../../model/targetJdContext'
 
 /**
@@ -19,9 +21,14 @@ import { useTargetJdId } from '../../model/targetJdContext'
 export const CareerSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const targetJdId = useTargetJdId()
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toCareerPayloads)
 
   return (
-    <Section title={title} actionButton={<AddItemButton label={'경력 / 활동 추가'} onClick={() => addItem({ career: { companyName: '', role: null, contents: '', period: null } })} />}>
+    <Section
+      title={title}
+      headerAction={<LoadProfileButton disabled={isLoading} onClick={loadProfileItems} />}
+      footerAction={<AddItemButton label={'경력 / 활동 추가'} onClick={() => addItem({ career: { companyName: '', role: null, contents: '', period: null } })} />}
+    >
       {fields.map((field, index) => (
         <CareerSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} targetJdId={targetJdId} />
       ))}

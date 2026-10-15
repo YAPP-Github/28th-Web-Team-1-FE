@@ -1,17 +1,24 @@
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Trash2 } from 'lucide-react'
-import { AddItemButton, Section } from './Section'
+import { AddItemButton, LoadProfileButton, Section } from './Section'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormDatePicker } from '../form/FormDatePicker'
 import { useSectionItems } from '../../hooks/useSectionItems'
+import { useLoadProfileItems } from '../../hooks/useLoadProfileItems'
+import { toLanguagePayloads } from '../../model/profileToSectionPayloads'
 
 export const LanguageSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toLanguagePayloads)
 
   return (
-    <Section title={title} actionButton={<AddItemButton label={'어학 추가'} onClick={() => addItem({ language: { examName: '', scoreOrGrade: '', acquiredAt: null } })} />}>
+    <Section
+      title={title}
+      headerAction={<LoadProfileButton disabled={isLoading} onClick={loadProfileItems} />}
+      footerAction={<AddItemButton label={'어학 추가'} onClick={() => addItem({ language: { examName: '', scoreOrGrade: '', acquiredAt: null } })} />}
+    >
       {fields.map((field, index) => (
         <LanguageSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} />
       ))}

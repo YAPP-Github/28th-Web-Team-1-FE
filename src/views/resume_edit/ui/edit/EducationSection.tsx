@@ -2,18 +2,25 @@ import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
 import { Trash2 } from 'lucide-react'
 import { DEGREE_OPTIONS, EDUCATION_STATUS_OPTIONS } from '@entities/profile'
-import { AddItemButton, Section } from './Section'
+import { AddItemButton, LoadProfileButton, Section } from './Section'
 import { DeleteItemAlert } from './DeleteItemAlert'
 import { FormInput } from '../form/FormInput'
 import { FormSelect } from '../form/FormSelect'
 import { FormPeriodPicker } from '../form/FormPeriodPicker'
 import { useSectionItems } from '../../hooks/useSectionItems'
+import { useLoadProfileItems } from '../../hooks/useLoadProfileItems'
+import { toEducationPayloads } from '../../model/profileToSectionPayloads'
 
 export const EducationSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toEducationPayloads)
 
   return (
-    <Section title={title} actionButton={<AddItemButton label={'학력 추가'} onClick={() => addItem({ education: { schoolName: '', major: null, degree: null, status: null, period: null } })} />}>
+    <Section
+      title={title}
+      headerAction={<LoadProfileButton disabled={isLoading} onClick={loadProfileItems} />}
+      footerAction={<AddItemButton label={'학력 추가'} onClick={() => addItem({ education: { schoolName: '', major: null, degree: null, status: null, period: null } })} />}
+    >
       {fields.map((field, index) => (
         <EducationSectionItem key={field.id} sectionIndex={sectionIndex} index={index} onRemove={() => remove(index)} />
       ))}
