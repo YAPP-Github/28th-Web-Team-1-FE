@@ -235,6 +235,7 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
       {
         // 실패 시 롤백한다. 에러 동안 사용자가 새로 입력·선택한 값이 있으면 덮어쓰지 않는다.
         onError: () => {
+          toast.error('메시지 전송에 실패했어요.\n잠시 후 다시 시도해 주세요.', { id: 'send-message-error', position: 'top-center' })
           setContent((current) => (current ? current : previousContent))
           setSelectedExperiences((current) => (current.length > 0 ? current : previousExperiences))
         }
