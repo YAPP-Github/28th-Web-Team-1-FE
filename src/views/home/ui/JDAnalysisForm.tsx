@@ -74,7 +74,7 @@ const JDInputStep = ({ onSubmit, isPending }: { onSubmit: (request: JdRegisterIn
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={cn(
-            'field-sizing-content',
+            'field-sizing-content wrap-anywhere',
             'max-h-24 min-h-18 w-full',
             'text-body1 text-text-basic',
             'resize-none overflow-y-auto outline-none',
