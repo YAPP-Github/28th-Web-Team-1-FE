@@ -1,15 +1,16 @@
 import { useEffect, useRef, Children, type ComponentProps } from 'react'
 import { Flex } from '@radix-ui/themes'
 import { Button, Divider, Spacing, Text } from '@shared/ui'
-import { Plus } from 'lucide-react'
+import { ArrowDown, Plus } from 'lucide-react'
 
 interface SectionProps {
   title: string
-  actionButton?: React.ReactNode
+  headerAction?: React.ReactNode
+  footerAction?: React.ReactNode
   children: React.ReactNode
 }
 
-export const Section = ({ title, actionButton, children }: SectionProps) => {
+export const Section = ({ title, headerAction, footerAction, children }: SectionProps) => {
   const count = Children.count(children)
   const isEmpty = count === 0
 
@@ -26,6 +27,7 @@ export const Section = ({ title, actionButton, children }: SectionProps) => {
     <Flex direction="column" className={'w-full px-8 pb-6'}>
       <Flex justify="between" align="center" className={'py-6'}>
         <Text variant={'headline1'}>{title}</Text>
+        {headerAction}
       </Flex>
       <Divider color={'gray-60'} />
       <Spacing size={32} />
@@ -36,7 +38,7 @@ export const Section = ({ title, actionButton, children }: SectionProps) => {
 
       <Spacing size={32} />
 
-      {actionButton}
+      {footerAction}
     </Flex>
   )
 }
@@ -57,3 +59,10 @@ export const AddItemButton = ({ label, ...props }: { label: string } & Component
     </Button>
   )
 }
+
+export const LoadProfileButton = ({ ...props }: ComponentProps<typeof Button>) => (
+  <Button type={'button'} variant={'text'} size={'sm'} {...props}>
+    내 정보 불러오기
+    <ArrowDown size={16} data-icon="inline-end" />
+  </Button>
+)

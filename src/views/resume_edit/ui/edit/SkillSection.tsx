@@ -9,11 +9,14 @@ import { X } from 'lucide-react'
 import { SKILL_LEVEL_LABELS, SKILL_LEVEL_OPTIONS } from '@entities/profile'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 import type { SkillLevel } from '@shared/lib/gql/graphql'
-import { Section } from './Section'
+import { Section, LoadProfileButton } from './Section'
 import { useSectionItems } from '../../hooks/useSectionItems'
+import { useLoadProfileItems } from '../../hooks/useLoadProfileItems'
+import { toSkillPayloads } from '../../model/profileToSectionPayloads'
 
 export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toSkillPayloads)
 
   // 기술 칩은 상단 입력으로 새로 만들어 append하는 방식이라, 입력 중인 값은 폼이 아닌 로컬 상태로 둔다.
   const [name, setName] = useState('')
@@ -27,7 +30,7 @@ export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIn
   }
 
   return (
-    <Section title={title}>
+    <Section title={title} headerAction={<LoadProfileButton disabled={isLoading} onClick={loadProfileItems} />}>
       <Flex className={'gap-5'} direction={'column'}>
         <Flex flexBasis={'1'} gap={'1'} align={'end'}>
           <Flex className={'w-full'} gap={'1'}>
