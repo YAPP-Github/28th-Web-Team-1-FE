@@ -2,7 +2,7 @@ import { Suspense, useEffect, useRef, useState, type SyntheticEvent } from 'reac
 import { useFormContext } from 'react-hook-form'
 import { Flex, Skeleton } from '@radix-ui/themes'
 import { ArrowUp, ChevronLeft, ChevronRight, CircleCheckBig, Plus, TextAlignStart, X } from 'lucide-react'
-import { Button, Divider, Spacing, Text } from '@shared/ui'
+import { Button, Divider, LoadingDots, Spacing, Text } from '@shared/ui'
 import { LogoIcon } from '@shared/icon'
 import { useExperienceQuestionRoom, useExperienceQuestionRooms, useSendExperienceQuestionRoomMessage, type ExperienceQuestionRoomMessage, type ProjectExperience } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
@@ -198,10 +198,14 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
   const [selectedExperiences, setSelectedExperiences] = useState<ProjectExperience[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  // 응답 대기 여부를 메시지 목록에서 파생한다. `isPending`은 AI 메시지가 붙은 뒤 다음 렌더에서야 false가 되어
+  // 로딩이 응답보다 늦게 사라지므로, 마지막 메시지가 USER일 때만 AI 타이핑 인디케이터를 노출한다.
+  const isAwaitingReply = isPending && messages[messages.length - 1]?.role === 'USER'
+
   useEffect(() => {
     const container = scrollRef.current
     if (container) container.scrollTop = container.scrollHeight
-  }, [messages])
+  }, [messages, isAwaitingReply])
 
   const { openManual } = useExperienceEdit()
 
@@ -219,6 +223,9 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
     const trimmed = content.trim()
     if (!trimmed && selectedExperiences.length === 0) return
 
+    const previousContent = content
+    const previousExperiences = selectedExperiences
+
     sendMessage(
       {
         content: trimmed || null,
@@ -226,12 +233,15 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
         optimisticExperiences: selectedExperiences.map((experience) => ({ experienceId: experience.experienceId, title: experience.title }))
       },
       {
-        onSuccess: () => {
-          setContent('')
-          setSelectedExperiences([])
+        // 실패 시 롤백한다. 에러 동안 사용자가 새로 입력·선택한 값이 있으면 덮어쓰지 않는다.
+        onError: () => {
+          setContent((current) => (current ? current : previousContent))
+          setSelectedExperiences((current) => (current.length > 0 ? current : previousExperiences))
         }
       }
     )
+    setContent('')
+    setSelectedExperiences([])
   }
 
   return (
@@ -271,6 +281,12 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
             <AiMessageCard key={message.messageId} message={message} onApply={() => message.block && handleApply(message.block)} />
           )
         )}
+        {isAwaitingReply && (
+          <Flex gap={'3'}>
+            <LogoIcon className={'shrink-0'} />
+            <LoadingDots size={'sm'} />
+          </Flex>
+        )}
       </Flex>
 
       <Spacing size={40} />
@@ -278,7 +294,7 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
       <form onSubmit={handleSubmit}>
         <Flex direction={'column'} gap={'4'} p={'4'} className="border-border-subtler bg-element-white shadow-3 h-fit w-full max-w-215 rounded-2xl border">
           {selectedExperiences.length > 0 && (
-            <Flex className={'gap-1.5'}>
+            <Flex className={'gap-1.5'} wrap={'wrap'}>
               {selectedExperiences.map((experience) => (
                 <ExperienceChip
                   key={experience.experienceId}
