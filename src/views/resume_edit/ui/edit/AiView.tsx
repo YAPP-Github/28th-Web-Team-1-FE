@@ -23,27 +23,29 @@ import * as amplitude from '@amplitude/unified'
 export const AiView = ({ targetJdId, sectionIndex, onApplied }: { targetJdId: string | null; sectionIndex: number; onApplied: () => void }) => {
   const [view, setView] = useState<'INDEX' | 'DETAIL'>('INDEX')
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null)
+  const [activeCardRank, setActiveCardRank] = useState(0)
 
   return (
     <>
       {view === 'INDEX' && (
         <AiIndexView
           targetJdId={targetJdId}
-          onOpen={(questionRoomId) => {
+          onOpen={(questionRoomId, cardRank) => {
             setActiveQuestionId(questionRoomId)
+            setActiveCardRank(cardRank)
             setView('DETAIL')
           }}
         />
       )}
 
       {view === 'DETAIL' && activeQuestionId && (
-        <AiDetailView targetJdId={targetJdId} questionRoomId={activeQuestionId} sectionIndex={sectionIndex} onApplied={onApplied} onBack={() => setView('INDEX')} />
+        <AiDetailView targetJdId={targetJdId} questionRoomId={activeQuestionId} cardRank={activeCardRank} sectionIndex={sectionIndex} onApplied={onApplied} onBack={() => setView('INDEX')} />
       )}
     </>
   )
 }
 
-const AiIndexView = ({ targetJdId, onOpen }: { targetJdId: string | null; onOpen: (questionRoomId: string) => void }) => {
+const AiIndexView = ({ targetJdId, onOpen }: { targetJdId: string | null; onOpen: (questionRoomId: string, cardRank: number) => void }) => {
   return (
     <Flex direction={'column'} className={'overflow-y-auto'}>
       <Flex gap={'3'}>
@@ -74,7 +76,7 @@ const AiIndexView = ({ targetJdId, onOpen }: { targetJdId: string | null; onOpen
   )
 }
 
-const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOpen: (questionRoomId: string) => void }) => {
+const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOpen: (questionRoomId: string, cardRank: number) => void }) => {
   const workspaceId = useWorkspaceId()
   const { questionRooms } = useExperienceQuestionRooms(workspaceId, targetJdId)
   const { getValues } = useFormContext<ResumeFormValues>()
@@ -88,7 +90,7 @@ const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOp
 
   return (
     <>
-      {questionRooms.map((room) => (
+      {questionRooms.map((room, index) => (
         <Flex
           key={room.questionRoomId}
           align={'center'}
@@ -101,7 +103,7 @@ const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOp
                 card_source: room.sourceType === 'PREFERRED_EXPERIENCE' ? 'preferred' : 'main_task',
                 card_count: questionRooms.length
               })
-              onOpen(room.questionRoomId)
+              onOpen(room.questionRoomId, index + 1)
             }}
           >
             <CircleCheckBig size={20} className={cn('shrink-0', appliedQuestionRoomIds.has(room.questionRoomId) ? 'text-text-primary-basic' : 'text-icon-gray-lighter')} />
@@ -161,6 +163,7 @@ AiRecommendQuestions.Skeleton = () => {
 interface AiDetailViewProps {
   targetJdId: string | null
   questionRoomId: string
+  cardRank: number
   sectionIndex: number
   onApplied: () => void
   onBack: () => void
@@ -170,7 +173,7 @@ interface AiDetailViewProps {
  * 질문 카드 상세. 목록에서 선택한 질문방 ID로 단건 조회해 질문·근거 원문과 전체 대화 메시지를 보여준다.
  * 뒤로가기는 `onBack`이 처리하므로 목록은 쿼리 캐시에서 재조회 없이 복귀한다.
  */
-const AiDetailView = ({ targetJdId, questionRoomId, sectionIndex, onApplied, onBack }: AiDetailViewProps) => {
+const AiDetailView = ({ targetJdId, questionRoomId, cardRank, sectionIndex, onApplied, onBack }: AiDetailViewProps) => {
   const workspaceId = useWorkspaceId()
 
   return (
@@ -187,7 +190,7 @@ const AiDetailView = ({ targetJdId, questionRoomId, sectionIndex, onApplied, onB
       <Spacing size={16} />
 
       <Suspense fallback={<AiDetailViewSkeleton />}>
-        <QuestionRoomDetail workspaceId={workspaceId} targetJdId={targetJdId} questionRoomId={questionRoomId} sectionIndex={sectionIndex} onApplied={onApplied} />
+        <QuestionRoomDetail workspaceId={workspaceId} targetJdId={targetJdId} questionRoomId={questionRoomId} cardRank={cardRank} sectionIndex={sectionIndex} onApplied={onApplied} />
       </Suspense>
     </Flex>
   )
@@ -197,11 +200,12 @@ interface QuestionRoomDetailProps {
   workspaceId: string
   targetJdId: string | null
   questionRoomId: string
+  cardRank: number
   sectionIndex: number
   onApplied: () => void
 }
 
-const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIndex, onApplied }: QuestionRoomDetailProps) => {
+const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, cardRank, sectionIndex, onApplied }: QuestionRoomDetailProps) => {
   const form = useFormContext<ResumeFormValues>()
   const { room, messages = [] } = useExperienceQuestionRoom(workspaceId, questionRoomId)
   const { mutate: sendMessage, isPending } = useSendExperienceQuestionRoomMessage(workspaceId, questionRoomId)
@@ -237,6 +241,13 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
 
     const previousContent = content
     const previousExperiences = selectedExperiences
+
+    amplitude.track(AMPLITUDE_EVENTS.AI_CHAT_MESSAGE_SENT, {
+      card_rank: cardRank,
+      attached_count: selectedExperiences.length,
+      text_length: trimmed.length,
+      turn_index: messages.filter((message) => message.role === 'USER').length + 1
+    })
 
     sendMessage(
       {
