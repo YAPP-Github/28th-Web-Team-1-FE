@@ -15,7 +15,6 @@ export const AMPLITUDE_EVENTS = {
   EXPERIENCE_SELECTION_COMPLETED: 'experience_selection_completed',
 
   // 이력서 편집
-  RESUME_DRAFT_VIEWED: 'resume_draft_viewed',
   TEXT_COPIED: 'text_copied',
 
   // AI 첨삭 모달

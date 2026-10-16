@@ -23,7 +23,6 @@ import { SetCategoryModal } from './SetCategoryModal'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
 import { ExperienceEditProvider, useExperienceEditState } from '../model/experienceEditContext'
 import { TargetJdProvider } from '../model/targetJdContext'
-import { useResumeDraftViewedTracking } from '../hooks/useResumeDraftViewedTracking'
 import { ResumeMobilePreview } from './ResumeMobilePreview'
 import { useRouter } from 'next/navigation'
 import { ResumePreview } from './preview/ResumePreview'
@@ -95,9 +94,6 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const router = useRouter()
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
-
-  // 페이지 진입 시 Amplitude 이벤트 전송
-  useResumeDraftViewedTracking(resume)
 
   const defaultValues = useMemo(() => resumeToFormValues(resume), [resume])
   const form = useForm<ResumeFormValues>({ defaultValues })
