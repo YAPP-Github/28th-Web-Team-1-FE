@@ -95,7 +95,15 @@ const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOp
           className={'hover:bg-element-white hover:border-border-primary-light bg-element-gray-lighter gap-4 rounded-lg border border-transparent px-4 py-5'}
           asChild
         >
-          <button onClick={() => onOpen(room.questionRoomId)}>
+          <button
+            onClick={() => {
+              amplitude.track(AMPLITUDE_EVENTS.AI_CHAT_CARD_CLICKED, {
+                card_source: room.sourceType === 'PREFERRED_EXPERIENCE' ? 'preferred' : 'main_task',
+                card_count: questionRooms.length
+              })
+              onOpen(room.questionRoomId)
+            }}
+          >
             <CircleCheckBig size={20} className={cn('shrink-0', appliedQuestionRoomIds.has(room.questionRoomId) ? 'text-text-primary-basic' : 'text-icon-gray-lighter')} />
 
             <Flex direction={'column'} className={'min-w-0 flex-1 gap-2'}>

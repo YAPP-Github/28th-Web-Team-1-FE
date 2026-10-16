@@ -19,6 +19,7 @@ export const AMPLITUDE_EVENTS = {
 
   // 이력서 편집
   TEXT_COPIED: 'text_copied',
+  AI_CHAT_CARD_CLICKED: 'ai_chat_card_clicked',
 
   // AI 첨삭 모달
   EDIT_MODAL_OPENED: 'edit_modal_opened',
