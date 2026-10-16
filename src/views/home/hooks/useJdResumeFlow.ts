@@ -53,25 +53,18 @@ export const useJdResumeFlow = (entrySource: 'home_input' | 'recommended_posting
         if (!jd) return setFlow(candidates?.length ? { step: 'SELECT_POSITION', choice, candidates } : { step: 'INPUT' })
         amplitude.track(AMPLITUDE_EVENTS.JD_URL_ENTERED, { jd_id: jd.jdId })
 
-        // 기존 내 이력서에서 추출하기
-        if (choice.method === 'import')
-          return importResume(
-            { file: choice.file, targetJdId: jd.jdId },
-            {
-              onSuccess: ({ resumeId }) => {
-                router.push(`/resumes/edit/${resumeId}`)
-              },
-              onError: fail
-            }
-          )
-        // 처음부터 만들기
-        else if (choice.method === 'scratch')
-          return createResume(buildResumeInput(jd.jdId, me), {
-            onSuccess: ({ resumeId }) => {
-              router.push(`/resumes/edit/${resumeId}`)
-            },
-            onError: fail
+        const onCreated = ({ resumeId }: { resumeId: string }) => {
+          amplitude.track(AMPLITUDE_EVENTS.RESUME_CREATE_METHOD_SELECTED, {
+            resume_id: resumeId,
+            create_method: choice.method === 'import' ? 'import_pdf' : 'from_scratch'
           })
+          router.push(`/resumes/edit/${resumeId}`)
+        }
+
+        // 기존 내 이력서에서 추출하기
+        if (choice.method === 'import') return importResume({ file: choice.file, targetJdId: jd.jdId }, { onSuccess: onCreated, onError: fail })
+        // 처음부터 만들기
+        else if (choice.method === 'scratch') return createResume(buildResumeInput(jd.jdId, me), { onSuccess: onCreated, onError: fail })
       },
       onError: fail
     })
@@ -93,7 +86,6 @@ export const useJdResumeFlow = (entrySource: 'home_input' | 'recommended_posting
         onOpenChange: (open: boolean) => !open && reset(),
         onSelect: (choice: ResumeCreateChoice) => {
           if (flow.step !== 'SELECT_METHOD') return
-          amplitude.track(AMPLITUDE_EVENTS.RESUME_CREATE_METHOD_SELECTED, { entry_source: entrySource })
           createResumeFromJd(flow.input, choice)
         }
       }
