@@ -146,7 +146,7 @@ const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove, uid 
           label={'세부내용'}
           sectionName="experience"
           jdId={targetJdId}
-          onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { jd_id: targetJdId, section_name: 'experience' })}
+          onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { jd_id: targetJdId, section_name: 'experience', location: 'direct_write' })}
         />
 
         <AiFeedbackDialog

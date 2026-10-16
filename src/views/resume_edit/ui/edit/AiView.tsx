@@ -8,10 +8,13 @@ import { LogoIcon } from '@shared/icon'
 import { useExperienceQuestionRoom, useExperienceQuestionRooms, useSendExperienceQuestionRoomMessage, type ExperienceQuestionRoomMessage, type ProjectExperience } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { cn } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { applyExperienceBlockToForm } from '../../model/applyExperienceBlockToForm'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 import { ExperiencePickerDialog } from './ExperiencePickerDialog'
 import { useExperienceEdit } from '../../model/experienceEditContext'
+
+import * as amplitude from '@amplitude/unified'
 
 /**
  * AI 추천 탭의 상세 뷰 묶음. 질문 카드 목록(INDEX)과 선택한 질문방 대화 상세(DETAIL)를 전환한다.
@@ -280,7 +283,12 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
           message.role === 'USER' ? (
             <UserMessageCard key={message.messageId} message={message} />
           ) : (
-            <AiMessageCard key={message.messageId} message={message} onApply={() => message.block && handleApply(message.block)} />
+            <AiMessageCard
+              key={message.messageId}
+              message={message}
+              onApply={() => message.block && handleApply(message.block)}
+              onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { jd_id: targetJdId, section_name: 'experience', location: 'ai_chat' })}
+            />
           )
         )}
         {isAwaitingReply && (
@@ -394,12 +402,12 @@ const ExperienceChip = ({ experience, onDelete }: ExperienceChipProps) => {
   )
 }
 
-const AiMessageCard = ({ message, onApply }: { message: ExperienceQuestionRoomMessage; onApply: () => void }) => (
+const AiMessageCard = ({ message, onApply, onCopy }: { message: ExperienceQuestionRoomMessage; onApply: () => void; onCopy: () => void }) => (
   <Flex gap={'3'}>
     <LogoIcon className={'shrink-0'} />
 
     <Flex direction={'column'} className={'gap-2.5'}>
-      <Flex direction={'column'} className={'border-border-subtle bg-element-white h-fit w-full gap-3 rounded-2xl border px-4 pt-3 pb-4'}>
+      <Flex direction={'column'} className={'border-border-subtle bg-element-white h-fit w-full gap-3 rounded-2xl border px-4 pt-3 pb-4'} onCopy={onCopy}>
         <Flex justify={'between'} align={'center'}>
           <Text variant={'label1'} color={'text-primary-basic'}>
             초안 {message.draftNumber}
