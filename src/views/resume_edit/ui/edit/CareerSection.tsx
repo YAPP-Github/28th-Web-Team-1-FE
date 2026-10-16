@@ -21,7 +21,7 @@ import { useTargetJdId } from '../../model/targetJdContext'
 export const CareerSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const targetJdId = useTargetJdId()
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
-  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toCareerPayloads)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toCareerPayloads, 'career_activity')
 
   return (
     <Section

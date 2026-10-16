@@ -19,6 +19,7 @@ export const AMPLITUDE_EVENTS = {
 
   // 이력서 편집
   RESUME_BUILDER_VIEWED: 'resume_builder_viewed',
+  PROFILE_DATA_IMPORTED: 'profile_data_imported',
   TEXT_COPIED: 'text_copied',
   AI_CHAT_CARD_CLICKED: 'ai_chat_card_clicked',
   AI_RESULT_APPLIED: 'ai_result_applied',

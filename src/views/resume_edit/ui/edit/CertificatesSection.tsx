@@ -11,7 +11,7 @@ import { toCertificatePayloads } from '../../model/profileToSectionPayloads'
 
 export const CertificatesSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
-  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toCertificatePayloads)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toCertificatePayloads, 'certificate')
 
   return (
     <Section

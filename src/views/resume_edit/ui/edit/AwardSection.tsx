@@ -11,7 +11,7 @@ import { toAwardPayloads } from '../../model/profileToSectionPayloads'
 
 export const AwardSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
-  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toAwardPayloads)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toAwardPayloads, 'award')
 
   return (
     <Section
