@@ -9,10 +9,6 @@ export const AMPLITUDE_EVENTS = {
   // JD 분석
   JD_URL_ENTERED: 'jd_url_entered',
 
-  // 경험 선택 모달
-  EXPERIENCE_SELECTION_VIEWED: 'experience_selection_viewed',
-  EXPERIENCE_SELECTED: 'experience_selected',
-
   // 이력서 편집
   TEXT_COPIED: 'text_copied',
 

@@ -18,9 +18,6 @@ export const ExperienceSection = ({ title, sectionIndex }: { title: string; sect
   const targetJdId = useTargetJdId()
   const { view, setView, itemTarget } = useExperienceEdit()
 
-  // Amplitude 이벤트 전송용 훅. 경험 재선택 시 이전에 선택된 경험 ID들을 추적해 `previous_experience_id`로 보낸다.
-  // const { previousExperienceIds, setPreviousExperienceIds } = usePreviousExperienceIdsTracking()
-
   return (
     <Flex direction="column" className={'min-h-0 w-full px-8 pb-6'}>
       <Flex justify="between" align="center" className={'py-6'}>
