@@ -50,7 +50,7 @@ export const StarEditor = ({ workspaceId, experience }: StarEditorProps) => {
     })
   }
   const { schedule: scheduleAutoSave, flush: flushAutoSave } = useAutosave(save, AUTOSAVE_DELAY_MS)
-  const { handleFocus: trackFocus, handleChange: trackChange } = useStarFieldEditTracking()
+  const { handleFocus: trackFocus, handleChange: trackChange } = useStarFieldEditTracking(experience.experienceId)
 
   const handleChange = (key: StarKey) => (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     trackChange(key, e.target.value)
