@@ -12,7 +12,6 @@ export const AMPLITUDE_EVENTS = {
   // 경험 선택 모달
   EXPERIENCE_SELECTION_VIEWED: 'experience_selection_viewed',
   EXPERIENCE_SELECTED: 'experience_selected',
-  EXPERIENCE_SELECTION_COMPLETED: 'experience_selection_completed',
 
   // 이력서 편집
   TEXT_COPIED: 'text_copied',
