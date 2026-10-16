@@ -6,6 +6,8 @@ export const AMPLITUDE_EVENTS = {
 
   // 홈
   HOME_VIEWED: 'home_viewed',
+  RESUME_CREATE_METHOD_VIEWED: 'resume_create_method_viewed',
+  RESUME_CREATE_METHOD_SELECTED: 'resume_create_method_selected',
 
   // 세그먼트 분기
   RESUME_STATUS_SELECTED: 'resume_status_selected',

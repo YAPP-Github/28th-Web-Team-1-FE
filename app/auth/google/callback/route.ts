@@ -49,8 +49,8 @@ export const GET = async (request: NextRequest) => {
   const response = NextResponse.redirect(new URL(redirectTo, origin))
   response.cookies.set('access_token', accessToken, cookieOptions(ACCESS_TOKEN_MAX_AGE))
   response.cookies.set('refresh_token', refreshToken, cookieOptions(REFRESH_TOKEN_MAX_AGE))
+
   // Amplitude sign_up_completed·home_viewed(is_first_visit) 전송용. 클라이언트가 읽고 지워야 하므로 httpOnly가 아니다.
-  // ponytail: 첫 홈 쿠키는 1일 유효. 가입 후 하루 넘게 홈을 안 들르면 첫 방문이 false로 잡힌다.
   if (isNewUser) {
     response.cookies.set(SIGN_UP_COMPLETED_COOKIE, '1', { ...cookieOptions(5 * 60), httpOnly: false })
     response.cookies.set(FIRST_HOME_VISIT_COOKIE, '1', { ...cookieOptions(24 * 60 * 60), httpOnly: false })
