@@ -22,6 +22,7 @@ export const AMPLITUDE_EVENTS = {
   PROFILE_DATA_IMPORTED: 'profile_data_imported',
   TEXT_COPIED: 'text_copied',
   AI_CHAT_CARD_CLICKED: 'ai_chat_card_clicked',
+  CHAT_EXPERIENCE_ATTACHED: 'chat_experience_attached',
   AI_RESULT_APPLIED: 'ai_result_applied',
 
   // AI 첨삭 모달

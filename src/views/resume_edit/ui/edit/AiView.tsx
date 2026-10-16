@@ -366,6 +366,9 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
           jdId={targetJdId}
           questionRoomId={questionRoomId}
           onComplete={(experiences) => {
+            experiences
+              .filter((experience) => !selectedExperiences.some((selected) => selected.experienceId === experience.experienceId))
+              .forEach((experience) => amplitude.track(AMPLITUDE_EVENTS.CHAT_EXPERIENCE_ATTACHED, { matching_rate: experience.matchRate }))
             setSelectedExperiences(experiences)
             setIsPickerOpen(false)
           }}
