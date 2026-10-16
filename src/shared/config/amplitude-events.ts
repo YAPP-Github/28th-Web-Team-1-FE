@@ -18,8 +18,10 @@ export const AMPLITUDE_EVENTS = {
   JD_URL_ENTERED: 'jd_url_entered',
 
   // 이력서 편집
+  RESUME_BUILDER_VIEWED: 'resume_builder_viewed',
   TEXT_COPIED: 'text_copied',
   AI_CHAT_CARD_CLICKED: 'ai_chat_card_clicked',
+  AI_RESULT_APPLIED: 'ai_result_applied',
 
   // AI 첨삭 모달
   EDIT_MODAL_OPENED: 'edit_modal_opened',

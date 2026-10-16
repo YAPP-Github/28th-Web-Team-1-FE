@@ -26,6 +26,7 @@ import { TargetJdProvider } from '../model/targetJdContext'
 import { ResumeMobilePreview } from './ResumeMobilePreview'
 import { useRouter } from 'next/navigation'
 import { ResumePreview } from './preview/ResumePreview'
+import { ResumeBuilderViewTracker } from './ResumeBuilderViewTracker'
 
 import * as amplitude from '@amplitude/unified'
 
@@ -162,6 +163,9 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
 
   return (
     <FormProvider {...form}>
+      <Suspense fallback={null}>
+        <ResumeBuilderViewTracker resumeId={resumeId} />
+      </Suspense>
       <ResumeToolbar targetJd={resume.targetJd} onSave={handleSave} onDraftSave={handleDraftSave} isSaving={isPending} lastSavedAt={lastSavedAt} />
       <main className="flex min-h-0 flex-1">
         <TargetJdProvider targetJdId={resume.targetJd?.jdId ?? null}>

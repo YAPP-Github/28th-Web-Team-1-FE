@@ -54,11 +54,10 @@ export const useJdResumeFlow = (entrySource: 'home_input' | 'recommended_posting
         amplitude.track(AMPLITUDE_EVENTS.JD_URL_ENTERED, { jd_id: jd.jdId })
 
         const onCreated = ({ resumeId }: { resumeId: string }) => {
-          amplitude.track(AMPLITUDE_EVENTS.RESUME_CREATE_METHOD_SELECTED, {
-            resume_id: resumeId,
-            create_method: choice.method === 'import' ? 'import_pdf' : 'from_scratch'
-          })
-          router.push(`/resumes/edit/${resumeId}`)
+          const createMethod = choice.method === 'import' ? 'import_pdf' : 'from_scratch'
+          amplitude.track(AMPLITUDE_EVENTS.RESUME_CREATE_METHOD_SELECTED, { resume_id: resumeId, create_method: createMethod })
+          // 빌더가 새 이력서 진입(visit_type: new)임을 알 수 있도록 생성 방식을 실어 보낸다.
+          router.push(`/resumes/edit/${resumeId}?create_method=${createMethod}`)
         }
 
         // 기존 내 이력서에서 추출하기
