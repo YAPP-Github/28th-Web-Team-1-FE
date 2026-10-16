@@ -34,6 +34,7 @@ export const AMPLITUDE_EVENTS = {
   KAKAO_CLICKED: 'kakao_clicked',
 
   // 경험 정리
+  EXPERIENCE_LIST_VIEWED: 'experience_list_viewed',
   EXPERIENCE_ADD_METHOD_SELECTED: 'experience_add_method_selected',
   EXPERIENCE_TEXT_SUBMITTED: 'experience_text_submitted',
   STAR_FIELD_EDITED: 'star_field_edited',

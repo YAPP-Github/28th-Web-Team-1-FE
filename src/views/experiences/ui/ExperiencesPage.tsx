@@ -1,6 +1,8 @@
 'use client'
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import Link from 'next/link'
+import * as amplitude from '@amplitude/unified'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { Flex, Grid } from '@radix-ui/themes'
 import { ArrowRight } from 'lucide-react'
 import { useProjectList } from '@entities/project'
@@ -39,6 +41,11 @@ export const ExperiencesPage = () => {
 const ExperiencesProjectGrid = () => {
   const workspaceId = useWorkspaceId()
   const { projects } = useProjectList(workspaceId)
+
+  useEffect(() => {
+    amplitude.track(AMPLITUDE_EVENTS.EXPERIENCE_LIST_VIEWED, { has_experience: projects.length > 0 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (projects.length === 0) {
     return (
