@@ -18,7 +18,6 @@ export const AmplitudeIdentify = () => {
 
     if (!document.cookie.split('; ').includes(`${SIGN_UP_COMPLETED_COOKIE}=1`)) return
     document.cookie = `${SIGN_UP_COMPLETED_COOKIE}=; path=/; max-age=0`
-    amplitude.identify(new amplitude.Identify().setOnce('signup_version', 'v1.1'))
     amplitude.track(AMPLITUDE_EVENTS.SIGN_UP_COMPLETED)
   }, [userId])
 
