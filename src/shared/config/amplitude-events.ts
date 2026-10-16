@@ -39,7 +39,10 @@ export const AMPLITUDE_EVENTS = {
 
   // 계정
   ACCOUNT_TAB_VIEWED: 'account_tab_viewed',
-  ACCOUNT_INFO_UPDATED: 'account_info_updated'
+  ACCOUNT_INFO_UPDATED: 'account_info_updated',
+
+  // 이력서
+  RESUME_LIST_VIEWED: 'resume_list_viewed'
 } as const
 
 /** 신규 가입 직후임을 클라이언트에 알리는 일회용 쿠키. 구글 콜백이 심고, `AmplitudeIdentify`가 읽은 뒤 지운다. */

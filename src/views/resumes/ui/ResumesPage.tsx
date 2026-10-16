@@ -1,12 +1,13 @@
 'use client'
 
-import { Suspense, useRef, type ComponentProps, type ReactNode } from 'react'
+import { Suspense, useEffect, useRef, type ComponentProps, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Flex } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { Button, Divider, ErrorFallback, Heading, Spacing, Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
 import { formatDate } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
 import type { ResumeStatusType, ResumesQuery } from '@shared/lib/gql/graphql'
 import { useResumeCounts, useResumeList, useDeleteResume } from '@entities/resume'
@@ -24,6 +25,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@shared/ui/alert_dialog'
+
+import * as amplitude from '@amplitude/unified'
 
 type ResumeSummary = ResumesQuery['resumes']['resumes'][number]
 
@@ -57,6 +60,11 @@ export const ResumesPage = () => {
 const ResumeSections = () => {
   const workspaceId = useWorkspaceId()
   const { counts } = useResumeCounts(workspaceId)
+
+  useEffect(() => {
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_LIST_VIEWED, { draft: counts.DRAFT ?? 0, completed: counts.COMPLETED ?? 0 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
