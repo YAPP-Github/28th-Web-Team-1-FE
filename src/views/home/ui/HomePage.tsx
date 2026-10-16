@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@sentry/nextjs'
 import { ErrorFallback, Heading, Text } from '@shared/ui'
 import { JDAnalysisForm } from './JDAnalysisForm'
 import { RecommendedJdSection } from './RecommendedJdSection'
+import { HomeViewTracker } from './HomeViewTracker'
 import homeGradientDesktop from '../assets/home_gradient_desktop.webp'
 import { TextLogo } from '@/src/shared/icon'
 
@@ -13,6 +14,7 @@ const { props: desktopImageProps } = getImageProps({ src: homeGradientDesktop, a
 export const HomePage = () => {
   return (
     <Flex direction={'column'} className={'min-h-0 flex-1 overflow-y-auto'}>
+      <HomeViewTracker />
       <Flex
         direction={'column'}
         align={{ initial: 'start', sm: 'center' }}
