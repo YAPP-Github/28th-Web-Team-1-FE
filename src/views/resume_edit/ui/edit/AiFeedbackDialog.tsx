@@ -41,6 +41,8 @@ interface AiFeedbackDialogProps {
   target: AiFeedbackTarget
   /** 대상 채용공고 ID. 주면 해당 JD의 지원 전략을 반영해 다듬는다(경험 섹션 등). */
   jdId?: string | null
+  /** Amplitude 이벤트 전송 시만 사용. AI 대화방 [적용]으로 생긴 블록의 ID(= experienceQuestionRoomId). */
+  aiBlockId?: string | null
 }
 
 /** 작성구조 옵션. value는 서버 `PolishStructure`, label은 표시용. */
@@ -56,7 +58,7 @@ const WRITING_STRUCTURES = [
  * 폼과의 연결은 RHF `name` 기반 — 열 때 현재 값을 우측 필드에 채우고, '적용' 시 편집값을 되쓴다.
  * 우측 필드는 항상 직접 타이핑할 수 있고, 'AI 수정 시작'은 그 값을 AI 결과로 덮어쓴다.
  */
-export const AiFeedbackDialog = ({ target, jdId }: AiFeedbackDialogProps) => {
+export const AiFeedbackDialog = ({ target, jdId, aiBlockId = null }: AiFeedbackDialogProps) => {
   const { kind, title, description } = target
   const { getValues, setValue } = useFormContext<ResumeFormValues>()
   const workspaceId = useWorkspaceId()
@@ -79,7 +81,12 @@ export const AiFeedbackDialog = ({ target, jdId }: AiFeedbackDialogProps) => {
   /** Amplitude 이벤트 전송용: 기준값과 달라지는 첫 onChange에서만 1회 전송하고, draft를 갱신한다. */
   const handleDescriptionChange = (value: string) => {
     if (editBaselineRef.current !== null && value !== editBaselineRef.current) {
-      amplitude.track(AMPLITUDE_EVENTS.SECTION_EDITED, { jd_id: jdId ?? null, section_name: SECTION_NAME_BY_KIND[target.kind], location: 'ai_modal' })
+      amplitude.track(AMPLITUDE_EVENTS.SECTION_EDITED, {
+        section_name: SECTION_NAME_BY_KIND[target.kind],
+        location: 'ai_modal',
+        is_ai_generated_block: aiBlockId !== null,
+        block_id: aiBlockId
+      })
       editBaselineRef.current = null
     }
     setDrafts((prev) => ({ ...prev, [description.name]: value }))

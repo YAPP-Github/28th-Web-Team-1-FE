@@ -9,18 +9,19 @@ type FormTextareaProps = Omit<ComponentProps<typeof Textarea>, 'value' | 'onChan
   name: string
   /** Amplitude 이벤트 전송 시만 사용. */
   sectionName?: 'core_competency' | 'experience' | 'career'
-  /** Amplitude 이벤트 전송 시만 사용. 대상 채용공고 ID. */
-  jdId?: string | null
+  /** Amplitude 이벤트 전송 시만 사용. AI 대화방 [적용]으로 생긴 블록의 ID(= experienceQuestionRoomId). */
+  aiBlockId?: string | null
 }
 
 /**
  * 디자인 시스템 `Textarea`를 react-hook-form에 연결하는 제어형 브릿지.
  * 연동 방식·이유는 {@link FormInput}과 동일하다. (글자수 카운터 등 내부 상태 보존)
  */
-export const FormTextarea = ({ name, sectionName, jdId, ...props }: FormTextareaProps) => {
+export const FormTextarea = ({ name, sectionName, aiBlockId, ...props }: FormTextareaProps) => {
   const { control } = useFormContext<ResumeFormValues>()
+
   // Amplitude 이벤트 전송용 훅. `sectionName`이 없으면 아무 일도 하지 않는다.
-  const { handleFocus, handleChange } = useSectionEditTracking(sectionName ?? 'experience', 'editor', jdId ?? null)
+  const { handleFocus, handleChange } = useSectionEditTracking({ sectionName: sectionName ?? 'experience', location: 'editor', aiBlockId })
 
   return (
     <Controller

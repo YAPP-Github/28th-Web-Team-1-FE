@@ -48,7 +48,16 @@ export const ManualView = ({ sectionIndex, targetJdId, target }: { sectionIndex:
         ) : (
           <>
             {fields.map((field, index) => (
-              <ExperienceSectionItem key={field.id} uid={field.uid} sectionIndex={sectionIndex} index={index} targetJdId={targetJdId} onRemove={() => remove(index)} />
+              <ExperienceSectionItem
+                key={field.id}
+                uid={field.uid}
+                sectionIndex={sectionIndex}
+                index={index}
+                targetJdId={targetJdId}
+                // Amplitude 이벤트 전송용 훅에 전달할 AI 대화방 블록 ID. 경험 편집 시점에만 존재한다.
+                aiBlockId={('payload' in field && field.payload.experience?.experienceQuestionRoomId) || null}
+                onRemove={() => remove(index)}
+              />
             ))}
           </>
         )}
@@ -110,7 +119,16 @@ const MenuItem = ({ icon: Icon, label, description, onSelect, disabled }: { icon
   </DropdownMenu.Item>
 )
 
-const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove, uid }: { sectionIndex: number; index: number; targetJdId: string | null; onRemove: () => void; uid: string }) => {
+interface ExperienceSectionItemProps {
+  sectionIndex: number
+  index: number
+  targetJdId: string | null
+  aiBlockId: string | null
+  onRemove: () => void
+  uid: string
+}
+
+const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, aiBlockId, onRemove, uid }: ExperienceSectionItemProps) => {
   const base = `sections.${sectionIndex}.items.${index}.payload.experience`
 
   return (
@@ -145,12 +163,13 @@ const ExperienceSectionItem = ({ sectionIndex, index, targetJdId, onRemove, uid 
           name={`${base}.contents`}
           label={'세부내용'}
           sectionName="experience"
-          jdId={targetJdId}
+          aiBlockId={aiBlockId}
           onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { jd_id: targetJdId, section_name: 'experience', location: 'direct_write' })}
         />
 
         <AiFeedbackDialog
           jdId={targetJdId}
+          aiBlockId={aiBlockId}
           target={{
             kind: 'EXPERIENCE',
             title: { name: `${base}.name`, label: '경험명' },
