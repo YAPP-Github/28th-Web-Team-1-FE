@@ -30,7 +30,7 @@ export const ResumeBuilderViewTracker = ({ resumeId }: { resumeId: string }) => 
       create_method: createMethod,
       visit_type: isNew ? 'new' : 'revisit',
       resume_sequence: isNew ? Object.values(counts).reduce((sum, count) => sum + count, 0) : null,
-      has_experience: projects.length > 0
+      experience_count: projects.reduce((sum, project) => sum + project.experienceCount, 0)
     })
     if (isNew) router.replace(`/resumes/edit/${resumeId}`)
     // eslint-disable-next-line react-hooks/exhaustive-deps

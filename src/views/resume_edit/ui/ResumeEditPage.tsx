@@ -39,6 +39,10 @@ export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
 
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
+      {/* 데스크톱·모바일 공통 진입 이벤트. 화면을 막지 않도록 별도 Suspense로 감싼다. */}
+      <Suspense fallback={null}>
+        <ResumeBuilderViewTracker resumeId={resumeId} />
+      </Suspense>
       <ErrorBoundary fallback={({ error }) => (isAccessDeniedError(error) ? <ResumeAccessDeniedFallback error={error} /> : <ResumeFallback>Failed to load resume.</ResumeFallback>)}>
         <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
           {isDesktop === null ? <ResumeFallback>불러오는 중...</ResumeFallback> : isDesktop ? <ResumeWorkspace resumeId={resumeId} /> : <ResumeMobilePreview resumeId={resumeId} />}
@@ -168,9 +172,6 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
 
   return (
     <FormProvider {...form}>
-      <Suspense fallback={null}>
-        <ResumeBuilderViewTracker resumeId={resumeId} />
-      </Suspense>
       <ResumeToolbar targetJd={resume.targetJd} onSave={handleSave} onDraftSave={handleDraftSave} isSaving={isPending} lastSavedAt={lastSavedAt} />
       <main className="flex min-h-0 flex-1">
         <TargetJdProvider targetJdId={resume.targetJd?.jdId ?? null}>
