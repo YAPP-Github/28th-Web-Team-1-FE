@@ -13,7 +13,6 @@ import { toPreviewSections, useResumeDetail, useUpdateResume, type ResumeSection
 import { useGenerateCoreCompetency } from '@entities/profile'
 import { useWorkspaceId } from '@entities/user'
 import { ResumeBasicInfoHeader, ResumeSectionView } from '@widgets/resume_preview'
-import { useResumeDraftViewedTracking } from '../hooks/useResumeDraftViewedTracking'
 import { createFormItem, nextDisplayOrder, type ResumeFormValues } from '../model/resume-form.types'
 import { needsCoreCompetency } from '../model/coreCompetency'
 import { resumeToFormValues } from '../model/resumeToFormValues'
@@ -33,7 +32,6 @@ import * as amplitude from '@amplitude/unified'
 export const ResumeMobilePreview = ({ resumeId }: { resumeId: string }) => {
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
-  useResumeDraftViewedTracking(resume)
   useGenerateCoreCompetencyOnEntry(workspaceId, resumeId, resume)
 
   const { basicInfoSection, bodySections } = toPreviewSections(resume.sections)

@@ -10,7 +10,7 @@ import type { useJdResumeFlow } from '../hooks/useJdResumeFlow'
  * 이력서 생성 방식 모달 + JD 분석·PDF 추출 진행 모달.
  * @example
  * ```tsx
- * const { handleRegister, dialogProps } = useJdResumeFlow()
+ * const { handleRegister, dialogProps } = useJdResumeFlow('home_input')
  * <JdResumeFlowDialogs {...dialogProps} />
  * ```
  */

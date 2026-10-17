@@ -1,11 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_MAX_AGE, cookieOptions, authFailureRedirect, safeRedirectPath } from '@shared/lib/auth'
+import { SIGN_UP_COMPLETED_COOKIE, FIRST_HOME_VISIT_COOKIE } from '@shared/config'
 
 const API_URL = process.env.API_URL
 
 interface LoginApiResult {
   accessToken: string
   refreshToken: string
+  isNewUser?: boolean
 }
 /**
  * 구글이 인가 코드를 붙여 리다이렉트하는 콜백을 서버에서 처리하는 라우트 핸들러이다.
@@ -42,10 +44,16 @@ export const GET = async (request: NextRequest) => {
 
   if (!res.ok || data?.ok === false || !data?.result) return authFailureRedirect(origin)
 
-  const { accessToken, refreshToken } = data.result as LoginApiResult
+  const { accessToken, refreshToken, isNewUser } = data.result as LoginApiResult
 
   const response = NextResponse.redirect(new URL(redirectTo, origin))
   response.cookies.set('access_token', accessToken, cookieOptions(ACCESS_TOKEN_MAX_AGE))
   response.cookies.set('refresh_token', refreshToken, cookieOptions(REFRESH_TOKEN_MAX_AGE))
+
+  // Amplitude sign_up_completed·home_viewed(is_first_visit) 전송용. 클라이언트가 읽고 지워야 하므로 httpOnly가 아니다.
+  if (isNewUser) {
+    response.cookies.set(SIGN_UP_COMPLETED_COOKIE, '1', { ...cookieOptions(5 * 60), httpOnly: false })
+    response.cookies.set(FIRST_HOME_VISIT_COOKIE, '1', { ...cookieOptions(24 * 60 * 60), httpOnly: false })
+  }
   return response
 }

@@ -1,14 +1,13 @@
 // Amplitude 이벤트 이름을 상수로 정의하여 오타를 방지합니다.
 
 export const AMPLITUDE_EVENTS = {
-  // 온보딩
-  RESUME_VIEWED: 'resume_viewed',
-  RESUME_UPLOAD_VIEWED: 'resume_upload_viewed',
-  RESUME_CONFIRM_VIEWED: 'resume_confirm_viewed',
-  NOTION_VIEWED: 'notion_viewed',
-  NOTION_SELECTED_VIEWED: 'notion_selected_viewed',
-  DIRECT_WRITE_ENTERED: 'direct_write_entered',
-  ONBOARDING_COMPLETE_VIEWED: 'onboarding_complete_viewed',
+  // 가입
+  SIGN_UP_COMPLETED: 'sign_up_completed',
+
+  // 홈
+  HOME_VIEWED: 'home_viewed',
+  RESUME_CREATE_METHOD_VIEWED: 'resume_create_method_viewed',
+  RESUME_CREATE_METHOD_SELECTED: 'resume_create_method_selected',
 
   // 세그먼트 분기
   RESUME_STATUS_SELECTED: 'resume_status_selected',
@@ -18,14 +17,14 @@ export const AMPLITUDE_EVENTS = {
   // JD 분석
   JD_URL_ENTERED: 'jd_url_entered',
 
-  // 경험 선택 모달
-  EXPERIENCE_SELECTION_VIEWED: 'experience_selection_viewed',
-  EXPERIENCE_SELECTED: 'experience_selected',
-  EXPERIENCE_SELECTION_COMPLETED: 'experience_selection_completed',
-
   // 이력서 편집
-  RESUME_DRAFT_VIEWED: 'resume_draft_viewed',
+  RESUME_BUILDER_VIEWED: 'resume_builder_viewed',
+  PROFILE_DATA_IMPORTED: 'profile_data_imported',
   TEXT_COPIED: 'text_copied',
+  AI_CHAT_CARD_CLICKED: 'ai_chat_card_clicked',
+  CHAT_EXPERIENCE_ATTACHED: 'chat_experience_attached',
+  AI_RESULT_APPLIED: 'ai_result_applied',
+  AI_CHAT_MESSAGE_SENT: 'ai_chat_message_sent',
 
   // AI 첨삭 모달
   EDIT_MODAL_OPENED: 'edit_modal_opened',
@@ -40,11 +39,21 @@ export const AMPLITUDE_EVENTS = {
   KAKAO_CLICKED: 'kakao_clicked',
 
   // 경험 정리
+  EXPERIENCE_LIST_VIEWED: 'experience_list_viewed',
   EXPERIENCE_ADD_METHOD_SELECTED: 'experience_add_method_selected',
   EXPERIENCE_TEXT_SUBMITTED: 'experience_text_submitted',
   STAR_FIELD_EDITED: 'star_field_edited',
 
   // 계정
   ACCOUNT_TAB_VIEWED: 'account_tab_viewed',
-  ACCOUNT_INFO_UPDATED: 'account_info_updated'
+  ACCOUNT_INFO_UPDATED: 'account_info_updated',
+
+  // 이력서
+  RESUME_LIST_VIEWED: 'resume_list_viewed'
 } as const
+
+/** 신규 가입 직후임을 클라이언트에 알리는 일회용 쿠키. 구글 콜백이 심고, `AmplitudeIdentify`가 읽은 뒤 지운다. */
+export const SIGN_UP_COMPLETED_COOKIE = 'sign_up_completed'
+
+/** 가입 후 첫 홈 진입임을 알리는 일회용 쿠키. 구글 콜백이 심고, `HomeViewTracker`가 읽은 뒤 지운다. (가입 쿠키와 따로 둬 소비 순서에 의존하지 않는다) */
+export const FIRST_HOME_VISIT_COOKIE = 'first_home_visit'

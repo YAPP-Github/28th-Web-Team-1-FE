@@ -13,7 +13,7 @@ import { toEducationPayloads } from '../../model/profileToSectionPayloads'
 
 export const EducationSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
-  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toEducationPayloads)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toEducationPayloads, 'education')
 
   return (
     <Section

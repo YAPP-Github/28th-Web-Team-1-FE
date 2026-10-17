@@ -20,15 +20,16 @@ type Flow =
 
 /**
  * JD 입력 → 이력서 생성 방식 선택 → (JD 분석 + PDF 추출, 로딩 한 번) → 이력서 화면 이동.
+ * Amplitude 이벤트를 `entrySource`와 함께 보낸다.
  * 분석 결과가 후보 목록이면 `flow.candidates`(SELECT_POSITION 단계)에 담기고, 후보를 `handleSelectPosition`으로 넘기면 고른 방식으로 바로 진행한다.
  * @example
  * ```tsx
- * const { flow, handleRegister, handleSelectPosition, handleReset, isPending, dialogProps } = useJdResumeFlow()
+ * const { flow, handleRegister, handleSelectPosition, handleReset, isPending, dialogProps } = useJdResumeFlow('home_input')
  * handleRegister({ sourceUrl })
  * <JdResumeFlowDialogs {...dialogProps} />
  * ```
  */
-export const useJdResumeFlow = () => {
+export const useJdResumeFlow = (entrySource: 'home_input' | 'recommended_posting') => {
   const router = useRouter()
   const workspaceId = useWorkspaceId()
   const { me } = useMe()
@@ -52,25 +53,17 @@ export const useJdResumeFlow = () => {
         if (!jd) return setFlow(candidates?.length ? { step: 'SELECT_POSITION', choice, candidates } : { step: 'INPUT' })
         amplitude.track(AMPLITUDE_EVENTS.JD_URL_ENTERED, { jd_id: jd.jdId })
 
+        const onCreated = ({ resumeId }: { resumeId: string }) => {
+          const createMethod = choice.method === 'import' ? 'import_pdf' : 'from_scratch'
+          amplitude.track(AMPLITUDE_EVENTS.RESUME_CREATE_METHOD_SELECTED, { resume_id: resumeId, create_method: createMethod })
+          // 빌더가 새 이력서 진입(visit_type: new)임을 알 수 있도록 생성 방식을 실어 보낸다.
+          router.push(`/resumes/edit/${resumeId}?create_method=${createMethod}`)
+        }
+
         // 기존 내 이력서에서 추출하기
-        if (choice.method === 'import')
-          return importResume(
-            { file: choice.file, targetJdId: jd.jdId },
-            {
-              onSuccess: ({ resumeId }) => {
-                router.push(`/resumes/edit/${resumeId}`)
-              },
-              onError: fail
-            }
-          )
+        if (choice.method === 'import') return importResume({ file: choice.file, targetJdId: jd.jdId }, { onSuccess: onCreated, onError: fail })
         // 처음부터 만들기
-        else if (choice.method === 'scratch')
-          return createResume(buildResumeInput(jd.jdId, me), {
-            onSuccess: ({ resumeId }) => {
-              router.push(`/resumes/edit/${resumeId}`)
-            },
-            onError: fail
-          })
+        else if (choice.method === 'scratch') return createResume(buildResumeInput(jd.jdId, me), { onSuccess: onCreated, onError: fail })
       },
       onError: fail
     })
@@ -78,7 +71,10 @@ export const useJdResumeFlow = () => {
 
   return {
     flow,
-    handleRegister: (input: JdRegisterInput) => setFlow({ step: 'SELECT_METHOD', input }),
+    handleRegister: (input: JdRegisterInput) => {
+      amplitude.track(AMPLITUDE_EVENTS.RESUME_CREATE_METHOD_VIEWED, { entry_source: entrySource })
+      setFlow({ step: 'SELECT_METHOD', input })
+    },
     handleSelectPosition: (input: JdRegisterInput) => flow.step === 'SELECT_POSITION' && createResumeFromJd(input, flow.choice),
     handleReset: reset,
     isPending: flow.step === 'PROCESSING',
@@ -87,7 +83,10 @@ export const useJdResumeFlow = () => {
       method: {
         isOpen: flow.step === 'SELECT_METHOD',
         onOpenChange: (open: boolean) => !open && reset(),
-        onSelect: (choice: ResumeCreateChoice) => flow.step === 'SELECT_METHOD' && createResumeFromJd(flow.input, choice)
+        onSelect: (choice: ResumeCreateChoice) => {
+          if (flow.step !== 'SELECT_METHOD') return
+          createResumeFromJd(flow.input, choice)
+        }
       }
     }
   }

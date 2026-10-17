@@ -15,7 +15,7 @@ export const RecommendedJdSection = () => {
   const [, startTransition] = useTransition()
   const { tags } = useJdRecommendationTags()
   const { recommendations } = useJdRecommendations(selectedTag ? [selectedTag] : [], RECOMMENDATION_SIZE)
-  const { handleRegister, isPending, dialogProps } = useJdResumeFlow()
+  const { handleRegister, isPending, dialogProps } = useJdResumeFlow('recommended_posting')
 
   return (
     <Flex direction={'column'} gap={{ initial: '4', sm: '6' }} className={'w-full max-w-215'}>

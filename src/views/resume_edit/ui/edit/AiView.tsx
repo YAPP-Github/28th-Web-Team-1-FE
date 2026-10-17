@@ -8,10 +8,13 @@ import { LogoIcon } from '@shared/icon'
 import { useExperienceQuestionRoom, useExperienceQuestionRooms, useSendExperienceQuestionRoomMessage, type ExperienceQuestionRoomMessage, type ProjectExperience } from '@entities/experience'
 import { useWorkspaceId } from '@entities/user'
 import { cn } from '@shared/lib'
+import { AMPLITUDE_EVENTS } from '@shared/config'
 import { applyExperienceBlockToForm } from '../../model/applyExperienceBlockToForm'
 import type { ResumeFormValues } from '../../model/resume-form.types'
 import { ExperiencePickerDialog } from './ExperiencePickerDialog'
 import { useExperienceEdit } from '../../model/experienceEditContext'
+
+import * as amplitude from '@amplitude/unified'
 
 /**
  * AI 추천 탭의 상세 뷰 묶음. 질문 카드 목록(INDEX)과 선택한 질문방 대화 상세(DETAIL)를 전환한다.
@@ -20,27 +23,29 @@ import { useExperienceEdit } from '../../model/experienceEditContext'
 export const AiView = ({ targetJdId, sectionIndex, onApplied }: { targetJdId: string | null; sectionIndex: number; onApplied: () => void }) => {
   const [view, setView] = useState<'INDEX' | 'DETAIL'>('INDEX')
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null)
+  const [activeCardRank, setActiveCardRank] = useState(0)
 
   return (
     <>
       {view === 'INDEX' && (
         <AiIndexView
           targetJdId={targetJdId}
-          onOpen={(questionRoomId) => {
+          onOpen={(questionRoomId, cardRank) => {
             setActiveQuestionId(questionRoomId)
+            setActiveCardRank(cardRank)
             setView('DETAIL')
           }}
         />
       )}
 
       {view === 'DETAIL' && activeQuestionId && (
-        <AiDetailView targetJdId={targetJdId} questionRoomId={activeQuestionId} sectionIndex={sectionIndex} onApplied={onApplied} onBack={() => setView('INDEX')} />
+        <AiDetailView targetJdId={targetJdId} questionRoomId={activeQuestionId} cardRank={activeCardRank} sectionIndex={sectionIndex} onApplied={onApplied} onBack={() => setView('INDEX')} />
       )}
     </>
   )
 }
 
-const AiIndexView = ({ targetJdId, onOpen }: { targetJdId: string | null; onOpen: (questionRoomId: string) => void }) => {
+const AiIndexView = ({ targetJdId, onOpen }: { targetJdId: string | null; onOpen: (questionRoomId: string, cardRank: number) => void }) => {
   return (
     <Flex direction={'column'} className={'overflow-y-auto'}>
       <Flex gap={'3'}>
@@ -71,7 +76,7 @@ const AiIndexView = ({ targetJdId, onOpen }: { targetJdId: string | null; onOpen
   )
 }
 
-const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOpen: (questionRoomId: string) => void }) => {
+const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOpen: (questionRoomId: string, cardRank: number) => void }) => {
   const workspaceId = useWorkspaceId()
   const { questionRooms } = useExperienceQuestionRooms(workspaceId, targetJdId)
   const { getValues } = useFormContext<ResumeFormValues>()
@@ -85,14 +90,22 @@ const AiRecommendQuestions = ({ targetJdId, onOpen }: { targetJdId: string; onOp
 
   return (
     <>
-      {questionRooms.map((room) => (
+      {questionRooms.map((room, index) => (
         <Flex
           key={room.questionRoomId}
           align={'center'}
           className={'hover:bg-element-white hover:border-border-primary-light bg-element-gray-lighter gap-4 rounded-lg border border-transparent px-4 py-5'}
           asChild
         >
-          <button onClick={() => onOpen(room.questionRoomId)}>
+          <button
+            onClick={() => {
+              amplitude.track(AMPLITUDE_EVENTS.AI_CHAT_CARD_CLICKED, {
+                card_source: room.sourceType === 'PREFERRED_EXPERIENCE' ? 'preferred' : 'main_task',
+                card_count: questionRooms.length
+              })
+              onOpen(room.questionRoomId, index + 1)
+            }}
+          >
             <CircleCheckBig size={20} className={cn('shrink-0', appliedQuestionRoomIds.has(room.questionRoomId) ? 'text-text-primary-basic' : 'text-icon-gray-lighter')} />
 
             <Flex direction={'column'} className={'min-w-0 flex-1 gap-2'}>
@@ -150,6 +163,7 @@ AiRecommendQuestions.Skeleton = () => {
 interface AiDetailViewProps {
   targetJdId: string | null
   questionRoomId: string
+  cardRank: number
   sectionIndex: number
   onApplied: () => void
   onBack: () => void
@@ -159,7 +173,7 @@ interface AiDetailViewProps {
  * 질문 카드 상세. 목록에서 선택한 질문방 ID로 단건 조회해 질문·근거 원문과 전체 대화 메시지를 보여준다.
  * 뒤로가기는 `onBack`이 처리하므로 목록은 쿼리 캐시에서 재조회 없이 복귀한다.
  */
-const AiDetailView = ({ targetJdId, questionRoomId, sectionIndex, onApplied, onBack }: AiDetailViewProps) => {
+const AiDetailView = ({ targetJdId, questionRoomId, cardRank, sectionIndex, onApplied, onBack }: AiDetailViewProps) => {
   const workspaceId = useWorkspaceId()
 
   return (
@@ -176,7 +190,7 @@ const AiDetailView = ({ targetJdId, questionRoomId, sectionIndex, onApplied, onB
       <Spacing size={16} />
 
       <Suspense fallback={<AiDetailViewSkeleton />}>
-        <QuestionRoomDetail workspaceId={workspaceId} targetJdId={targetJdId} questionRoomId={questionRoomId} sectionIndex={sectionIndex} onApplied={onApplied} />
+        <QuestionRoomDetail workspaceId={workspaceId} targetJdId={targetJdId} questionRoomId={questionRoomId} cardRank={cardRank} sectionIndex={sectionIndex} onApplied={onApplied} />
       </Suspense>
     </Flex>
   )
@@ -186,11 +200,12 @@ interface QuestionRoomDetailProps {
   workspaceId: string
   targetJdId: string | null
   questionRoomId: string
+  cardRank: number
   sectionIndex: number
   onApplied: () => void
 }
 
-const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIndex, onApplied }: QuestionRoomDetailProps) => {
+const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, cardRank, sectionIndex, onApplied }: QuestionRoomDetailProps) => {
   const form = useFormContext<ResumeFormValues>()
   const { room, messages = [] } = useExperienceQuestionRoom(workspaceId, questionRoomId)
   const { mutate: sendMessage, isPending } = useSendExperienceQuestionRoomMessage(workspaceId, questionRoomId)
@@ -210,7 +225,15 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
 
   const { openManual } = useExperienceEdit()
 
-  const handleApply = (block: NonNullable<ExperienceQuestionRoomMessage['block']>) => {
+  const handleApply = (block: NonNullable<ExperienceQuestionRoomMessage['block']>, messageIndex: number) => {
+    // Amplitude 이벤트 전송. AI 대화방에서 [이력서 적용] 시 관련정보를 보낸다.
+    const userMessages = messages.slice(0, messageIndex).filter((message) => message.role === 'USER')
+    amplitude.track(AMPLITUDE_EVENTS.AI_RESULT_APPLIED, {
+      card_rank: cardRank,
+      turn_index: userMessages.length,
+      attached_count: userMessages.at(-1)?.experiences?.length ?? 0,
+      block_id: questionRoomId
+    })
     const addedUid = applyExperienceBlockToForm(form, { sectionIndex, experienceQuestionRoomId: questionRoomId, block })
     openManual(addedUid)
     onApplied()
@@ -226,6 +249,13 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
 
     const previousContent = content
     const previousExperiences = selectedExperiences
+
+    amplitude.track(AMPLITUDE_EVENTS.AI_CHAT_MESSAGE_SENT, {
+      card_rank: cardRank,
+      attached_count: selectedExperiences.length,
+      text_length: trimmed.length,
+      turn_index: messages.filter((message) => message.role === 'USER').length + 1
+    })
 
     sendMessage(
       {
@@ -276,11 +306,16 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
             관련 경험을 입력하면 SCOOP AI가 공고에 맞춰 초안을 작성해 드려요.
           </Text>
         </Flex>
-        {messages.map((message) =>
+        {messages.map((message, index) =>
           message.role === 'USER' ? (
             <UserMessageCard key={message.messageId} message={message} />
           ) : (
-            <AiMessageCard key={message.messageId} message={message} onApply={() => message.block && handleApply(message.block)} />
+            <AiMessageCard
+              key={message.messageId}
+              message={message}
+              onApply={() => message.block && handleApply(message.block, index)}
+              onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { jd_id: targetJdId, section_name: 'experience', location: 'ai_chat' })}
+            />
           )
         )}
         {isAwaitingReply && (
@@ -350,6 +385,9 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, sectionIn
           jdId={targetJdId}
           questionRoomId={questionRoomId}
           onComplete={(experiences) => {
+            experiences
+              .filter((experience) => !selectedExperiences.some((selected) => selected.experienceId === experience.experienceId))
+              .forEach((experience) => amplitude.track(AMPLITUDE_EVENTS.CHAT_EXPERIENCE_ATTACHED, { matching_rate: experience.matchRate }))
             setSelectedExperiences(experiences)
             setIsPickerOpen(false)
           }}
@@ -394,12 +432,12 @@ const ExperienceChip = ({ experience, onDelete }: ExperienceChipProps) => {
   )
 }
 
-const AiMessageCard = ({ message, onApply }: { message: ExperienceQuestionRoomMessage; onApply: () => void }) => (
+const AiMessageCard = ({ message, onApply, onCopy }: { message: ExperienceQuestionRoomMessage; onApply: () => void; onCopy: () => void }) => (
   <Flex gap={'3'}>
     <LogoIcon className={'shrink-0'} />
 
     <Flex direction={'column'} className={'gap-2.5'}>
-      <Flex direction={'column'} className={'border-border-subtle bg-element-white h-fit w-full gap-3 rounded-2xl border px-4 pt-3 pb-4'}>
+      <Flex direction={'column'} className={'border-border-subtle bg-element-white h-fit w-full gap-3 rounded-2xl border px-4 pt-3 pb-4'} onCopy={onCopy}>
         <Flex justify={'between'} align={'center'}>
           <Text variant={'label1'} color={'text-primary-basic'}>
             초안 {message.draftNumber}

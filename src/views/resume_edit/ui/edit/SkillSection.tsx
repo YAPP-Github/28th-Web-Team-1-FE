@@ -16,7 +16,7 @@ import { toSkillPayloads } from '../../model/profileToSectionPayloads'
 
 export const SkillSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
-  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toSkillPayloads)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toSkillPayloads, 'skill')
 
   // 기술 칩은 상단 입력으로 새로 만들어 append하는 방식이라, 입력 중인 값은 폼이 아닌 로컬 상태로 둔다.
   const [name, setName] = useState('')

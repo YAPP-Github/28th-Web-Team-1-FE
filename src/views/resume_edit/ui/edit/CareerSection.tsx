@@ -21,7 +21,7 @@ import { useTargetJdId } from '../../model/targetJdContext'
 export const CareerSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const targetJdId = useTargetJdId()
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
-  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toCareerPayloads)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toCareerPayloads, 'career_activity')
 
   return (
     <Section
@@ -67,13 +67,7 @@ const CareerSectionItem = ({ sectionIndex, index, onRemove, targetJdId }: { sect
       <Spacing size={16} />
 
       <Flex direction={'column'} className={'gap-5 py-1'}>
-        <FormTextarea
-          name={`${base}.contents`}
-          label={'세부내용'}
-          sectionName="career"
-          jdId={targetJdId}
-          onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { jd_id: targetJdId, section_name: 'career' })}
-        />
+        <FormTextarea name={`${base}.contents`} label={'세부내용'} sectionName="career" onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { jd_id: targetJdId, section_name: 'career' })} />
 
         <AiFeedbackDialog target={{ kind: 'CAREER_DESCRIPTION', description: { name: `${base}.contents`, label: '세부내용' } }} jdId={targetJdId} />
       </Flex>

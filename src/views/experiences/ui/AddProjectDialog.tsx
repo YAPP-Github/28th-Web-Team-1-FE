@@ -14,6 +14,7 @@ import { AddProjectDefaultView } from './AddProjectDefaultView'
 import { AddProjectManualView } from './AddProjectManualView'
 import { AddProjectNotionView } from './AddProjectNotionView'
 import { AddProjectProgressView } from './AddProjectProgressView'
+import { useExperienceTextSubmittedTracking } from '../hooks/useExperienceTextSubmittedTracking'
 
 import { AMPLITUDE_EVENTS } from '@shared/config'
 import * as amplitude from '@amplitude/unified'
@@ -34,6 +35,7 @@ export const AddProjectDialog = () => {
 
   // 노션에서 돌아온 경우, URL 파라미터를 읽어 connectionId를 가져온다. (없으면 null)
   const { connectionId } = useNotionReturn(NOTION_RETURN_PATH)
+  const { trackTextSubmitted } = useExperienceTextSubmittedTracking()
 
   const [isOpen, setIsOpen] = useState(() => Boolean(connectionId))
   const [view, setView] = useState<DialogView>(() => (connectionId ? 'notion-select' : 'default'))
@@ -83,12 +85,19 @@ export const AddProjectDialog = () => {
     amplitude.identify(new amplitude.Identify().set('is_direct_write', true))
 
     setView('progress')
+    const onError = (error: Error) => {
+      trackTextSubmitted(input.summary, 'new', false)
+      handleExtractError(error)
+    }
     createProject(input, {
       onSuccess: (project) => {
         // title은 빈값을 보내고, AI가 생성한다.
-        createExperience({ projectId: project.projectId, title: '', contents: { type: 'FREE', free: { content: input.summary } } }, { onError: handleExtractError })
+        createExperience(
+          { projectId: project.projectId, title: '', contents: { type: 'FREE', free: { content: input.summary } } },
+          { onSuccess: () => trackTextSubmitted(input.summary, 'new', true), onError }
+        )
       },
-      onError: handleExtractError
+      onError
     })
   }
 
@@ -99,9 +108,16 @@ export const AddProjectDialog = () => {
     amplitude.identify(new amplitude.Identify().set('is_direct_write', true))
 
     setView('progress')
+    const content = input.contents.free?.content ?? ''
     createExperience(input, {
-      onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.lists() }),
-      onError: handleExtractError
+      onSuccess: () => {
+        trackTextSubmitted(content, 'existing', true)
+        queryClient.invalidateQueries({ queryKey: projectKeys.lists() })
+      },
+      onError: (error) => {
+        trackTextSubmitted(content, 'existing', false)
+        handleExtractError(error)
+      }
     })
   }
 

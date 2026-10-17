@@ -23,10 +23,10 @@ import { SetCategoryModal } from './SetCategoryModal'
 import { ResumeSectionEdit } from './edit/ResumeSectionEdit'
 import { ExperienceEditProvider, useExperienceEditState } from '../model/experienceEditContext'
 import { TargetJdProvider } from '../model/targetJdContext'
-import { useResumeDraftViewedTracking } from '../hooks/useResumeDraftViewedTracking'
 import { ResumeMobilePreview } from './ResumeMobilePreview'
 import { useRouter } from 'next/navigation'
 import { ResumePreview } from './preview/ResumePreview'
+import { ResumeBuilderViewTracker } from './ResumeBuilderViewTracker'
 
 import * as amplitude from '@amplitude/unified'
 
@@ -39,6 +39,10 @@ export const ResumeEditPage = ({ resumeId }: { resumeId: string }) => {
 
   return (
     <Flex direction="column" className="h-full flex-1 overflow-hidden">
+      {/* 데스크톱·모바일 공통 진입 이벤트. 화면을 막지 않도록 별도 Suspense로 감싼다. */}
+      <Suspense fallback={null}>
+        <ResumeBuilderViewTracker resumeId={resumeId} />
+      </Suspense>
       <ErrorBoundary fallback={({ error }) => (isAccessDeniedError(error) ? <ResumeAccessDeniedFallback error={error} /> : <ResumeFallback>Failed to load resume.</ResumeFallback>)}>
         <Suspense fallback={<ResumeFallback>불러오는 중...</ResumeFallback>}>
           {isDesktop === null ? <ResumeFallback>불러오는 중...</ResumeFallback> : isDesktop ? <ResumeWorkspace resumeId={resumeId} /> : <ResumeMobilePreview resumeId={resumeId} />}
@@ -96,9 +100,6 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   const workspaceId = useWorkspaceId()
   const { resume } = useResumeDetail(workspaceId, resumeId)
 
-  // 페이지 진입 시 Amplitude 이벤트 전송
-  useResumeDraftViewedTracking(resume)
-
   const defaultValues = useMemo(() => resumeToFormValues(resume), [resume])
   const form = useForm<ResumeFormValues>({ defaultValues })
   const { mutate: updateResume, mutateAsync: updateResumeAsync, isPending } = useUpdateResume(workspaceId, resumeId)
@@ -138,7 +139,12 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   )
 
   const handleSave = form.handleSubmit((values) => {
-    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED, { jd_id: resume.targetJd?.jdId })
+    // AI 대화방에서 적용한 경험 항목(experienceQuestionRoomId 보유) 중 완료 시점에 이력서에 보이는 것만 센다.
+    const appliedAiBlockCount = values.sections
+      .filter((section) => section.type === 'EXPERIENCE' && section.visible)
+      .flatMap((section) => section.items)
+      .filter((item) => item.visible && item.payload.experience?.experienceQuestionRoomId).length
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED, { resume_id: resumeId, applied_ai_block_count: appliedAiBlockCount })
     updateResume(buildSaveInput(values, 'COMPLETED'), {
       onSuccess: () => {
         setLastSavedAt(new Date())

@@ -14,7 +14,7 @@ import { JdResumeFlowDialogs } from './JdResumeFlowDialogs'
 import { useJdResumeFlow } from '../hooks/useJdResumeFlow'
 
 export const JDAnalysisForm = () => {
-  const { flow, handleRegister, handleSelectPosition, handleReset, isPending, dialogProps } = useJdResumeFlow()
+  const { flow, handleRegister, handleSelectPosition, handleReset, isPending, dialogProps } = useJdResumeFlow('home_input')
 
   return (
     <>

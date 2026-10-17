@@ -10,11 +10,11 @@ type StarField = 'situation' | 'task' | 'action' | 'result'
  * 필드 4개가 한 컴포넌트에서 동시에 존재하므로 focus 시점 값을 필드별로 따로 기억한다.
  * @example
  * ```tsx
- * const { handleFocus, handleChange } = useStarFieldEditTracking()
+ * const { handleFocus, handleChange } = useStarFieldEditTracking(experience.experienceId)
  * <Textarea onFocus={() => handleFocus('situation', values.situation)} onChange={(e) => { handleChange('situation', e.target.value); setValues(...) }} />
  * ```
  */
-export const useStarFieldEditTracking = () => {
+export const useStarFieldEditTracking = (experienceId: string) => {
   const valueAtFocusRef = useRef<Record<StarField, string | null>>({ situation: null, task: null, action: null, result: null })
 
   const handleFocus = (field: StarField, currentValue: string) => {
@@ -24,7 +24,7 @@ export const useStarFieldEditTracking = () => {
   const handleChange = (field: StarField, nextValue: string) => {
     const valueAtFocus = valueAtFocusRef.current[field]
     if (valueAtFocus === null || nextValue === valueAtFocus) return
-    amplitude.track(AMPLITUDE_EVENTS.STAR_FIELD_EDITED, { field })
+    amplitude.track(AMPLITUDE_EVENTS.STAR_FIELD_EDITED, { field, experience_id: experienceId })
     valueAtFocusRef.current[field] = null
   }
 

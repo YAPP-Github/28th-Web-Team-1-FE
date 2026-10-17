@@ -11,7 +11,7 @@ import { toLanguagePayloads } from '../../model/profileToSectionPayloads'
 
 export const LanguageSection = ({ title, sectionIndex }: { title: string; sectionIndex: number }) => {
   const { fields, remove, addItem } = useSectionItems(sectionIndex)
-  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toLanguagePayloads)
+  const { loadProfileItems, isLoading } = useLoadProfileItems(addItem, toLanguagePayloads, 'language')
 
   return (
     <Section
