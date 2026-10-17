@@ -225,7 +225,15 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, cardRank,
 
   const { openManual } = useExperienceEdit()
 
-  const handleApply = (block: NonNullable<ExperienceQuestionRoomMessage['block']>) => {
+  const handleApply = (block: NonNullable<ExperienceQuestionRoomMessage['block']>, messageIndex: number) => {
+    // Amplitude 이벤트 전송. AI 대화방에서 [이력서 적용] 시 관련정보를 보낸다.
+    const userMessages = messages.slice(0, messageIndex).filter((message) => message.role === 'USER')
+    amplitude.track(AMPLITUDE_EVENTS.AI_RESULT_APPLIED, {
+      card_rank: cardRank,
+      turn_index: userMessages.length,
+      attached_count: userMessages.at(-1)?.experiences?.length ?? 0,
+      block_id: questionRoomId
+    })
     const addedUid = applyExperienceBlockToForm(form, { sectionIndex, experienceQuestionRoomId: questionRoomId, block })
     openManual(addedUid)
     onApplied()
@@ -298,14 +306,14 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, cardRank,
             관련 경험을 입력하면 SCOOP AI가 공고에 맞춰 초안을 작성해 드려요.
           </Text>
         </Flex>
-        {messages.map((message) =>
+        {messages.map((message, index) =>
           message.role === 'USER' ? (
             <UserMessageCard key={message.messageId} message={message} />
           ) : (
             <AiMessageCard
               key={message.messageId}
               message={message}
-              onApply={() => message.block && handleApply(message.block)}
+              onApply={() => message.block && handleApply(message.block, index)}
               onCopy={() => amplitude.track(AMPLITUDE_EVENTS.TEXT_COPIED, { jd_id: targetJdId, section_name: 'experience', location: 'ai_chat' })}
             />
           )
