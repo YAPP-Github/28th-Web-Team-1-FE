@@ -133,15 +133,17 @@ const Menu = ({ trigger, children }: MenuProps) => {
           {trigger}
         </button>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content
-        className={'bg-element-white text-text-subtler shadow-3 shadow-shadow-3 w-47 overflow-hidden rounded-md'}
-        side={'top'}
-        align={'center'}
-        sideOffset={10}
-        collisionPadding={15}
-      >
-        {children}
-      </DropdownMenu.Content>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className={'bg-element-white text-text-subtler shadow-3 shadow-shadow-3 w-47 overflow-hidden rounded-md'}
+          side={'top'}
+          align={'center'}
+          sideOffset={10}
+          collisionPadding={15}
+        >
+          {children}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
     </DropdownMenu.Root>
   )
 }
