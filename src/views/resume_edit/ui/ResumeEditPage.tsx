@@ -135,7 +135,12 @@ const ResumeWorkspace = ({ resumeId }: { resumeId: string }) => {
   )
 
   const handleSave = form.handleSubmit((values) => {
-    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED, { resume_id: resumeId })
+    // AI 대화방에서 적용한 경험 항목(experienceQuestionRoomId 보유) 중 완료 시점에 이력서에 보이는 것만 센다.
+    const appliedAiBlockCount = values.sections
+      .filter((section) => section.type === 'EXPERIENCE' && section.visible)
+      .flatMap((section) => section.items)
+      .filter((item) => item.visible && item.payload.experience?.experienceQuestionRoomId).length
+    amplitude.track(AMPLITUDE_EVENTS.RESUME_COMPLETION_CLICKED, { resume_id: resumeId, applied_ai_block_count: appliedAiBlockCount })
     updateResume(buildSaveInput(values, 'COMPLETED'), {
       onSuccess: () => {
         setLastSavedAt(new Date())
