@@ -46,3 +46,13 @@ storybook-static
 .idea/
 # Sentry Config File
 .env.sentry-build-plugin
+
+# AI E2E (PR마다 일회성으로 생성되는 TC·spec·리포트)
+/e2e-ai/generated/
+/e2e-ai/tc.md
+/e2e-ai/result.md
+/e2e-ai/report.json
+/e2e-ai/site/
+/e2e-ai/screens.md
+/playwright-report/
+/test-results/
