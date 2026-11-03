@@ -209,7 +209,7 @@ const ExperienceList = ({ workspaceId, projectId, projectTitle, params, selected
     <Flex className={'min-w-0 flex-1'}>
       <Flex direction={'column'} gap={'4'} className={'min-h-0 w-90 flex-1 overflow-y-auto px-5 py-4'}>
         <Flex justify={'between'} align={'center'}>
-          <Heading variant={'heading2'} className={'line-clamp-1'}>
+          <Heading variant={'headline2'} className={'line-clamp-1'}>
             {projectTitle}
           </Heading>
 
