@@ -1,10 +1,12 @@
 name: 'AI E2E'
 
-# PR의 Vercel Preview 배포가 끝나면 Claude가 이슈·PR·diff를 보고 TC를 만들어 E2E를 실행하고 결과를 PR에 코멘트한다.
+# PR에 `🤖 E2E` 라벨을 붙이면 그 시점 커밋의 Vercel Preview로 한 번 실행한다.
+# Claude가 이슈·PR·diff를 보고 TC를 만들어 E2E를 실행하고 결과를 PR에 코멘트한다.
+#  - 이후 push로는 다시 실행하지 않는다. 재실행하려면 라벨을 뗐다 다시 붙이거나 workflow_dispatch로 실행
+#  - Preview 배포가 아직 진행 중이면 끝날 때까지 최대 15분 기다린다
 # 지침: .claude/skills/e2e-from-pr/SKILL.md (로컬 `/e2e-from-pr`과 동일)
 
 on:
-  deployment_status:
   workflow_dispatch:
     inputs:
       pr_number:
@@ -13,9 +15,9 @@ on:
       base_url:
         description: '테스트할 URL (Vercel Preview)'
         required: true
-  # PR이 닫히면 Pages에 올린 해당 PR 리포트를 지운다
+  # labeled: 라벨 부착 시 실행 / closed: Pages에 올린 해당 PR 리포트 삭제
   pull_request:
-    types: [closed]
+    types: [labeled, closed]
 
 permissions:
   contents: write # gh-pages 브랜치에 리포트 push
@@ -24,18 +26,18 @@ permissions:
   deployments: read
 
 concurrency:
-  group: e2e-ai-${{ github.event.deployment.sha || github.event.inputs.pr_number || github.event.pull_request.number }}
+  group: e2e-ai-${{ github.event.inputs.pr_number || github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   e2e-ai:
-    # Vercel Preview 배포 성공 시 또는 수동 실행
+    # 수동 실행 / `🤖 E2E` 라벨 부착
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.deployment_status.state == 'success' &&
-       startsWith(github.event.deployment.environment, 'Preview'))
+      (github.event_name == 'pull_request' && github.event.action == 'labeled' &&
+       github.event.label.name == '🤖 E2E')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -45,23 +47,35 @@ jobs:
         env:
           INPUT_PR: ${{ github.event.inputs.pr_number }}
           INPUT_URL: ${{ github.event.inputs.base_url }}
-          DEPLOY_SHA: ${{ github.event.deployment.sha }}
-          DEPLOY_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}
+          LABELED_PR: ${{ github.event.pull_request.number }}
+          LABELED_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          if [ -n "$INPUT_PR" ]; then
+          skip() { echo "$1 → 건너뜀"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; }
+          REPO="${{ github.repository }}"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             PR="$INPUT_PR"; URL="$INPUT_URL"
           else
-            PR=$(gh api "repos/${{ github.repository }}/commits/$DEPLOY_SHA/pulls" --jq '[.[] | select(.state == "open")][0].number // empty')
-            URL="$DEPLOY_URL"
+            # 라벨을 붙인 커밋의 Preview 배포 완료를 기다린다 (20초 간격, 최대 15분)
+            PR="$LABELED_PR"; URL=""
+            for _ in $(seq 1 45); do
+              DEPLOY_ID=$(gh api "repos/$REPO/deployments?sha=$LABELED_SHA" --jq '[.[] | select(.environment | startswith("Preview"))][0].id // empty')
+              if [ -n "$DEPLOY_ID" ]; then
+                read -r STATE DEPLOY_URL <<< "$(gh api "repos/$REPO/deployments/$DEPLOY_ID/statuses" --jq '.[0] | "\(.state) \(.environment_url // .target_url)"')"
+                [ "$STATE" = "success" ] && { URL="$DEPLOY_URL"; break; }
+                [[ "$STATE" = "failure" || "$STATE" = "error" ]] && skip "Preview 배포 실패(state=$STATE)"
+              fi
+              echo "Preview 배포 대기 중... (state=${STATE:-none})"; sleep 20
+            done
+            [ -z "$URL" ] && skip "15분 내 Preview 배포 완료를 확인하지 못함"
           fi
-          if [ -z "$PR" ]; then echo "열린 PR 없음 → 건너뜀"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          [ -z "$PR" ] && skip "PR 번호 없음"
 
-          INFO=$(gh pr view "$PR" --repo "${{ github.repository }}" --json baseRefName,headRefOid,isDraft,title,url,author,labels)
+          INFO=$(gh pr view "$PR" --repo "$REPO" --json baseRefName,headRefOid,isDraft,title,url,author)
           BASE=$(jq -r .baseRefName <<< "$INFO")
           DRAFT=$(jq -r .isDraft <<< "$INFO")
-          SKIP_LABEL=$(jq -r '[.labels[].name] | index("skip-e2e") != null' <<< "$INFO")
-          if [[ "$BASE" != "dev" && "$BASE" != "main" ]] || [ "$DRAFT" = "true" ] || [ "$SKIP_LABEL" = "true" ]; then
-            echo "대상 아님(base=$BASE, draft=$DRAFT, skip-e2e=$SKIP_LABEL) → 건너뜀"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0
+          if [[ "$BASE" != "dev" && "$BASE" != "main" ]] || [ "$DRAFT" = "true" ]; then
+            skip "대상 아님(base=$BASE, draft=$DRAFT)"
           fi
 
           {
@@ -69,7 +83,7 @@ jobs:
             echo "pr=$PR"
             echo "url=$URL"
             echo "base=$BASE"
-            echo "sha=$(jq -r .headRefOid <<< "$INFO")"
+            echo "sha=${LABELED_SHA:-$(jq -r .headRefOid <<< "$INFO")}" # 라벨 부착 시점 커밋 = 테스트한 Preview 커밋
             echo "title=$(jq -r .title <<< "$INFO")"
             echo "pr_url=$(jq -r .url <<< "$INFO")"
             echo "author=$(jq -r .author.login <<< "$INFO")"
