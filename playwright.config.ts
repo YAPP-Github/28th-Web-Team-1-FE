@@ -30,6 +30,8 @@ export default defineConfig({
     extraHTTPHeaders,
     locale: 'ko-KR',
     timezoneId: 'Asia/Seoul',
+    // 로컬 dev의 MSW 서비스워커가 page.route 가로채기와 충돌해 페이지가 멈추므로 막는다 (Preview에는 영향 없음)
+    serviceWorkers: 'block',
     trace: 'retain-on-failure',
     screenshot: 'on',
     video: 'retain-on-failure'
