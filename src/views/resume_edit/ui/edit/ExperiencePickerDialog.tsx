@@ -159,24 +159,39 @@ const ProjectExperiencesBody = ({ workspaceId, activeProjectId, listParams, sele
 type ProjectListItem = ReturnType<typeof useProjectList>['projects'][number]
 
 /** 프로젝트 한 항목(이름·기간·경험 수). 활성 상태 스타일과 클릭 동작만 담당한다. */
-const ProjectItem = ({ project, isActive, disabled, onSelect }: { project: ProjectListItem; isActive: boolean; disabled: boolean; onSelect: (projectId: string) => void }) => (
-  <button
-    type={'button'}
-    disabled={disabled}
-    onClick={() => onSelect(project.projectId)}
-    className={cn(
-      'hover:bg-element-white hover:shadow-2 flex flex-col gap-0.5 rounded-md px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent',
-      isActive && 'bg-element-white shadow-2'
-    )}
-  >
-    <Text variant={'label1'} truncate className={cn('line-clamp-1', isActive && 'text-text-primary-basic')}>
-      {project.name}
-    </Text>
-    <Text variant={'label2'} color={'text-subtler'} truncate>
-      {formatDate(project.period?.startAt, 'YYYY.MM')} - {formatDate(project.period?.endAt, 'YYYY.MM')} · 경험 {project.experienceCount}개
-    </Text>
-  </button>
-)
+const ProjectItem = ({ project, isActive, disabled, onSelect }: { project: ProjectListItem; isActive: boolean; disabled: boolean; onSelect: (projectId: string) => void }) => {
+  const start = formatDate(project.period?.startAt, 'YYYY.MM')
+  const end = formatDate(project.period?.endAt, 'YYYY.MM')
+
+  // Todo: periodText에서도 진행 중 파편화 통일할지 고민 필요
+  const period =
+    start && end
+      ? `${start} - ${end}`
+      : start
+        ? `${start} - 진행 중` // '진행 중' 대신 `${start} -` 로 변경 가능
+        : end
+          ? `- ${end}`
+          : ''
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onSelect(project.projectId)}
+      className={cn(
+        'hover:bg-element-white hover:shadow-2 flex flex-col gap-0.5 rounded-md px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent',
+        isActive && 'bg-element-white shadow-2'
+      )}
+    >
+      <Text variant="label1" truncate className={cn('line-clamp-1', isActive && 'text-text-primary-basic')}>
+        {project.name}
+      </Text>
+      <Text variant="label2" color="text-subtler" truncate>
+        {period ? `${period} · ` : ''} 경험 {project.experienceCount ?? 0}개
+      </Text>
+    </button>
+  )
+}
 
 interface ExperienceListProps {
   workspaceId: string
