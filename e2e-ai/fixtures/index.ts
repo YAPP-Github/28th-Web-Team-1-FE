@@ -29,11 +29,9 @@ export const test = base.extend<Fixtures>({
     const isHttps = url.protocol === 'https:'
     const cookie = { domain: url.hostname, path: '/', httpOnly: true, secure: isHttps, sameSite: 'Lax' as const }
 
-    const cookies = [{ name: 'refresh_token', value: refreshToken, ...cookie }]
-    // access_token은 30분 만료라 생략 가능. 없으면 middleware가 refresh_token으로 발급한다.
-    if (process.env.QA_ACCESS_TOKEN) cookies.push({ name: 'access_token', value: process.env.QA_ACCESS_TOKEN, ...cookie })
-
-    await context.addCookies(cookies)
+    // refresh_token만 넣는다. middleware가 access_token을 새로 발급하므로 refresh 만료 시 스모크가 바로 실패한다.
+    // (만료된 access_token을 같이 넣으면 middleware가 검증 없이 통과시켜 refresh 만료를 가린다)
+    await context.addCookies([{ name: 'refresh_token', value: refreshToken, ...cookie }])
     await blockTracking(page)
     await provide(page)
   },

@@ -14,7 +14,9 @@ TC와 spec은 일회성이다. `e2e-ai/generated/`, `e2e-ai/tc.md`, `e2e-ai/resu
 
 ## 1. 컨텍스트 수집
 0. **번호 해석**: 이 레포는 이슈·PR이 같은 번호 체계를 쓴다 (브랜치 `feat/#215`의 PR은 #217일 수 있음)
-   - `gh pr view <N>`이 실패하면 이슈 번호로 보고, 연결된 PR을 찾는다: `gh pr list --state all --search "<N> in:title,body" --json number,headRefName,state` 중 `headRefName`이 `*/#<N>`인 것 → 없으면 PR 본문에 `#<N>`이 있는 것
+   - `gh pr view <N>`이 실패하면 이슈 번호로 보고, 연결된 PR을 찾는다
+     1. 브랜치명 기준: `gh pr list --state all --limit 200 --json number,headRefName,state,body` 결과를 가져와 `headRefName`이 `*/#<N>`으로 끝나는 것 (검색어로 거르지 않는다. 제목·본문에 번호가 없으면 검색에서 빠진다)
+     2. 없으면 같은 결과에서 `body`에 `#<N>`이 있는 것
    - 그래도 없으면 중단하고 "PR을 찾지 못함"으로 보고한다. 어떤 PR로 진행했는지 결과 첫 줄에 적는다 (예: "이슈 #215 → PR #217")
 1. PR: `gh pr view <PR> --json number,title,body,headRefName,baseRefName,files`
    - `gh`가 없으면 현재 브랜치명과 `git log origin/dev..HEAD --oneline`으로 대신한다
@@ -48,6 +50,7 @@ TC와 spec은 일회성이다. `e2e-ai/generated/`, `e2e-ai/tc.md`, `e2e-ai/resu
 - TC마다(또는 화면 단위로) `NN-<화면>.spec.ts` 작성
 - **반드시** `import { test, expect, waitForGraphql, expectToast, expectAuthenticated, e2eName } from '../fixtures'` 사용 (`@playwright/test` 직접 import 금지)
   - `page`: 로그인 상태, `guestPage`: 비로그인 상태
+  - ⛔ **한 테스트에서 `page`와 `guestPage`를 함께 쓰지 않는다.** 같은 context를 공유해 `page`의 로그인 쿠키가 `guestPage`에도 적용된다 (비로그인 `/` 진입이 `/home`으로 리다이렉트됨). 로그인/비로그인 비교는 테스트를 나눈다
 - test 제목은 `TC-01 | <시나리오>` 형식, 모바일도 돌릴 TC는 제목 끝에 ` @mobile`
 - 셀렉터 우선순위: `getByRole` > `getByLabel`/`getByPlaceholder` > `getByText` > `getByTestId` > CSS
   - 셀렉터를 정하기 전에 실제 컴포넌트 소스를 읽어 문구·role을 확인한다
