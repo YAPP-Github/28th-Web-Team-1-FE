@@ -133,7 +133,7 @@ jobs:
           claude -p "$PROMPT" \
             --permission-mode acceptEdits \
             --max-turns 80 \
-            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(npx playwright test:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh issue view:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(cp:*),Bash(mkdir:*),Bash(ls:*)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(npx playwright test:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr list:*),Bash(git merge-base:*),Bash(gh issue view:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(cp:*),Bash(mkdir:*),Bash(ls:*)"
 
       # AI 보고와 별개로 최종 spec을 한 번 더 실행해 실제 결과를 교차 확인한다
       - name: Verify (final Playwright run)
