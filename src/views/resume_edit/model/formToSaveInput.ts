@@ -28,16 +28,18 @@ export const formToSaveInput = (values: ResumeFormValues, meta: SaveMeta): SaveR
   status: meta.status,
   template: meta.template,
   targetJdId: meta.targetJdId,
-  sections: values.sections.map((section, sectionIndex) => ({
-    sectionId: section.sectionId ?? undefined,
-    type: section.type,
-    displayOrder: sectionIndex,
-    visible: section.visible,
-    items: section.items.map((item, itemIndex) => ({
-      itemId: item.itemId ?? undefined,
-      displayOrder: itemIndex,
-      visible: item.visible,
-      payload: toSavePayload(item.payload)
+  sections: values.sections
+    .filter((section) => !(section.autoInjected && section.items.length === 0))
+    .map((section, sectionIndex) => ({
+      sectionId: section.sectionId ?? undefined,
+      type: section.type,
+      displayOrder: sectionIndex,
+      visible: section.visible,
+      items: section.items.map((item, itemIndex) => ({
+        itemId: item.itemId ?? undefined,
+        displayOrder: itemIndex,
+        visible: item.visible,
+        payload: toSavePayload(item.payload)
+      }))
     }))
-  }))
 })

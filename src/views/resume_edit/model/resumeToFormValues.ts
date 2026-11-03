@@ -17,9 +17,9 @@ const insertAfterType = (sections: ResumeFormSection[], afterType: ResumeSection
   return index < 0 ? [...sections, section] : [...sections.slice(0, index + 1), section, ...sections.slice(index + 1)]
 }
 
-/** 편집 진입 시 경험(EXPERIENCE) 섹션이 없으면 아이템 없는 섹션을 폼에만 넣는다. 저장 시에는 `formToSaveInput`이 제외한다. */
+/** 편집 진입 시 경험(EXPERIENCE) 섹션이 없으면 아이템 없는 섹션을 폼에만 넣는다. `autoInjected`로 표시해 저장 때 구분한다. */
 const withExperienceSection = (sections: ResumeFormSection[]): ResumeFormSection[] =>
-  sections.some((s) => s.type === 'EXPERIENCE') ? sections : insertAfterType(sections, 'CORE_SKILL', createCategorySection('EXPERIENCE', sections))
+  sections.some((s) => s.type === 'EXPERIENCE') ? sections : insertAfterType(sections, 'CORE_SKILL', { ...createCategorySection('EXPERIENCE', sections), autoInjected: true })
 
 /**
  * 편집 진입 시 핵심역량(CORE_SKILL) 섹션이 없으면 빈 아이템을 주입한다.
