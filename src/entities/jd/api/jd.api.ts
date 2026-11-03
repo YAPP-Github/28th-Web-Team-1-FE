@@ -8,7 +8,7 @@ export const jdAPI = {
   getJdDetail: (variables: { workspaceId: string; jdId: string }) => execute(jdDetailDocument, variables),
   registerJd: (variables: { workspaceId: string; request: JdRegisterInput }) => execute(registerJdDocument, variables),
   getJdRecommendationTags: () => execute(jdRecommendationTagsDocument),
-  getJdRecommendations: (variables: { tags: JdRecommendationTag[]; size: number }) => execute(jdRecommendationsDocument, variables)
+  getJdRecommendations: (variables: { tags: JdRecommendationTag[]; size: number; cursor: string | null }) => execute(jdRecommendationsDocument, variables)
 }
 
 const jdInsightDocument = graphql(`
@@ -64,8 +64,12 @@ const jdRecommendationTagsDocument = graphql(`
 `)
 
 const jdRecommendationsDocument = graphql(`
-  query JdRecommendations($tags: [JdRecommendationTag!]!, $size: Int!) {
-    jdRecommendations(tags: $tags, size: $size) {
+  query JdRecommendations($tags: [JdRecommendationTag!]!, $size: Int!, $cursor: String) {
+    jdRecommendations(tags: $tags, size: $size, cursor: $cursor) {
+      cursor {
+        hasNext
+        nextCursor
+      }
       recommendations {
         id
         companyName

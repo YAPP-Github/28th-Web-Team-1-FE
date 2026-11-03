@@ -1,4 +1,4 @@
-import { queryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import { type JdRecommendationTag } from '@shared/lib/gql/graphql'
 import { jdAPI } from '../api/jd.api'
 
@@ -45,10 +45,12 @@ export const jdQueries = {
       queryKey: jdKeys.recommendationTags(),
       queryFn: jdAPI.getJdRecommendationTags
     }),
-  /** 추천 공고 목록을 조회한다. `tags`가 비면 전체, 여러 개면 모두 포함한 공고만. */
+  /** 추천 공고 목록을 커서 기반으로 조회한다. `tags`가 비면 전체, 여러 개면 모두 포함한 공고만. */
   recommendations: (tags: JdRecommendationTag[], size: number) =>
-    queryOptions({
+    infiniteQueryOptions({
       queryKey: jdKeys.recommendations(tags, size),
-      queryFn: () => jdAPI.getJdRecommendations({ tags, size })
+      queryFn: ({ pageParam }) => jdAPI.getJdRecommendations({ tags, size, cursor: pageParam }),
+      initialPageParam: null as string | null,
+      getNextPageParam: (lastPage) => (lastPage.jdRecommendations.cursor.hasNext ? lastPage.jdRecommendations.cursor.nextCursor : null)
     })
 }

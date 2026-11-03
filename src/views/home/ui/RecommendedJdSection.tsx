@@ -1,20 +1,34 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { CalendarIcon } from 'lucide-react'
-import { Flex, Grid } from '@radix-ui/themes'
+import { Flex, Grid, Skeleton } from '@radix-ui/themes'
 import { cn, formatDate } from '@shared/lib'
 import { Button, Text } from '@shared/ui'
+import { useIntersectionObserver } from '@shared/hooks/useIntersectionObserver'
 import { useJdRecommendationTags, useJdRecommendations, type JdRecommendation, type JdRecommendationTag } from '@entities/jd'
 import { useJdResumeFlow } from '../hooks/useJdResumeFlow'
 import { JdResumeFlowDialogs } from './JdResumeFlowDialogs'
 
 const RECOMMENDATION_SIZE = 6
 
+const CARD_CLASS_NAME = cn(
+  'min-w-0 rounded-lg',
+  // sm
+  'sm:border-border-subtler sm:bg-element-white sm:shadow-2 sm:border',
+  // initial
+  'bg-element-gray-lighter'
+)
+
 export const RecommendedJdSection = () => {
   const [selectedTag, setSelectedTag] = useState<JdRecommendationTag | null>(null)
   const [, startTransition] = useTransition()
   const { tags } = useJdRecommendationTags()
-  const { recommendations } = useJdRecommendations(selectedTag ? [selectedTag] : [], RECOMMENDATION_SIZE)
+  const { recommendations, hasNextPage, fetchNextPage, isFetchingNextPage } = useJdRecommendations(selectedTag ? [selectedTag] : [], RECOMMENDATION_SIZE)
+  const sentinelRef = useIntersectionObserver<HTMLDivElement>({
+    enabled: hasNextPage && !isFetchingNextPage,
+    onIntersect: fetchNextPage,
+    rootMargin: '200px'
+  })
   const { handleRegister, isPending, dialogProps } = useJdResumeFlow('recommended_posting')
 
   return (
@@ -44,12 +58,14 @@ export const RecommendedJdSection = () => {
             {recommendations.map((jd) => (
               <RecommendedJdCard key={jd.id} jd={jd} onCreate={() => handleRegister({ sourceUrl: jd.sourceUrl })} disabled={isPending} />
             ))}
+            {isFetchingNextPage && Array.from({ length: 2 }, (_, i) => <RecommendedJdCardSkeleton key={i} />)}
           </Grid>
         ) : (
           <Text as={'p'} variant={'body2'} color={'text-subtler'}>
             추천 공고가 없어요.
           </Text>
         )}
+        {hasNextPage && <div ref={sentinelRef} />}
       </Flex>
     </Flex>
   )
@@ -59,19 +75,7 @@ const RecommendedJdCard = ({ jd, onCreate, disabled }: { jd: JdRecommendation; o
   const period = [formatDate(jd.recruitmentStartAt), formatDate(jd.recruitmentEndAt)].filter(Boolean).join(' ~ ')
 
   return (
-    <Flex
-      direction={'column'}
-      justify={'between'}
-      gap={'4'}
-      p={{ initial: '4', sm: '5' }}
-      className={cn(
-        'min-w-0 rounded-lg',
-        // sm
-        'sm:border-border-subtler sm:bg-element-white sm:shadow-2 sm:border',
-        // initial
-        'bg-element-gray-lighter'
-      )}
-    >
+    <Flex direction={'column'} justify={'between'} gap={'4'} p={{ initial: '4', sm: '5' }} className={CARD_CLASS_NAME}>
       <Flex direction={'column'} className="gap-1.5">
         <Text as={'p'} variant={'label1'} color={'text-basic'} className={'truncate'}>
           [{jd.companyName}] {jd.title}
@@ -98,3 +102,16 @@ const RecommendedJdCard = ({ jd, onCreate, disabled }: { jd: JdRecommendation; o
     </Flex>
   )
 }
+
+const RecommendedJdCardSkeleton = () => (
+  <Flex direction={'column'} justify={'between'} gap={'4'} p={{ initial: '4', sm: '5' }} className={CARD_CLASS_NAME}>
+    <Flex direction={'column'} className="gap-1.5">
+      <Skeleton className={'h-5 w-3/4'} />
+      <Skeleton className={'h-4 w-32'} />
+    </Flex>
+    <Flex gap={'2'}>
+      <Skeleton className={'h-7.5 w-17'} />
+      <Skeleton className={'h-7.5 w-21'} />
+    </Flex>
+  </Flex>
+)
