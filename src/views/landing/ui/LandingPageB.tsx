@@ -2,7 +2,8 @@
 import { Suspense, useState, useTransition } from 'react'
 import Image from 'next/image'
 import heroGradient from '../assets/hero_b_gradient.webp'
-import { ArrowRightIcon, CalendarIcon } from 'lucide-react'
+import { ArrowRightIcon, CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { Flex, Grid } from '@radix-ui/themes'
 import { ErrorBoundary } from '@sentry/nextjs'
 import { cn, formatDate } from '@shared/lib'
@@ -17,16 +18,14 @@ import { TaglineSection } from './TaglineSection'
 import { UploadFeatureSection } from './UploadFeatureSection'
 import { AuthErrorToast, useGoogleLoginRedirect } from '@features/authenticate'
 
-const RECOMMENDATION_SIZE = 6
-
 /** AB-TEST(landing): 랜딩 A/B 테스트의 B안 (Aha-moment를 일찍) */
 // TODO : AB-TEST(landing)
 export const LandingPageB = () => {
   return (
     <div className="relative isolate">
       <div className="absolute inset-x-0 top-0 -z-10" aria-hidden>
-        <div className="bg-element-primary-lighter h-[calc(--spacing(109.75)+--spacing(20))] sm:hidden" />
-        <div className="relative hidden h-[calc(--spacing(164)+--spacing(26.5))] sm:block">
+        <div className="bg-element-primary-lighter h-[calc(--spacing(109.75)+(--spacing(20)))] sm:hidden" />
+        <div className="relative hidden h-[calc(--spacing(164)+(--spacing(26.5)))] sm:block">
           <Image src={heroGradient} alt="" fill priority sizes="100vw" className="object-fill" />
         </div>
         <div className="to-bg-white absolute inset-x-0 bottom-0 h-11.25 bg-linear-to-b from-transparent" />
@@ -123,11 +122,27 @@ const JdInputCard = ({ onSubmit }: { onSubmit: () => void }) => {
   )
 }
 
+const PAGE_VARIANTS = {
+  enter: (direction: number) => ({ opacity: 0, x: direction * 24 }),
+  center: { opacity: 1, x: 0 },
+  exit: (direction: number) => ({ opacity: 0, x: direction * -24 })
+}
+
 const RecommendedJdList = ({ onCreate }: { onCreate: () => void }) => {
   const [selectedTag, setSelectedTag] = useState<JdRecommendationTag | null>(null)
+
+  const [{ page, direction }, setPaging] = useState({ page: 0, direction: 1 })
   const [, startTransition] = useTransition()
   const { tags } = useJdRecommendationTags()
-  const { recommendations } = useJdRecommendations(selectedTag ? [selectedTag] : [], RECOMMENDATION_SIZE)
+  const { pages, hasNextPage, fetchNextPage, isFetchingNextPage } = useJdRecommendations(selectedTag ? [selectedTag] : [], 4)
+
+  const visible = pages[page] ?? []
+  const isLoadedLast = page === pages.length - 1
+
+  const goNext = async () => {
+    if (isLoadedLast) await fetchNextPage()
+    setPaging({ page: page + 1, direction: 1 })
+  }
 
   return (
     <Flex direction={'column'} gap={{ initial: '4', sm: '6' }} className={'w-full max-w-215'}>
@@ -143,19 +158,50 @@ const RecommendedJdList = ({ onCreate }: { onCreate: () => void }) => {
               size={'xs'}
               variant={selectedTag === tag ? 'secondary' : 'outline'}
               aria-pressed={selectedTag === tag}
-              onClick={() => startTransition(() => setSelectedTag(selectedTag === tag ? null : tag))}
+              onClick={() =>
+                startTransition(() => {
+                  setSelectedTag(selectedTag === tag ? null : tag)
+                  setPaging({ page: 0, direction: 1 })
+                })
+              }
             >
               {name}
             </Button>
           ))}
         </Flex>
 
-        {recommendations.length ? (
-          <Grid columns={{ initial: '1', sm: '2' }} gap={'4'}>
-            {recommendations.map((jd) => (
-              <RecommendedJdCard key={jd.id} jd={jd} onCreate={onCreate} />
-            ))}
-          </Grid>
+        {visible.length ? (
+          <Flex direction={'column'} gap={'4'}>
+            <div className={'overflow-hidden'}>
+              <AnimatePresence mode={'wait'} initial={false} custom={direction}>
+                <motion.div
+                  key={`${selectedTag}-${page}`}
+                  custom={direction}
+                  variants={PAGE_VARIANTS}
+                  initial={'enter'}
+                  animate={'center'}
+                  exit={'exit'}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                >
+                  <Grid columns={{ initial: '1', sm: '2' }} gap={'4'}>
+                    {visible.map((jd) => (
+                      <RecommendedJdCard key={jd.id} jd={jd} onCreate={onCreate} />
+                    ))}
+                  </Grid>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            <Flex justify={'center'} gap={'2'}>
+              <Button size={'sm'} variant={'outline'} onClick={() => setPaging({ page: page - 1, direction: -1 })} disabled={page === 0}>
+                <ChevronLeftIcon data-icon={'inline-start'} />
+                이전
+              </Button>
+              <Button size={'sm'} variant={'outline'} onClick={goNext} disabled={(isLoadedLast && !hasNextPage) || isFetchingNextPage}>
+                다음
+                <ChevronRightIcon data-icon={'inline-end'} />
+              </Button>
+            </Flex>
+          </Flex>
         ) : (
           <Text as={'p'} variant={'body2'} color={'text-subtler'}>
             추천 공고가 없어요.
@@ -187,14 +233,12 @@ const RecommendedJdCard = ({ jd, onCreate }: { jd: JdRecommendation; onCreate: (
         <Text as={'p'} variant={'label1'} color={'text-basic'} className={'truncate'}>
           [{jd.companyName}] {jd.title}
         </Text>
-        {period && (
-          <Flex align={'center'} gap={'1'}>
-            <CalendarIcon size={12} className={'text-text-subtler'} />
-            <Text variant={'caption2'} color={'text-subtler'}>
-              {period}
-            </Text>
-          </Flex>
-        )}
+        <Flex align={'center'} gap={'1'} className={cn(!period && 'invisible')} aria-hidden={!period}>
+          <CalendarIcon size={12} className={'text-text-subtler'} />
+          <Text variant={'caption2'} color={'text-subtler'}>
+            {period || '-'}
+          </Text>
+        </Flex>
       </Flex>
       <Flex gap={'2'}>
         <Button asChild size={'xs'} variant={'secondary'}>

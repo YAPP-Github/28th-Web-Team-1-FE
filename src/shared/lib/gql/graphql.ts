@@ -677,10 +677,11 @@ export type JdRecommendationTagsQuery = { jdRecommendationTags: Array<{ tag: JdR
 export type JdRecommendationsQueryVariables = Exact<{
   tags: Array<JdRecommendationTag> | JdRecommendationTag;
   size: number;
+  cursor?: string | null | undefined;
 }>;
 
 
-export type JdRecommendationsQuery = { jdRecommendations: { recommendations: Array<{ id: string, companyName: string, title: string, sourceUrl: string, recruitmentStartAt: string | null, recruitmentEndAt: string | null }> } };
+export type JdRecommendationsQuery = { jdRecommendations: { cursor: { hasNext: boolean, nextCursor: string | null }, recommendations: Array<{ id: string, companyName: string, title: string, sourceUrl: string, recruitmentStartAt: string | null, recruitmentEndAt: string | null }> } };
 
 export type ConnectNotionMutationVariables = Exact<{
   workspaceId: string | number;
@@ -1290,8 +1291,12 @@ export const JdRecommendationTagsDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<JdRecommendationTagsQuery, JdRecommendationTagsQueryVariables>;
 export const JdRecommendationsDocument = new TypedDocumentString(`
-    query JdRecommendations($tags: [JdRecommendationTag!]!, $size: Int!) {
-  jdRecommendations(tags: $tags, size: $size) {
+    query JdRecommendations($tags: [JdRecommendationTag!]!, $size: Int!, $cursor: String) {
+  jdRecommendations(tags: $tags, size: $size, cursor: $cursor) {
+    cursor {
+      hasNext
+      nextCursor
+    }
     recommendations {
       id
       companyName

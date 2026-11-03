@@ -5,6 +5,7 @@ import { ProcessingView, Text } from '@shared/ui'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@shared/ui/dialog'
 
 import type { useJdResumeFlow } from '../hooks/useJdResumeFlow'
+import { cn } from '@/src/shared/lib'
 
 /**
  * 이력서 생성 방식 모달 + JD 분석·PDF 추출 진행 모달.
@@ -67,7 +68,17 @@ export const JdResumeFlowDialogs = ({ method, progress }: ReturnType<typeof useJ
 }
 
 const MethodCard = ({ title, description, thumbnail, onClick }: { title: string; description: string; thumbnail: React.ReactNode; onClick: () => void }) => (
-  <button type="button" onClick={onClick} className="bg-element-gray-lighter flex items-center justify-between gap-4 rounded-lg p-6 text-left">
+  <button
+    type="button"
+    onClick={onClick}
+    className={cn(
+      `bg-element-gray-lighter group out flex items-center justify-between gap-4 rounded-lg p-6 text-left transition-all duration-300`,
+      //hover
+      `hover:bg-element-primary-lighter hover:ring-btn-secondary-border-hovered hover:ring-1`,
+      //focus
+      `focus:not-hover:ring-btn-tertiary-border focus:ring-1 focus:outline-none`
+    )}
+  >
     <Flex direction="column" gap="6px">
       <Text variant="headline2" weight="semibold" className="text-text-basic">
         {title}
@@ -81,7 +92,7 @@ const MethodCard = ({ title, description, thumbnail, onClick }: { title: string;
 )
 
 const ResumeIcon = () => (
-  <span aria-hidden className="bg-element-gray-light relative h-15 w-12.5 shrink-0 overflow-clip rounded-[3.7px]">
+  <span aria-hidden className="bg-element-gray-light group-hover:bg-element-primary-light relative h-15 w-12.5 shrink-0 overflow-clip rounded-[3.7px] transition-all duration-300">
     <span className="bg-primary-0 absolute top-3 left-1.5 h-1 w-6 rounded-full" />
     <span className="text-gray-95 absolute top-1.25 left-[7.64px] text-[8px] leading-[1.35] font-bold tracking-[-0.16px]">이력서</span>
     <span className="bg-primary-10 absolute top-1.75 left-9 size-2 rounded-full" />
@@ -94,7 +105,7 @@ const ResumeIcon = () => (
 )
 
 const ResumePlusIcon = () => (
-  <span aria-hidden className="bg-element-gray-light relative flex h-15 w-12.5 shrink-0 items-center justify-center rounded-[3.7px]">
+  <span aria-hidden className="bg-element-gray-light group-hover:bg-element-primary-light relative flex h-15 w-12.5 shrink-0 items-center justify-center rounded-[3.7px] transition-all duration-300">
     <span className="bg-gray-0 relative flex size-6.5 items-center justify-center rounded-full">
       <span className="bg-primary-30 absolute h-[2.8px] w-4.25 rounded-full" />
       <span className="bg-primary-30 absolute h-4.25 w-[2.8px] rounded-full" />

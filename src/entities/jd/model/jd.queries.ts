@@ -1,5 +1,5 @@
 'use client'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { type JdRecommendationTag } from '@shared/lib/gql/graphql'
 import { jdQueries } from './jd.keys'
 
@@ -82,18 +82,20 @@ export const useJdRecommendationTags = () => {
 
 /**
  * 추천 공고 목록을 Suspense로 조회한다. `tags`가 비면 전체, 여러 개면 모두 포함한 공고만 온다.
+ * 커서 기반 페이지들을 평탄화한 목록(`recommendations`, 무한 스크롤용)과 페이지별 목록(`pages`, 이전/다음용)을 함께 돌려준다.
  * 로딩은 상위 `Suspense`, 실패는 상위 `ErrorBoundary`가 처리한다.
  * @param tags 필터할 추천 태그 목록
- * @param size 조회 개수 (서버 최대 30)
+ * @param size 페이지당 조회 개수
  * @example
  * ```tsx
- * const { recommendations } = useJdRecommendations(['POPULAR'], 6)
+ * const { recommendations, hasNextPage, fetchNextPage } = useJdRecommendations(['POPULAR'], 6)
+ * const { pages } = useJdRecommendations([], 4) // pages[0] = 첫 페이지 4개
  * ```
  */
 export const useJdRecommendations = (tags: JdRecommendationTag[], size: number) => {
-  const { data, ...rest } = useSuspenseQuery({
+  const { data, ...rest } = useSuspenseInfiniteQuery({
     ...jdQueries.recommendations(tags, size),
-    select: (data) => data.jdRecommendations.recommendations
+    select: (data) => data.pages.map((page) => page.jdRecommendations.recommendations)
   })
-  return { recommendations: data, ...rest }
+  return { pages: data, recommendations: data.flat(), ...rest }
 }
