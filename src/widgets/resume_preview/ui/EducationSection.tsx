@@ -1,6 +1,7 @@
 import type { Degree, EducationStatus, ResumeEducationFieldsFragment } from '@shared/lib/gql/graphql'
 import { DEGREE_LABELS, EDUCATION_STATUS_LABELS } from '@entities/profile'
-import { Section, SectionItem, SectionItemSubtitle, SectionItemTitle, periodText, SectionItemShell, type SectionItemWrapper, type PreviewItem } from './Section'
+import { Section, SectionItem, SectionItemSubtitle, SectionItemTitle, SectionItemShell, type SectionItemWrapper, type PreviewItem } from './Section'
+import { educationPeriodText } from '@entities/resume'
 
 export const EducationSection = ({ title, items, ItemWrapper }: { title: string; items: Array<PreviewItem<ResumeEducationFieldsFragment>>; ItemWrapper?: SectionItemWrapper }) => {
   return (
@@ -9,13 +10,11 @@ export const EducationSection = ({ title, items, ItemWrapper }: { title: string;
         // 서버가 enum 코드('BACHELOR'/'GRADUATED')로 내려주므로 표시용 한글 라벨로 변환한다.
         const degree = item.degree ? (DEGREE_LABELS[item.degree as Degree] ?? item.degree) : null
         const status = item.status ? (EDUCATION_STATUS_LABELS[item.status as EducationStatus] ?? item.status) : null
-        // 졸업·수료는 이미 끝난 학력이므로 종료일이 없어도 '진행 중'을 붙이지 않는다.
-        const isCompleted = item.status === 'GRADUATED' || item.status === 'COMPLETED'
         return (
           <SectionItemShell key={item.uid ?? index} ItemWrapper={ItemWrapper} uid={item.uid} index={index}>
             <SectionItem>
               <SectionItemTitle>{[item.schoolName, item.major].filter(Boolean).join(' ')}</SectionItemTitle>
-              <SectionItemSubtitle parts={[periodText(item.period, { showOngoing: !isCompleted }), degree, status]} />
+              <SectionItemSubtitle parts={[educationPeriodText(item), degree, status]} />
             </SectionItem>
           </SectionItemShell>
         )

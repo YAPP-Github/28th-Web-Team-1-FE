@@ -1,5 +1,6 @@
 import type { ResumeExperienceFieldsFragment } from '@shared/lib/gql/graphql'
-import { Section, SectionItem, SectionItemContent, SectionItemSubtitle, SectionItemTitle, periodText, SectionItemShell, type SectionItemWrapper, type PreviewItem } from './Section'
+import { Section, SectionItem, SectionItemContent, SectionItemSubtitle, SectionItemTitle, SectionItemShell, type SectionItemWrapper, type PreviewItem } from './Section'
+import { periodText } from '@entities/resume'
 
 export const ExperienceSection = ({ title, items, ItemWrapper }: { title: string; items: Array<PreviewItem<ResumeExperienceFieldsFragment>>; ItemWrapper?: SectionItemWrapper }) => {
   return (
