@@ -81,14 +81,17 @@ export const SectionItemContent = ({ children }: { children: ReactNode }) => (
   </Text>
 )
 
-/** `{ startAt, endAt }` 기간을 `2025.03 - 2025.06` 형태로 만든다. 둘 다 비어 있으면 null. */
-export const periodText = (period?: { startAt?: string | null; endAt?: string | null } | null): string | null => {
+/**
+ * `{ startAt, endAt }` 기간을 `2025.03 - 2025.06` 형태로 만든다. 둘 다 비어 있으면 null.
+ * 종료일이 없을 때 `showOngoing`이 true면 '진행 중'을 붙인다. 이미 끝난 항목(졸업·수료 등)은 false로 넘긴다.
+ */
+export const periodText = (period?: { startAt?: string | null; endAt?: string | null } | null, { showOngoing = true }: { showOngoing?: boolean } = {}): string | null => {
   const start = formatYYYYMM(period?.startAt)
   const end = formatYYYYMM(period?.endAt)
 
   if (!start && !end) return null
   if (start && end) return `${start} - ${end}`
-  if (start && !end) return `${start} - 진행 중`
+  if (start && !end) return showOngoing ? `${start} - 진행 중` : start
 
   return `- ${end}` // 종료일만 있는 경우
 }
