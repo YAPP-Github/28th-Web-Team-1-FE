@@ -85,6 +85,10 @@ export const SectionItemContent = ({ children }: { children: ReactNode }) => (
 export const periodText = (period?: { startAt?: string | null; endAt?: string | null } | null): string | null => {
   const start = formatYYYYMM(period?.startAt)
   const end = formatYYYYMM(period?.endAt)
+
   if (!start && !end) return null
-  return `${start} ${end && '-'} ${end}`
+  if (start && end) return `${start} - ${end}`
+  if (start && !end) return `${start} - 진행 중`
+
+  return `- ${end}` // 종료일만 있는 경우
 }
