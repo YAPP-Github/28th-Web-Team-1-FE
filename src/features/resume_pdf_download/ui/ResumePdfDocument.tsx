@@ -1,8 +1,8 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { Children, Fragment, type ReactNode } from 'react'
 import type { Degree, EducationStatus, ResumeBasicInfoFieldsFragment, SkillLevel } from '@shared/lib/gql/graphql'
-import { formatDate, formatYYYYMM } from '@shared/lib'
-import { payloadsOf, visibleItems, type ResumeSectionData } from '@entities/resume'
+import { formatDate } from '@shared/lib'
+import { educationPeriodText, payloadsOf, periodText, visibleItems, type ResumeSectionData } from '@entities/resume'
 import { DEGREE_LABELS, EDUCATION_STATUS_LABELS, SKILL_LEVEL_LABELS } from '@entities/profile'
 import { FONT_FAMILY } from '../lib/registerPdfFonts'
 import { buildResumeBaseName } from '../lib/resumeFileName'
@@ -53,14 +53,6 @@ const styles = StyleSheet.create({
   skillName: { fontSize: 12, flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0, maxLines: 1, textOverflow: 'ellipsis', marginRight: 8 },
   skillLevel: { fontSize: 12, color: COLOR.subtler, flexShrink: 0 }
 })
-
-/** `{ startAt, endAt }` 기간을 `2025.03 - 2025.06` 형태로. 둘 다 없으면 null. (미리보기 periodText와 동일 규약) */
-const periodText = (period?: { startAt?: string | null; endAt?: string | null } | null): string | null => {
-  const start = formatYYYYMM(period?.startAt)
-  const end = formatYYYYMM(period?.endAt)
-  if (!start && !end) return null
-  return `${start} - ${end}`
-}
 
 /** 역할·기간·기관 등 메타를 `·`로 잇는다. 빈 값은 제외. 모두 비면 렌더 안 함. (미리보기 SectionItemSubtitle 대응) */
 const Subtitle = ({ parts }: { parts: Array<string | null | undefined> }) => {
@@ -151,7 +143,7 @@ const SectionView = ({ section }: { section: ResumeSectionData }) => {
               title={[item.schoolName, item.major].filter(Boolean).join(' ')}
               // 서버가 enum 코드('BACHELOR'/'GRADUATED')로 내려주므로 표시용 한글 라벨로 변환한다.
               subtitle={[
-                periodText(item.period),
+                educationPeriodText(item),
                 item.degree ? (DEGREE_LABELS[item.degree as Degree] ?? item.degree) : null,
                 item.status ? (EDUCATION_STATUS_LABELS[item.status as EducationStatus] ?? item.status) : null
               ]}

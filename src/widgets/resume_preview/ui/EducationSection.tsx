@@ -1,6 +1,7 @@
 import type { Degree, EducationStatus, ResumeEducationFieldsFragment } from '@shared/lib/gql/graphql'
 import { DEGREE_LABELS, EDUCATION_STATUS_LABELS } from '@entities/profile'
-import { Section, SectionItem, SectionItemSubtitle, SectionItemTitle, periodText, SectionItemShell, type SectionItemWrapper, type PreviewItem } from './Section'
+import { Section, SectionItem, SectionItemSubtitle, SectionItemTitle, SectionItemShell, type SectionItemWrapper, type PreviewItem } from './Section'
+import { educationPeriodText } from '@entities/resume'
 
 export const EducationSection = ({ title, items, ItemWrapper }: { title: string; items: Array<PreviewItem<ResumeEducationFieldsFragment>>; ItemWrapper?: SectionItemWrapper }) => {
   return (
@@ -13,7 +14,7 @@ export const EducationSection = ({ title, items, ItemWrapper }: { title: string;
           <SectionItemShell key={item.uid ?? index} ItemWrapper={ItemWrapper} uid={item.uid} index={index}>
             <SectionItem>
               <SectionItemTitle>{[item.schoolName, item.major].filter(Boolean).join(' ')}</SectionItemTitle>
-              <SectionItemSubtitle parts={[periodText(item.period), degree, status]} />
+              <SectionItemSubtitle parts={[educationPeriodText(item), degree, status]} />
             </SectionItem>
           </SectionItemShell>
         )

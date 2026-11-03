@@ -104,11 +104,23 @@ const ProjectPane = ({ children }: { children: ReactNode }) => (
 const ProjectExperiencesBody = ({ workspaceId, activeProjectId, listParams, selectedExperienceIds, onToggle, onReset, onSelect }: ProjectExperiencesBodyProps) => {
   const { projects } = useProjectList(workspaceId)
   const projectTitle = projects.find((project) => project.projectId === activeProjectId)?.name ?? '프로젝트'
+  // 경험을 하나라도 고르면 같은 프로젝트 안에서만 추가로 고를 수 있도록 다른 프로젝트를 잠근다.
+  const isProjectDisabled = (projectId: string) => selectedExperienceIds.length > 0 && projectId !== activeProjectId
 
   return (
     <BodyFrame>
       <ProjectPane>
-        <ProjectList projects={projects} activeProjectId={activeProjectId} hasSelection={selectedExperienceIds.length > 0} onSelect={onSelect} />
+        {projects.length === 0 ? (
+          <Text variant={'label1'} color={'text-subtler'}>
+            등록된 프로젝트가 없어요
+          </Text>
+        ) : (
+          <Flex direction={'column'} gap={'2'} className={'overflow-y-auto'}>
+            {projects.map((project) => (
+              <ProjectItem key={project.projectId} project={project} isActive={activeProjectId === project.projectId} disabled={isProjectDisabled(project.projectId)} onSelect={onSelect} />
+            ))}
+          </Flex>
+        )}
       </ProjectPane>
 
       {activeProjectId ? (
@@ -144,51 +156,40 @@ const ProjectExperiencesBody = ({ workspaceId, activeProjectId, listParams, sele
   )
 }
 
-const ProjectList = ({
-  projects,
-  activeProjectId,
-  hasSelection,
-  onSelect
-}: {
-  projects: ReturnType<typeof useProjectList>['projects']
-  activeProjectId: string | null
-  hasSelection: boolean
-  onSelect: (projectId: string) => void
-}) => {
-  if (projects.length === 0) {
-    return (
-      <Text variant={'label1'} color={'text-subtler'}>
-        등록된 프로젝트가 없어요
-      </Text>
-    )
-  }
+type ProjectListItem = ReturnType<typeof useProjectList>['projects'][number]
+
+/** 프로젝트 한 항목(이름·기간·경험 수). 활성 상태 스타일과 클릭 동작만 담당한다. */
+const ProjectItem = ({ project, isActive, disabled, onSelect }: { project: ProjectListItem; isActive: boolean; disabled: boolean; onSelect: (projectId: string) => void }) => {
+  const start = formatDate(project.period?.startAt, 'YYYY.MM')
+  const end = formatDate(project.period?.endAt, 'YYYY.MM')
+
+  // Todo: periodText에서도 진행 중 파편화 통일할지 고민 필요
+  const period =
+    start && end
+      ? `${start} - ${end}`
+      : start
+        ? `${start} - 진행 중` // '진행 중' 대신 `${start} -` 로 변경 가능
+        : end
+          ? `- ${end}`
+          : ''
 
   return (
-    <Flex direction={'column'} gap={'2'} className={'overflow-y-auto'}>
-      {projects.map((project) => {
-        const disabled = hasSelection && project.projectId !== activeProjectId
-
-        return (
-          <button
-            key={project.projectId}
-            type={'button'}
-            disabled={disabled}
-            onClick={() => onSelect(project.projectId)}
-            className={cn(
-              'hover:bg-element-white hover:shadow-2 flex flex-col gap-0.5 rounded-md px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent',
-              activeProjectId === project.projectId && 'bg-element-white shadow-2'
-            )}
-          >
-            <Text variant={'label1'} truncate className={cn('line-clamp-1', activeProjectId === project.projectId && 'text-text-primary-basic')}>
-              {project.name}
-            </Text>
-            <Text variant={'label2'} color={'text-subtler'} truncate>
-              {formatDate(project.period?.startAt, 'YYYY.MM')} - {formatDate(project.period?.endAt, 'YYYY.MM')} · 경험 {project.experienceCount}개
-            </Text>
-          </button>
-        )
-      })}
-    </Flex>
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onSelect(project.projectId)}
+      className={cn(
+        'hover:bg-element-white hover:shadow-2 flex flex-col gap-0.5 rounded-md px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent',
+        isActive && 'bg-element-white shadow-2'
+      )}
+    >
+      <Text variant="label1" truncate className={cn('line-clamp-1', isActive && 'text-text-primary-basic')}>
+        {project.name}
+      </Text>
+      <Text variant="label2" color="text-subtler" truncate>
+        {period ? `${period} · ` : ''} 경험 {project.experienceCount ?? 0}개
+      </Text>
+    </button>
   )
 }
 
@@ -209,7 +210,7 @@ const ExperienceList = ({ workspaceId, projectId, projectTitle, params, selected
     <Flex className={'min-w-0 flex-1'}>
       <Flex direction={'column'} gap={'4'} className={'min-h-0 w-90 flex-1 overflow-y-auto px-5 py-4'}>
         <Flex justify={'between'} align={'center'}>
-          <Heading variant={'heading2'} className={'line-clamp-1'}>
+          <Heading variant={'headline2'} className={'line-clamp-1'}>
             {projectTitle}
           </Heading>
 
@@ -330,7 +331,7 @@ const FormatExperienceContents = ({ contents }: { contents?: ProjectExperience['
           <Text variant={'caption1'} color={'text-subtler'}>
             {label}
           </Text>
-          <Text variant={'caption1'} className={'whitespace-pre-wrap'} color={'text-subtler'}>
+          <Text variant={'caption1'} className={'whitespace-pre-wrap'} color={'text-basic'}>
             {value || '-'}
           </Text>
         </Flex>

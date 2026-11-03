@@ -1,4 +1,5 @@
-import type { ResumeQuery } from '@shared/lib/gql/graphql'
+import type { EducationStatus, ResumeQuery } from '@shared/lib/gql/graphql'
+import { formatYYYYMM } from '@shared/lib'
 
 type QuerySection = ResumeQuery['resume']['sections'][number]
 type QueryItem = QuerySection['items'][number]
@@ -61,4 +62,33 @@ export const toPreviewSections = (sections: readonly ResumeSectionData[]) => {
     basicInfoSection: sorted.find((section) => section.type === 'BASIC_INFO') ?? null,
     bodySections: sorted.filter((section) => section.visible && section.type !== 'BASIC_INFO')
   }
+}
+
+/** 시작·종료 연월을 담는 기간 shape. 서버 응답과 폼 값이 같은 모양이라 공용으로 쓴다. */
+type DateRange = { startAt?: string | null; endAt?: string | null }
+
+/**
+ * `{ startAt, endAt }` 기간을 `2025.03 - 2025.06` 형태로 만든다. 둘 다 비어 있으면 null.
+ * 종료일이 없을 때 `ongoingLabel`(기본 '진행 중')을 붙이고, `null`을 넘기면 붙이지 않는다.
+ * 미리보기(화면)와 PDF가 함께 쓰는 순수 함수라 UI 의존성을 두지 않는다.
+ */
+export const periodText = (period?: DateRange | null, ongoingLabel: string | null = '진행 중'): string | null => {
+  const start = formatYYYYMM(period?.startAt)
+  const end = formatYYYYMM(period?.endAt)
+
+  if (!start && !end) return null
+  if (start && end) return `${start} - ${end}`
+  if (start && !end) return ongoingLabel ? `${start} - ${ongoingLabel}` : start
+
+  return `- ${end}` // 종료일만 있는 경우
+}
+
+const COMPLETED_EDUCATION_STATUSES: readonly EducationStatus[] = ['GRADUATED', 'COMPLETED']
+// 서버 응답의 status는 `string`이라 Set<string>으로 두면 캐스트 없이 조회할 수 있다.
+const completedEducationStatusSet = new Set<string>(COMPLETED_EDUCATION_STATUSES)
+
+/** 학력 항목의 기간 표기. 졸업·수료는 이미 끝난 학력이라 종료일이 없어도 '진행 중'을 붙이지 않는다. 미리보기와 PDF 공용. */
+export const educationPeriodText = (item: { period?: DateRange | null; status?: string | null }): string | null => {
+  const isCompleted = completedEducationStatusSet.has(item.status ?? '')
+  return periodText(item.period, isCompleted ? null : '진행 중')
 }

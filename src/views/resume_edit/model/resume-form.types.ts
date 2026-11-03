@@ -30,6 +30,7 @@ export type ResumeFormSection = Omit<QuerySection, 'sectionId' | 'items'> & {
   uid: string
   sectionId: string | null
   items: ResumeFormItem[]
+  autoInjected?: boolean
 }
 
 export type ResumeFormValues = { sections: ResumeFormSection[] }

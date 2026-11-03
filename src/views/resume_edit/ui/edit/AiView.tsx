@@ -182,7 +182,7 @@ const AiDetailView = ({ targetJdId, questionRoomId, cardRank, sectionIndex, onAp
         <button onClick={onBack}>
           <ChevronLeft size={18} className={'text-icon-gray-light shrink-0'} />
           <Text variant={'label1'} color={'text-subtle'}>
-            질문목록
+            질문 목록
           </Text>
         </button>
       </Flex>
@@ -367,7 +367,7 @@ const QuestionRoomDetail = ({ workspaceId, targetJdId, questionRoomId, cardRank,
           <Flex>
             <Button type={'button'} variant={'tertiary'} size={'xs'} className="flex gap-1 rounded-full" onClick={() => setIsPickerOpen(true)} disabled={isPending}>
               <Plus size={12} />
-              경험불러오기
+              경험 불러오기
             </Button>
             <Button type={'submit'} aria-label="경험 전송" variant={'primary'} size={'icon-xs'} className="ml-auto" disabled={isPending || (!content.trim() && selectedExperiences.length === 0)}>
               <ArrowUp size={12} />
@@ -469,14 +469,9 @@ const AiMessageCard = ({ message, onApply, onCopy }: { message: ExperienceQuesti
       </Flex>
 
       {message.feedback && (
-        <Flex direction={'column'}>
-          <Text variant={'body2'} className={'whitespace-pre-wrap'}>
-            {message.feedback.fit}
-          </Text>
-          <Text variant={'body2'} className={'whitespace-pre-wrap'}>
-            {message.feedback.improvement}
-          </Text>
-        </Flex>
+        <Text variant={'body2'} color={'text-subtle'} className={'whitespace-pre-wrap'}>
+          {message.feedback.fit} {message.feedback.improvement}
+        </Text>
       )}
     </Flex>
   </Flex>

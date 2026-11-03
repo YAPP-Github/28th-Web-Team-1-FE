@@ -1,6 +1,5 @@
 import { Flex } from '@radix-ui/themes'
 import { Divider, Text } from '@shared/ui'
-import { formatYYYYMM } from '@shared/lib'
 import { Fragment, type ComponentType, type ReactNode } from 'react'
 
 /**
@@ -80,11 +79,3 @@ export const SectionItemContent = ({ children }: { children: ReactNode }) => (
     {children}
   </Text>
 )
-
-/** `{ startAt, endAt }` 기간을 `2025.03 - 2025.06` 형태로 만든다. 둘 다 비어 있으면 null. */
-export const periodText = (period?: { startAt?: string | null; endAt?: string | null } | null): string | null => {
-  const start = formatYYYYMM(period?.startAt)
-  const end = formatYYYYMM(period?.endAt)
-  if (!start && !end) return null
-  return `${start} ${end && '-'} ${end}`
-}
