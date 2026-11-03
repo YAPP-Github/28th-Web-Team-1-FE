@@ -9,8 +9,6 @@ import { useJdRecommendationTags, useJdRecommendations, type JdRecommendation, t
 import { useJdResumeFlow } from '../hooks/useJdResumeFlow'
 import { JdResumeFlowDialogs } from './JdResumeFlowDialogs'
 
-const RECOMMENDATION_SIZE = 6
-
 const CARD_CLASS_NAME = cn(
   'min-w-0 rounded-lg',
   // sm
@@ -23,7 +21,7 @@ export const RecommendedJdSection = () => {
   const [selectedTag, setSelectedTag] = useState<JdRecommendationTag | null>(null)
   const [, startTransition] = useTransition()
   const { tags } = useJdRecommendationTags()
-  const { recommendations, hasNextPage, fetchNextPage, isFetchingNextPage } = useJdRecommendations(selectedTag ? [selectedTag] : [], RECOMMENDATION_SIZE)
+  const { recommendations, hasNextPage, fetchNextPage, isFetchingNextPage } = useJdRecommendations(selectedTag ? [selectedTag] : [], 6)
   const sentinelRef = useIntersectionObserver<HTMLDivElement>({
     enabled: hasNextPage && !isFetchingNextPage,
     onIntersect: fetchNextPage,
@@ -80,14 +78,12 @@ const RecommendedJdCard = ({ jd, onCreate, disabled }: { jd: JdRecommendation; o
         <Text as={'p'} variant={'label1'} color={'text-basic'} className={'truncate'}>
           [{jd.companyName}] {jd.title}
         </Text>
-        {period && (
-          <Flex align={'center'} gap={'1'}>
-            <CalendarIcon size={12} className={'text-text-subtler'} />
-            <Text variant={'caption2'} color={'text-subtler'}>
-              {period}
-            </Text>
-          </Flex>
-        )}
+        <Flex align={'center'} gap={'1'} className={cn(!period && 'invisible')} aria-hidden={!period}>
+          <CalendarIcon size={12} className={'text-text-subtler'} />
+          <Text variant={'caption2'} color={'text-subtler'}>
+            {period || '-'}
+          </Text>
+        </Flex>
       </Flex>
       <Flex gap={'2'}>
         <Button asChild size={'xs'} variant={'secondary'}>
