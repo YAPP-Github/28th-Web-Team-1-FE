@@ -1,6 +1,6 @@
 name: 'AI E2E'
 
-# PR에 `🤖 E2E` 라벨을 붙이면 그 시점 커밋의 Vercel Preview로 한 번 실행한다.
+# PR에 `🤖 E2E` 라벨을 붙이면(PR 생성 시 라벨 포함) 그 시점 커밋의 Vercel Preview로 한 번 실행한다.
 # Claude가 이슈·PR·diff를 보고 TC를 만들어 E2E를 실행하고 결과를 PR에 코멘트한다.
 #  - 이후 push로는 다시 실행하지 않는다. 재실행하려면 라벨을 뗐다 다시 붙이거나 workflow_dispatch로 실행
 #  - Preview 배포가 아직 진행 중이면 끝날 때까지 최대 15분 기다린다
@@ -15,9 +15,9 @@ on:
       base_url:
         description: '테스트할 URL (Vercel Preview)'
         required: true
-  # labeled: 라벨 부착 시 실행 / closed: Pages에 올린 해당 PR 리포트 삭제
+  # opened: 라벨을 단 채로 PR 생성 / labeled: 라벨 부착 / closed: Pages에 올린 해당 PR 리포트 삭제
   pull_request:
-    types: [labeled, closed]
+    types: [opened, labeled, closed]
 
 permissions:
   contents: write # gh-pages 브랜치에 리포트 push
@@ -25,17 +25,20 @@ permissions:
   issues: read
   deployments: read
 
-concurrency:
-  group: e2e-ai-${{ github.event.inputs.pr_number || github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
   e2e-ai:
-    # 수동 실행 / `🤖 E2E` 라벨 부착
+    # 수동 실행 / `🤖 E2E` 라벨 부착 / 라벨을 단 채로 PR 생성
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' && github.event.action == 'labeled' &&
-       github.event.label.name == '🤖 E2E')
+       github.event.label.name == '🤖 E2E') ||
+      (github.event_name == 'pull_request' && github.event.action == 'opened' &&
+       contains(github.event.pull_request.labels.*.name, '🤖 E2E'))
+    # job 단위로 묶어야 다른 라벨 부착(job skip)이 실행 중인 E2E를 취소하지 않는다.
+    # PR 생성 시 opened·labeled가 함께 와도 마지막 1건만 실행된다.
+    concurrency:
+      group: e2e-ai-${{ github.event.inputs.pr_number || github.event.pull_request.number }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -121,7 +124,10 @@ jobs:
           VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_BYPASS_SECRET }}
           CI: 'true'
         run: |
-          PROMPT="$(cat .claude/skills/e2e-from-pr/SKILL.md)
+          # 프롬프트가 SKILL.md의 `---`(frontmatter)로 시작하면 CLI가 옵션으로 오인해 종료하므로 앞에 문장을 둔다
+          PROMPT="다음은 e2e-from-pr 스킬 지침이다.
+
+          $(cat .claude/skills/e2e-from-pr/SKILL.md)
 
           ---
           위 지침대로 수행하라.
