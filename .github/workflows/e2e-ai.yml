@@ -224,13 +224,40 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           MARKER='<!-- e2e-ai -->'
+          # 상단: 제목 + 리포트 링크만. 재실행 결과는 AI 보고와 어긋날 때만 상단 경고로 올린다.
+          # (AI 결과는 TC 단위, 재실행은 스모크·모바일 포함 테스트 단위라 개수 대신 '실패 유무'로 비교)
+          header_extra() {
+            AI_FAILED=$(head -1 e2e-ai/result.md 2>/dev/null | grep -oE '실패 [0-9]+' | grep -oE '[0-9]+' || true)
+            if [ -n "$PASSED" ] && [ -n "$AI_FAILED" ]; then
+              if [ "$AI_FAILED" = "0" ] && [ "$FAILED" != "0" ]; then
+                echo "> ⚠️ **AI는 모두 통과로 보고했지만, 최종 재실행에서 ${FAILED}개 테스트가 실패했어요.** 리포트를 확인해 주세요."
+                echo
+              elif [ "$AI_FAILED" != "0" ] && [ "$FAILED" = "0" ]; then
+                echo "> ⚠️ **AI는 실패 ${AI_FAILED}건을 보고했지만, 최종 재실행에서는 모두 통과했어요.** 불안정한(flaky) 테스트일 수 있어요."
+                echo
+              fi
+            fi
+            if [ -n "$REPORT_URL" ]; then
+              echo "### 📊 [테스트 리포트 열기]($REPORT_URL/)"
+              echo "<sub>Pages 반영까지 1~2분 걸릴 수 있어요</sub>"
+              echo
+            fi
+          }
           {
             echo "$MARKER"
             if [ -f e2e-ai/result.md ]; then
-              cat e2e-ai/result.md
+              # result.md 첫 줄(## 제목) → 경고·리포트 링크 → 나머지 본문
+              FIRST=$(head -1 e2e-ai/result.md)
+              if [[ "$FIRST" == "#"* ]]; then
+                echo "$FIRST"; echo; header_extra; echo "---"; tail -n +2 e2e-ai/result.md
+              else
+                echo "## 🤖 AI E2E 결과"; echo; header_extra; echo "---"; cat e2e-ai/result.md
+              fi
             else
               echo "## 🤖 AI E2E 결과"
               echo "⚠️ AI가 결과를 작성하지 못했어요. 실행 로그를 확인해 주세요."
+              echo
+              header_extra
             fi
             echo
             if [ -n "$REPORT_URL" ] && [ -s e2e-ai/screens.md ]; then
@@ -239,10 +266,8 @@ jobs:
             fi
             echo "---"
             if [ -n "$PASSED" ]; then
-              echo "**최종 재실행 결과:** ✅ ${PASSED} · ❌ ${FAILED} · ⏭️ ${SKIPPED} · 🔁 flaky ${FLAKY}"
-            fi
-            if [ -n "$REPORT_URL" ]; then
-              echo "📊 **[테스트 리포트 열기]($REPORT_URL/)** (Pages 반영까지 1~2분 걸릴 수 있어요)"
+              echo "**최종 재실행** <sub>(스모크·모바일 포함 테스트 단위)</sub>: ✅ ${PASSED} · ❌ ${FAILED} · ⏭️ ${SKIPPED} · 🔁 flaky ${FLAKY}"
+              echo
             fi
             echo "🔗 [Preview]($URL) · [실행 로그]($RUN_URL)${ARTIFACT_URL:+ · [트레이스·spec 다운로드(비공개)]($ARTIFACT_URL)}"
             echo
