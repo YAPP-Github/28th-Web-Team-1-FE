@@ -72,9 +72,11 @@ const MethodCard = ({ title, description, thumbnail, onClick }: { title: string;
     type="button"
     onClick={onClick}
     className={cn(
-      `bg-element-gray-lighter group flex items-center justify-between gap-4 rounded-lg p-6 text-left transition-all duration-300`,
+      `bg-element-gray-lighter group out flex items-center justify-between gap-4 rounded-lg p-6 text-left transition-all duration-300`,
       //hover
-      `hover:bg-element-primary-lighter hover:ring-btn-secondary-border-hovered hover:ring-1`
+      `hover:bg-element-primary-lighter hover:ring-btn-secondary-border-hovered hover:ring-1`,
+      //focus
+      `focus:not-hover:ring-btn-tertiary-border focus:ring-1 focus:outline-none`
     )}
   >
     <Flex direction="column" gap="6px">
