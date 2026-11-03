@@ -1,0 +1,270 @@
+name: 'AI E2E'
+
+# PR의 Vercel Preview 배포가 끝나면 Claude가 이슈·PR·diff를 보고 TC를 만들어 E2E를 실행하고 결과를 PR에 코멘트한다.
+# 지침: .claude/skills/e2e-from-pr/SKILL.md (로컬 `/e2e-from-pr`과 동일)
+
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR 번호'
+        required: true
+      base_url:
+        description: '테스트할 URL (Vercel Preview)'
+        required: true
+  # PR이 닫히면 Pages에 올린 해당 PR 리포트를 지운다
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write # gh-pages 브랜치에 리포트 push
+  pull-requests: write
+  issues: read
+  deployments: read
+
+concurrency:
+  group: e2e-ai-${{ github.event.deployment.sha || github.event.inputs.pr_number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-ai:
+    # Vercel Preview 배포 성공 시 또는 수동 실행
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       startsWith(github.event.deployment.environment, 'Preview'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Resolve PR and Preview URL
+        id: ctx
+        env:
+          INPUT_PR: ${{ github.event.inputs.pr_number }}
+          INPUT_URL: ${{ github.event.inputs.base_url }}
+          DEPLOY_SHA: ${{ github.event.deployment.sha }}
+          DEPLOY_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}
+        run: |
+          if [ -n "$INPUT_PR" ]; then
+            PR="$INPUT_PR"; URL="$INPUT_URL"
+          else
+            PR=$(gh api "repos/${{ github.repository }}/commits/$DEPLOY_SHA/pulls" --jq '[.[] | select(.state == "open")][0].number // empty')
+            URL="$DEPLOY_URL"
+          fi
+          if [ -z "$PR" ]; then echo "열린 PR 없음 → 건너뜀"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+
+          INFO=$(gh pr view "$PR" --repo "${{ github.repository }}" --json baseRefName,headRefOid,isDraft,title,url,author,labels)
+          BASE=$(jq -r .baseRefName <<< "$INFO")
+          DRAFT=$(jq -r .isDraft <<< "$INFO")
+          SKIP_LABEL=$(jq -r '[.labels[].name] | index("skip-e2e") != null' <<< "$INFO")
+          if [[ "$BASE" != "dev" && "$BASE" != "main" ]] || [ "$DRAFT" = "true" ] || [ "$SKIP_LABEL" = "true" ]; then
+            echo "대상 아님(base=$BASE, draft=$DRAFT, skip-e2e=$SKIP_LABEL) → 건너뜀"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+
+          {
+            echo "skip=false"
+            echo "pr=$PR"
+            echo "url=$URL"
+            echo "base=$BASE"
+            echo "sha=$(jq -r .headRefOid <<< "$INFO")"
+            echo "title=$(jq -r .title <<< "$INFO")"
+            echo "pr_url=$(jq -r .url <<< "$INFO")"
+            echo "author=$(jq -r .author.login <<< "$INFO")"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout PR head
+        if: steps.ctx.outputs.skip == 'false'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ctx.outputs.sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        if: steps.ctx.outputs.skip == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        if: steps.ctx.outputs.skip == 'false'
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm install -g @anthropic-ai/claude-code
+
+      - name: Generate TC & run E2E (Claude)
+        if: steps.ctx.outputs.skip == 'false'
+        continue-on-error: true
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          E2E_BASE_URL: ${{ steps.ctx.outputs.url }}
+          QA_REFRESH_TOKEN: ${{ secrets.QA_REFRESH_TOKEN }}
+          VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_BYPASS_SECRET }}
+          CI: 'true'
+        run: |
+          PROMPT="$(cat .claude/skills/e2e-from-pr/SKILL.md)
+
+          ---
+          위 지침대로 수행하라.
+          - PR 번호: ${{ steps.ctx.outputs.pr }}
+          - base 브랜치: ${{ steps.ctx.outputs.base }}
+          - E2E_BASE_URL: $E2E_BASE_URL
+          - CI 환경이므로 질문하지 말고 끝까지 진행한 뒤 e2e-ai/result.md를 반드시 작성하라."
+
+          claude -p "$PROMPT" \
+            --permission-mode acceptEdits \
+            --max-turns 80 \
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(npx playwright test:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh issue view:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(cp:*),Bash(mkdir:*),Bash(ls:*)"
+
+      # AI 보고와 별개로 최종 spec을 한 번 더 실행해 실제 결과를 교차 확인한다
+      - name: Verify (final Playwright run)
+        id: verify
+        if: steps.ctx.outputs.skip == 'false' && hashFiles('e2e-ai/generated/*.spec.ts') != ''
+        continue-on-error: true
+        env:
+          E2E_BASE_URL: ${{ steps.ctx.outputs.url }}
+          QA_REFRESH_TOKEN: ${{ secrets.QA_REFRESH_TOKEN }}
+          VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_BYPASS_SECRET }}
+          CI: 'true'
+        run: |
+          npx playwright test || true
+          if [ -f e2e-ai/report.json ]; then
+            echo "passed=$(jq '.stats.expected' e2e-ai/report.json)" >> "$GITHUB_OUTPUT"
+            echo "failed=$(jq '.stats.unexpected' e2e-ai/report.json)" >> "$GITHUB_OUTPUT"
+            echo "skipped=$(jq '.stats.skipped' e2e-ai/report.json)" >> "$GITHUB_OUTPUT"
+            echo "flaky=$(jq '.stats.flaky' e2e-ai/report.json)" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 공개 Pages 배포용: HTML 리포트(트레이스 zip 제외) + 스크린샷 모음
+      - name: Build Pages site
+        id: pages
+        if: steps.ctx.outputs.skip == 'false' && always()
+        env:
+          PR: ${{ steps.ctx.outputs.pr }}
+        run: |
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPORT_URL="https://${OWNER_LC}.github.io/${{ github.event.repository.name }}/pr-${PR}/${{ github.run_id }}"
+          node e2e-ai/scripts/build-pages.mjs "$REPORT_URL"
+          echo "dir=pr-${PR}/${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          echo "url=$REPORT_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy report to GitHub Pages
+        id: deploy
+        if: steps.ctx.outputs.skip == 'false' && always() && steps.pages.outcome == 'success'
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: e2e-ai/site
+          destination_dir: ${{ steps.pages.outputs.dir }}
+          keep_files: true
+          commit_message: 'e2e-ai report PR #${{ steps.ctx.outputs.pr }} (run ${{ github.run_id }})'
+
+      # 트레이스(쿠키·토큰 포함)는 공개하지 않고 비공개 artifact로만 남긴다
+      - name: Upload report
+        id: artifact
+        if: steps.ctx.outputs.skip == 'false' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-ai-pr${{ steps.ctx.outputs.pr }}-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+            e2e-ai/tc.md
+            e2e-ai/result.md
+            e2e-ai/report.json
+            e2e-ai/generated/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Comment on PR
+        if: steps.ctx.outputs.skip == 'false' && always()
+        env:
+          PR: ${{ steps.ctx.outputs.pr }}
+          URL: ${{ steps.ctx.outputs.url }}
+          PASSED: ${{ steps.verify.outputs.passed }}
+          FAILED: ${{ steps.verify.outputs.failed }}
+          SKIPPED: ${{ steps.verify.outputs.skipped }}
+          FLAKY: ${{ steps.verify.outputs.flaky }}
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+          REPORT_URL: ${{ steps.deploy.outcome == 'success' && steps.pages.outputs.url || '' }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          MARKER='<!-- e2e-ai -->'
+          {
+            echo "$MARKER"
+            if [ -f e2e-ai/result.md ]; then
+              cat e2e-ai/result.md
+            else
+              echo "## 🤖 AI E2E 결과"
+              echo "⚠️ AI가 결과를 작성하지 못했어요. 실행 로그를 확인해 주세요."
+            fi
+            echo
+            if [ -n "$REPORT_URL" ] && [ -s e2e-ai/screens.md ]; then
+              cat e2e-ai/screens.md
+              echo
+            fi
+            echo "---"
+            if [ -n "$PASSED" ]; then
+              echo "**최종 재실행 결과:** ✅ ${PASSED} · ❌ ${FAILED} · ⏭️ ${SKIPPED} · 🔁 flaky ${FLAKY}"
+            fi
+            if [ -n "$REPORT_URL" ]; then
+              echo "📊 **[테스트 리포트 열기]($REPORT_URL/)** (Pages 반영까지 1~2분 걸릴 수 있어요)"
+            fi
+            echo "🔗 [Preview]($URL) · [실행 로그]($RUN_URL)${ARTIFACT_URL:+ · [트레이스·spec 다운로드(비공개)]($ARTIFACT_URL)}"
+            echo
+            echo "<sub>AI가 생성한 일회성 TC입니다. 이 결과만으로 머지를 결정하지 마세요. 실패 원인 분류는 추정입니다.</sub>"
+          } > comment.md
+
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/$PR/comments" --paginate \
+            --jq "[.[] | select(.body | startswith(\"$MARKER\"))][0].id // empty")
+          if [ -n "$COMMENT_ID" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" -F body=@comment.md > /dev/null
+          else
+            gh pr comment "$PR" --repo "${{ github.repository }}" --body-file comment.md
+          fi
+
+      - name: Discord notification
+        if: steps.ctx.outputs.skip == 'false' && always()
+        env:
+          # Storybook 알림과 채널을 분리하기 위해 E2E 전용 웹훅을 쓴다 (미등록 시 알림 생략)
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_E2E_WEBHOOK_URL }}
+          PR_NUMBER: ${{ steps.ctx.outputs.pr }}
+          PR_TITLE: ${{ steps.ctx.outputs.title }}
+          PR_URL: ${{ steps.ctx.outputs.pr_url }}
+          PR_AUTHOR: ${{ steps.ctx.outputs.author }}
+          PASSED: ${{ steps.verify.outputs.passed }}
+          FAILED: ${{ steps.verify.outputs.failed }}
+          REPORT_URL: ${{ steps.deploy.outcome == 'success' && steps.pages.outputs.url || '' }}
+        run: |
+          [ -z "$DISCORD_WEBHOOK_URL" ] && exit 0
+          if [ -z "$PASSED" ]; then STATUS="⚠️ 실행 실패"; elif [ "$FAILED" = "0" ]; then STATUS="✅ ${PASSED}개 통과"; else STATUS="❌ ${FAILED}개 실패 / ✅ ${PASSED}개 통과"; fi
+          NOTIFICATION_MSG="🤖 **AI E2E 완료** ${STATUS}
+          PR: [#${PR_NUMBER} - ${PR_TITLE}](${PR_URL}) by **${PR_AUTHOR}**"
+          [ -n "$REPORT_URL" ] && NOTIFICATION_MSG="${NOTIFICATION_MSG}
+          📊 [테스트 리포트 열기](${REPORT_URL}/)"
+          PAYLOAD=$(jq -n --arg content "$NOTIFICATION_MSG" '{content: $content}')
+          curl -s -H "Content-Type: application/json" -d "$PAYLOAD" "$DISCORD_WEBHOOK_URL"
+
+  # PR이 닫히면(머지 포함) gh-pages에서 해당 PR 리포트 폴더 삭제
+  cleanup-pages:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove PR report from gh-pages
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone --depth 1 --branch gh-pages "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" pages || { echo "gh-pages 브랜치 없음"; exit 0; }
+          cd pages
+          [ -d "pr-${PR}" ] || { echo "삭제할 리포트 없음"; exit 0; }
+          git rm -rq "pr-${PR}"
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "e2e-ai: remove report for PR #${PR}"
+          git push -q origin gh-pages
