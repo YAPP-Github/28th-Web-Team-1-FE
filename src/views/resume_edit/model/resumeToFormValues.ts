@@ -1,4 +1,4 @@
-import type { ResumeQuery } from '@shared/lib/gql/graphql'
+import type { ResumeQuery, ResumeSectionType } from '@shared/lib/gql/graphql'
 import { createCategorySection } from './category'
 import { createFormItem, type ResumeFormSection, type ResumeFormValues } from './resume-form.types'
 
@@ -11,40 +11,28 @@ import { createFormItem, type ResumeFormSection, type ResumeFormValues } from '.
  */
 const byDisplayOrder = <T extends { displayOrder: number }>(a: T, b: T) => a.displayOrder - b.displayOrder
 
-/**
- * 편집 진입 시 경험(EXPERIENCE) 섹션이 없으면 빈 섹션을 자동으로 넣는다.
- * (import 등 서버가 경험을 추출하지 못해 섹션을 만들지 않은 이력서에서 경험을 편집할 수 있게 한다.)
- */
-const withExperienceSection = (sections: ResumeFormSection[]): ResumeFormSection[] => {
-  if (sections.some((section) => section.type === 'EXPERIENCE')) return sections
-
-  const experienceSection: ResumeFormSection = {
-    ...createCategorySection('EXPERIENCE', sections),
-    items: [createFormItem({ experience: { name: '', role: null, contents: '', period: null, experienceQuestionRoomId: null } }, 1)]
-  }
-
-  // 생성 시 섹션 순서(`buildResumeInput`)와 맞춰 CORE_SKILL 바로 뒤에 둔다. 없으면 맨 뒤에 붙인다.
-  const coreSkillIndex = sections.findIndex((section) => section.type === 'CORE_SKILL')
-  if (coreSkillIndex < 0) return [...sections, experienceSection]
-  return [...sections.slice(0, coreSkillIndex + 1), experienceSection, ...sections.slice(coreSkillIndex + 1)]
+/** `afterType` 섹션 바로 뒤에 `section`을 끼운다. 기준 섹션이 없으면 맨 뒤에 붙인다. 생성 시 섹션 순서와 맞춘다. */
+const insertAfterType = (sections: ResumeFormSection[], afterType: ResumeSectionType, section: ResumeFormSection): ResumeFormSection[] => {
+  const index = sections.findIndex((s) => s.type === afterType)
+  return index < 0 ? [...sections, section] : [...sections.slice(0, index + 1), section, ...sections.slice(index + 1)]
 }
+
+/** 편집 진입 시 경험(EXPERIENCE) 섹션이 없으면 아이템 없는 섹션을 폼에만 넣는다. 저장 시에는 `formToSaveInput`이 제외한다. */
+const withExperienceSection = (sections: ResumeFormSection[]): ResumeFormSection[] =>
+  sections.some((s) => s.type === 'EXPERIENCE') ? sections : insertAfterType(sections, 'CORE_SKILL', createCategorySection('EXPERIENCE', sections))
 
 /**
  * 편집 진입 시 핵심역량(CORE_SKILL) 섹션이 없으면 빈 아이템을 주입한다.
  * `isInitialItem: true`로 두면 편집 화면이 진입 시 AI 핵심역량을 자동 생성해 채운다(`needsCoreCompetency`).
- * 생성 시 섹션 순서(`buildResumeInput`)와 맞춰 기본정보 바로 뒤에 둔다.
  */
 const withCoreSkillSection = (sections: ResumeFormSection[]): ResumeFormSection[] => {
-  if (sections.some((section) => section.type === 'CORE_SKILL')) return sections
+  if (sections.some((s) => s.type === 'CORE_SKILL')) return sections
 
   const coreSkillSection: ResumeFormSection = {
     ...createCategorySection('CORE_SKILL', sections),
     items: [createFormItem({ coreSkill: { content: '', isInitialItem: true } }, 1)]
   }
-
-  const basicInfoIndex = sections.findIndex((section) => section.type === 'BASIC_INFO')
-  if (basicInfoIndex < 0) return [coreSkillSection, ...sections]
-  return [...sections.slice(0, basicInfoIndex + 1), coreSkillSection, ...sections.slice(basicInfoIndex + 1)]
+  return insertAfterType(sections, 'BASIC_INFO', coreSkillSection)
 }
 
 export const resumeToFormValues = (resume: ResumeQuery['resume']): ResumeFormValues => {
