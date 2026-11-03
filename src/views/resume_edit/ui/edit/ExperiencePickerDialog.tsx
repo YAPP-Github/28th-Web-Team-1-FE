@@ -316,7 +316,7 @@ const FormatExperienceContents = ({ contents }: { contents?: ProjectExperience['
           <Text variant={'caption1'} color={'text-subtler'}>
             {label}
           </Text>
-          <Text variant={'caption1'} className={'whitespace-pre-wrap'} color={'text-subtler'}>
+          <Text variant={'caption1'} className={'whitespace-pre-wrap'} color={'text-basic'}>
             {value || '-'}
           </Text>
         </Flex>
