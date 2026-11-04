@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import dayjs, { type Dayjs } from 'dayjs'
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@shared/lib/cn'
 import { Text } from '../typography'
 import { Popover, PopoverContent, PopoverTrigger } from '../popover'
@@ -47,10 +47,23 @@ export const DatePicker = ({ value, onChange, placeholder = 'YYYY.MM.DD', disabl
   const [isOpen, setIsOpen] = useState(false)
   // 그리드에 보여줄 달(1일 기준). 열 때마다 선택 월(없으면 이번 달)로 맞춘다.
   const [viewMonth, setViewMonth] = useState<Dayjs>(() => (selected ?? today).startOf('month'))
+  // 'day': 일자 그리드, 'month': 연·월 그리드. 헤더(YYYY년 M월)를 누르면 'month'로 전환해 먼 날짜로 빠르게 이동한다.
+  const [viewMode, setViewMode] = useState<'day' | 'month'>('day')
 
   const handleOpenChange = (next: boolean) => {
-    if (next) setViewMonth((parseDate(value) ?? today).startOf('month'))
+    if (next) {
+      setViewMonth((parseDate(value) ?? today).startOf('month'))
+      setViewMode('day')
+    }
     setIsOpen(next)
+  }
+
+  const isMonthMode = viewMode === 'month'
+  const moveView = (direction: 1 | -1) => setViewMonth((prev) => prev.add(direction, isMonthMode ? 'year' : 'month'))
+
+  const selectMonth = (monthIndex: number) => {
+    setViewMonth((prev) => prev.month(monthIndex))
+    setViewMode('day')
   }
 
   const selectDay = (day: Dayjs) => {
@@ -86,52 +99,85 @@ export const DatePicker = ({ value, onChange, placeholder = 'YYYY.MM.DD', disabl
         <div className={'flex items-center justify-between pb-3'}>
           <button
             type={'button'}
-            aria-label={'이전 달'}
-            onClick={() => setViewMonth((prev) => prev.subtract(1, 'month'))}
+            aria-label={isMonthMode ? '이전 연도' : '이전 달'}
+            onClick={() => moveView(-1)}
             className={'text-icon-gray hover:bg-element-gray-lighter rounded-md p-1 transition-colors'}
           >
             <ChevronLeft size={20} />
           </button>
-          <Text variant={'headline2'}>{viewMonth.format('YYYY년 M월')}</Text>
           <button
             type={'button'}
-            aria-label={'다음 달'}
-            onClick={() => setViewMonth((prev) => prev.add(1, 'month'))}
+            aria-label={isMonthMode ? '일자 선택으로 돌아가기' : '연·월 선택'}
+            onClick={() => setViewMode(isMonthMode ? 'day' : 'month')}
+            className={'hover:bg-element-gray-lighter flex items-center gap-1 rounded-md px-2 py-1 transition-colors'}
+          >
+            <Text variant={'headline2'}>{isMonthMode ? viewMonth.format('YYYY년') : viewMonth.format('YYYY년 M월')}</Text>
+            <ChevronDown size={16} className={cn('text-icon-gray transition-transform', isMonthMode && 'rotate-180')} />
+          </button>
+          <button
+            type={'button'}
+            aria-label={isMonthMode ? '다음 연도' : '다음 달'}
+            onClick={() => moveView(1)}
             className={'text-icon-gray hover:bg-element-gray-lighter rounded-md p-1 transition-colors'}
           >
             <ChevronRight size={20} />
           </button>
         </div>
 
-        <div className={'grid grid-cols-7 gap-1'}>
-          {WEEKDAYS.map((weekday) => (
-            <div key={weekday} className={'text-caption1 text-text-subtler py-1 text-center'}>
-              {weekday}
-            </div>
-          ))}
-          {days.map((day) => {
-            const isCurrentMonth = day.isSame(viewMonth, 'month')
-            const isSelected = selected?.isSame(day, 'day')
-            const isToday = today.isSame(day, 'day')
-            return (
-              <button
-                key={day.format('YYYY-MM-DD')}
-                type={'button'}
-                onClick={() => selectDay(day)}
-                className={cn(
-                  'text-body2 aspect-square rounded-md transition-colors',
-                  isSelected && 'bg-btn-primary-fill text-text-bolder-inverse',
-                  !isSelected && 'hover:bg-element-gray-lighter',
-                  !isSelected && !isCurrentMonth && 'text-text-disabled',
-                  !isSelected && isCurrentMonth && isToday && 'text-text-primary-basic',
-                  !isSelected && isCurrentMonth && !isToday && 'text-text-basic'
-                )}
-              >
-                {day.date()}
-              </button>
-            )
-          })}
-        </div>
+        {isMonthMode ? (
+          <div className={'grid grid-cols-3 gap-1'}>
+            {Array.from({ length: 12 }, (_, monthIndex) => {
+              const isViewing = viewMonth.month() === monthIndex
+              const isCurrent = today.isSame(viewMonth.month(monthIndex), 'month')
+              return (
+                <button
+                  key={monthIndex}
+                  type={'button'}
+                  onClick={() => selectMonth(monthIndex)}
+                  className={cn(
+                    'text-body2 rounded-md py-2 transition-colors',
+                    isViewing && 'bg-btn-primary-fill text-text-bolder-inverse',
+                    !isViewing && 'hover:bg-element-gray-lighter',
+                    !isViewing && isCurrent && 'text-text-primary-basic',
+                    !isViewing && !isCurrent && 'text-text-basic'
+                  )}
+                >
+                  {monthIndex + 1}월
+                </button>
+              )
+            })}
+          </div>
+        ) : (
+          <div className={'grid grid-cols-7 gap-1'}>
+            {WEEKDAYS.map((weekday) => (
+              <div key={weekday} className={'text-caption1 text-text-subtler py-1 text-center'}>
+                {weekday}
+              </div>
+            ))}
+            {days.map((day) => {
+              const isCurrentMonth = day.isSame(viewMonth, 'month')
+              const isSelected = selected?.isSame(day, 'day')
+              const isToday = today.isSame(day, 'day')
+              return (
+                <button
+                  key={day.format('YYYY-MM-DD')}
+                  type={'button'}
+                  onClick={() => selectDay(day)}
+                  className={cn(
+                    'text-body2 aspect-square rounded-md transition-colors',
+                    isSelected && 'bg-btn-primary-fill text-text-bolder-inverse',
+                    !isSelected && 'hover:bg-element-gray-lighter',
+                    !isSelected && !isCurrentMonth && 'text-text-disabled',
+                    !isSelected && isCurrentMonth && isToday && 'text-text-primary-basic',
+                    !isSelected && isCurrentMonth && !isToday && 'text-text-basic'
+                  )}
+                >
+                  {day.date()}
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         <Spacing size={12} />
 
