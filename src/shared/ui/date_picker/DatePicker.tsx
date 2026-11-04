@@ -7,8 +7,6 @@ import { Text } from '../typography'
 import { Popover, PopoverContent, PopoverTrigger } from '../popover'
 import { Button, Spacing } from '@shared/ui'
 
-const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
-
 /** `'YYYY.MM.DD'` → dayjs(유효하지 않으면 null). ISO(`YYYY-MM-DD`)로 바꿔 파싱해 별도 플러그인 없이 처리한다. */
 const parseDate = (value: string | null) => {
   if (!value) return null
@@ -149,7 +147,7 @@ export const DatePicker = ({ value, onChange, placeholder = 'YYYY.MM.DD', disabl
           </div>
         ) : (
           <div className={'grid grid-cols-7 gap-1'}>
-            {WEEKDAYS.map((weekday) => (
+            {['일', '월', '화', '수', '목', '금', '토'].map((weekday) => (
               <div key={weekday} className={'text-caption1 text-text-subtler py-1 text-center'}>
                 {weekday}
               </div>
