@@ -32,6 +32,11 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     images: ['/ogImage.png']
+  },
+  verification: {
+    other: {
+      'naver-site-verification': '93a4354402c8b0989d8b3a14b87d9e7457d8985d'
+    }
   }
 }
 
