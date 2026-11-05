@@ -25,6 +25,7 @@ export const AMPLITUDE_EVENTS = {
   CHAT_EXPERIENCE_ATTACHED: 'chat_experience_attached',
   AI_RESULT_APPLIED: 'ai_result_applied',
   AI_CHAT_MESSAGE_SENT: 'ai_chat_message_sent',
+  RESUME_DOWNLOADED: 'resume_downloaded',
 
   // AI 첨삭 모달
   EDIT_MODAL_OPENED: 'edit_modal_opened',
