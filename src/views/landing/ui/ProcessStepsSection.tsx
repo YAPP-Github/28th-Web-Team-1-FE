@@ -311,8 +311,8 @@ const StepCard = ({ step }: { step: Step }) => (
 
       <Flex direction="column" className="gap-3 sm:gap-6">
         <Flex direction="column" className="gap-1 sm:gap-2">
-          <h3 className="text-text-basic text-heading2 leading-tight font-bold tracking-tight whitespace-nowrap sm:text-[70px]">{step.titleEn}</h3>
-          <p className="text-text-disabled text-caption2 tracking-tight sm:text-[28px] sm:font-semibold">{step.titleKo}</p>
+          <h2 className="text-text-basic text-heading2 leading-tight font-bold tracking-tight whitespace-nowrap sm:text-[70px]">{step.titleEn}</h2>
+          <h2 className="text-text-disabled text-caption2 tracking-tight sm:text-[28px] sm:font-semibold">{step.titleKo}</h2>
         </Flex>
         <p className="text-text-subtle text-[9px] leading-normal sm:text-[20px]">{step.description}</p>
       </Flex>

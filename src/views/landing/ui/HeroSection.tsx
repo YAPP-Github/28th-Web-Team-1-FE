@@ -2,7 +2,7 @@
 import { useGoogleLoginRedirect } from '@features/authenticate'
 import Image from 'next/image'
 import backgroundImage from '../assets/background.webp'
-import landingLogo from '../assets/landing_logo.gif'
+import landingLogo from '../assets/landing_logo.webp'
 import resumeImage from '../assets/resume.webp'
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'

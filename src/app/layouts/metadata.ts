@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://scoop.me.kr'
 const TITLE = 'SCOOP - 떠먹여 주는 이력서'
-const DESCRIPTION = '채용 마감 전, 경쟁력 있는 맞춤 이력서를 5분 만에 만들어 드려요'
+const DESCRIPTION = '채용 마감 전, 경쟁력 있는 맞춤 이력서를 5분 만에 만들어 드려요. 노션, PDF에 흩어진 경험을 올리면 AI가 핵심만 뽑아 지원하는 채용공고에 꼭 맞는 이력서를 만들어 드려요.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/ogImage.png',
+        url: '/ogImage.jpg',
         width: 1200,
         height: 630,
         alt: TITLE
@@ -31,7 +31,12 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: TITLE,
     description: DESCRIPTION,
-    images: ['/ogImage.png']
+    images: ['/ogImage.jpg']
+  },
+  verification: {
+    other: {
+      'naver-site-verification': '93a4354402c8b0989d8b3a14b87d9e7457d8985d'
+    }
   }
 }
 
@@ -44,11 +49,23 @@ export const viewport: Viewport = {
 /** 검색엔진·AI가 서비스 정체를 이해할 수 있게 루트 레이아웃에 심는 구조화 데이터. */
 export const organizationJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'Scoop',
-  url: SITE_URL,
-  description: DESCRIPTION,
-  applicationCategory: 'BusinessApplication',
-  operatingSystem: 'Web',
-  inLanguage: 'ko'
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: 'Scoop',
+      url: SITE_URL,
+      sameAs: ['https://www.instagram.com/scoop.me.official/', 'https://www.yapp.co.kr/project/28th/scoop']
+    },
+    {
+      '@type': 'WebApplication',
+      name: 'Scoop',
+      url: SITE_URL,
+      description: DESCRIPTION,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      inLanguage: 'ko',
+      publisher: { '@id': `${SITE_URL}/#organization` }
+    }
+  ]
 }
