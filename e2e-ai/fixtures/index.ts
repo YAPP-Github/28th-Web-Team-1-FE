@@ -1,4 +1,5 @@
 import { test as base, expect, type Page } from '@playwright/test'
+import { Kind, parse, type OperationDefinitionNode } from 'graphql'
 
 /**
  * AI가 생성하는 E2E spec의 공통 fixture.
@@ -97,6 +98,29 @@ type RouteGraphqlOptions = {
 }
 
 /**
+ * GraphQL 문서가 실제로 어떤 오퍼레이션(이름·query/mutation)을 실행하는지 판별한다.
+ * - 파싱 성공: `operationName`이 가리키는 오퍼레이션, 없으면 오퍼레이션이 1개일 때 그것의 종류를 쓴다
+ * - 대상을 고를 수 없으면(이름 불일치, 여러 개인데 이름 없음) 하나라도 mutation이면 mutation으로 본다 (보수적)
+ * - 파싱 불가 문서는 `mutation` 키워드 유무로 폴백한다 (보수적)
+ * 주석·fragment·문자열 속 `mutation`에 속지 않는다.
+ */
+export const classifyGraphql = (body: { query: string; operationName?: string | null }): { operation: string; type: 'query' | 'mutation' } => {
+  let operations: OperationDefinitionNode[]
+  try {
+    operations = parse(body.query).definitions.filter((d): d is OperationDefinitionNode => d.kind === Kind.OPERATION_DEFINITION)
+  } catch {
+    const type = /\bmutation\b/.test(body.query) ? 'mutation' : 'query'
+    return { operation: body.operationName ?? /\b(?:query|mutation)\s+(\w+)/.exec(body.query)?.[1] ?? '', type }
+  }
+
+  const target = body.operationName ? operations.find((o) => o.name?.value === body.operationName) : operations.length === 1 ? operations[0] : undefined
+  if (target) return { operation: target.name?.value ?? '', type: String(target.operation) === 'mutation' ? 'mutation' : 'query' }
+
+  const hasMutation = operations.some((o) => String(o.operation) === 'mutation')
+  return { operation: body.operationName ?? '', type: hasMutation ? 'mutation' : 'query' }
+}
+
+/**
  * 페이지의 GraphQL 요청을 한 곳에서 제어한다. 테스트당 한 번만 호출한다 (route 핸들러가 겹치지 않도록).
  * - AI·외부 연동 오퍼레이션은 `mock`이 없으면 기본 차단된다 (실수로 실제 호출되는 것을 막는 안전장치)
  * - 나머지는 실제 서버로 보낸다 (테스트가 만든 데이터의 생성·수정·삭제는 실제로 실행)
@@ -126,9 +150,7 @@ export const routeGraphql = async (page: Page, options: RouteGraphqlOptions = {}
     } catch {
       return route.continue()
     }
-    // 주석·fragment가 앞에 와도, 여러 오퍼레이션이 섞여도 안전하도록 문서 전체에서 mutation 키워드를 찾는다 (보수적 판별)
-    const operation = body.operationName ?? /\b(?:query|mutation)\s+(\w+)/.exec(body.query)?.[1] ?? ''
-    const type = /\bmutation\b/.test(body.query) ? 'mutation' : 'query'
+    const { operation, type } = classifyGraphql(body)
     const variables = body.variables ?? {}
     const record = (handled: GraphqlCall['handled']) => calls.push({ operation, type, variables, handled })
 
