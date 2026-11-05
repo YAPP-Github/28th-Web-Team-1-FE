@@ -77,6 +77,11 @@ jobs:
           INFO=$(gh pr view "$PR" --repo "$REPO" --json baseRefName,headRefOid,isDraft,title,url,author)
           BASE=$(jq -r .baseRefName <<< "$INFO")
           DRAFT=$(jq -r .isDraft <<< "$INFO")
+          # fork PR은 시크릿이 있는 단계에서 checkout·실행하지 않는다 (workflow_dispatch 포함)
+          HEAD_REPO=$(gh api "repos/$REPO/pulls/$PR" --jq '.head.repo.full_name // empty')
+          if [ "$HEAD_REPO" != "$REPO" ]; then
+            skip "fork PR 제외(head=$HEAD_REPO)"
+          fi
           if [[ "$BASE" != "dev" && "$BASE" != "main" ]] || [ "$DRAFT" = "true" ]; then
             skip "대상 아님(base=$BASE, draft=$DRAFT)"
           fi
@@ -124,10 +129,23 @@ jobs:
           VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_BYPASS_SECRET }}
           CI: 'true'
         run: |
+          # PR head의 SKILL.md는 PR 작성자가 수정할 수 있으므로 기준 브랜치(base)의 파일을 우선 사용한다.
+          # base에 스킬이 아직 없는 최초 도입 PR에서만 PR head 파일로 fallback한다.
+          SKILL_PATH=".claude/skills/e2e-from-pr/SKILL.md"
+          BASE="${{ steps.ctx.outputs.base }}"
+          git fetch --quiet origin "$BASE" || true
+          if git cat-file -e "origin/${BASE}:${SKILL_PATH}" 2>/dev/null; then
+            SKILL_MD=$(git show "origin/${BASE}:${SKILL_PATH}")
+            echo "SKILL.md: base(${BASE})에서 로드"
+          else
+            SKILL_MD=$(cat "$SKILL_PATH")
+            echo "::warning::base(${BASE})에 SKILL.md가 없어 PR head 파일을 사용합니다. 스킬 최초 도입 PR에서만 허용됩니다."
+          fi
+
           # 프롬프트가 SKILL.md의 `---`(frontmatter)로 시작하면 CLI가 옵션으로 오인해 종료하므로 앞에 문장을 둔다
           PROMPT="다음은 e2e-from-pr 스킬 지침이다.
 
-          $(cat .claude/skills/e2e-from-pr/SKILL.md)
+          ${SKILL_MD}
 
           ---
           위 지침대로 수행하라.
