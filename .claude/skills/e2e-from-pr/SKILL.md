@@ -48,51 +48,79 @@ TC와 spec은 일회성이다. `e2e-ai/generated/`, `e2e-ai/tc.md`, `e2e-ai/resu
 ## 4. spec 생성 → `e2e-ai/generated/*.spec.ts`
 - 먼저 `e2e-ai/templates/00-smoke.spec.ts`를 `e2e-ai/generated/00-smoke.spec.ts`로 복사한다
 - TC마다(또는 화면 단위로) `NN-<화면>.spec.ts` 작성
-- **반드시** `import { test, expect, waitForGraphql, expectToast, expectAuthenticated, e2eName } from '../fixtures'` 사용 (`@playwright/test` 직접 import 금지)
+- **반드시** `import { test, expect, routeGraphql, gql, waitForGraphql, expectToast, expectAuthenticated, e2eName } from '../fixtures'` 사용 (`@playwright/test` 직접 import 금지)
   - `page`: 로그인 상태, `guestPage`: 비로그인 상태
   - ⛔ **한 테스트에서 `page`와 `guestPage`를 함께 쓰지 않는다.** 같은 context를 공유해 `page`의 로그인 쿠키가 `guestPage`에도 적용된다 (비로그인 `/` 진입이 `/home`으로 리다이렉트됨). 로그인/비로그인 비교는 테스트를 나눈다
 - test 제목은 `TC-01 | <시나리오>` 형식, 모바일도 돌릴 TC는 제목 끝에 ` @mobile`
 - 셀렉터 우선순위: `getByRole` > `getByLabel`/`getByPlaceholder` > `getByText` > `getByTestId` > CSS
   - 셀렉터를 정하기 전에 실제 컴포넌트 소스를 읽어 문구·role을 확인한다
 - 고정 `waitForTimeout` 금지. `expect(...).toBeVisible()`, `waitForGraphql(page, 'OperationName')` 사용
-- 데이터를 생성하면 이름에 `e2eName('라벨')`을 사용하고, 가능하면 테스트 끝에 삭제한다 (단, 아래 4-1의 차단 방식을 우선)
-- 외부 연동(Google/Kakao/Notion OAuth, 파일 업로드 후 AI 분석처럼 오래 걸리는 생성 작업)은 `test.skip(true, '사유')` 처리하거나 `page.route`로 응답을 막는다
+- 데이터 생성·수정·삭제, AI 요청, 외부 연동은 아래 4-1 규칙을 따른다
+- 로그인(Google/Kakao OAuth)처럼 외부 화면으로 넘어가는 흐름은 `test.skip(true, '사유')` 처리한다
 - 랜딩 A/B가 필요하면 `guestPage.context().addCookies([{ name: 'landing_variant', value: 'B', url: baseURL }])`
 
-### 4-1. 데이터 안전 · 상태 재현 패턴
-- **저장·생성 요청은 차단하고 요청 본문을 검사한다.** 실데이터를 바꾸지 않으면서 "무엇을 보내는지"를 확인할 수 있다
+### 4-1. 요청 처리 규칙 (데이터 · AI · 외부 연동)
+GraphQL 요청 제어는 fixture의 **`routeGraphql(page, { mock, transform, block })`** 한 번으로 한다 (테스트당 1회). GraphQL은 `page.route`를 직접 작성하지 않고, REST(AI 추출 등)만 아래 규칙 B처럼 예외로 직접 가짜 응답을 줄 수 있다.
+AI·외부 연동 오퍼레이션은 `mock`을 주지 않으면 **자동 차단**된다.
+
+| 구분 | 오퍼레이션 | 처리 |
+|---|---|---|
+| **테스트가 만든 데이터** | `CreateExperience`·`UpdateExperience`·`DeleteExperience`, `CreateProject`·`UpdateProject`·`DeleteProject`, 테스트가 만든 이력서의 `UpdateResume`·`DeleteResume` 등 | **실제로 실행**하고, 새로고침·재조회로 반영 여부까지 확인. 끝나면 정리 (규칙 A) |
+| **원래 있던 데이터 변경** | 기존 이력서 `UpdateResume`·`DeleteResume`, `UpdateProfile` 등 | **실제로 바꾸지 않는다.** `block`으로 막고 요청 본문(`calls`)만 검사 |
+| **AI 비용·시간** | `GenerateCoreCompetency`, `RegisterJd`(JD 분석), `SendExperienceQuestionRoomMessage`, `PolishProfileText`, PDF 이력서 추출(REST `resume-imports`) | **가짜 응답(`mock`)으로 대체** (규칙 B). 실제 호출은 기본 차단 |
+| **외부 연동** | `ConnectNotion`, `ImportNotionExperiences`, OAuth | 기본 차단. 필요하면 `mock`, 화면 이동이 있으면 `test.skip` |
+
+#### 규칙 A. 실제 생성·수정·삭제 (테스트가 만든 데이터만)
+- 이름·제목에 `e2eName('라벨')`(`[E2E-AI] 라벨 타임스탬프`)을 쓴다. 목록에서 찾을 때도 **이 이름으로만** 찾는다 (다른 PR 실행이 같은 QA 계정을 동시에 쓸 수 있음)
+- 수정·삭제는 **이 테스트가 만든 항목에만** 한다. 원래 있던 항목을 고르거나 "첫 번째 항목"을 수정·삭제하지 않는다
+- 동작 후 **새로고침(`page.reload()`) 또는 재진입으로 실제 반영**을 확인한다 (화면 상태만 보고 통과시키지 않는다)
+- 정리는 `try/finally`로, 테스트가 실패해도 실행되게 한다. 화면 대신 `gql()`로 직접 지우는 게 빠르고 확실하다
   ```ts
-  const mutations: Array<{ query: string; variables: any }> = []
-  await page.route('**/api/graphql', async (route) => {
-    const raw = route.request().postData() ?? ''
-    if (raw.includes('mutation ')) { mutations.push(JSON.parse(raw)); return route.abort() }
-    return route.continue()
-  })
-  // ... 저장 버튼 클릭 후
-  await expect.poll(() => mutations.filter((m) => m.query.includes('mutation UpdateResume')).length).toBeGreaterThan(0)
+  const gqlRoute = await routeGraphql(page) // AI·외부 연동만 자동 차단, 나머지는 실제 실행
+  const name = e2eName('경험')
+  let created: { workspaceId: string; experienceId: string } | null = null
+  try {
+    // ... 화면에서 name으로 생성 → 응답/URL에서 id 확보해 created에 저장
+    await page.reload()
+    await expect(page.getByText(name)).toBeVisible() // 실제 반영 확인
+    // ... 수정 → reload → 확인, 삭제 → reload → 사라졌는지 확인 (삭제까지 했으면 created = null)
+  } finally {
+    if (created) await gql(page, 'mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) { deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId) }', created).catch(() => {})
+  }
   ```
-  - AI 생성·메시지 전송 같은 비용 드는 mutation도 같은 방식으로 막는다
-  - 실제로 저장돼야만 검증 가능한 시나리오(저장 후 재조회 등)만 예외로 실데이터를 쓰고, 그때는 `e2eName`과 정리를 지킨다
-- **서버 데이터로 만들기 어려운 상태는 조회 응답을 가공해 재현한다** (섹션 없음, 기간 일부 누락, 빈 목록 등)
+  - 오퍼레이션 이름·인자·반환 필드는 `src/entities/**/api/*.api.ts`의 실제 문서를 보고 쓴다
+- 결과의 "사람이 확인할 것"에 정리 실패가 있었다면 남은 데이터 이름을 적는다
+
+#### 규칙 B. AI 요청은 가짜 응답으로 대체
+- 목적은 **프론트 동작 검증**이다: 요청이 올바른 인자로 나가는지, 응답이 화면에 반영되는지, 실패 시 에러가 보이는지. AI 답변 품질은 검증 대상이 아니다
+- 가짜 응답은 `src/entities/**/api/*.api.ts`의 해당 문서 선택 필드와 `src/shared/lib/gql/graphql.ts`의 타입에 맞춰 **필요한 필드를 모두** 채운다. 화면에 보일 값은 `E2E 핵심역량 응답`처럼 고유한 문자열로 해서, 그 문자열이 화면에 나타나는지 확인한다
   ```ts
-  let transformed = 0
-  await page.route('**/api/graphql', async (route) => {
-    const raw = route.request().postData() ?? ''
-    if (raw.includes('query Resume(')) {
-      const response = await route.fetch()
-      const json = await response.json()
-      json.data.resume.sections = json.data.resume.sections.filter((s) => s.type !== 'EXPERIENCE')
-      transformed += 1
-      return route.fulfill({ response, json })
+  const gqlRoute = await routeGraphql(page, {
+    mock: {
+      GenerateCoreCompetency: { data: { generateCoreCompetency: { coreCompetency: 'E2E 핵심역량 응답', strategy: 'E2E 전략' } } }
     }
-    return route.continue()
+  })
+  // ... 트리거 후
+  await expect(page.getByText('E2E 핵심역량 응답')).toBeVisible()
+  expect(gqlRoute.calls.find((c) => c.operation === 'GenerateCoreCompetency')?.variables).toMatchObject({ jdId: expect.any(String) })
+  ```
+- **실패 경로도 1개** 검증한다: `mock: { X: { errors: [{ message: '...', extensions: { code: 'INTERNAL' } }] } }` → 에러 토스트·복구 UI 확인
+- 실제 AI 호출(`allowAiCalls: true`)은 **PR이 AI 기능 자체(해당 mutation·응답 처리)를 바꾼 경우의 대표 흐름 1개**에만 쓴다. 이때 TC 제목 끝에 ` @real-ai`를 붙이고, 응답 내용이 아니라 "응답이 와서 화면에 반영됐는지"만 검증한다 (타임아웃은 `test.setTimeout`으로 넉넉히)
+- `GenerateCoreCompetency`는 백엔드에서 LLM을 호출하는 비용 발생 API다. 이력서 편집 화면은 대상 JD가 있고 핵심역량이 아직 초기 항목이면 **진입 시 자동 호출**한다(`src/views/resume_edit/ui/ResumeEditPage.tsx`, `src/views/resume_edit/ui/ResumeMobilePreview.tsx`). 이 화면을 여는 TC는 반드시 `mock`으로 막아라. 다른 AI 흐름을 실제로 테스트하려고 `allowAiCalls: true`를 쓰더라도, 이 자동 호출까지 실제로 나가지 않도록 `mock`을 함께 지정한다.
+- PDF 업로드 후 추출처럼 REST로 가는 AI 요청은 자동 차단된다. GraphQL과 달리 REST는 `routeGraphql`이 아니라 `page.route`로 직접 가짜 응답을 준다: `page.route(/resume-imports/, (r) => r.fulfill({ json: { resumeId: '...' } }))` (단, 이후 화면이 그 id를 실제 조회하면 실패하므로 요청 인자 검증까지만 한다)
+
+#### 상태 재현: 조회 응답 가공
+- 서버 데이터로 만들기 어려운 상태(섹션 없음, 기간 일부 누락, 빈 목록 등)는 `transform`으로 조회 응답을 가공한다
+  ```ts
+  const gqlRoute = await routeGraphql(page, {
+    block: ['UpdateResume'], // 원래 있던 이력서이므로 저장은 막고 본문만 검사
+    transform: { Resume: (data) => ({ ...data, resume: { ...data.resume, sections: data.resume.sections.filter((s: { type: string }) => s.type !== 'EXPERIENCE') } }) }
   })
   // 진입 후 반드시
-  expect(transformed, '응답 가공이 실제로 적용돼야 함').toBeGreaterThan(0)
+  expect(gqlRoute.transformed.Resume, '응답 가공이 실제로 적용돼야 함').toBeGreaterThan(0)
   ```
   - ⚠️ **가공 적용 여부를 반드시 assert 한다.** 서버 렌더링(SSR)으로 조회되면 브라우저 route에 걸리지 않아, 원래 데이터만으로 통과하는 **거짓 통과**가 생긴다
   - 같은 이유로, 기존 데이터만으로도 기대결과가 이미 성립하는지 먼저 확인하고, 그렇다면 가공이나 고유 값(예: `E2E경력시작만`)으로 PR 변경이 없으면 실패하는 테스트로 만든다
-  - 하나의 테스트에서 차단과 가공을 함께 쓸 때는 route 핸들러를 하나로 합친다
 - `waitForLoadState('networkidle')` 금지: dev 서버·폴링 때문에 끝나지 않아 타임아웃 난다. 화면 요소(`toBeVisible`)로 기다린다
 
 ## 5. 실행 및 자가 수정
