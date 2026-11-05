@@ -179,9 +179,20 @@ jobs:
           fi
 
       # 공개 Pages 배포용: HTML 리포트(트레이스 zip 제외) + 스크린샷 모음
+      # 실행 도중 PR이 닫혔으면(머지 포함) 리포트를 다시 Pages에 올리지 않는다
+      - name: Confirm PR is still open
+        id: open
+        if: steps.ctx.outputs.skip == 'false' && always()
+        env:
+          PR: ${{ steps.ctx.outputs.pr }}
+        run: |
+          STATE=$(gh pr view "$PR" --repo "${{ github.repository }}" --json state --jq .state)
+          echo "state=$STATE" >> "$GITHUB_OUTPUT"
+          echo "PR #$PR state: $STATE"
+
       - name: Build Pages site
         id: pages
-        if: steps.ctx.outputs.skip == 'false' && always()
+        if: steps.ctx.outputs.skip == 'false' && always() && steps.open.outputs.state == 'OPEN'
         env:
           PR: ${{ steps.ctx.outputs.pr }}
         run: |
@@ -200,7 +211,7 @@ jobs:
 
       - name: Deploy report to GitHub Pages
         id: deploy
-        if: steps.ctx.outputs.skip == 'false' && always() && steps.pages.outputs.ready == 'true'
+        if: steps.ctx.outputs.skip == 'false' && always() && steps.open.outputs.state == 'OPEN' && steps.pages.outputs.ready == 'true'
         continue-on-error: true
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -245,6 +256,10 @@ jobs:
           # 상단: 제목 + 리포트 링크만. 재실행 결과는 AI 보고와 어긋날 때만 상단 경고로 올린다.
           # (AI 결과는 TC 단위, 재실행은 스모크·모바일 포함 테스트 단위라 개수 대신 '실패 유무'로 비교)
           header_extra() {
+            if [ -z "$PASSED" ]; then
+              echo "> ⚠️ **최종 재실행 결과가 없어요.** 검증이 실행되지 않았을 수 있어요. 실행 로그를 확인해 주세요."
+              echo
+            fi
             AI_FAILED=$(head -1 e2e-ai/result.md 2>/dev/null | grep -oE '실패 [0-9]+' | grep -oE '[0-9]+' || true)
             if [ -n "$PASSED" ] && [ -n "$AI_FAILED" ]; then
               if [ "$AI_FAILED" = "0" ] && [ "$FAILED" != "0" ]; then

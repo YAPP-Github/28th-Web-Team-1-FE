@@ -79,7 +79,7 @@ export const EXTERNAL_OPERATIONS = ['ConnectNotion', 'ImportNotionExperiences'] 
 /** PDF 이력서 추출(AI). GraphQL이 아닌 REST라 별도 패턴으로 막는다. */
 const RESUME_IMPORT_URL = /\/api\/v1\/workspaces\/[^/]+\/resume-imports/
 
-type GraphqlBody = { query: string; variables?: Record<string, unknown> }
+type GraphqlBody = { query: string; operationName?: string | null; variables?: Record<string, unknown> }
 /** GraphQL 응답 본문(`{ data }` 또는 `{ errors }`). 함수면 요청 variables를 받아 응답을 만든다. */
 type MockResponse = Record<string, unknown> | ((variables: Record<string, unknown>) => Record<string, unknown>)
 
@@ -126,8 +126,9 @@ export const routeGraphql = async (page: Page, options: RouteGraphqlOptions = {}
     } catch {
       return route.continue()
     }
-    const operation = /\b(?:query|mutation)\s+(\w+)/.exec(body.query)?.[1] ?? ''
-    const type = /^\s*mutation\b/.test(body.query) ? 'mutation' : 'query'
+    // 주석·fragment가 앞에 와도, 여러 오퍼레이션이 섞여도 안전하도록 문서 전체에서 mutation 키워드를 찾는다 (보수적 판별)
+    const operation = body.operationName ?? /\b(?:query|mutation)\s+(\w+)/.exec(body.query)?.[1] ?? ''
+    const type = /\bmutation\b/.test(body.query) ? 'mutation' : 'query'
     const variables = body.variables ?? {}
     const record = (handled: GraphqlCall['handled']) => calls.push({ operation, type, variables, handled })
 

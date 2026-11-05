@@ -16,7 +16,8 @@ TC와 spec은 일회성이다. `e2e-ai/generated/`, `e2e-ai/tc.md`, `e2e-ai/resu
 0. **번호 해석**: 이 레포는 이슈·PR이 같은 번호 체계를 쓴다 (브랜치 `feat/#215`의 PR은 #217일 수 있음)
    - `gh pr view <N>`이 실패하면 이슈 번호로 보고, 연결된 PR을 찾는다
      1. 브랜치명 기준: `gh pr list --state all --limit 200 --json number,headRefName,state,body` 결과를 가져와 `headRefName`이 `*/#<N>`으로 끝나는 것 (검색어로 거르지 않는다. 제목·본문에 번호가 없으면 검색에서 빠진다)
-     2. 없으면 같은 결과에서 `body`에 `#<N>`이 있는 것
+     2. 없으면 같은 결과에서 `body`에 `#<N>`이 있는 것. 번호 뒤에 숫자가 이어지면 다른 번호다 (`#21`은 `#215`가 아님)
+     3. 후보가 여러 개면 임의로 고르지 말고 후보 목록을 결과에 적고 중단한다
    - 그래도 없으면 중단하고 "PR을 찾지 못함"으로 보고한다. 어떤 PR로 진행했는지 결과 첫 줄에 적는다 (예: "이슈 #215 → PR #217")
 1. PR: `gh pr view <PR> --json number,title,body,headRefName,baseRefName,files`
    - `gh`가 없으면 현재 브랜치명과 `git log origin/dev..HEAD --oneline`으로 대신한다
@@ -85,7 +86,13 @@ AI·외부 연동 오퍼레이션은 `mock`을 주지 않으면 **자동 차단*
     await expect(page.getByText(name)).toBeVisible() // 실제 반영 확인
     // ... 수정 → reload → 확인, 삭제 → reload → 사라졌는지 확인 (삭제까지 했으면 created = null)
   } finally {
-    if (created) await gql(page, 'mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) { deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId) }', created).catch(() => {})
+    if (created) {
+      const target = created
+      await gql(page, 'mutation DeleteExperience($workspaceId: ID!, $experienceId: ID!) { deleteExperience(workspaceId: $workspaceId, experienceId: $experienceId) }', target).catch((e: Error) => {
+        // 정리 실패를 삼키지 않는다. 남은 데이터를 테스트 실패 메시지와 결과 보고에 남긴다
+        throw new Error(`[e2e-ai] 정리 실패 — 남은 데이터: ${name} (experienceId=${target.experienceId}): ${e.message}`)
+      })
+    }
   }
   ```
   - 오퍼레이션 이름·인자·반환 필드는 `src/entities/**/api/*.api.ts`의 실제 문서를 보고 쓴다
