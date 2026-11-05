@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://scoop.me.kr'
 const TITLE = 'SCOOP - 떠먹여 주는 이력서'
-const DESCRIPTION = '채용 마감 전, 경쟁력 있는 맞춤 이력서를 5분 만에 만들어 드려요'
+const DESCRIPTION = '채용 마감 전, 경쟁력 있는 맞춤 이력서를 5분 만에 만들어 드려요. 노션, PDF에 흩어진 경험을 올리면 AI가 핵심만 뽑아 지원하는 채용공고에 꼭 맞는 이력서를 만들어 드려요.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
