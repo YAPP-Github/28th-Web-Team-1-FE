@@ -3,7 +3,7 @@ import { useGoogleLoginRedirect } from '@features/authenticate'
 import { ArrowRight, Sparkle } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Flex } from '@radix-ui/themes'
-import { Button, Heading } from '@shared/ui'
+import { Button, Text } from '@shared/ui'
 
 export const FooterCtaSection = () => {
   const startLogin = useGoogleLoginRedirect()
@@ -12,9 +12,9 @@ export const FooterCtaSection = () => {
     <section className="py-14 sm:py-24">
       <Flex direction="row" align="center" justify="between" className="bg-primary-50 relative mx-auto overflow-hidden rounded-sm p-4 sm:gap-8 sm:rounded-4xl sm:px-14 sm:py-14">
         <Flex direction="column" className="relative z-10 min-w-0 flex-1 gap-0.5 text-left sm:gap-2">
-          <Heading variant="title2" color="text-bolder-inverse" className="sm:text-title2 text-[13px] font-semibold break-keep">
+          <Text variant="title2" color="text-bolder-inverse" className="sm:text-title2 text-[13px] font-semibold break-keep">
             이력서 작성, 더 이상 혼자 고민하지 마세요
-          </Heading>
+          </Text>
           <span className="sm:text-heading2 text-[9px] break-keep text-white">SCOOP이 채용공고에 맞는 맞춤 이력서를 5분 만에 만들어 드려요.</span>
           <Button
             variant="secondary"

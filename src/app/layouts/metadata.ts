@@ -49,11 +49,23 @@ export const viewport: Viewport = {
 /** 검색엔진·AI가 서비스 정체를 이해할 수 있게 루트 레이아웃에 심는 구조화 데이터. */
 export const organizationJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'Scoop',
-  url: SITE_URL,
-  description: DESCRIPTION,
-  applicationCategory: 'BusinessApplication',
-  operatingSystem: 'Web',
-  inLanguage: 'ko'
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: 'Scoop',
+      url: SITE_URL,
+      sameAs: ['https://www.instagram.com/scoop.me.official/', 'https://www.yapp.co.kr/project/28th/scoop']
+    },
+    {
+      '@type': 'WebApplication',
+      name: 'Scoop',
+      url: SITE_URL,
+      description: DESCRIPTION,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      inLanguage: 'ko',
+      publisher: { '@id': `${SITE_URL}/#organization` }
+    }
+  ]
 }
