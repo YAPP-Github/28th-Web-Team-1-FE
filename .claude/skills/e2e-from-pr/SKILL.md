@@ -67,13 +67,13 @@ AI·외부 연동 오퍼레이션은 `mock`을 주지 않으면 **자동 차단*
 | 구분 | 오퍼레이션 | 처리 |
 |---|---|---|
 | **테스트가 만든 데이터** | `CreateExperience`·`UpdateExperience`·`DeleteExperience`, `CreateProject`·`UpdateProject`·`DeleteProject`, 테스트가 만든 이력서의 `UpdateResume`·`DeleteResume` 등 | **실제로 실행**하고, 새로고침·재조회로 반영 여부까지 확인. 끝나면 정리 (규칙 A) |
-| **원래 있던 데이터 변경** | 기존 이력서 `UpdateResume`·`DeleteResume`, `UpdateProfile` 등 | **실제로 바꾸지 않는다.** `block`으로 막고 요청 본문(`calls`)만 검사 |
+| **QA 계정의 기존 데이터 변경** | 기존 이력서 `UpdateResume`·`DeleteResume`, `UpdateProfile` 등 | **실제로 실행한다.** QA 계정(잡도리)은 E2E 전용이므로 허용. 단 규칙 A의 대상 지정·원복·기록 규칙을 지킨다. 원복이 어려우면 `block`으로 막고 요청 본문(`calls`)만 검사 |
 | **AI 비용·시간** | `GenerateCoreCompetency`, `RegisterJd`(JD 분석), `SendExperienceQuestionRoomMessage`, `PolishProfileText`, PDF 이력서 추출(REST `resume-imports`) | **가짜 응답(`mock`)으로 대체** (규칙 B). 실제 호출은 기본 차단 |
 | **외부 연동** | `ConnectNotion`, `ImportNotionExperiences`, OAuth | 기본 차단. 필요하면 `mock`, 화면 이동이 있으면 `test.skip` |
 
 #### 규칙 A. 실제 생성·수정·삭제 (테스트가 만든 데이터만)
 - 이름·제목에 `e2eName('라벨')`(`[E2E-AI] 라벨 타임스탬프`)을 쓴다. 목록에서 찾을 때도 **이 이름으로만** 찾는다 (다른 PR 실행이 같은 QA 계정을 동시에 쓸 수 있음)
-- 수정·삭제는 **이 테스트가 만든 항목에만** 한다. 원래 있던 항목을 고르거나 "첫 번째 항목"을 수정·삭제하지 않는다
+- 기존 데이터(QA 계정의 원래 이력서·프로필 등)도 수정·삭제할 수 있다. 단 (a) 대상은 이름이나 ID로 명확히 고르고, "첫 번째 항목"처럼 임의로 고르지 않는다, (b) 수정 전 값을 저장해 테스트 끝에 원래 값으로 되돌린다. 되돌릴 수 없는 삭제는 결과의 "사람이 확인할 것"에 무엇을 지웠는지 적는다
 - 동작 후 **새로고침(`page.reload()`) 또는 재진입으로 실제 반영**을 확인한다 (화면 상태만 보고 통과시키지 않는다)
 - 정리는 `try/finally`로, 테스트가 실패해도 실행되게 한다. 화면 대신 `gql()`로 직접 지우는 게 빠르고 확실하다
   ```ts
@@ -120,7 +120,7 @@ AI·외부 연동 오퍼레이션은 `mock`을 주지 않으면 **자동 차단*
 - 서버 데이터로 만들기 어려운 상태(섹션 없음, 기간 일부 누락, 빈 목록 등)는 `transform`으로 조회 응답을 가공한다
   ```ts
   const gqlRoute = await routeGraphql(page, {
-    block: ['UpdateResume'], // 원래 있던 이력서이므로 저장은 막고 본문만 검사
+    block: ['UpdateResume'], // 이 TC는 상태 재현만 보므로 저장은 막고 본문만 검사 (저장 결과를 검증할 TC라면 생략하고 규칙 A대로 원복)
     transform: { Resume: (data) => ({ ...data, resume: { ...data.resume, sections: data.resume.sections.filter((s: { type: string }) => s.type !== 'EXPERIENCE') } }) }
   })
   // 진입 후 반드시
