@@ -156,6 +156,7 @@ jobs:
           - CI 환경이므로 질문하지 말고 끝까지 진행한 뒤 e2e-ai/result.md를 반드시 작성하라."
 
           claude -p "$PROMPT" \
+            --model sonnet \
             --permission-mode acceptEdits \
             --max-turns 80 \
             --allowedTools "Read,Write,Edit,Glob,Grep,Bash(npx playwright test:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr list:*),Bash(git merge-base:*),Bash(gh issue view:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(cp:*),Bash(mkdir:*),Bash(ls:*)"
