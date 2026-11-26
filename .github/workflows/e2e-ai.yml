@@ -39,7 +39,8 @@ jobs:
     concurrency:
       group: e2e-ai-${{ github.event.inputs.pr_number || github.event.pull_request.number }}
       cancel-in-progress: true
-    runs-on: ubuntu-latest
+    # Playwright 1.60이 지원하는 OS로 고정한다 (ubuntu-latest의 OS 변경에 따른 설치 실패 방지).
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -108,7 +109,7 @@ jobs:
         if: steps.ctx.outputs.skip == 'false'
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
