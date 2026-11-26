@@ -3,7 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
-import * as amplitude from '@amplitude/unified'
+import { initAmplitude } from '@shared/lib/amplitude'
 
 const amplitudeApiKey = process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY
 
@@ -13,12 +13,7 @@ if (process.env.NODE_ENV !== 'production') {
 } else if (!amplitudeApiKey) {
   console.warn('Amplitude API key missing — analytics disabled')
 } else {
-  amplitude.initAll(amplitudeApiKey, {
-    analytics: { autocapture: true },
-    sessionReplay: { sampleRate: 1 },
-    // Feature Flag용 Experiment deployment 키
-    experiment: { deploymentKey: process.env.NEXT_PUBLIC_AMPLITUDE_DEPLOYMENT_KEY }
-  })
+  initAmplitude(amplitudeApiKey, process.env.NEXT_PUBLIC_AMPLITUDE_DEPLOYMENT_KEY)
 }
 
 Sentry.init({

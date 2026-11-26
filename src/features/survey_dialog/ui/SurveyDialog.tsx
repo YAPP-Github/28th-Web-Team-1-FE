@@ -4,6 +4,7 @@ import { XIcon } from 'lucide-react'
 import { useMeQuery } from '@entities/user'
 import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
+import { whenAmplitudeReady } from '@shared/lib/amplitude'
 import { Button, Text } from '@shared/ui'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog'
 import * as amplitude from '@amplitude/unified'
@@ -42,10 +43,12 @@ export const SurveyDialog = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    const experiment = amplitude.experiment()
-    if (!userId || !experiment || localStorage.getItem(DISMISSED_KEY)) return
+    if (!userId || localStorage.getItem(DISMISSED_KEY)) return
 
-    experiment.fetch({ user_id: userId }).then(() => {
+    whenAmplitudeReady().then(async () => {
+      const experiment = amplitude.experiment()
+      if (!experiment) return
+      await experiment.fetch({ user_id: userId })
       const { value, payload } = experiment.variant(FLAG_KEY)
       // 대시보드에 등록된 url을 가져옴
       const url: unknown = typeof payload === 'string' ? payload : payload?.url
