@@ -13,7 +13,12 @@ if (process.env.NODE_ENV !== 'production') {
 } else if (!amplitudeApiKey) {
   console.warn('Amplitude API key missing — analytics disabled')
 } else {
-  amplitude.initAll(amplitudeApiKey, { analytics: { autocapture: true }, sessionReplay: { sampleRate: 1 } })
+  amplitude.initAll(amplitudeApiKey, {
+    analytics: { autocapture: true },
+    sessionReplay: { sampleRate: 1 },
+    // Feature Flag용 Experiment deployment 키
+    experiment: { deploymentKey: process.env.NEXT_PUBLIC_AMPLITUDE_DEPLOYMENT_KEY }
+  })
 }
 
 Sentry.init({

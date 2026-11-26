@@ -1,13 +1,19 @@
 'use client'
-import { Flex } from '@radix-ui/themes'
+import { useEffect, useState } from 'react'
 import { XIcon } from 'lucide-react'
+import { useMeQuery } from '@entities/user'
+import { Flex } from '@radix-ui/themes'
 import { cn } from '@shared/lib/cn'
 import { Button, Text } from '@shared/ui'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog'
-import { useState } from 'react'
+import * as amplitude from '@amplitude/unified'
 
-/** 대상 사용자 그룹. `active` = 이력서 완성 4회+ 헤비 유저, `churned` = 이탈 유저. */
+const DISMISSED_KEY = 'survey_dialog_dismissed_v1' // 한 번 닫은 유저에게 다시 띄우지 않기 위한 localStorage 키
+const FLAG_KEY = 'survey-dialog' // Amplitude 플래그 명
+
 type Variant = 'active' | 'churned'
+
+const isVariant = (value: unknown): value is Variant => value === 'active' || value === 'churned'
 
 const COPY: Record<Variant, { title: string; description: string; chat: [string, string, string] }> = {
   active: {
@@ -24,7 +30,6 @@ const COPY: Record<Variant, { title: string; description: string; chat: [string,
 
 /**
  * 외부 설문(비대면 인터뷰) 참여 모달. 마운트 시 Amplitude 플래그 `survey-dialog`가 켜진 유저에게만 뜬다.
- * 대시보드에서 대상(User ID·cohort)과 on/off를 바꾸면 배포 없이 반영된다.
  *
  * @example
  * ```tsx
@@ -32,11 +37,34 @@ const COPY: Record<Variant, { title: string; description: string; chat: [string,
  * ```
  */
 export const SurveyDialog = () => {
-  const [isOpen] = useState(true)
-  const { title, description, chat } = COPY['active']
+  const userId = useMeQuery().data?.me.userId
+  const [survey, setSurvey] = useState<{ variant: Variant; url: string } | null>(null)
+  const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    const experiment = amplitude.experiment()
+    if (!userId || !experiment || localStorage.getItem(DISMISSED_KEY)) return
+
+    experiment.fetch({ user_id: userId }).then(() => {
+      const { value, payload } = experiment.variant(FLAG_KEY)
+      // 대시보드에 등록된 url을 가져옴
+      const url: unknown = typeof payload === 'string' ? payload : payload?.url
+      if (!isVariant(value) || typeof url !== 'string') return
+      setSurvey({ variant: value, url })
+      setIsOpen(true)
+    })
+  }, [userId])
+
+  if (!survey) return null
+  const { title, description, chat } = COPY[survey.variant]
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setIsOpen(nextOpen)
+    if (!nextOpen) localStorage.setItem(DISMISSED_KEY, '1')
+  }
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent showCloseButton={false} onOpenAutoFocus={(event) => event.preventDefault()} className={'bg-bg-gray-subtler flex h-82 w-142.5 gap-0 overflow-hidden rounded-xl p-0'}>
         <div aria-hidden className={'bg-primary-50 relative w-60 shrink-0 overflow-hidden'}>
           <div className={'absolute -top-21.25 -left-20 size-50 rounded-full bg-white opacity-12'} />
@@ -69,13 +97,11 @@ export const SurveyDialog = () => {
           </Flex>
 
           <Flex direction={'column'} align={'center'} gap={'2'}>
-            <DialogClose asChild>
-              <Button asChild size={'md'} fullWidth className={'rounded-lg'}>
-                <a href={'hi'} target={'_blank'} rel={'noopener noreferrer'}>
-                  참여 신청하기
-                </a>
-              </Button>
-            </DialogClose>
+            <Button asChild size={'md'} fullWidth className={'rounded-lg'}>
+              <a href={survey.url} target={'_blank'} rel={'noopener noreferrer'}>
+                참여 신청하기
+              </a>
+            </Button>
             <DialogClose asChild>
               <Button variant={'text'} size={'md'} className={'text-caption1 border-0'}>
                 다음에 할게요
