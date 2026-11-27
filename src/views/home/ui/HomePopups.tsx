@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useMeQuery } from '@entities/user'
-import { OptionalConsentDialog, SignupConsentDialog, needsSignupConsent } from '@features/consent'
+import { OptionalConsentDialog, REQUIRED_CONSENTS, SignupConsentDialog } from '@features/consent'
 import { SurveyDialog } from '@features/survey_dialog'
 
 const SESSION_KEY = 'home_popup_shown' // 이번 세션에 인터뷰 모달이 떴으면 동의 시트를 띄우지 않기 위한 sessionStorage 키
@@ -12,8 +12,9 @@ const SESSION_KEY = 'home_popup_shown' // 이번 세션에 인터뷰 모달이 �
  */
 export const HomePopups = () => {
   const me = useMeQuery().data?.me
-  // 기존 가입자(consentSheetRequired)는 선택 동의 시트로 따로 받는다
-  const isSignup = me !== undefined && !me.consentSheetRequired && needsSignupConsent(me.consents)
+  // 필수 동의가 하나라도 없으면 가입 동의 시트. 기존 가입자(consentSheetRequired)는 선택 동의 시트로 따로 받는다
+  const hasRequiredConsents = REQUIRED_CONSENTS.every(({ type }) => me?.consents.some((consent) => consent.type === type && consent.agreed))
+  const isSignup = me !== undefined && !me.consentSheetRequired && !hasRequiredConsents
   const [hasShownSignup, setShownSignup] = useState(false)
   const [isSurveyShown, setSurveyShown] = useState<boolean | null>(null)
 

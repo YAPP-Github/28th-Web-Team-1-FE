@@ -3,40 +3,37 @@ import { useMe, useUpdateOptionalConsents } from '@entities/user'
 import { formatDate } from '@shared/lib'
 import { Divider, Heading, Spacing, Text } from '@shared/ui'
 import { Switch } from '@shared/ui/switch'
-import { CONSENTS, OPTIONAL_CONSENTS, REQUIRED_CONSENTS, findConsent } from '@features/consent'
+import { OPTIONAL_CONSENTS, REQUIRED_CONSENTS, type ConsentField } from '@features/consent'
 
 export const ConsentSettings = () => {
   const { me } = useMe()
   const { mutate } = useUpdateOptionalConsents()
 
-  const toggle = (type: (typeof OPTIONAL_CONSENTS)[number], agreed: boolean) => mutate({ source: 'MYPAGE', ...(type === 'RESEARCH' ? { research: agreed } : { marketingEmail: agreed }) })
+  const toggle = (field: ConsentField, agreed: boolean) => mutate({ source: 'MYPAGE', [field]: agreed })
 
   return (
     <>
       <Heading variant={'heading2'}>선택 동의</Heading>
       <Spacing size={16} />
       <ul className={'border-border-subtler bg-bg-white divide-border-subtler divide-y rounded-lg border'}>
-        {OPTIONAL_CONSENTS.map((type) => {
-          const { title, description, url } = CONSENTS[type]
-          return (
-            <li key={type} className={'flex items-center justify-between p-5'}>
-              <div className={'flex flex-col gap-1'}>
-                <div className={'flex items-center gap-2'}>
-                  <Text variant={'headline2'} color={'text-bolder'}>
-                    {title}
-                  </Text>
-                  <a href={url} target={'_blank'} rel={'noopener noreferrer'} className={'text-label2 text-text-subtle shrink-0 underline'}>
-                    보기
-                  </a>
-                </div>
-                <Text variant={'body2'} color={'text-subtle'}>
-                  {description}
+        {OPTIONAL_CONSENTS.map(({ type, field, title, description, url }) => (
+          <li key={type} className={'flex items-center justify-between p-5'}>
+            <div className={'flex flex-col gap-1'}>
+              <div className={'flex items-center gap-2'}>
+                <Text variant={'headline2'} color={'text-bolder'}>
+                  {title}
                 </Text>
+                <a href={url} target={'_blank'} rel={'noopener noreferrer'} className={'text-label2 text-text-subtle shrink-0 underline'}>
+                  보기
+                </a>
               </div>
-              <Switch aria-label={title} checked={findConsent(me.consents, type)?.agreed ?? false} onCheckedChange={(agreed) => toggle(type, agreed)} />
-            </li>
-          )
-        })}
+              <Text variant={'body2'} color={'text-subtle'} className={'whitespace-pre-line'}>
+                {description}
+              </Text>
+            </div>
+            <Switch aria-label={title} checked={me.consents.find((consent) => consent.type === type)?.agreed ?? false} onCheckedChange={(agreed) => toggle(field, agreed)} />
+          </li>
+        ))}
       </ul>
       <Spacing size={16} />
       <Text as={'p'} variant={'caption1'} color={'text-subtler'} className={'px-1'}>
@@ -50,12 +47,12 @@ export const ConsentSettings = () => {
       <Heading variant={'heading2'}>필수 동의</Heading>
       <Spacing size={16} />
       <ul className={'bg-bg-gray-subtler flex flex-col gap-4 rounded-lg p-5'}>
-        {REQUIRED_CONSENTS.map((type) => {
-          const consent = findConsent(me.consents, type)
+        {REQUIRED_CONSENTS.map(({ type, title, url }) => {
+          const consent = me.consents.find((consent) => consent.type === type)
           return (
             <li key={type} className={'flex items-center justify-between'}>
               <Text variant={'body2'} color={'text-basic'}>
-                {CONSENTS[type].title}
+                {title}
               </Text>
               <div className={'flex items-center gap-2'}>
                 {consent?.agreed && (
@@ -63,7 +60,7 @@ export const ConsentSettings = () => {
                     {formatDate(consent.changedAt)} 동의
                   </Text>
                 )}
-                <a href={CONSENTS[type].url} target={'_blank'} rel={'noopener noreferrer'} className={'text-label2 text-text-subtle shrink-0 underline'}>
+                <a href={url} target={'_blank'} rel={'noopener noreferrer'} className={'text-label2 text-text-subtle shrink-0 underline'}>
                   보기
                 </a>
               </div>
