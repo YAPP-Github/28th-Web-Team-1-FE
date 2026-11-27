@@ -5,7 +5,6 @@ import { Divider, Heading, Spacing, Text } from '@shared/ui'
 import { Switch } from '@shared/ui/switch'
 import { CONSENTS, OPTIONAL_CONSENTS, REQUIRED_CONSENTS, findConsent } from '@features/consent'
 
-/** 마이페이지 동의 관리: 선택 동의 2개는 토글로 바로 변경, 필수 동의는 동의일만 보여준다. */
 export const ConsentSettings = () => {
   const { me } = useMe()
   const { mutate } = useUpdateOptionalConsents()
