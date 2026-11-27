@@ -4,12 +4,24 @@ import { formatDate } from '@shared/lib'
 import { Divider, Heading, Spacing, Text } from '@shared/ui'
 import { Switch } from '@shared/ui/switch'
 import { OPTIONAL_CONSENTS, REQUIRED_CONSENTS, type ConsentField } from '@features/consent'
+import { toast } from 'sonner'
 
 export const ConsentSettings = () => {
   const { me } = useMe()
   const { mutate } = useUpdateOptionalConsents()
 
-  const toggle = (field: ConsentField, agreed: boolean) => mutate({ source: 'MYPAGE', [field]: agreed })
+  const toggle = (field: ConsentField, agreed: boolean) =>
+    mutate(
+      { source: 'MYPAGE', [field]: agreed },
+      {
+        onSuccess: () => {
+          toast.success('저장되었어요', { id: 'consent-save', position: 'top-center' })
+        },
+        onError: () => {
+          toast.error('저장에 실패했어요.\n잠시 후 다시 시도해 주세요.')
+        }
+      }
+    )
 
   return (
     <>

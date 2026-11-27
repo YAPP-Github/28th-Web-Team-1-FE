@@ -4,7 +4,8 @@ import { useMarkConsentSheetShown, useUpdateOptionalConsents } from '@entities/u
 import { Checkbox } from '@shared/ui/checkbox'
 import { Button, Text } from '@shared/ui'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog'
-import { INITIAL_CHECKS, OPTIONAL_CONSENTS } from '../model/consents'
+import { OPTIONAL_CONSENTS, OPTIONAL_INITIAL_CHECKS } from '../model/consents'
+import { toast } from 'sonner'
 
 /**
  * 기존 가입자에게 홈에서 한 번 띄우는 선택 동의 시트. 열리는 순간 노출 기록을 남겨 다시 뜨지 않는다.
@@ -12,13 +13,24 @@ import { INITIAL_CHECKS, OPTIONAL_CONSENTS } from '../model/consents'
  */
 export const OptionalConsentDialog = () => {
   const [isOpen, setIsOpen] = useState(true)
-  const [checked, setChecked] = useState(INITIAL_CHECKS)
+  const [checked, setChecked] = useState(OPTIONAL_INITIAL_CHECKS)
   const { mutate: markShown } = useMarkConsentSheetShown()
-  const { mutate: update, isPending } = useUpdateOptionalConsents()
+  const { mutate, isPending } = useUpdateOptionalConsents()
 
   useEffect(() => markShown(), [markShown])
 
-  const handleSave = () => update({ research: checked.research, marketingEmail: checked.marketingEmail, source: 'EXISTING_USER_SHEET' }, { onSuccess: () => setIsOpen(false) })
+  const handleSave = () =>
+    mutate(
+      { ...checked, source: 'EXISTING_USER_SHEET' },
+      {
+        onSuccess: () => {
+          setIsOpen(false)
+        },
+        onError: () => {
+          toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.')
+        }
+      }
+    )
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

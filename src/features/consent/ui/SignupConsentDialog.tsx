@@ -5,10 +5,11 @@ import { Checkbox } from '@shared/ui/checkbox'
 import { Button, Text } from '@shared/ui'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog'
 import { CONSENTS, INITIAL_CHECKS, REQUIRED_CONSENTS, type ConsentField } from '../model/consents'
+import { toast } from 'sonner'
 
 const ALL_CHECKED: Record<ConsentField, boolean> = { terms: true, privacy: true, research: true, marketingEmail: true }
 
-// 가입 직후 필수 동의가 없는 유저에게 띄우는 동의 시트.
+// 가입 직후 띄우는 동의 시트.
 export const SignupConsentDialog = () => {
   const { mutate, isPending } = useAgreeSignupConsents()
   const [checked, setChecked] = useState(INITIAL_CHECKS)
@@ -16,7 +17,15 @@ export const SignupConsentDialog = () => {
   const isAllChecked = CONSENTS.every(({ field }) => checked[field])
   const isSubmittable = REQUIRED_CONSENTS.every(({ field }) => checked[field])
 
-  const handleSubmit = () => mutate(checked)
+  const handleSubmit = () =>
+    mutate(
+      { ...checked },
+      {
+        onError: () => {
+          toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.')
+        }
+      }
+    )
 
   return (
     <Dialog open>

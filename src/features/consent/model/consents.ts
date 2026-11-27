@@ -33,3 +33,4 @@ export const OPTIONAL_CONSENTS = CONSENTS.filter((consent) => !consent.isRequire
 
 /** 동의 시트 체크 초기값. 선택 항목은 반드시 해제 상태로 시작해야 한다. */
 export const INITIAL_CHECKS = Object.fromEntries(CONSENTS.map(({ field }) => [field, false])) as Record<ConsentField, boolean>
+export const OPTIONAL_INITIAL_CHECKS = Object.fromEntries(OPTIONAL_CONSENTS.map(({ field }) => [field, false])) as Record<ConsentField, boolean>
