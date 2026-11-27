@@ -53,7 +53,10 @@ export const SurveyDialog = () => {
       // 대시보드에 등록된 url을 가져옴
       const url: unknown = typeof payload === 'string' ? payload : payload?.url
       if (!isVariant(value) || typeof url !== 'string') return
-      setSurvey({ variant: value, url })
+      // Tally 히든 필드: 응답자와 실제 사용 로그를 매칭하기 위함 (group은 Amplitude payload URL에 포함)
+      const tallyUrl = new URL(url)
+      tallyUrl.searchParams.set('user_id', String(userId))
+      setSurvey({ variant: value, url: tallyUrl.toString() })
       setIsOpen(true)
     })
   }, [userId])
