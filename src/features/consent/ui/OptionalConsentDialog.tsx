@@ -23,12 +23,8 @@ export const OptionalConsentDialog = () => {
     mutate(
       { ...checked, source: 'EXISTING_USER_SHEET' },
       {
-        onSuccess: () => {
-          setIsOpen(false)
-        },
-        onError: () => {
-          toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.')
-        }
+        onSuccess: () => setIsOpen(false),
+        onError: () => toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.')
       }
     )
 
@@ -36,7 +32,7 @@ export const OptionalConsentDialog = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent showCloseButton={false} onOpenAutoFocus={(event) => event.preventDefault()} className={'bg-bg-white flex w-102.5 flex-col gap-5 rounded-2xl p-6'}>
         <div className={'flex flex-col gap-1'}>
-          <DialogTitle className={'text-heading2 text-text-bolder'}>받아 볼 안내를 골라 주세요</DialogTitle>
+          <DialogTitle className={'text-heading2 text-text-bolder font-semibold'}>받아 볼 안내를 골라 주세요</DialogTitle>
           <DialogDescription className={'text-body2 text-text-subtler'}>동의하지 않아도 지금처럼 이용할 수 있어요.</DialogDescription>
         </div>
 

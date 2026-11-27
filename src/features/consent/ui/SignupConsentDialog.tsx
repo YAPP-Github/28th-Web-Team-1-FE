@@ -18,14 +18,9 @@ export const SignupConsentDialog = () => {
   const isSubmittable = REQUIRED_CONSENTS.every(({ field }) => checked[field])
 
   const handleSubmit = () =>
-    mutate(
-      { ...checked },
-      {
-        onError: () => {
-          toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.')
-        }
-      }
-    )
+    mutate(checked, {
+      onError: () => toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.')
+    })
 
   return (
     <Dialog open>
@@ -37,7 +32,7 @@ export const SignupConsentDialog = () => {
         className={'bg-bg-white flex w-117.5 flex-col gap-5 rounded-2xl p-6'}
       >
         <div className={'flex flex-col gap-1'}>
-          <DialogTitle className={'text-heading2 text-text-bolder'}>시작하기 전에 확인해 주세요</DialogTitle>
+          <DialogTitle className={'text-heading2 text-text-bolder font-semibold'}>시작하기 전에 확인해 주세요</DialogTitle>
           <DialogDescription className={'text-body2 text-text-subtler'}>필수 항목에 동의하면 바로 시작할 수 있어요.</DialogDescription>
         </div>
 
