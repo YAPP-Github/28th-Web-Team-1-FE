@@ -7,11 +7,12 @@ import { Divider, ErrorFallback, Heading, Spacing, Text } from '@shared/ui'
 import { Chip } from '@shared/ui/chip'
 import { GoogleIcon, NotionIcon } from '@shared/icon'
 import { WithdrawButton } from '@features/authenticate'
+import { ConsentSettings } from './ConsentSettings'
 import { useMe } from '@entities/user'
 
 export const MyAccountPage = () => {
   return (
-    <Flex direction="column" p="8" className="min-h-0 flex-1">
+    <Flex direction="column" p="8" className="min-h-0 flex-1 overflow-y-auto">
       <Heading variant="heading2">계정 관리</Heading>
 
       <Spacing size={32} />
@@ -26,6 +27,10 @@ export const MyAccountPage = () => {
             }
           >
             <ConnectedAccounts />
+            <Spacing size={32} />
+            <Divider color="gray-10" />
+            <Spacing size={32} />
+            <ConsentSettings />
           </Suspense>
         </ErrorBoundary>
 

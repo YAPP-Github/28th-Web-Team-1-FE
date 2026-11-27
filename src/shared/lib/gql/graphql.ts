@@ -4,6 +4,18 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
+/** 가입 시 약관 동의 요청입니다. */
+export type AgreeSignupConsentsRequest = {
+  /** 광고성 정보 수신(이메일) 동의 여부입니다. */
+  marketingEmail?: boolean | null | undefined;
+  /** 개인정보 수집/이용 동의 여부입니다. */
+  privacy: boolean;
+  /** 서비스 개선 리서치 참여 안내 수신 동의 여부입니다. */
+  research?: boolean | null | undefined;
+  /** 이용약관 동의 여부입니다. */
+  terms: boolean;
+};
+
 /** Notion 연결 요청입니다. */
 export type ConnectNotionRequest = {
   /** Notion OAuth authorization code입니다. */
@@ -11,6 +23,24 @@ export type ConnectNotionRequest = {
   /** Notion OAuth redirect URI입니다. */
   redirectUri: string;
 };
+
+/** 선택 동의를 변경한 경로입니다. */
+export type ConsentChangeSource =
+  /** 기존 가입자 동의 시트에서 변경했습니다. */
+  | 'EXISTING_USER_SHEET'
+  /** 마이페이지에서 변경했습니다. */
+  | 'MYPAGE';
+
+/** 저장하는 동의 항목의 유형입니다. */
+export type ConsentType =
+  /** 광고성 정보 수신(이메일) 동의입니다. */
+  | 'MARKETING_EMAIL'
+  /** 개인정보 수집/이용 동의입니다. */
+  | 'PRIVACY'
+  /** 서비스 개선 리서치 참여 안내 수신 동의입니다. (인터뷰, 설문, 사용성 테스트 참여 요청) */
+  | 'RESEARCH'
+  /** 이용약관 동의입니다. */
+  | 'TERMS';
 
 /** 경험 프로젝트 생성 입력입니다. */
 export type CreateExperienceProjectRequest = {
@@ -513,6 +543,16 @@ export type UpdateExperienceRequest = {
   title: string;
 };
 
+/** 선택 동의 변경 요청입니다. */
+export type UpdateOptionalConsentsRequest = {
+  /** 광고성 정보 수신(이메일) 동의 여부입니다. */
+  marketingEmail?: boolean | null | undefined;
+  /** 서비스 개선 리서치 참여 안내 수신 동의 여부입니다. */
+  research?: boolean | null | undefined;
+  /** 선택 동의를 변경한 경로입니다. */
+  source: ConsentChangeSource;
+};
+
 /** 프로필 수정 입력입니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다. */
 export type UpdateProfileRequest = {
   /** 변경할 수상 목록입니다. (전체 교체) */
@@ -874,12 +914,31 @@ export type ResumeQuery = { resume: { resumeId: string, status: ResumeStatusType
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { userId: string, name: string, profileImageUrl: string | null, email: string, workspaces: Array<{ workspaceId: string }> } };
+export type MeQuery = { me: { userId: string, name: string, profileImageUrl: string | null, email: string, consentSheetRequired: boolean, workspaces: Array<{ workspaceId: string }>, consents: Array<{ type: ConsentType, agreed: boolean, changedAt: string }> } };
 
 export type UserWorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type UserWorkspacesQuery = { me: { workspaces: Array<{ workspaceId: string }> } };
+
+export type AgreeSignupConsentsMutationVariables = Exact<{
+  request: AgreeSignupConsentsRequest;
+}>;
+
+
+export type AgreeSignupConsentsMutation = { agreeSignupConsents: Array<{ type: ConsentType, agreed: boolean, changedAt: string }> };
+
+export type UpdateOptionalConsentsMutationVariables = Exact<{
+  request: UpdateOptionalConsentsRequest;
+}>;
+
+
+export type UpdateOptionalConsentsMutation = { updateOptionalConsents: Array<{ type: ConsentType, agreed: boolean, changedAt: string }> };
+
+export type MarkConsentSheetShownMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MarkConsentSheetShownMutation = { markConsentSheetShown: boolean };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -1699,6 +1758,12 @@ export const MeDocument = new TypedDocumentString(`
     workspaces {
       workspaceId
     }
+    consentSheetRequired
+    consents {
+      type
+      agreed
+      changedAt
+    }
   }
 }
     `) as unknown as TypedDocumentString<MeQuery, MeQueryVariables>;
@@ -1711,3 +1776,26 @@ export const UserWorkspacesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UserWorkspacesQuery, UserWorkspacesQueryVariables>;
+export const AgreeSignupConsentsDocument = new TypedDocumentString(`
+    mutation AgreeSignupConsents($request: AgreeSignupConsentsRequest!) {
+  agreeSignupConsents(request: $request) {
+    type
+    agreed
+    changedAt
+  }
+}
+    `) as unknown as TypedDocumentString<AgreeSignupConsentsMutation, AgreeSignupConsentsMutationVariables>;
+export const UpdateOptionalConsentsDocument = new TypedDocumentString(`
+    mutation UpdateOptionalConsents($request: UpdateOptionalConsentsRequest!) {
+  updateOptionalConsents(request: $request) {
+    type
+    agreed
+    changedAt
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateOptionalConsentsMutation, UpdateOptionalConsentsMutationVariables>;
+export const MarkConsentSheetShownDocument = new TypedDocumentString(`
+    mutation MarkConsentSheetShown {
+  markConsentSheetShown
+}
+    `) as unknown as TypedDocumentString<MarkConsentSheetShownMutation, MarkConsentSheetShownMutationVariables>;

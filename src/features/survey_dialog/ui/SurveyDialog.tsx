@@ -34,28 +34,35 @@ const COPY: Record<Variant, { title: string; description: string; chat: [string,
  *
  * @example
  * ```tsx
- * <SurveyDialog />
+ * <SurveyDialog onSettled={(shown) => ...} />
  * ```
+ * @param onSettled 노출 여부가 정해지면 한 번 호출된다. 같은 세션의 다른 팝업(동의 시트) 노출 판단용
  */
-export const SurveyDialog = () => {
+export const SurveyDialog = ({ onSettled }: { onSettled?: (shown: boolean) => void }) => {
   const userId = useMeQuery().data?.me.userId
   const [survey, setSurvey] = useState<{ variant: Variant; url: string } | null>(null)
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    if (!userId || localStorage.getItem(DISMISSED_KEY)) return
+    if (!userId) return
+    if (localStorage.getItem(DISMISSED_KEY)) return onSettled?.(false)
 
-    whenAmplitudeReady().then(async () => {
-      const experiment = amplitude.experiment()
-      if (!experiment) return
-      await experiment.fetch({ user_id: userId })
-      const { value, payload } = experiment.variant(FLAG_KEY)
-      // 대시보드에 등록된 url을 가져옴
-      const url: unknown = typeof payload === 'string' ? payload : payload?.url
-      if (!isVariant(value) || typeof url !== 'string') return
-      setSurvey({ variant: value, url })
-      setIsOpen(true)
-    })
+    whenAmplitudeReady()
+      .then(async () => {
+        const experiment = amplitude.experiment()
+        if (!experiment) return onSettled?.(false)
+        await experiment.fetch({ user_id: userId })
+        const { value, payload } = experiment.variant(FLAG_KEY)
+        // 대시보드에 등록된 url을 가져옴
+        const url: unknown = typeof payload === 'string' ? payload : payload?.url
+        if (!isVariant(value) || typeof url !== 'string') return onSettled?.(false)
+        setSurvey({ variant: value, url })
+        setIsOpen(true)
+        onSettled?.(true)
+      })
+      .catch(() => onSettled?.(false))
+    // onSettled는 마운트 시점 판단용이라 deps에서 제외
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
   if (!survey) return null

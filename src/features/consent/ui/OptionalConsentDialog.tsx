@@ -1,0 +1,77 @@
+'use client'
+import { useEffect, useState } from 'react'
+import { useMarkConsentSheetShown, useUpdateOptionalConsents } from '@entities/user'
+import { Checkbox } from '@shared/ui/checkbox'
+import { Button, Text } from '@shared/ui'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog'
+import { CONSENTS, MARKETING_RECONFIRM_NOTE, type OPTIONAL_CONSENTS } from '../model/consents'
+
+type OptionalKey = (typeof OPTIONAL_CONSENTS)[number]
+
+const ITEMS: Array<{ type: OptionalKey; description: string }> = [
+  { type: 'RESEARCH', description: CONSENTS.RESEARCH.description },
+  { type: 'MARKETING_EMAIL', description: `${CONSENTS.MARKETING_EMAIL.description}\n${MARKETING_RECONFIRM_NOTE}` }
+]
+
+/**
+ * 기존 가입자에게 홈에서 한 번 띄우는 선택 동의 시트. 열리는 순간 노출 기록을 남겨 다시 뜨지 않는다.
+ * 노출 여부(consentSheetRequired, 인터뷰 모달과의 우선순위)는 호출부가 판단한다.
+ */
+export const OptionalConsentDialog = () => {
+  const [isOpen, setIsOpen] = useState(true)
+  // 선택 항목은 반드시 해제 상태로 시작한다
+  const [checked, setChecked] = useState<Record<OptionalKey, boolean>>({ RESEARCH: false, MARKETING_EMAIL: false })
+  const { mutate: markShown } = useMarkConsentSheetShown()
+  const { mutate: update, isPending } = useUpdateOptionalConsents()
+
+  useEffect(() => markShown(), [markShown])
+
+  const set = (key: OptionalKey) => (value: boolean) => setChecked((prev) => ({ ...prev, [key]: value }))
+
+  const handleSave = () => update({ research: checked.RESEARCH, marketingEmail: checked.MARKETING_EMAIL, source: 'EXISTING_USER_SHEET' }, { onSuccess: () => setIsOpen(false) })
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent showCloseButton={false} onOpenAutoFocus={(event) => event.preventDefault()} className={'bg-bg-white flex w-102.5 flex-col gap-5 rounded-2xl p-6'}>
+        <div className={'flex flex-col gap-1'}>
+          <DialogTitle className={'text-heading2 text-text-bolder'}>받아 볼 안내를 골라 주세요</DialogTitle>
+          <DialogDescription className={'text-body2 text-text-subtler'}>동의하지 않아도 지금처럼 이용할 수 있어요.</DialogDescription>
+        </div>
+
+        <div className={'flex flex-col gap-4'}>
+          <div className={'border-border-subtler flex flex-col gap-5 rounded-xl border p-4'}>
+            {ITEMS.map(({ type, description }) => (
+              <div key={type} className={'flex w-full items-start gap-2.5'}>
+                <label className={'flex min-w-0 flex-1 cursor-pointer items-start gap-2.5'}>
+                  <span className={'flex h-4.5 w-4 shrink-0 items-end'}>
+                    <Checkbox checked={checked[type]} onCheckedChange={(value) => set(type)(value === true)} />
+                  </span>
+                  <span className={'flex min-w-0 flex-1 flex-col gap-1'}>
+                    <span className={'text-body2 flex items-center gap-1.5'}>
+                      <span className={'text-text-subtle font-semibold'}>선택</span>
+                      <span className={'text-text-basic'}>{CONSENTS[type].title}</span>
+                    </span>
+                    <Text variant={'caption1'} color={'text-subtler'} className={'whitespace-pre-line'}>
+                      {description}
+                    </Text>
+                  </span>
+                </label>
+                <a href={CONSENTS[type].url} target={'_blank'} rel={'noopener noreferrer'} className={'text-label2 text-text-subtle shrink-0 underline'}>
+                  보기
+                </a>
+              </div>
+            ))}
+          </div>
+          <div className={'flex gap-2'}>
+            <Button variant={'tertiary'} className={'flex-1'} onClick={() => setIsOpen(false)}>
+              괜찮아요
+            </Button>
+            <Button className={'flex-1'} disabled={(!checked.RESEARCH && !checked.MARKETING_EMAIL) || isPending} onClick={handleSave}>
+              저장하기
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
