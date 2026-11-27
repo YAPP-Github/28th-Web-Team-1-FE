@@ -61,7 +61,6 @@ export const SurveyDialog = ({ onSettled }: { onSettled?: (shown: boolean) => vo
         onSettled?.(true)
       })
       .catch(() => onSettled?.(false))
-    // onSettled는 마운트 시점 판단용이라 deps에서 제외
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
