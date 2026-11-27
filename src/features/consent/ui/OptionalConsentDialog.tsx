@@ -4,7 +4,7 @@ import { useMarkConsentSheetShown, useUpdateOptionalConsents } from '@entities/u
 import { Checkbox } from '@shared/ui/checkbox'
 import { Button, Text } from '@shared/ui'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog'
-import { OPTIONAL_CONSENTS, fillChecks } from '../model/consents'
+import { INITIAL_CHECKS, OPTIONAL_CONSENTS } from '../model/consents'
 
 /**
  * 기존 가입자에게 홈에서 한 번 띄우는 선택 동의 시트. 열리는 순간 노출 기록을 남겨 다시 뜨지 않는다.
@@ -12,7 +12,7 @@ import { OPTIONAL_CONSENTS, fillChecks } from '../model/consents'
  */
 export const OptionalConsentDialog = () => {
   const [isOpen, setIsOpen] = useState(true)
-  const [checked, setChecked] = useState(() => fillChecks(false))
+  const [checked, setChecked] = useState(INITIAL_CHECKS)
   const { mutate: markShown } = useMarkConsentSheetShown()
   const { mutate: update, isPending } = useUpdateOptionalConsents()
 
@@ -29,7 +29,7 @@ export const OptionalConsentDialog = () => {
         </div>
 
         <div className={'flex flex-col gap-4'}>
-          <div className={'border-border-subtler flex flex-col gap-5 rounded-xl border p-4'}>
+          <div className={'border-border-subtler flex flex-col gap-5 rounded-lg border p-4'}>
             {OPTIONAL_CONSENTS.map((consent) => (
               <div key={consent.type} className={'flex w-full items-start gap-2.5'}>
                 <label className={'flex min-w-0 flex-1 cursor-pointer items-start gap-2.5'}>
@@ -37,9 +37,9 @@ export const OptionalConsentDialog = () => {
                     <Checkbox checked={checked[consent.field]} onCheckedChange={(value) => setChecked((prev) => ({ ...prev, [consent.field]: value === true }))} />
                   </span>
                   <span className={'flex min-w-0 flex-1 flex-col gap-1'}>
-                    <span className={'text-body2 flex items-center gap-1.5'}>
-                      <span className={'text-text-subtle font-semibold'}>선택</span>
-                      <span className={'text-text-basic'}>{consent.title}</span>
+                    <span className={'flex items-center gap-1.5'}>
+                      <span className={'text-label1 text-text-subtle font-semibold'}>선택</span>
+                      <span className={'text-body2 text-text-basic'}>{consent.title}</span>
                     </span>
                     <Text variant={'caption1'} color={'text-subtler'} className={'whitespace-pre-line'}>
                       {consent.description}

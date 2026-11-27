@@ -31,5 +31,5 @@ export const CONSENTS: Consent[] = [
 export const REQUIRED_CONSENTS = CONSENTS.filter((consent) => consent.isRequired)
 export const OPTIONAL_CONSENTS = CONSENTS.filter((consent) => !consent.isRequired)
 
-/** 체크 상태를 한 값으로 채운다. 선택 항목은 반드시 해제 상태로 시작해야 하므로 초기값은 `fillChecks(false)`. */
-export const fillChecks = (value: boolean): Record<ConsentField, boolean> => ({ terms: value, privacy: value, research: value, marketingEmail: value })
+/** 동의 시트 체크 초기값. 선택 항목은 반드시 해제 상태로 시작해야 한다. */
+export const INITIAL_CHECKS = Object.fromEntries(CONSENTS.map(({ field }) => [field, false])) as Record<ConsentField, boolean>

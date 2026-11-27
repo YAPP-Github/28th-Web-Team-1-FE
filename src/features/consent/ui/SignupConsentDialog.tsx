@@ -4,14 +4,14 @@ import { useAgreeSignupConsents } from '@entities/user'
 import { Checkbox } from '@shared/ui/checkbox'
 import { Button, Text } from '@shared/ui'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@shared/ui/dialog'
-import { CONSENTS, REQUIRED_CONSENTS, fillChecks } from '../model/consents'
+import { CONSENTS, INITIAL_CHECKS, REQUIRED_CONSENTS, type ConsentField } from '../model/consents'
 
-/**
- * 가입 직후 필수 동의가 없는 유저에게 띄우는 동의 시트.
- */
+const ALL_CHECKED: Record<ConsentField, boolean> = { terms: true, privacy: true, research: true, marketingEmail: true }
+
+// 가입 직후 필수 동의가 없는 유저에게 띄우는 동의 시트.
 export const SignupConsentDialog = () => {
   const { mutate, isPending } = useAgreeSignupConsents()
-  const [checked, setChecked] = useState(() => fillChecks(false))
+  const [checked, setChecked] = useState(INITIAL_CHECKS)
 
   const isAllChecked = CONSENTS.every(({ field }) => checked[field])
   const isSubmittable = REQUIRED_CONSENTS.every(({ field }) => checked[field])
@@ -36,7 +36,7 @@ export const SignupConsentDialog = () => {
           <div className={'flex flex-col gap-5'}>
             <label className={'bg-bg-gray-subtler flex cursor-pointer items-center justify-between rounded-xl px-4 py-3.5'}>
               <span className={'flex items-center gap-2.5'}>
-                <Checkbox checked={isAllChecked} onCheckedChange={(value) => setChecked(fillChecks(value === true))} />
+                <Checkbox checked={isAllChecked} onCheckedChange={(value) => setChecked(value === true ? ALL_CHECKED : INITIAL_CHECKS)} />
                 <Text variant={'headline2'} color={'text-bolder'}>
                   전체 동의
                 </Text>
