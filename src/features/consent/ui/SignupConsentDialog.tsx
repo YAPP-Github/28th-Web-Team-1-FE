@@ -19,7 +19,7 @@ export const SignupConsentDialog = () => {
 
   const handleSubmit = () =>
     mutate(checked, {
-      onError: () => toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.')
+      onError: () => toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.', { position: 'top-center' })
     })
 
   return (

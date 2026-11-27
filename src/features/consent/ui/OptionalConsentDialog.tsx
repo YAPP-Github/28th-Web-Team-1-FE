@@ -24,7 +24,7 @@ export const OptionalConsentDialog = () => {
       { ...checked, source: 'EXISTING_USER_SHEET' },
       {
         onSuccess: () => setIsOpen(false),
-        onError: () => toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.')
+        onError: () => toast.error('일시적인 오류가 생겼어요. 잠시 후 다시 시도해 주세요.', { position: 'top-center' })
       }
     )
 
