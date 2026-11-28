@@ -62,8 +62,11 @@ type Documents = {
     "\n  fragment ResumeCertificateFields on ResumeCertificatePayload {\n    name\n    organization\n    acquiredAt\n  }\n": typeof types.ResumeCertificateFieldsFragmentDoc,
     "\n  fragment ResumeSkillFields on ResumeSkillPayload {\n    name\n    level\n  }\n": typeof types.ResumeSkillFieldsFragmentDoc,
     "\n  query Resume($resumeId: ID!, $workspaceId: ID!) {\n    resume(resumeId: $resumeId, workspaceId: $workspaceId) {\n      resumeId\n      status\n      template\n      targetJd {\n        jdId\n        companyName\n        positionTitle\n      }\n      sections {\n        sectionId\n        type\n        displayText\n        displayOrder\n        visible\n        items {\n          itemId\n          displayOrder\n          visible\n          payload {\n            basicInfo {\n              ...ResumeBasicInfoFields\n            }\n            coreSkill {\n              ...ResumeCoreSkillFields\n            }\n            career {\n              ...ResumeCareerFields\n            }\n            experience {\n              ...ResumeExperienceFields\n            }\n            education {\n              ...ResumeEducationFields\n            }\n            award {\n              ...ResumeAwardFields\n            }\n            language {\n              ...ResumeLanguageFields\n            }\n            certificate {\n              ...ResumeCertificateFields\n            }\n            skill {\n              ...ResumeSkillFields\n            }\n          }\n        }\n      }\n    }\n  }\n": typeof types.ResumeDocument,
-    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": typeof types.MeDocument,
+    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n      consentSheetRequired\n      consents {\n        type\n        agreed\n        changedAt\n      }\n    }\n  }\n": typeof types.MeDocument,
     "\n  query UserWorkspaces {\n    me {\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": typeof types.UserWorkspacesDocument,
+    "\n  mutation AgreeSignupConsents($request: AgreeSignupConsentsRequest!) {\n    agreeSignupConsents(request: $request) {\n      type\n      agreed\n      changedAt\n    }\n  }\n": typeof types.AgreeSignupConsentsDocument,
+    "\n  mutation UpdateOptionalConsents($request: UpdateOptionalConsentsRequest!) {\n    updateOptionalConsents(request: $request) {\n      type\n      agreed\n      changedAt\n    }\n  }\n": typeof types.UpdateOptionalConsentsDocument,
+    "\n  mutation MarkConsentSheetShown {\n    markConsentSheetShown\n  }\n": typeof types.MarkConsentSheetShownDocument,
 };
 const documents: Documents = {
     "\n  query Experiences($workspaceId: ID!, $size: Int!, $cursor: String) {\n    experiences(workspaceId: $workspaceId, size: $size, cursor: $cursor) {\n      cursor {\n        hasNext\n        nextCursor\n      }\n      experiences {\n        experienceId\n        title\n        tags\n        project {\n          projectId\n          name\n          role\n          period {\n            startAt\n            endAt\n          }\n        }\n      }\n    }\n  }\n": types.ExperiencesDocument,
@@ -113,8 +116,11 @@ const documents: Documents = {
     "\n  fragment ResumeCertificateFields on ResumeCertificatePayload {\n    name\n    organization\n    acquiredAt\n  }\n": types.ResumeCertificateFieldsFragmentDoc,
     "\n  fragment ResumeSkillFields on ResumeSkillPayload {\n    name\n    level\n  }\n": types.ResumeSkillFieldsFragmentDoc,
     "\n  query Resume($resumeId: ID!, $workspaceId: ID!) {\n    resume(resumeId: $resumeId, workspaceId: $workspaceId) {\n      resumeId\n      status\n      template\n      targetJd {\n        jdId\n        companyName\n        positionTitle\n      }\n      sections {\n        sectionId\n        type\n        displayText\n        displayOrder\n        visible\n        items {\n          itemId\n          displayOrder\n          visible\n          payload {\n            basicInfo {\n              ...ResumeBasicInfoFields\n            }\n            coreSkill {\n              ...ResumeCoreSkillFields\n            }\n            career {\n              ...ResumeCareerFields\n            }\n            experience {\n              ...ResumeExperienceFields\n            }\n            education {\n              ...ResumeEducationFields\n            }\n            award {\n              ...ResumeAwardFields\n            }\n            language {\n              ...ResumeLanguageFields\n            }\n            certificate {\n              ...ResumeCertificateFields\n            }\n            skill {\n              ...ResumeSkillFields\n            }\n          }\n        }\n      }\n    }\n  }\n": types.ResumeDocument,
-    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": types.MeDocument,
+    "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n      consentSheetRequired\n      consents {\n        type\n        agreed\n        changedAt\n      }\n    }\n  }\n": types.MeDocument,
     "\n  query UserWorkspaces {\n    me {\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n": types.UserWorkspacesDocument,
+    "\n  mutation AgreeSignupConsents($request: AgreeSignupConsentsRequest!) {\n    agreeSignupConsents(request: $request) {\n      type\n      agreed\n      changedAt\n    }\n  }\n": types.AgreeSignupConsentsDocument,
+    "\n  mutation UpdateOptionalConsents($request: UpdateOptionalConsentsRequest!) {\n    updateOptionalConsents(request: $request) {\n      type\n      agreed\n      changedAt\n    }\n  }\n": types.UpdateOptionalConsentsDocument,
+    "\n  mutation MarkConsentSheetShown {\n    markConsentSheetShown\n  }\n": types.MarkConsentSheetShownDocument,
 };
 
 /**
@@ -308,11 +314,23 @@ export function graphql(source: "\n  query Resume($resumeId: ID!, $workspaceId: 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n"): typeof import('./graphql').MeDocument;
+export function graphql(source: "\n  query Me {\n    me {\n      userId\n      name\n      profileImageUrl\n      email\n      workspaces {\n        workspaceId\n      }\n      consentSheetRequired\n      consents {\n        type\n        agreed\n        changedAt\n      }\n    }\n  }\n"): typeof import('./graphql').MeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query UserWorkspaces {\n    me {\n      workspaces {\n        workspaceId\n      }\n    }\n  }\n"): typeof import('./graphql').UserWorkspacesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AgreeSignupConsents($request: AgreeSignupConsentsRequest!) {\n    agreeSignupConsents(request: $request) {\n      type\n      agreed\n      changedAt\n    }\n  }\n"): typeof import('./graphql').AgreeSignupConsentsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateOptionalConsents($request: UpdateOptionalConsentsRequest!) {\n    updateOptionalConsents(request: $request) {\n      type\n      agreed\n      changedAt\n    }\n  }\n"): typeof import('./graphql').UpdateOptionalConsentsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation MarkConsentSheetShown {\n    markConsentSheetShown\n  }\n"): typeof import('./graphql').MarkConsentSheetShownDocument;
 
 
 export function graphql(source: string) {

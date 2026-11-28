@@ -7,9 +7,8 @@ import { JDAnalysisForm } from './JDAnalysisForm'
 import { RecommendedJdSection } from './RecommendedJdSection'
 import { HomeViewTracker } from './HomeViewTracker'
 import homeGradientDesktop from '../assets/home_gradient_desktop.webp'
+import { HomePopups } from './HomePopups'
 import { TextLogo } from '@/src/shared/icon'
-
-import { SurveyDialog } from '@features/survey_dialog'
 
 const { props: desktopImageProps } = getImageProps({ src: homeGradientDesktop, alt: '', sizes: '100vw' })
 
@@ -17,8 +16,7 @@ export const HomePage = () => {
   return (
     <Flex direction={'column'} className={'min-h-0 flex-1 overflow-y-auto'}>
       <HomeViewTracker />
-      {/** TODO : 설문 종료 후 삭제 필요 */}
-      <SurveyDialog />
+      <HomePopups />
       <Flex
         direction={'column'}
         align={{ initial: 'start', sm: 'center' }}

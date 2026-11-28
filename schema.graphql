@@ -12,6 +12,21 @@ This directive disables error propagation when a non nullable field returns null
 """
 directive @experimental_disableErrorPropagation on MUTATION | QUERY | SUBSCRIPTION
 
+"""가입 시 약관 동의 요청입니다."""
+input AgreeSignupConsentsRequest {
+  """광고성 정보 수신(이메일) 동의 여부입니다."""
+  marketingEmail: Boolean
+
+  """개인정보 수집/이용 동의 여부입니다."""
+  privacy: Boolean!
+
+  """서비스 개선 리서치 참여 안내 수신 동의 여부입니다."""
+  research: Boolean
+
+  """이용약관 동의 여부입니다."""
+  terms: Boolean!
+}
+
 """Notion 연결 요청입니다."""
 input ConnectNotionRequest {
   """Notion OAuth authorization code입니다."""
@@ -19,6 +34,30 @@ input ConnectNotionRequest {
 
   """Notion OAuth redirect URI입니다."""
   redirectUri: String!
+}
+
+"""선택 동의를 변경한 경로입니다."""
+enum ConsentChangeSource {
+  """기존 가입자 동의 시트에서 변경했습니다."""
+  EXISTING_USER_SHEET
+
+  """마이페이지에서 변경했습니다."""
+  MYPAGE
+}
+
+"""저장하는 동의 항목의 유형입니다."""
+enum ConsentType {
+  """광고성 정보 수신(이메일) 동의입니다."""
+  MARKETING_EMAIL
+
+  """개인정보 수집/이용 동의입니다."""
+  PRIVACY
+
+  """서비스 개선 리서치 참여 안내 수신 동의입니다. (인터뷰, 설문, 사용성 테스트 참여 요청)"""
+  RESEARCH
+
+  """이용약관 동의입니다."""
+  TERMS
 }
 
 """경험 프로젝트 생성 입력입니다."""
@@ -476,6 +515,12 @@ enum JdStatus {
 scalar Long
 
 type Mutation {
+  """가입에 필요한 동의와 선택 동의를 저장합니다."""
+  agreeSignupConsents(
+    """저장할 가입 동의 항목입니다."""
+    request: AgreeSignupConsentsRequest!
+  ): [UserConsent!]!
+
   """워크스페이스에 Notion을 연결합니다."""
   connectNotion(
     """Notion 연결 요청입니다."""
@@ -573,6 +618,9 @@ type Mutation {
     workspaceId: ID!
   ): Boolean!
 
+  """기존 가입자 동의 시트를 노출한 것으로 기록합니다."""
+  markConsentSheetShown: Boolean!
+
   """
   이력서 생성이 완료된 JD를 완료 상태(COMPLETED)로 전환합니다. (AR0001 진행 중 -> 완료)
   이미 완료면 그대로 반환하며, 워크스페이스 밖 JD면 오류를 반환합니다.
@@ -655,6 +703,12 @@ type Mutation {
     """경험 프로젝트가 속한 워크스페이스 ID입니다."""
     workspaceId: ID!
   ): ExperienceProject!
+
+  """선택 동의 상태를 변경합니다."""
+  updateOptionalConsents(
+    """변경할 선택 동의 항목입니다."""
+    request: UpdateOptionalConsentsRequest!
+  ): [UserConsent!]!
 
   """
   이력서 기본 정보 프로필을 수정합니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다 (빈 리스트 = 비우기, 배열 순서 = 노출 순서).
@@ -1806,6 +1860,18 @@ input UpdateExperienceRequest {
   title: String!
 }
 
+"""선택 동의 변경 요청입니다."""
+input UpdateOptionalConsentsRequest {
+  """광고성 정보 수신(이메일) 동의 여부입니다."""
+  marketingEmail: Boolean
+
+  """서비스 개선 리서치 참여 안내 수신 동의 여부입니다."""
+  research: Boolean
+
+  """선택 동의를 변경한 경로입니다."""
+  source: ConsentChangeSource!
+}
+
 """프로필 수정 입력입니다. null 필드는 미변경, 섹션 리스트는 전체 교체됩니다."""
 input UpdateProfileRequest {
   """변경할 수상 목록입니다. (전체 교체)"""
@@ -1841,6 +1907,12 @@ input UpdateProfileRequest {
 
 """사용자 정보입니다."""
 type User {
+  """기존 가입자에게 동의 시트를 보여야 하는지 반환합니다."""
+  consentSheetRequired: Boolean!
+
+  """동의 유형별 최신 동의 상태를 반환합니다."""
+  consents: [UserConsent!]!
+
   """이메일입니다."""
   email: String!
 
@@ -1855,6 +1927,18 @@ type User {
 
   """사용자가 속한 워크스페이스 목록입니다."""
   workspaces: [Workspace!]!
+}
+
+"""사용자의 특정 동의 상태입니다."""
+type UserConsent {
+  """동의 여부입니다."""
+  agreed: Boolean!
+
+  """동의 상태가 변경된 시각입니다."""
+  changedAt: String!
+
+  """동의 유형입니다."""
+  type: ConsentType!
 }
 
 """워크스페이스 정보입니다."""
